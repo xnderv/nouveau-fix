@@ -1,0 +1,8 @@
+00:41:48 Опыт: режимы 0f 03 (драйвер: /lib/modules/7.0.0-38-generic/updates/nouveau-fix/nouveau.ko)
+00:41:48   lab_core = Y
+00:41:48   lab_disp_pause = 1
+00:41:48   lab_mem = N
+00:41:48   lab_pcie = N
+00:41:49   lab_volt_first = Y
+00:41:49 Исходно: AC: core 50 MHz memory 135 MHz; GPU 36°C, вентилятор 1470 об/мин, pwm 40
+00:41:49 Переключаю в режим 0f...
