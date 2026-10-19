@@ -1,0 +1,359 @@
+00:21:31 Опыт: режимы 07 03 (драйвер: /lib/modules/7.0.0-38-generic/updates/nouveau-fix/nouveau.ko)
+00:21:31   lab_core = Y
+00:21:31   lab_mem = Y
+00:21:32   lab_pcie = Y
+00:21:32   lab_volt_first = Y
+00:21:32 Исходно: AC: core 50 MHz memory 135 MHz; GPU 37°C, вентилятор 1440 об/мин, pwm 40
+00:21:32 Переключаю в режим 07...
+00:21:33 Сейчас: AC: core 405 MHz memory 135 MHz; GPU 38°C, вентилятор 1440 об/мин, pwm 40
+00:21:48 НЕТ ПОДТВЕРЖДЕНИЯ после режима 07. Пробую вернуть режим 03.
+00:22:11 Карта не отвечает. Сохраняю журнал и перезагружаюсь сам.
+Oct 20 00:20:07.963210 host kernel: Command line: BOOT_IMAGE=/boot/vmlinuz-7.0.0-38-generic root=UUID=8a895fc3-d38d-42c3-a875-351b55115818 ro quiet splash nouveau.hdmimhz=297 nouveau.debug=clk=trace,fb=trace,volt=trace,pmu=debug crashkernel=2G-4G:320M,4G-32G:512M,32G-64G:1024M,64G-128G:2048M,128G-:4096M
+Oct 20 00:20:07.964687 host kernel: Kernel command line: BOOT_IMAGE=/boot/vmlinuz-7.0.0-38-generic root=UUID=8a895fc3-d38d-42c3-a875-351b55115818 ro quiet splash nouveau.hdmimhz=297 nouveau.debug=clk=trace,fb=trace,volt=trace,pmu=debug crashkernel=2G-4G:320M,4G-32G:512M,32G-64G:1024M,64G-128G:2048M,128G-:4096M
+Oct 20 00:20:07.987104 host kernel: NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+Oct 20 00:20:08.862297 host kernel: nouveau: loading out-of-tree module taints kernel.
+Oct 20 00:20:08.862346 host kernel: nouveau: module verification failed: signature and/or required key missing - tainting kernel
+Oct 20 00:20:09.074298 host kernel: nouveau 0000:01:00.0: NVIDIA GF114 (0ce000a1)
+Oct 20 00:20:09.213292 host kernel: nouveau 0000:01:00.0: bios: version 70.24.11.00.01
+Oct 20 00:20:09.213554 host kernel: nouveau 0000:01:00.0: volt: min: 825000uv max: 1150000uv
+Oct 20 00:20:09.213766 host kernel: nouveau 0000:01:00.0: volt: VID 05: 1150000uv
+Oct 20 00:20:09.213958 host kernel: nouveau 0000:01:00.0: volt: VID 06: 1137500uv
+Oct 20 00:20:09.214148 host kernel: nouveau 0000:01:00.0: volt: VID 07: 1125000uv
+Oct 20 00:20:09.214350 host kernel: nouveau 0000:01:00.0: volt: VID 08: 1112500uv
+Oct 20 00:20:09.214539 host kernel: nouveau 0000:01:00.0: volt: VID 09: 1100000uv
+Oct 20 00:20:09.214725 host kernel: nouveau 0000:01:00.0: volt: VID 0a: 1087500uv
+Oct 20 00:20:09.214920 host kernel: nouveau 0000:01:00.0: volt: VID 0b: 1075000uv
+Oct 20 00:20:09.215100 host kernel: nouveau 0000:01:00.0: volt: VID 0c: 1062500uv
+Oct 20 00:20:09.215359 host kernel: nouveau 0000:01:00.0: volt: VID 0d: 1050000uv
+Oct 20 00:20:09.215787 host kernel: nouveau 0000:01:00.0: volt: VID 0e: 1037500uv
+Oct 20 00:20:09.216211 host kernel: nouveau 0000:01:00.0: volt: VID 0f: 1025000uv
+Oct 20 00:20:09.216656 host kernel: nouveau 0000:01:00.0: volt: VID 10: 1012500uv
+Oct 20 00:20:09.217097 host kernel: nouveau 0000:01:00.0: volt: VID 11: 1000000uv
+Oct 20 00:20:09.217548 host kernel: nouveau 0000:01:00.0: volt: VID 12: 987500uv
+Oct 20 00:20:09.217978 host kernel: nouveau 0000:01:00.0: volt: VID 13: 975000uv
+Oct 20 00:20:09.218419 host kernel: nouveau 0000:01:00.0: volt: VID 14: 962500uv
+Oct 20 00:20:09.218843 host kernel: nouveau 0000:01:00.0: volt: VID 15: 950000uv
+Oct 20 00:20:09.219278 host kernel: nouveau 0000:01:00.0: volt: VID 16: 937500uv
+Oct 20 00:20:09.219710 host kernel: nouveau 0000:01:00.0: volt: VID 17: 925000uv
+Oct 20 00:20:09.220137 host kernel: nouveau 0000:01:00.0: volt: VID 18: 912500uv
+Oct 20 00:20:09.220583 host kernel: nouveau 0000:01:00.0: volt: VID 19: 900000uv
+Oct 20 00:20:09.221018 host kernel: nouveau 0000:01:00.0: volt: VID 1a: 887500uv
+Oct 20 00:20:09.221464 host kernel: nouveau 0000:01:00.0: volt: VID 1b: 875000uv
+Oct 20 00:20:09.221917 host kernel: nouveau 0000:01:00.0: volt: VID 1c: 862500uv
+Oct 20 00:20:09.222393 host kernel: nouveau 0000:01:00.0: volt: VID 1d: 850000uv
+Oct 20 00:20:09.222762 host kernel: nouveau 0000:01:00.0: volt: VID 1e: 837500uv
+Oct 20 00:20:09.222940 host kernel: nouveau 0000:01:00.0: volt: VID 1f: 825000uv
+Oct 20 00:20:09.223146 host kernel: nouveau 0000:01:00.0: clk: 16:     270000 KHz
+Oct 20 00:20:09.223580 host kernel: nouveau 0000:01:00.0: clk: 15:     540000 KHz
+Oct 20 00:20:09.223993 host kernel: nouveau 0000:01:00.0: clk: 18:     135000 KHz
+Oct 20 00:20:09.224399 host kernel: nouveau 0000:01:00.0: clk: 13:     101000 KHz
+Oct 20 00:20:09.224659 host kernel: nouveau 0000:01:00.0: clk: 14:     270000 KHz
+Oct 20 00:20:09.224919 host kernel: nouveau 0000:01:00.0: clk: 12:     135000 KHz
+Oct 20 00:20:09.225181 host kernel: nouveau 0000:01:00.0: clk: 1b:     135000 KHz
+Oct 20 00:20:09.225458 host kernel: nouveau 0000:01:00.0: clk: 19:     203000 KHz
+Oct 20 00:20:09.225721 host kernel: nouveau 0000:01:00.0: clk: 17:     270000 KHz
+Oct 20 00:20:09.225986 host kernel: nouveau 0000:01:00.0: clk: 03: core 50 MHz memory 135 MHz 
+Oct 20 00:20:09.226378 host kernel: nouveau 0000:01:00.0: clk: 16:     810000 KHz
+Oct 20 00:20:09.226808 host kernel: nouveau 0000:01:00.0: clk: 15:     810000 KHz
+Oct 20 00:20:09.227230 host kernel: nouveau 0000:01:00.0: clk: 18:     405000 KHz
+Oct 20 00:20:09.227673 host kernel: nouveau 0000:01:00.0: clk: 13:     810000 KHz
+Oct 20 00:20:09.228096 host kernel: nouveau 0000:01:00.0: clk: 14:     810000 KHz
+Oct 20 00:20:09.228536 host kernel: nouveau 0000:01:00.0: clk: 12:     324000 KHz
+Oct 20 00:20:09.228965 host kernel: nouveau 0000:01:00.0: clk: 1b:     405000 KHz
+Oct 20 00:20:09.229405 host kernel: nouveau 0000:01:00.0: clk: 19:     203000 KHz
+Oct 20 00:20:09.229829 host kernel: nouveau 0000:01:00.0: clk: 17:     810000 KHz
+Oct 20 00:20:09.230270 host kernel: nouveau 0000:01:00.0: clk: 07: core 405 MHz memory 324 MHz 
+Oct 20 00:20:09.230688 host kernel: nouveau 0000:01:00.0: clk: 16:    1645000 KHz
+Oct 20 00:20:09.231113 host kernel: nouveau 0000:01:00.0: clk: 15:    1645000 KHz
+Oct 20 00:20:09.231554 host kernel: nouveau 0000:01:00.0: clk: 18:     540000 KHz
+Oct 20 00:20:09.232026 host kernel: nouveau 0000:01:00.0: clk: 13:    1800000 KHz
+Oct 20 00:20:09.232333 host kernel: nouveau 0000:01:00.0: clk: 14:    1907000 KHz
+Oct 20 00:20:09.232767 host kernel: nouveau 0000:01:00.0: clk: 12:    2004000 KHz
+Oct 20 00:20:09.233197 host kernel: nouveau 0000:01:00.0: clk: 1b:     540000 KHz
+Oct 20 00:20:09.233652 host kernel: nouveau 0000:01:00.0: clk: 19:     203000 KHz
+Oct 20 00:20:09.234075 host kernel: nouveau 0000:01:00.0: clk: 17:    1907000 KHz
+Oct 20 00:20:09.234548 host kernel: nouveau 0000:01:00.0: clk: 0f: core 900 MHz memory 2004 MHz 
+Oct 20 00:20:09.239292 host kernel: nouveau 0000:01:00.0: vgaarb: deactivate vga console
+Oct 20 00:20:09.239522 host kernel: nouveau 0000:01:00.0: fb: preinit running...
+Oct 20 00:20:09.239710 host kernel: nouveau 0000:01:00.0: fb: preinit completed in 0us
+Oct 20 00:20:09.239900 host kernel: nouveau 0000:01:00.0: volt: preinit running...
+Oct 20 00:20:09.240085 host kernel: nouveau 0000:01:00.0: volt: preinit completed in 0us
+Oct 20 00:20:09.240295 host kernel: nouveau 0000:01:00.0: clk: preinit running...
+Oct 20 00:20:09.240476 host kernel: nouveau 0000:01:00.0: clk: preinit completed in 0us
+Oct 20 00:20:09.261266 host kernel: nouveau 0000:01:00.0: clk: reset running...
+Oct 20 00:20:09.261507 host kernel: nouveau 0000:01:00.0: clk: reset completed in 0us
+Oct 20 00:20:09.261699 host kernel: nouveau 0000:01:00.0: volt: reset running...
+Oct 20 00:20:09.261886 host kernel: nouveau 0000:01:00.0: volt: reset completed in 0us
+Oct 20 00:20:09.262076 host kernel: nouveau 0000:01:00.0: fb: reset running...
+Oct 20 00:20:09.262289 host kernel: nouveau 0000:01:00.0: fb: reset completed in 0us
+Oct 20 00:20:09.262474 host kernel: nouveau 0000:01:00.0: fb: init running...
+Oct 20 00:20:09.262655 host kernel: nouveau 0000:01:00.0: fb: one-time init running...
+Oct 20 00:20:09.262837 host kernel: nouveau 0000:01:00.0: fb: 4 FBP(s)
+Oct 20 00:20:09.263019 host kernel: nouveau 0000:01:00.0: fb: FBP 0:  256 MiB, 1 LTC(s)
+Oct 20 00:20:09.263199 host kernel: nouveau 0000:01:00.0: fb: FBP 1:  256 MiB, 1 LTC(s)
+Oct 20 00:20:09.263412 host kernel: nouveau 0000:01:00.0: fb: FBP 2:  256 MiB, 1 LTC(s)
+Oct 20 00:20:09.263593 host kernel: nouveau 0000:01:00.0: fb: FBP 3:  256 MiB, 1 LTC(s)
+Oct 20 00:20:09.263777 host kernel: nouveau 0000:01:00.0: fb: Lower: 1024 MiB @ 0000000000
+Oct 20 00:20:09.263958 host kernel: nouveau 0000:01:00.0: fb: Upper:    0 MiB @ 0210000000
+Oct 20 00:20:09.264139 host kernel: nouveau 0000:01:00.0: fb: Total: 1024 MiB
+Oct 20 00:20:09.264350 host kernel: nouveau 0000:01:00.0: fb: 1024 MiB GDDR5
+Oct 20 00:20:09.265282 host kernel: nouveau 0000:01:00.0: fb: one-time init completed in 3502us
+Oct 20 00:20:09.265520 host kernel: nouveau 0000:01:00.0: fb: init completed in 3591us
+Oct 20 00:20:09.270288 host kernel: nouveau 0000:01:00.0: volt: init running...
+Oct 20 00:20:09.270517 host kernel: nouveau 0000:01:00.0: volt: one-time init running...
+Oct 20 00:20:09.270710 host kernel: nouveau 0000:01:00.0: volt: speedo 5c5
+Oct 20 00:20:09.270904 host kernel: nouveau 0000:01:00.0: volt: one-time init completed in 5us
+Oct 20 00:20:09.271098 host kernel: nouveau 0000:01:00.0: volt: current voltage: 950000uv
+Oct 20 00:20:09.271295 host kernel: nouveau 0000:01:00.0: volt: init completed in 15us
+Oct 20 00:20:09.271479 host kernel: nouveau 0000:01:00.0: iccsense: found invalid sensor id: 1, power readingmight be invalid
+Oct 20 00:20:09.272309 host kernel: nouveau 0000:01:00.0: iccsense: found invalid sensor id: 2, power readingmight be invalid
+Oct 20 00:20:09.273293 host kernel: nouveau 0000:01:00.0: iccsense: found invalid sensor id: 3, power readingmight be invalid
+Oct 20 00:20:09.321300 host kernel: nouveau 0000:01:00.0: clk: init running...
+Oct 20 00:20:09.321586 host kernel: nouveau 0000:01:00.0: clk: 00:      27000 KHz
+Oct 20 00:20:09.321781 host kernel: nouveau 0000:01:00.0: clk: 01:     100000 KHz
+Oct 20 00:20:09.321968 host kernel: nouveau 0000:01:00.0: clk: 16:     270000 KHz
+Oct 20 00:20:09.322151 host kernel: nouveau 0000:01:00.0: clk: 15:     540000 KHz
+Oct 20 00:20:09.322406 host kernel: nouveau 0000:01:00.0: clk: 18:     135000 KHz
+Oct 20 00:20:09.322587 host kernel: nouveau 0000:01:00.0: clk: 13:     101250 KHz
+Oct 20 00:20:09.322768 host kernel: nouveau 0000:01:00.0: clk: 14:     270000 KHz
+Oct 20 00:20:09.322949 host kernel: nouveau 0000:01:00.0: clk: 12:     135000 KHz
+Oct 20 00:20:09.323130 host kernel: nouveau 0000:01:00.0: clk: 1b:     135000 KHz
+Oct 20 00:20:09.323351 host kernel: nouveau 0000:01:00.0: clk: 19:     202500 KHz
+Oct 20 00:20:09.323534 host kernel: nouveau 0000:01:00.0: clk: 17:     270000 KHz
+Oct 20 00:20:09.323716 host kernel: nouveau 0000:01:00.0: clk: --: core 50 MHz memory 135 MHz 
+Oct 20 00:20:09.323898 host kernel: nouveau 0000:01:00.0: clk: P -1 PWR 1 U(AC) -1 U(DC) -1 A 2 T 90°C D 0
+Oct 20 00:20:09.324078 host kernel: nouveau 0000:01:00.0: clk: -> -1
+Oct 20 00:20:09.324307 host kernel: nouveau 0000:01:00.0: clk: init completed in 111us
+Oct 20 00:20:09.324491 host kernel: nouveau 0000:01:00.0: drm: VRAM: 1024 MiB
+Oct 20 00:20:09.324673 host kernel: nouveau 0000:01:00.0: drm: GART: 1048576 MiB
+Oct 20 00:20:09.324853 host kernel: nouveau 0000:01:00.0: drm: TMDS table version 2.0
+Oct 20 00:20:09.325032 host kernel: nouveau 0000:01:00.0: drm: failed to create ce channel, -22
+Oct 20 00:20:09.395382 host kernel: nouveau 0000:01:00.0: drm: MM: using M2MF for buffer copies
+Oct 20 00:20:09.396280 host kernel: nouveau 0000:01:00.0: [drm] Registered 2 planes with drm panic
+Oct 20 00:20:09.407285 host kernel: [drm] Initialized nouveau 1.4.2 for 0000:01:00.0 on minor 0
+Oct 20 00:20:09.508279 host kernel: fbcon: nouveaudrmfb (fb0) is primary device
+Oct 20 00:20:09.508363 host kernel: nouveau 0000:01:00.0: [drm] fb0: nouveaudrmfb frame buffer device
+Oct 20 00:20:09.612276 host kernel: nouveau 0000:01:00.0: drm: [DRM/00000004:kmsOutp] [HDMI head:0 enable:1 max_ac_packet:2 rekey:56 khz:241500 scdc:1 scdc_scrambling:1 scdc_low_rates:0] (ret:-22)
+Oct 20 00:20:31.868274 host kernel: nouveau 0000:01:00.0: Direct firmware load for nouveau/nvce_fuc084 failed with error -2
+Oct 20 00:20:31.868922 host kernel: nouveau 0000:01:00.0: Direct firmware load for nouveau/nvce_fuc084d failed with error -2
+Oct 20 00:20:31.869210 host kernel: nouveau 0000:01:00.0: msvld: unable to load firmware data
+Oct 20 00:20:31.869549 host kernel: nouveau 0000:01:00.0: msvld: init failed, -19
+Oct 20 00:20:31.884274 host kernel: nouveau 0000:01:00.0: gr: TRAP ch 3 [003fa86000 gst-plugin-scan[2659]]
+Oct 20 00:20:31.884843 host kernel: nouveau 0000:01:00.0: gr: GPC0/PROP trap: 00000020 [RT_HEIGHT_OVERRUN] x = 16, y = 16, format = 37, storage type = 0
+Oct 20 00:20:31.885319 host kernel: nouveau 0000:01:00.0: gr: GPC1/PROP trap: 00000020 [RT_HEIGHT_OVERRUN] x = 0, y = 16, format = 37, storage type = 0
+Oct 20 00:20:41.005281 host kernel: nouveau-engobj-idle: idling chid 6 before deleting oclass 9097
+Oct 20 00:20:41.009264 host kernel: nouveau-engobj-idle: idling chid 6 before deleting oclass 902d
+Oct 20 00:20:41.010287 host kernel: nouveau-engobj-idle: idling chid 6 before deleting oclass 9039
+Oct 20 00:20:41.010355 host kernel: nouveau-engobj-idle: idling chid 6 before deleting oclass 90c0
+Oct 20 00:20:41.010382 host kernel: nouveau-engobj-idle: idling chid 6 before deleting oclass fffffff9
+Oct 20 00:21:32.085296 host kernel: nouveau 0000:01:00.0: clk: P -1 PWR 1 U(AC) -1 U(DC) 1 A 2 T 90°C D 0
+Oct 20 00:21:32.085899 host kernel: nouveau 0000:01:00.0: clk: -> -1
+Oct 20 00:21:32.086327 host kernel: nouveau 0000:01:00.0: clk: P -1 PWR 1 U(AC) 1 U(DC) 1 A 2 T 90°C D 0
+Oct 20 00:21:32.086771 host kernel: nouveau 0000:01:00.0: clk: -> 1
+Oct 20 00:21:32.087032 host kernel: nouveau 0000:01:00.0: clk: setting performance state 1
+Oct 20 00:21:32.087303 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 20 00:21:32.087575 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+Oct 20 00:21:32.087918 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+Oct 20 00:21:32.088313 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 950000 uV (id 1)
+Oct 20 00:21:32.088722 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+Oct 20 00:21:32.089121 host kernel: nouveau 0000:01:00.0: fb: LAB disp before reclock: 0x611200=00000031 0x61c140=00000000
+Oct 20 00:21:32.089544 host kernel: nouveau 0000:01:00.0: pmu: R[137360] = 00000001
+Oct 20 00:21:32.089950 host kernel: nouveau 0000:01:00.0: pmu: R[132000] = 18010002
+Oct 20 00:21:32.090264 host kernel: nouveau 0000:01:00.0: pmu: R[132000] = 18010000
+Oct 20 00:21:32.090681 host kernel: nouveau 0000:01:00.0: pmu: R[132100] = 00000001
+Oct 20 00:21:32.091054 host kernel: nouveau 0000:01:00.0: pmu: R[10fb04] = 55550000
+Oct 20 00:21:32.091319 host kernel: nouveau 0000:01:00.0: pmu: R[10fb08] = 55550000
+Oct 20 00:21:32.091597 host kernel: nouveau 0000:01:00.0: pmu: R[10f988] = 2004ff00
+Oct 20 00:21:32.091891 host kernel: nouveau 0000:01:00.0: pmu: R[10f98c] = 003fc040
+Oct 20 00:21:32.092148 host kernel: nouveau 0000:01:00.0: pmu: R[10f990] = 20012001
+Oct 20 00:21:32.092416 host kernel: nouveau 0000:01:00.0: pmu: R[10f998] = 00011a00
+Oct 20 00:21:32.092671 host kernel: nouveau 0000:01:00.0: pmu: R[13d8f4] = 00000000
+Oct 20 00:21:32.092928 host kernel: nouveau 0000:01:00.0: pmu: R[100b0c] = 00080012
+Oct 20 00:21:32.093181 host kernel: nouveau 0000:01:00.0: pmu: R[611200] = 00003300
+Oct 20 00:21:32.093462 host kernel: nouveau 0000:01:00.0: pmu: R[10f200] = 008f8000
+Oct 20 00:21:32.093712 host kernel: nouveau 0000:01:00.0: pmu: R[10f210] = 00000000
+Oct 20 00:21:32.093959 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 1000 ns
+Oct 20 00:21:32.094208 host kernel: nouveau 0000:01:00.0: pmu: R[10f910] = 000c1001
+Oct 20 00:21:32.094491 host kernel: nouveau 0000:01:00.0: pmu: R[10f914] = 000c1001
+Oct 20 00:21:32.094754 host kernel: nouveau 0000:01:00.0: pmu: R[10f310] = 00000001
+Oct 20 00:21:32.095016 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 1000 ns
+Oct 20 00:21:32.095377 host kernel: nouveau 0000:01:00.0: pmu: R[10f090] = 00000061
+Oct 20 00:21:32.095694 host kernel: nouveau 0000:01:00.0: pmu: R[10f090] = c000007f
+Oct 20 00:21:32.095937 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 1000 ns
+Oct 20 00:21:32.096176 host kernel: nouveau 0000:01:00.0: pmu: R[10f824] = 00007fd4
+Oct 20 00:21:32.096448 host kernel: nouveau 0000:01:00.0: pmu: R[10f830] = 41500010
+Oct 20 00:21:32.096690 host kernel: nouveau 0000:01:00.0: pmu: R[10f830] = 40500010
+Oct 20 00:21:32.096927 host kernel: nouveau 0000:01:00.0: pmu: R[132100] = 00000101
+Oct 20 00:21:32.097162 host kernel: nouveau 0000:01:00.0: pmu: R[10f050] = ff000090
+Oct 20 00:21:32.097430 host kernel: nouveau 0000:01:00.0: pmu: R[1373ec] = 00020f0f
+Oct 20 00:21:32.097670 host kernel: nouveau 0000:01:00.0: pmu: R[1373f0] = 00000003
+Oct 20 00:21:32.097909 host kernel: nouveau 0000:01:00.0: pmu: R[137310] = 81201616
+Oct 20 00:21:32.098146 host kernel: nouveau 0000:01:00.0: pmu: R[132100] = 00000001
+Oct 20 00:21:32.098413 host kernel: nouveau 0000:01:00.0: pmu: R[10f830] = 00300017
+Oct 20 00:21:32.098653 host kernel: nouveau 0000:01:00.0: pmu: R[1373f0] = 00000001
+Oct 20 00:21:32.098902 host kernel: nouveau 0000:01:00.0: pmu: R[10f824] = 00007e77
+Oct 20 00:21:32.099177 host kernel: nouveau 0000:01:00.0: pmu: R[132000] = 18030001
+Oct 20 00:21:32.099546 host kernel: nouveau 0000:01:00.0: pmu: R[10f090] = 4000007e
+Oct 20 00:21:32.099823 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 2000 ns
+Oct 20 00:21:32.100078 host kernel: nouveau 0000:01:00.0: pmu: R[10f314] = 00000001
+Oct 20 00:21:32.100348 host kernel: nouveau 0000:01:00.0: pmu: R[10f210] = 80000000
+Oct 20 00:21:32.100626 host kernel: nouveau 0000:01:00.0: pmu: R[10f338] = 00300220
+Oct 20 00:21:32.100878 host kernel: nouveau 0000:01:00.0: pmu: R[10f300] = 0000011d
+Oct 20 00:21:32.101138 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 1000 ns
+Oct 20 00:21:32.101429 host kernel: nouveau 0000:01:00.0: pmu: R[10f290] = 02060505
+Oct 20 00:21:32.101676 host kernel: nouveau 0000:01:00.0: pmu: R[10f294] = 34208288
+Oct 20 00:21:32.101928 host kernel: nouveau 0000:01:00.0: pmu: R[10f298] = 44050411
+Oct 20 00:21:32.102163 host kernel: nouveau 0000:01:00.0: pmu: R[10f29c] = 0000114c
+Oct 20 00:21:32.102412 host kernel: nouveau 0000:01:00.0: pmu: R[10f2a0] = 42e10069
+Oct 20 00:21:32.102651 host kernel: nouveau 0000:01:00.0: pmu: R[10f614] = 40044f77
+Oct 20 00:21:32.102901 host kernel: nouveau 0000:01:00.0: pmu: R[10f610] = 40044f77
+Oct 20 00:21:32.103160 host kernel: nouveau 0000:01:00.0: pmu: R[10f344] = 00600009
+Oct 20 00:21:32.103429 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 1000 ns
+Oct 20 00:21:32.103727 host kernel: nouveau 0000:01:00.0: pmu: R[10f348] = 00700008
+Oct 20 00:21:32.103987 host kernel: nouveau 0000:01:00.0: pmu: R[61c140] = 00000000
+Oct 20 00:21:32.104236 host kernel: nouveau 0000:01:00.0: pmu: R[10f830] = 00300017
+Oct 20 00:21:32.104499 host kernel: nouveau 0000:01:00.0: pmu: R[10f910] = 80021001
+Oct 20 00:21:32.104748 host kernel: nouveau 0000:01:00.0: pmu: R[10f914] = 80021001
+Oct 20 00:21:32.104998 host kernel: nouveau 0000:01:00.0: pmu: R[110974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:32.105236 host kernel: nouveau 0000:01:00.0: pmu: R[111974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:32.105513 host kernel: nouveau 0000:01:00.0: pmu: R[112974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:32.105757 host kernel: nouveau 0000:01:00.0: pmu: R[113974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:32.106001 host kernel: nouveau 0000:01:00.0: pmu: R[10f910] = 80081001
+Oct 20 00:21:32.106239 host kernel: nouveau 0000:01:00.0: pmu: R[10f914] = 80081001
+Oct 20 00:21:32.106512 host kernel: nouveau 0000:01:00.0: pmu: R[110974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:32.106752 host kernel: nouveau 0000:01:00.0: pmu: R[111974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:32.106990 host kernel: nouveau 0000:01:00.0: pmu: R[112974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:32.107224 host kernel: nouveau 0000:01:00.0: pmu: R[113974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:32.107497 host kernel: nouveau 0000:01:00.0: pmu: R[10f340] = 00500004
+Oct 20 00:21:32.107737 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 1000 ns
+Oct 20 00:21:32.107974 host kernel: nouveau 0000:01:00.0: pmu: R[10f830] = 01300017
+Oct 20 00:21:32.108207 host kernel: nouveau 0000:01:00.0: pmu: R[10f830] = 00300017
+Oct 20 00:21:32.108474 host kernel: nouveau 0000:01:00.0: pmu: R[100b0c] = 00080028
+Oct 20 00:21:32.108711 host kernel: nouveau 0000:01:00.0: pmu: R[611200] = 00000031
+Oct 20 00:21:32.108946 host kernel: nouveau 0000:01:00.0: pmu: R[10f200] = 008f8800
+Oct 20 00:21:32.109184 host kernel: nouveau 0000:01:00.0: pmu: R[132000] = 18030000
+Oct 20 00:21:32.109435 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 20 00:21:32.109669 host kernel: nouveau 0000:01:00.0: pmu: Exec took 0ns, PMU_IN 0ccf3730
+Oct 20 00:21:32.109902 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 20 00:21:32.110137 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+Oct 20 00:21:32.110386 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 950000 uV (cstate voltage id 1)
+Oct 20 00:21:32.110621 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 20 00:21:32.110902 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 20 00:21:32.111171 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 20 00:21:32.111478 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 20 00:21:32.111731 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 20 00:21:32.111981 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 20 00:21:32.112230 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 20 00:21:32.112481 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 20 00:21:32.112723 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 20 00:21:32.112962 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 20 00:21:32.113203 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 20 00:21:32.113441 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 20 00:21:32.113676 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 20 00:21:32.113911 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 20 00:21:32.114144 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+Oct 20 00:21:48.300309 host kernel: nouveau 0000:01:00.0: clk: P 1 PWR 1 U(AC) 1 U(DC) 0 A 2 T 90°C D 0
+Oct 20 00:21:48.301068 host kernel: nouveau 0000:01:00.0: clk: -> 1
+Oct 20 00:21:48.301670 host kernel: nouveau 0000:01:00.0: clk: P 1 PWR 1 U(AC) 0 U(DC) 0 A 2 T 90°C D 0
+Oct 20 00:21:48.302189 host kernel: nouveau 0000:01:00.0: clk: -> 0
+Oct 20 00:21:48.302777 host kernel: nouveau 0000:01:00.0: clk: setting performance state 0
+Oct 20 00:21:48.303335 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 20 00:21:48.303916 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+Oct 20 00:21:48.304554 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+Oct 20 00:21:48.305207 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 950000 uV (id 0)
+Oct 20 00:21:48.305952 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+Oct 20 00:21:48.306723 host kernel: nouveau 0000:01:00.0: fb: LAB disp before reclock: 0x611200=00000031 0x61c140=00000000
+Oct 20 00:21:48.307372 host kernel: nouveau 0000:01:00.0: pmu: R[132100] = 00000001
+Oct 20 00:21:48.307979 host kernel: nouveau 0000:01:00.0: pmu: R[10fb04] = 55550000
+Oct 20 00:21:48.308611 host kernel: nouveau 0000:01:00.0: pmu: R[10fb08] = 00000000
+Oct 20 00:21:48.309207 host kernel: nouveau 0000:01:00.0: pmu: R[10f988] = 2004ff00
+Oct 20 00:21:48.309825 host kernel: nouveau 0000:01:00.0: pmu: R[10f98c] = 003fc040
+Oct 20 00:21:48.310448 host kernel: nouveau 0000:01:00.0: pmu: R[10f990] = 20012001
+Oct 20 00:21:48.311038 host kernel: nouveau 0000:01:00.0: pmu: R[10f998] = 00011a00
+Oct 20 00:21:48.311652 host kernel: nouveau 0000:01:00.0: pmu: R[13d8f4] = 00000000
+Oct 20 00:21:48.312213 host kernel: nouveau 0000:01:00.0: pmu: R[100b0c] = 00080012
+Oct 20 00:21:48.312821 host kernel: nouveau 0000:01:00.0: pmu: R[611200] = 00003300
+Oct 20 00:21:48.313438 host kernel: nouveau 0000:01:00.0: pmu: R[10f200] = 008f8000
+Oct 20 00:21:48.314038 host kernel: nouveau 0000:01:00.0: pmu: R[10f210] = 00000000
+Oct 20 00:21:48.314680 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 1000 ns
+Oct 20 00:21:48.315277 host kernel: nouveau 0000:01:00.0: pmu: R[10f910] = 000c1001
+Oct 20 00:21:48.315875 host kernel: nouveau 0000:01:00.0: pmu: R[10f914] = 000c1001
+Oct 20 00:21:48.316480 host kernel: nouveau 0000:01:00.0: pmu: R[10f310] = 00000001
+Oct 20 00:21:48.317075 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 1000 ns
+Oct 20 00:21:48.317700 host kernel: nouveau 0000:01:00.0: pmu: R[10f090] = 00000061
+Oct 20 00:21:48.318302 host kernel: nouveau 0000:01:00.0: pmu: R[10f090] = c000007f
+Oct 20 00:21:48.318903 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 1000 ns
+Oct 20 00:21:48.319501 host kernel: nouveau 0000:01:00.0: pmu: R[10f824] = 00007fd4
+Oct 20 00:21:48.320068 host kernel: nouveau 0000:01:00.0: pmu: R[10f830] = 41500010
+Oct 20 00:21:48.320663 host kernel: nouveau 0000:01:00.0: pmu: R[10f830] = 40500010
+Oct 20 00:21:48.321229 host kernel: nouveau 0000:01:00.0: pmu: R[132100] = 00000101
+Oct 20 00:21:48.321923 host kernel: nouveau 0000:01:00.0: pmu: R[10f050] = ff000090
+Oct 20 00:21:48.322518 host kernel: nouveau 0000:01:00.0: pmu: R[1373ec] = 00020f0f
+Oct 20 00:21:48.323083 host kernel: nouveau 0000:01:00.0: pmu: R[1373f0] = 00000003
+Oct 20 00:21:48.323674 host kernel: nouveau 0000:01:00.0: pmu: R[137310] = 81201616
+Oct 20 00:21:48.324268 host kernel: nouveau 0000:01:00.0: pmu: R[132100] = 00000001
+Oct 20 00:21:48.324880 host kernel: nouveau 0000:01:00.0: pmu: R[10f830] = 00300017
+Oct 20 00:21:48.325487 host kernel: nouveau 0000:01:00.0: pmu: R[1373f0] = 00000001
+Oct 20 00:21:48.326060 host kernel: nouveau 0000:01:00.0: pmu: R[10f824] = 00007e77
+Oct 20 00:21:48.326653 host kernel: nouveau 0000:01:00.0: pmu: R[132000] = 18030001
+Oct 20 00:21:48.327218 host kernel: nouveau 0000:01:00.0: pmu: R[10f090] = 4000007e
+Oct 20 00:21:48.327828 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 2000 ns
+Oct 20 00:21:48.328422 host kernel: nouveau 0000:01:00.0: pmu: R[10f314] = 00000001
+Oct 20 00:21:48.328978 host kernel: nouveau 0000:01:00.0: pmu: R[10f210] = 80000000
+Oct 20 00:21:48.329551 host kernel: nouveau 0000:01:00.0: pmu: R[10f338] = 00300220
+Oct 20 00:21:48.330110 host kernel: nouveau 0000:01:00.0: pmu: R[10f300] = 0000011d
+Oct 20 00:21:48.330711 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 1000 ns
+Oct 20 00:21:48.331311 host kernel: nouveau 0000:01:00.0: pmu: R[10f290] = 02060505
+Oct 20 00:21:48.331869 host kernel: nouveau 0000:01:00.0: pmu: R[10f294] = 34208288
+Oct 20 00:21:48.332447 host kernel: nouveau 0000:01:00.0: pmu: R[10f298] = 44050411
+Oct 20 00:21:48.333008 host kernel: nouveau 0000:01:00.0: pmu: R[10f29c] = 0000114c
+Oct 20 00:21:48.333611 host kernel: nouveau 0000:01:00.0: pmu: R[10f2a0] = 42e10069
+Oct 20 00:21:48.334182 host kernel: nouveau 0000:01:00.0: pmu: R[10f614] = 40044f77
+Oct 20 00:21:48.334828 host kernel: nouveau 0000:01:00.0: pmu: R[10f610] = 40044f77
+Oct 20 00:21:48.335416 host kernel: nouveau 0000:01:00.0: pmu: R[10f344] = 00600009
+Oct 20 00:21:48.335984 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 1000 ns
+Oct 20 00:21:48.336568 host kernel: nouveau 0000:01:00.0: pmu: R[10f348] = 00700008
+Oct 20 00:21:48.337125 host kernel: nouveau 0000:01:00.0: pmu: R[61c140] = 00000000
+Oct 20 00:21:48.337705 host kernel: nouveau 0000:01:00.0: pmu: R[10f830] = 00300017
+Oct 20 00:21:48.338298 host kernel: nouveau 0000:01:00.0: pmu: R[10f910] = 80021001
+Oct 20 00:21:48.338863 host kernel: nouveau 0000:01:00.0: pmu: R[10f914] = 80021001
+Oct 20 00:21:48.339425 host kernel: nouveau 0000:01:00.0: pmu: R[110974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:48.339977 host kernel: nouveau 0000:01:00.0: pmu: R[111974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:48.340565 host kernel: nouveau 0000:01:00.0: pmu: R[112974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:48.341121 host kernel: nouveau 0000:01:00.0: pmu: R[113974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:48.341714 host kernel: nouveau 0000:01:00.0: pmu: R[10f910] = 80081001
+Oct 20 00:21:48.342279 host kernel: nouveau 0000:01:00.0: pmu: R[10f914] = 80081001
+Oct 20 00:21:48.342845 host kernel: nouveau 0000:01:00.0: pmu: R[110974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:48.343424 host kernel: nouveau 0000:01:00.0: pmu: R[111974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:48.343986 host kernel: nouveau 0000:01:00.0: pmu: R[112974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:48.344579 host kernel: nouveau 0000:01:00.0: pmu: R[113974] & 0000000f == 00000000, 500000 us
+Oct 20 00:21:48.345142 host kernel: nouveau 0000:01:00.0: pmu: R[10f340] = 00500004
+Oct 20 00:21:48.345778 host kernel: nouveau 0000:01:00.0: pmu:     DELAY = 1000 ns
+Oct 20 00:21:48.346341 host kernel: nouveau 0000:01:00.0: pmu: R[10f830] = 01300017
+Oct 20 00:21:48.346901 host kernel: nouveau 0000:01:00.0: pmu: R[10f830] = 00300017
+Oct 20 00:21:48.347488 host kernel: nouveau 0000:01:00.0: pmu: R[100b0c] = 00080028
+Oct 20 00:21:48.348054 host kernel: nouveau 0000:01:00.0: pmu: R[611200] = 00000031
+Oct 20 00:21:48.348629 host kernel: nouveau 0000:01:00.0: pmu: R[10f200] = 008f8800
+Oct 20 00:21:48.349182 host kernel: nouveau 0000:01:00.0: pmu: R[132000] = 18030000
+Oct 20 00:21:48.349761 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 20 00:21:48.350344 host kernel: nouveau 0000:01:00.0: pmu: Exec took 0ns, PMU_IN 0ccf3730
+Oct 20 00:21:48.350905 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 20 00:21:48.351492 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+Oct 20 00:21:48.352049 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 950000 uV (cstate voltage id 0)
+Oct 20 00:21:48.352647 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 101000 got 100894 ssel 00000001 coef 0013470f dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 20 00:21:48.353203 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 270000 got 270000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000a0a mdiv 00000000
+Oct 20 00:21:48.353782 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 270000 got 270000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000a0a mdiv 00000000
+Oct 20 00:21:48.354376 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 270000 got 270000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000a
+Oct 20 00:21:48.354948 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 20 00:21:48.355536 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 135000 got 135000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000016
+Oct 20 00:21:48.356104 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 20 00:21:48.356701 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 135000 got 135000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000016
+Oct 20 00:21:48.357282 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 20 00:21:48.357862 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 20 00:21:48.358418 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 20 00:21:48.358965 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 0013470f
+Oct 20 00:21:48.359564 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 20 00:21:48.360127 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 20 00:21:48.360708 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 20 00:21:48.361311 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 20 00:21:48.361887 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
