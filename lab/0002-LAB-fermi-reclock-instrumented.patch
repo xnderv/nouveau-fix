@@ -1,0 +1,103 @@
+diff --git a/nvkm/subdev/clk/base.c b/nvkm/subdev/clk/base.c
+index 572e638..ae7ba40 100644
+--- a/nvkm/subdev/clk/base.c
++++ b/nvkm/subdev/clk/base.c
+@@ -280,20 +280,31 @@ nvkm_pstate_prog(struct nvkm_clk *clk, int pstatei)
+ 	nvkm_debug(subdev, "setting performance state %d\n", pstatei);
+ 	clk->pstate = pstatei;
+ 
++	nvkm_info(subdev, "LAB pstate %d: pcie speed %d width %d\n", pstatei, pstate->pcie_speed, pstate->pcie_width);
+ 	nvkm_pcie_set_link(pci, pstate->pcie_speed, pstate->pcie_width);
++	nvkm_info(subdev, "LAB pstate %d: pcie done\n", pstatei);
+ 
+ 	if (fb && fb->ram && fb->ram->func->calc) {
+ 		struct nvkm_ram *ram = fb->ram;
+ 		int khz = pstate->base.domain[nv_clk_src_mem];
++		nvkm_info(subdev, "LAB pstate %d: memory -> %d kHz\n", pstatei, khz);
+ 		do {
+ 			ret = ram->func->calc(ram, khz);
+-			if (ret == 0)
++			nvkm_info(subdev, "LAB ram calc ret %d\n", ret);
++			if (ret == 0) {
+ 				ret = ram->func->prog(ram);
++				nvkm_info(subdev, "LAB ram prog ret %d\n", ret);
++			}
+ 		} while (ret > 0);
+ 		ram->func->tidy(ram);
++	} else {
++		nvkm_info(subdev, "LAB pstate %d: no memory reclock support\n", pstatei);
+ 	}
+ 
+-	return nvkm_cstate_prog(clk, pstate, NVKM_CLK_CSTATE_HIGHEST);
++	nvkm_info(subdev, "LAB pstate %d: programming core clocks/voltage\n", pstatei);
++	ret = nvkm_cstate_prog(clk, pstate, NVKM_CLK_CSTATE_HIGHEST);
++	nvkm_info(subdev, "LAB pstate %d: done ret %d\n", pstatei, ret);
++	return ret;
+ }
+ 
+ static void
+diff --git a/nvkm/subdev/clk/gf100.c b/nvkm/subdev/clk/gf100.c
+index 163c1b2..c4a1667 100644
+--- a/nvkm/subdev/clk/gf100.c
++++ b/nvkm/subdev/clk/gf100.c
+@@ -318,6 +318,8 @@ calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
+ 		info->freq = clk1;
+ 	}
+ 
++	nvkm_info(&clk->base.subdev, "LAB calc idx %02x dom %d: want %u got %u ssel %08x coef %08x dsrc %08x ddiv %08x mdiv %08x\n",
++		  idx, dom, freq, info->freq, info->ssel, info->coef, info->dsrc, info->ddiv, info->mdiv);
+ 	return 0;
+ }
+ 
+@@ -377,10 +379,15 @@ gf100_clk_prog_2(struct gf100_clk *clk, int idx)
+ 
+ 			/* Test PLL lock */
+ 			nvkm_mask(device, addr + 0x00, 0x00000010, 0x00000000);
+-			nvkm_msec(device, 2000,
++			if (nvkm_msec(device, 2000,
+ 				if (nvkm_rd32(device, addr + 0x00) & 0x00020000)
+ 					break;
+-			);
++			) < 0)
++				nvkm_error(&clk->base.subdev, "LAB prog_2 idx %02x PLL NOT LOCKED ctrl %08x coef %08x\n",
++					   idx, nvkm_rd32(device, addr + 0x00), nvkm_rd32(device, addr + 0x04));
++			else
++				nvkm_info(&clk->base.subdev, "LAB prog_2 idx %02x PLL locked ctrl %08x coef %08x\n",
++					  idx, nvkm_rd32(device, addr + 0x00), nvkm_rd32(device, addr + 0x04));
+ 			nvkm_mask(device, addr + 0x00, 0x00000010, 0x00000010);
+ 
+ 			/* Enable sync mode */
+@@ -395,12 +402,16 @@ gf100_clk_prog_3(struct gf100_clk *clk, int idx)
+ 	struct gf100_clk_info *info = &clk->eng[idx];
+ 	struct nvkm_device *device = clk->base.subdev.device;
+ 	if (info->ssel) {
++		nvkm_info(&clk->base.subdev, "LAB prog_3 idx %02x select PLL, 0x137100=%08x\n", idx, nvkm_rd32(device, 0x137100));
+ 		nvkm_mask(device, 0x137100, (1 << idx), info->ssel);
+-		nvkm_msec(device, 2000,
++		if (nvkm_msec(device, 2000,
+ 			u32 tmp = nvkm_rd32(device, 0x137100) & (1 << idx);
+ 			if (tmp == info->ssel)
+ 				break;
+-		);
++		) < 0)
++			nvkm_error(&clk->base.subdev, "LAB prog_3 idx %02x SWITCH TIMEOUT 0x137100=%08x pllctrl=%08x\n",
++				   idx, nvkm_rd32(device, 0x137100),
++				   idx <= 7 ? nvkm_rd32(device, 0x137000 + idx * 0x20) : 0);
+ 	}
+ }
+ 
+@@ -428,6 +439,7 @@ gf100_clk_prog(struct nvkm_clk *base)
+ 	int i, j;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(stage); i++) {
++		nvkm_info(&clk->base.subdev, "LAB prog stage %d\n", i);
+ 		for (j = 0; j < ARRAY_SIZE(clk->eng); j++) {
+ 			if (!clk->eng[j].freq)
+ 				continue;
+@@ -477,5 +489,5 @@ gf100_clk_new(struct nvkm_device *device, enum nvkm_subdev_type type, int inst,
+ 		return -ENOMEM;
+ 	*pclk = &clk->base;
+ 
+-	return nvkm_clk_ctor(&gf100_clk, device, type, inst, false, &clk->base);
++	return nvkm_clk_ctor(&gf100_clk, device, type, inst, true, &clk->base);
+ }
