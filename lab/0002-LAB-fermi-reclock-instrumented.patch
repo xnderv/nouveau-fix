@@ -175,10 +175,26 @@ index 163c1b2..c4a1667 100644
 +	return nvkm_clk_ctor(&gf100_clk, device, type, inst, true, &clk->base);
  }
 diff --git a/nvkm/subdev/fb/ramgf100.c b/nvkm/subdev/fb/ramgf100.c
-index b6b8398..846312a 100644
+index b6b8398..993f0b8 100644
 --- a/nvkm/subdev/fb/ramgf100.c
 +++ b/nvkm/subdev/fb/ramgf100.c
-@@ -142,6 +142,13 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
+@@ -25,6 +25,15 @@
+ #include "ram.h"
+ #include "ramfuc.h"
+ 
++#include <linux/moduleparam.h>
++
++/* LAB: как «ставить на паузу» вывод изображения (рег. 0x611200) на время смены
++ * частоты памяти: 0 — не трогать регистр вообще; 1 — снять биты 0x30 у текущего
++ * значения (как в оригинальной трассе: 0x3330 -> 0x3300); 2 — записать чужое 0x3300. */
++static int lab_disp_pause = 1;
++module_param(lab_disp_pause, int, 0644);
++MODULE_PARM_DESC(lab_disp_pause, "LAB: display pause mode during memory reclock (0 skip, 1 clear 0x30, 2 trace 0x3300)");
++
+ #include <core/option.h>
+ #include <subdev/bios.h>
+ #include <subdev/bios/pll.h>
+@@ -142,6 +151,13 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  	int from, mode;
  	int N1, M1, P;
  	int ret;
@@ -187,12 +203,24 @@ index b6b8398..846312a 100644
 +	const u32 lab_611200 = nvkm_rd32(device, 0x611200);
 +	const u32 lab_61c140 = nvkm_rd32(device, 0x61c140);
 +
-+	nvkm_info(subdev, "LAB disp before reclock: 0x611200=%08x 0x61c140=%08x\n",
-+		  lab_611200, lab_61c140);
++	nvkm_info(subdev, "LAB disp before reclock: 0x611200=%08x 0x61c140=%08x, pause mode %d\n",
++		  lab_611200, lab_61c140, lab_disp_pause);
  
  	/* lookup memory config data relevant to the target frequency */
  	rammap.data = nvbios_rammapEm(bios, freq / 1000, &ver, &rammap.size,
-@@ -322,7 +329,7 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
+@@ -268,7 +284,10 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
+ 	ram_wr32(fuc, 0x100b0c, 0x00080012);
+ // 0x00030014 // 0x00000000 // 0x02b5f070
+ // 0x00030014 // 0x00010000 // 0x02b5f070
+-	ram_wr32(fuc, 0x611200, 0x00003300);
++	if (lab_disp_pause == 1)
++		ram_wr32(fuc, 0x611200, lab_611200 & ~0x00000030); /* LAB */
++	else if (lab_disp_pause == 2)
++		ram_wr32(fuc, 0x611200, 0x00003300);
+ // 0x00020034 // 0x0000000a
+ // 0x00030020 // 0x00000001 // 0x00000000
+ 
+@@ -322,7 +341,7 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  		ram_wr32(fuc, 0x10f344, 0x00600009);
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700008);
@@ -201,16 +229,17 @@ index b6b8398..846312a 100644
  		ram_wr32(fuc, 0x10f830, 0x00300017);
  		gf100_ram_train(fuc, 0x80021001);
  		gf100_ram_train(fuc, 0x80081001);
-@@ -333,7 +340,7 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
+@@ -333,7 +352,8 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  // 0x00030020 // 0x00000000 // 0x00000000
  // 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
 -		ram_wr32(fuc, 0x611200, 0x00003330);
-+		ram_wr32(fuc, 0x611200, lab_611200); /* LAB: было 0x00003330 */
++		if (lab_disp_pause)
++			ram_wr32(fuc, 0x611200, lab_611200); /* LAB: было 0x00003330 */
  	} else {
  		ram_wr32(fuc, 0x10f800, 0x00001800);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
-@@ -376,7 +383,7 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
+@@ -376,7 +396,7 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700000);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
@@ -219,12 +248,13 @@ index b6b8398..846312a 100644
  
  		gf100_ram_train(fuc, 0x800e1008);
  
-@@ -386,7 +393,7 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
+@@ -386,7 +406,8 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  	// 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
 -		ram_wr32(fuc, 0x611200, 0x00003330);
-+		ram_wr32(fuc, 0x611200, lab_611200); /* LAB: было 0x00003330 */
++		if (lab_disp_pause)
++			ram_wr32(fuc, 0x611200, lab_611200); /* LAB: было 0x00003330 */
  		ram_nsec(fuc, 100000);
  		ram_wr32(fuc, 0x10f9b0, 0x05313f41);
  		ram_wr32(fuc, 0x10f9b4, 0x00002f50);

@@ -12,6 +12,7 @@
 #                      A — только напряжение; B — напряжение + память; C — напряжение + ядро;
 #                      D — всё вместе (напряжение поднимается первым).
 #   lab.sh flags     — показать текущие переключатели лабораторного драйвера.
+#   lab.sh disp 0|1|2 — как ставить на паузу вывод изображения при смене частоты памяти.
 #   lab.sh restore   — вернуть стабильный драйвер из резервной копии (потом перезагрузка).
 # Частота сама НЕ поднимается: после перезагрузки карта всегда на исходных 50 МГц.
 set -euo pipefail
@@ -66,11 +67,16 @@ pstate)
     sudo sh -c "f=\$(ls /sys/kernel/debug/dri/*/pstate | head -n1); echo $P > \"\$f\"; cat \"\$f\" > '$OUT'; sync"
     cat "$OUT"
     ;;
+disp)
+    M="${2:-}"; [[ "$M" =~ ^[012]$ ]] || { echo "Режим паузы дисплея: 0 (не трогать), 1 (снять биты 0x30), 2 (чужое 0x3300)"; exit 1; }
+    sudo sh -c "echo $M > /sys/module/nouveau/parameters/lab_disp_pause"
+    echo "lab_disp_pause = $(cat /sys/module/nouveau/parameters/lab_disp_pause)"
+    ;;
 flags|exp)
     PRM=/sys/module/nouveau/parameters
     [ -e "$PRM/lab_core" ] || { echo "Лабораторный драйвер не загружен (нет $PRM/lab_core). Сначала: lab.sh install и перезагрузка."; exit 1; }
     if [ "$1" = flags ]; then
-        for f in lab_pcie lab_mem lab_core lab_volt_first; do echo "$f = $(cat "$PRM/$f")"; done
+        for f in lab_pcie lab_mem lab_core lab_volt_first lab_disp_pause; do [ -e "$PRM/$f" ] && echo "$f = $(cat "$PRM/$f")"; done
         exit 0
     fi
     E="${2:-}"
@@ -157,5 +163,5 @@ restore)
     echo "=== Стабильный драйвер возвращён. Перезагрузись и проверь: ~/nouveau-fix/check.sh"
     ;;
 *)
-    sed -n '2,16p' "$0"; exit 1 ;;
+    sed -n '2,17p' "$0"; exit 1 ;;
 esac
