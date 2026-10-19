@@ -1,0 +1,53 @@
+--- a/nouveau_abi16.c
++++ b/nouveau_abi16.c
+@@ -89,6 +89,7 @@
+ 		ENGOBJ,
+ 	} type;
+ 	u64 object;
++	struct nouveau_abi16_chan *chan;
+ 
+ 	struct nvif_object engobj;
+ 
+@@ -173,6 +174,13 @@
+ 			struct nouveau_abi16_chan *chan)
+ {
+ 	struct nouveau_abi16_ntfy *ntfy, *temp;
++	struct nouveau_abi16_obj *obj;
++
++	/* Forget references to this channel held by engine objects. */
++	list_for_each_entry(obj, &abi16->objects, head) {
++		if (obj->chan == chan)
++			obj->chan = NULL;
++	}
+ 
+ 	/* Cancel all jobs from the entity's queue. */
+ 	if (chan->sched)
+@@ -749,8 +757,19 @@
+ 
+ 	obj = nouveau_abi16_obj_find(abi16, ioctl->object);
+ 	if (obj) {
+-		if (obj->type == ENGOBJ)
++		if (obj->type == ENGOBJ) {
++			/* Synchronize with the user channel before destroying the
++			 * engine object, as the legacy GPUOBJ_FREE path does.  The
++			 * channel may still have work queued that needs the engine
++			 * context which is about to be unbound.
++			 */
++			if (obj->chan && obj->chan->chan) {
++				pr_info("nouveau-engobj-idle: idling chid %d before deleting oclass %04x\n",
++					obj->chan->chan->chid, obj->engobj.oclass);
++				nouveau_channel_idle(obj->chan->chan);
++			}
+ 			nvif_object_dtor(&obj->engobj);
++		}
+ 		nouveau_abi16_obj_del(obj);
+ 	}
+ 
+@@ -791,6 +810,7 @@
+ 	obj = nouveau_abi16_obj_new(abi16, ENGOBJ, args->object);
+ 	if (IS_ERR(obj))
+ 		return PTR_ERR(obj);
++	obj->chan = chan;
+ 
+ 	ret = nvif_object_ctor(&chan->chan->user, "abi16EngObj", args->handle, args->oclass,
+ 			       NULL, 0, &obj->engobj);
