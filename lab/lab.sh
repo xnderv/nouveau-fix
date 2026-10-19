@@ -8,6 +8,10 @@
 #   lab.sh try 07 0f — ОПЫТ СО СТРАХОВКОЙ: по очереди переключает режимы и после каждого ждёт
 #                      15 с, пока ты нажмёшь Enter («вижу экран»). Нет нажатия → возвращает 03;
 #                      снова нет → сам сохраняет журнал и перезагружает компьютер.
+#   lab.sh exp A|B|C|D — серия опытов «по одному параметру», каждый = try 0f 03:
+#                      A — только напряжение; B — напряжение + память; C — напряжение + ядро;
+#                      D — всё вместе (напряжение поднимается первым).
+#   lab.sh flags     — показать текущие переключатели лабораторного драйвера.
 #   lab.sh restore   — вернуть стабильный драйвер из резервной копии (потом перезагрузка).
 # Частота сама НЕ поднимается: после перезагрузки карта всегда на исходных 50 МГц.
 set -euo pipefail
@@ -62,6 +66,29 @@ pstate)
     sudo sh -c "f=\$(ls /sys/kernel/debug/dri/*/pstate | head -n1); echo $P > \"\$f\"; cat \"\$f\" > '$OUT'; sync"
     cat "$OUT"
     ;;
+flags|exp)
+    PRM=/sys/module/nouveau/parameters
+    [ -e "$PRM/lab_core" ] || { echo "Лабораторный драйвер не загружен (нет $PRM/lab_core). Сначала: lab.sh install и перезагрузка."; exit 1; }
+    if [ "$1" = flags ]; then
+        for f in lab_pcie lab_mem lab_core lab_volt_first; do echo "$f = $(cat "$PRM/$f")"; done
+        exit 0
+    fi
+    E="${2:-}"
+    case "$E" in
+        A) F="0 0 0 1"; D="только напряжение (без PCIe, памяти и ядра)";;
+        B) F="0 1 0 1"; D="напряжение + память";;
+        C) F="0 0 1 1"; D="напряжение + ядро";;
+        D) F="1 1 1 1"; D="всё: PCIe + напряжение + память + ядро";;
+        *) echo "Укажи опыт: A, B, C или D"; exit 1;;
+    esac
+    [ "$(id -u)" -eq 0 ] || exec sudo -E "$0" exp "$E"
+    read -r PC ME CO VF <<<"$F"
+    echo "$PC" > "$PRM/lab_pcie"; echo "$ME" > "$PRM/lab_mem"
+    echo "$CO" > "$PRM/lab_core"; echo "$VF" > "$PRM/lab_volt_first"
+    echo "=== Опыт $E: $D"
+    for f in lab_pcie lab_mem lab_core lab_volt_first; do echo "    $f = $(cat "$PRM/$f")"; done
+    exec "$0" try 0f 03
+    ;;
 try)
     # Опыт со страховкой: переключить режим(ы) и ждать подтверждения «вижу экран».
     # Нет подтверждения → вернуть 03; всё ещё нет → сохранить журнал и перезагрузиться самому.
@@ -73,6 +100,11 @@ try)
     RES="$KIT/results/try-$(date +%Y%m%d-%H%M%S).txt"
     PS="$(ls /sys/kernel/debug/dri/*/pstate | head -n 1)"
     note() { echo "$(date +%T) $*" | tee -a "$RES"; sync; }
+    temp() {  # температура GPU и вентилятор (если драйвер их сообщает)
+        local h; h="$(ls -d /sys/class/drm/card*/device/hwmon/hwmon* 2>/dev/null | head -n 1)"
+        [ -n "$h" ] || { echo "датчик не найден"; return; }
+        echo "GPU $(( $(cat "$h/temp1_input" 2>/dev/null || echo 0) / 1000 ))°C, вентилятор $(cat "$h/fan1_input" 2>/dev/null || echo '?') об/мин, pwm $(cat "$h/pwm1" 2>/dev/null || echo '?')"
+    }
     confirm() {  # $1 = секунды
         local n
         echo
@@ -102,16 +134,17 @@ try)
         exit 1
     }
     note "Опыт: режимы $* (драйвер: $(modinfo -n nouveau))"
-    note "Исходно: $(grep '^AC' "$PS")"
+    for f in /sys/module/nouveau/parameters/lab_*; do [ -e "$f" ] && note "  $(basename "$f") = $(cat "$f")"; done
+    note "Исходно: $(grep '^AC' "$PS"); $(temp)"
     for P in "$@"; do
         note "Переключаю в режим $P..."
         ( echo "$P" > "$PS" ) &
         W=$!
         for i in $(seq 1 20); do kill -0 "$W" 2>/dev/null || break; sleep 1; done
         kill -0 "$W" 2>/dev/null && note "Команда переключения всё ещё выполняется спустя 20 с."
-        note "Сейчас: $(timeout 5 grep '^AC' "$PS" 2>/dev/null || echo 'не читается')"
+        note "Сейчас: $(timeout 5 grep '^AC' "$PS" 2>/dev/null || echo 'не читается'); $(timeout 5 bash -c "$(declare -f temp); temp")"
         confirm 15 || rescue "$P"
-        note "Режим $P: экран живой, подтверждено."
+        note "Режим $P: экран живой, подтверждено. $(temp)"
     done
     note "Все режимы прошли. Карта остаётся в режиме ${*: -1} до перезагрузки."
     echo "Результат: $RES"
@@ -123,5 +156,5 @@ restore)
     echo "=== Стабильный драйвер возвращён. Перезагрузись и проверь: ~/nouveau-fix/check.sh"
     ;;
 *)
-    sed -n '2,12p' "$0"; exit 1 ;;
+    sed -n '2,16p' "$0"; exit 1 ;;
 esac

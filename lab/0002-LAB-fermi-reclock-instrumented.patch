@@ -1,16 +1,89 @@
 diff --git a/nvkm/subdev/clk/base.c b/nvkm/subdev/clk/base.c
-index 572e638..ae7ba40 100644
+index 572e638..41813a7 100644
 --- a/nvkm/subdev/clk/base.c
 +++ b/nvkm/subdev/clk/base.c
-@@ -280,20 +280,31 @@ nvkm_pstate_prog(struct nvkm_clk *clk, int pstatei)
+@@ -34,6 +34,23 @@
+ 
+ #include <core/option.h>
+ 
++#include <linux/moduleparam.h>
++
++/* LAB: управление этапами смены режима (можно менять на ходу через
++ * /sys/module/nouveau/parameters/lab_*). */
++static bool lab_pcie = true;
++module_param(lab_pcie, bool, 0644);
++MODULE_PARM_DESC(lab_pcie, "LAB: change PCIe link on pstate switch");
++static bool lab_mem = true;
++module_param(lab_mem, bool, 0644);
++MODULE_PARM_DESC(lab_mem, "LAB: reclock memory on pstate switch");
++static bool lab_core = true;
++module_param(lab_core, bool, 0644);
++MODULE_PARM_DESC(lab_core, "LAB: reclock core clocks on pstate switch");
++static bool lab_volt_first;
++module_param(lab_volt_first, bool, 0644);
++MODULE_PARM_DESC(lab_volt_first, "LAB: raise voltage before memory reclock");
++
+ /******************************************************************************
+  * misc
+  *****************************************************************************/
+@@ -190,12 +207,19 @@ nvkm_cstate_prog(struct nvkm_clk *clk, struct nvkm_pstate *pstate, int cstatei)
+ 			nvkm_error(subdev, "failed to raise voltage: %d\n", ret);
+ 			return ret;
+ 		}
++		nvkm_info(subdev, "LAB voltage after raise: %d uV (cstate voltage id %d)\n",
++			  nvkm_volt_get(volt), cstate->voltage);
+ 	}
+ 
+-	ret = clk->func->calc(clk, cstate);
+-	if (ret == 0) {
+-		ret = clk->func->prog(clk);
+-		clk->func->tidy(clk);
++	if (lab_core) {
++		ret = clk->func->calc(clk, cstate);
++		if (ret == 0) {
++			ret = clk->func->prog(clk);
++			clk->func->tidy(clk);
++		}
++	} else {
++		nvkm_info(subdev, "LAB core clocks SKIPPED (lab_core=0)\n");
++		ret = 0;
+ 	}
+ 
+ 	if (volt) {
+@@ -203,6 +227,7 @@ nvkm_cstate_prog(struct nvkm_clk *clk, struct nvkm_pstate *pstate, int cstatei)
+ 				       pstate->base.voltage, clk->temp, -1);
+ 		if (ret && ret != -ENODEV)
+ 			nvkm_error(subdev, "failed to lower voltage: %d\n", ret);
++		nvkm_info(subdev, "LAB voltage final: %d uV\n", nvkm_volt_get(volt));
+ 	}
+ 
+ 	if (therm) {
+@@ -280,20 +305,46 @@ nvkm_pstate_prog(struct nvkm_clk *clk, int pstatei)
  	nvkm_debug(subdev, "setting performance state %d\n", pstatei);
  	clk->pstate = pstatei;
  
-+	nvkm_info(subdev, "LAB pstate %d: pcie speed %d width %d\n", pstatei, pstate->pcie_speed, pstate->pcie_width);
- 	nvkm_pcie_set_link(pci, pstate->pcie_speed, pstate->pcie_width);
-+	nvkm_info(subdev, "LAB pstate %d: pcie done\n", pstatei);
+-	nvkm_pcie_set_link(pci, pstate->pcie_speed, pstate->pcie_width);
++	nvkm_info(subdev, "LAB pstate %d: flags pcie=%d mem=%d core=%d volt_first=%d\n",
++		  pstatei, lab_pcie, lab_mem, lab_core, lab_volt_first);
++	if (lab_pcie) {
++		nvkm_info(subdev, "LAB pstate %d: pcie speed %d width %d\n", pstatei, pstate->pcie_speed, pstate->pcie_width);
++		nvkm_pcie_set_link(pci, pstate->pcie_speed, pstate->pcie_width);
++		nvkm_info(subdev, "LAB pstate %d: pcie done\n", pstatei);
++	} else {
++		nvkm_info(subdev, "LAB pstate %d: pcie SKIPPED\n", pstatei);
++	}
++
++	if (lab_volt_first && subdev->device->volt) {
++		struct nvkm_volt *volt = subdev->device->volt;
++		int r = nvkm_volt_set_id(volt, pstate->base.voltage, pstate->base.voltage, clk->temp, +1);
++		nvkm_info(subdev, "LAB voltage-first ret %d, now %d uV (id %d)\n",
++			  r, nvkm_volt_get(volt), pstate->base.voltage);
++	}
  
- 	if (fb && fb->ram && fb->ram->func->calc) {
+-	if (fb && fb->ram && fb->ram->func->calc) {
++	if (!lab_mem) {
++		nvkm_info(subdev, "LAB pstate %d: memory SKIPPED (lab_mem=0)\n", pstatei);
++	} else if (fb && fb->ram && fb->ram->func->calc) {
  		struct nvkm_ram *ram = fb->ram;
  		int khz = pstate->base.domain[nv_clk_src_mem];
 +		nvkm_info(subdev, "LAB pstate %d: memory -> %d kHz\n", pstatei, khz);
