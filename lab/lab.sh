@@ -8,7 +8,7 @@
 #   lab.sh try 07 0f — ОПЫТ СО СТРАХОВКОЙ: по очереди переключает режимы и после каждого ждёт
 #                      15 с, пока ты нажмёшь Enter («вижу экран»). Нет нажатия → возвращает 03;
 #                      снова нет → сам сохраняет журнал и перезагружает компьютер.
-#   lab.sh exp A|B|C|D — серия опытов «по одному параметру», каждый = try 0f 03:
+#   lab.sh exp A|B|C|D [07|0f] — опыты «по одному параметру», каждый = try <режим> 03 (по умолчанию 0f):
 #                      A — только напряжение; B — напряжение + память; C — напряжение + ядро;
 #                      D — всё вместе (напряжение поднимается первым).
 #   lab.sh flags     — показать текущие переключатели лабораторного драйвера.
@@ -81,13 +81,14 @@ flags|exp)
         D) F="1 1 1 1"; D="всё: PCIe + напряжение + память + ядро";;
         *) echo "Укажи опыт: A, B, C или D"; exit 1;;
     esac
-    [ "$(id -u)" -eq 0 ] || exec sudo -E "$0" exp "$E"
+    T="${3:-0f}"; [[ "$T" =~ ^(07|0f)$ ]] || { echo "Режим опыта: 07 или 0f"; exit 1; }
+    [ "$(id -u)" -eq 0 ] || exec sudo "$0" exp "$E" "$T"
     read -r PC ME CO VF <<<"$F"
     echo "$PC" > "$PRM/lab_pcie"; echo "$ME" > "$PRM/lab_mem"
     echo "$CO" > "$PRM/lab_core"; echo "$VF" > "$PRM/lab_volt_first"
-    echo "=== Опыт $E: $D"
+    echo "=== Опыт $E ($T): $D"
     for f in lab_pcie lab_mem lab_core lab_volt_first; do echo "    $f = $(cat "$PRM/$f")"; done
-    exec "$0" try 0f 03
+    exec "$0" try "$T" 03
     ;;
 try)
     # Опыт со страховкой: переключить режим(ы) и ждать подтверждения «вижу экран».
@@ -95,7 +96,7 @@ try)
     shift
     [ "$#" -ge 1 ] || { echo "Укажи режимы, например: lab.sh try 07 0f"; exit 1; }
     for P in "$@"; do [[ "$P" =~ ^(03|07|0f)$ ]] || { echo "Неизвестный режим: $P"; exit 1; }; done
-    [ "$(id -u)" -eq 0 ] || exec sudo -E "$0" try "$@"
+    [ "$(id -u)" -eq 0 ] || exec sudo "$0" try "$@"
     mkdir -p "$KIT/results"
     RES="$KIT/results/try-$(date +%Y%m%d-%H%M%S).txt"
     PS="$(ls /sys/kernel/debug/dri/*/pstate | head -n 1)"
