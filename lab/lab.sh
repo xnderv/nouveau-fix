@@ -14,13 +14,15 @@
 #   lab.sh exp E|F [07|0f] — «только ядро» по рецепту twilight0, карта ОСТАЁТСЯ в режиме для нагрузки:
 #                      E — ядро без узлов вывода (hub), напряжение по таблице карты;
 #                      F — то же + напряжение не ниже 1,075 В (как у самой карты в 0f).
-#   lab.sh load [мин] — нагрузка glmark2 (по умолчанию 10 мин) с записью в results/.
+#   lab.sh load [мин] — тяжёлая нагрузка glmark2 1600x900 (по умолчанию 10 мин) с записью в results/.
 #   lab.sh bench 03 07 0f — замер: в каждом режиме ~1 мин glmark2, счёт, температура, реальные частоты.
 #                      HEAVY=1 перед командой — тяжёлый замер (окно 1600x900, сцены, нагружающие карту).
 #   lab.sh at ЯДРО ROP [HUB07 HUB06 HUB01] — свои частоты в МГц (0 = узел не трогать): ставит их,
 #                      переключает в 0f, делает замер, затем возвращает 07 по таблице карты.
 #                      Выше заводских значений 0f драйвер не поднимет (1800/1907/1907/1645/1645).
 #   lab.sh ladder [N] — ЛЕСТНИЦА: все узлы, кроме памяти, по ступенькам от меньшего риска к большему.
+#                      DIRECT=1 перед командой — каждая ступенька прыжком 03 → 0f, без промежуточного 07.
+#   lab.sh table 07|0f [мин] — режим ЦЕЛИКОМ по заводской таблице BIOS (все узлы), замер + нагрузка.
 #   lab.sh flags     — показать текущие переключатели лабораторного драйвера.
 #   lab.sh disp 0|1|2 — как ставить на паузу вывод изображения при смене частоты памяти.
 #   lab.sh restore   — вернуть стабильный драйвер из резервной копии (потом перезагрузка).
@@ -206,11 +208,12 @@ load)
     mkdir -p "$KIT/results"; [ -w "$KIT/results" ] || { echo "Папка results принадлежит root. Выполни: sudo chown -R $USER: $KIT/results"; exit 1; }
     OUT="$KIT/results/load-$(date +%Y%m%d-%H%M%S).txt"
     PS="$(ls /sys/kernel/debug/dri/*/pstate 2>/dev/null | head -n 1 || true)"
-    { echo "Нагрузка $M мин, начало $(date +%T)"; sudo -n cat "$PS" 2>/dev/null | grep '^AC' || true; } | tee "$OUT"; sync
+    { echo "Нагрузка $M мин (ТЯЖЁЛАЯ: 1600x900, 5 сцен по кругу), начало $(date +%T)"; sudo -n cat "$PS" 2>/dev/null | grep '^AC' || true; } | tee "$OUT"; sync
     END=$(( $(date +%s) + M * 60 )); N=0
     while [ "$(date +%s)" -lt "$END" ]; do
         N=$((N+1)); echo "$(date +%T) прогон $N" | tee -a "$OUT"; sync
-        "$G" --run-forever -b build:use-vbo=true >/dev/null 2>&1 & GP=$!
+        # Тяжёлая нагрузка: окно 1600x900, те же 5 тяжёлых сцен, что в HEAVY-замере, по кругу.
+        "$G" --run-forever -s 1600x900 -b shading:shading=phong -b bump:bump-render=high-poly -b effect2d:kernel=0,1,0\;1,-4,1\;0,1,0\; -b shadow -b refract >/dev/null 2>&1 & GP=$!
         sleep 60; kill "$GP" 2>/dev/null || true; wait "$GP" 2>/dev/null || true
         H="$(ls -d /sys/class/drm/card*/device/hwmon/hwmon* 2>/dev/null | head -n 1)"
         [ -n "$H" ] && echo "    GPU $(( $(cat "$H/temp1_input" 2>/dev/null || echo 0) / 1000 ))°C" | tee -a "$OUT"; sync
@@ -267,7 +270,8 @@ at)
     preflight 65147 0 0 0 0 0
     # Драйвер не перестраивает частоты, если режим не меняется, поэтому 07 «с нуля» — через 03.
     "$0" pstate 03 >/dev/null
-    if [ "${NOCONTROL:-0}" = 1 ]; then "$0" pstate 07 >/dev/null; echo "    (контрольный замер пропущен — он сделан в начале лестницы)"; else "$0" bench 07; fi
+    if [ "${DIRECT:-0}" = 1 ]; then echo "    ПРЯМОЙ ПРЫЖОК: остаёмся в 03, в 0f пойдём прямо отсюда (без 07)"
+    elif [ "${NOCONTROL:-0}" = 1 ]; then "$0" pstate 07 >/dev/null; echo "    (контрольный замер пропущен — он сделан в начале лестницы)"; else "$0" bench 07; fi
     # Шаг 2: свои частоты и переход в 0f.
     for i in 0 1 2 3 4; do sudo sh -c "echo $((A[i]*1000)) > $PRM/lab_${NAMES[$i]}_khz"; done
     sudo sh -c "echo $MASK > $PRM/lab_eng_mask"
@@ -304,12 +308,12 @@ ladder)
     )
     FROM="${2:-1}"; [[ "$FROM" =~ ^[1-8]$ ]] || { echo "Ступенька 1..8"; exit 1; }
     mkdir -p "$KIT/results"; LOG="$KIT/results/ladder-$(date +%Y%m%d-%H%M%S).txt"
-    echo "=== ЛЕСТНИЦА (память не трогаем; напряжение 0f = 1,075 В). План:"
+    echo "=== ЛЕСТНИЦА (память не трогаем; напряжение 0f = 1,075 В)$([ "${DIRECT:-0}" = 1 ] && echo '. ПРЯМЫЕ ПРЫЖКИ 03 → 0f, без 07'). План:"
     for i in "${!STEPS[@]}"; do n=$((i+1)); [ "$n" -ge "$FROM" ] && echo "  $n) ${STEPS[$i]#*|}   [ядро ROP hub07 hub06 hub01 = ${STEPS[$i]%%|*}]"; done
     echo "Каждая ступенька ~1,5 мин. При зависании: подожди минуту, Reset, затем lab.sh ladder <номер+1>."
     read -r -p "Начинаем? Enter — да, Ctrl+C — отмена " _
     sudo -v
-    { echo "Лестница $(date '+%F %T'), отпечаток $(md5sum "$0" | cut -c1-8), с $FROM"; } | tee "$LOG"; sync
+    { echo "Лестница $(date '+%F %T'), отпечаток $(md5sum "$0" | cut -c1-8), с $FROM, прямые прыжки: ${DIRECT:-0}"; } | tee "$LOG"; sync
     echo "=== Контрольный замер 07" | tee -a "$LOG"
     PRM=/sys/module/nouveau/parameters
     sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv; echo 65147 > $PRM/lab_eng_mask"
@@ -329,6 +333,31 @@ ladder)
     echo "=== Лестница пройдена целиком ✅  Итог: $LOG" | tee -a "$LOG"
     grep -E 'Ступенька|Режим' "$LOG"
     ;;
+table)
+    # Режим ЦЕЛИКОМ по заводской таблице BIOS: все узлы (и hub) перестраиваются, свои частоты выключены,
+    # память и PCIe не трогаем. Переход прямо из 03, тяжёлый замер, затем нагрузка, затем возврат.
+    T="${2:-}"; [[ "$T" =~ ^(07|0f)$ ]] || { echo "Укажи режим: lab.sh table 07  или  lab.sh table 0f [минуты нагрузки]"; exit 1; }
+    M="${3:-5}"; [[ "$M" =~ ^[0-9]+$ ]] || { echo "Минуты числом"; exit 1; }
+    PRM=/sys/module/nouveau/parameters
+    sudo -v
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv"
+    for n in gpc rop hub07 hub06 hub01; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
+    sudo sh -c "echo 65535 > $PRM/lab_eng_mask"
+    echo "=== Режим $T ЦЕЛИКОМ по таблице BIOS (все узлы, включая hub; память не трогаем), из 03"
+    preflight 65535 0 0 0 0 0
+    [ "$T" = 0f ] && echo "!!! 0f по таблице: ядро 1800, ROP/hubk07 1907, hubk06/hubk01 1645 — через PLL. Вчера так система вставала мгновенно."
+    [ "${NOCONFIRM:-0}" = 1 ] || read -r -p "Всё верно? Enter — запустить, Ctrl+C — отмена " _
+    "$0" pstate 03 >/dev/null
+    HEAVY=1 "$0" bench "$T" || true
+    echo "=== Нагрузка $M мин в режиме $T по таблице"
+    "$0" load "$M" || true
+    echo "=== Возврат: 03 по таблице (hub на стартовые), затем рабочий 07 (hub не трогаем)"
+    "$0" pstate 03 >/dev/null
+    sudo sh -c "echo 65147 > $PRM/lab_eng_mask"
+    "$0" pstate 07
+    echo "--- Узлы после возврата (по журналу драйвера):"
+    journalctl -k -b 0 --no-pager | grep -E 'LAB calc idx 0[01278] ' | tail -n 5 | sed -E 's/.*(LAB calc)/  \1/; s/ ssel.*//'
+    ;;
 restore)
     [ -e "$BACKUP" ] || { echo "Нет резервной копии $BACKUP. Стабильный драйвер можно пересобрать: ~/nouveau-fix/rebuild.sh"; exit 1; }
     sudo install -m 644 "$BACKUP" "$SLOT"
@@ -336,5 +365,5 @@ restore)
     echo "=== Стабильный драйвер возвращён. Перезагрузись и проверь: ~/nouveau-fix/check.sh"
     ;;
 *)
-    sed -n '2,25p' "$0"; exit 1 ;;
+    sed -n '2,27p' "$0"; exit 1 ;;
 esac
