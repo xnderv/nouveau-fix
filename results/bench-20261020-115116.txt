@@ -1,0 +1,14 @@
+Замер 2026-10-20 11:51:16
+  lab_core = Y
+  lab_disp_pause = 1
+  lab_eng_mask = 65147
+  lab_gpc_khz = 1800000
+  lab_hub01_khz = 0
+  lab_hub06_khz = 0
+  lab_hub07_khz = 0
+  lab_mem = Y
+  lab_pcie = Y
+  lab_rop_khz = 1800000
+  lab_volt_first = N
+  lab_volt_min_uv = 0
+=== Режим 0f: AC: core 900 MHz memory 2010 MHz, 42°C

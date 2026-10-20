@@ -1,0 +1,26 @@
+BIOS
+               total        used        free      shared  buff/cache   available
+Mem:              15           4           7           0           4          10
+ls: cannot open directory '/sys/fs/pstore': Permission denied
+CONFIG_EFI_VARS_PSTORE=m
+# CONFIG_EFI_VARS_PSTORE_DEFAULT_DISABLE is not set
+# CONFIG_PSTORE_CONSOLE is not set
+CONFIG_PSTORE_RAM=m
+00000000-00000fff : Reserved
+00001000-0009d7ff : System RAM
+0009d800-0009ffff : Reserved
+000e0000-000fffff : Reserved
+00100000-dde70fff : System RAM
+dde71000-de497fff : Reserved
+de5c3000-ded9efff : Reserved
+ded9f000-ded9ffff : System RAM
+dede3000-df599fff : System RAM
+df59a000-df7dafff : Reserved
+df7db000-df7fffff : System RAM
+    f8000000-fbffffff : Reserved
+fec00000-fec00fff : Reserved
+fed00000-fed03fff : Reserved
+fed1c000-fed1ffff : Reserved
+fee00000-fee00fff : Reserved
+ff000000-ffffffff : Reserved
+100000000-41effffff : System RAM

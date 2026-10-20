@@ -1,7 +1,6 @@
-diff --git a/nvkm/subdev/clk/base.c b/nvkm/subdev/clk/base.c
-index 572e638..41813a7 100644
---- a/nvkm/subdev/clk/base.c
-+++ b/nvkm/subdev/clk/base.c
+diff -ru base/nvkm/subdev/clk/base.c lab-n3/nvkm/subdev/clk/base.c
+--- base/nvkm/subdev/clk/base.c	2026-10-19 23:19:48.901191091 +0300
++++ lab-n3/nvkm/subdev/clk/base.c	2026-10-20 11:41:55.550834590 +0300
 @@ -34,6 +34,23 @@
  
  #include <core/option.h>
@@ -26,7 +25,7 @@ index 572e638..41813a7 100644
  /******************************************************************************
   * misc
   *****************************************************************************/
-@@ -190,12 +207,19 @@ nvkm_cstate_prog(struct nvkm_clk *clk, struct nvkm_pstate *pstate, int cstatei)
+@@ -190,12 +207,19 @@
  			nvkm_error(subdev, "failed to raise voltage: %d\n", ret);
  			return ret;
  		}
@@ -50,7 +49,7 @@ index 572e638..41813a7 100644
  	}
  
  	if (volt) {
-@@ -203,6 +227,7 @@ nvkm_cstate_prog(struct nvkm_clk *clk, struct nvkm_pstate *pstate, int cstatei)
+@@ -203,6 +227,7 @@
  				       pstate->base.voltage, clk->temp, -1);
  		if (ret && ret != -ENODEV)
  			nvkm_error(subdev, "failed to lower voltage: %d\n", ret);
@@ -58,7 +57,7 @@ index 572e638..41813a7 100644
  	}
  
  	if (therm) {
-@@ -280,20 +305,46 @@ nvkm_pstate_prog(struct nvkm_clk *clk, int pstatei)
+@@ -280,20 +305,46 @@
  	nvkm_debug(subdev, "setting performance state %d\n", pstatei);
  	clk->pstate = pstatei;
  
@@ -72,15 +71,15 @@ index 572e638..41813a7 100644
 +	} else {
 +		nvkm_info(subdev, "LAB pstate %d: pcie SKIPPED\n", pstatei);
 +	}
-+
+ 
+-	if (fb && fb->ram && fb->ram->func->calc) {
 +	if (lab_volt_first && subdev->device->volt) {
 +		struct nvkm_volt *volt = subdev->device->volt;
 +		int r = nvkm_volt_set_id(volt, pstate->base.voltage, pstate->base.voltage, clk->temp, +1);
 +		nvkm_info(subdev, "LAB voltage-first ret %d, now %d uV (id %d)\n",
 +			  r, nvkm_volt_get(volt), pstate->base.voltage);
 +	}
- 
--	if (fb && fb->ram && fb->ram->func->calc) {
++
 +	if (!lab_mem) {
 +		nvkm_info(subdev, "LAB pstate %d: memory SKIPPED (lab_mem=0)\n", pstatei);
 +	} else if (fb && fb->ram && fb->ram->func->calc) {
@@ -109,11 +108,91 @@ index 572e638..41813a7 100644
  }
  
  static void
-diff --git a/nvkm/subdev/clk/gf100.c b/nvkm/subdev/clk/gf100.c
-index 163c1b2..c4a1667 100644
---- a/nvkm/subdev/clk/gf100.c
-+++ b/nvkm/subdev/clk/gf100.c
-@@ -318,6 +318,8 @@ calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
+diff -ru base/nvkm/subdev/clk/gf100.c lab-n3/nvkm/subdev/clk/gf100.c
+--- base/nvkm/subdev/clk/gf100.c	2026-10-19 23:19:48.901228789 +0300
++++ lab-n3/nvkm/subdev/clk/gf100.c	2026-10-20 11:42:03.018333254 +0300
+@@ -23,6 +23,8 @@
+  */
+ #define gf100_clk(p) container_of((p), struct gf100_clk, base)
+ #include "priv.h"
++
++#include <linux/moduleparam.h>
+ #include "pll.h"
+ 
+ #include <subdev/bios.h>
+@@ -270,6 +272,41 @@
+ 	return ret;
+ }
+ 
++/* LAB: bitmask of clock engines (idx) that may be reprogrammed.
++ * bit 0 gpc, 1 rop, 2 hubk07, 7 hubk06, 8 hubk01, 9 copy, 12 pmu, 14 vdec.
++ * 0xfe7b = everything except the three hub clocks (twilight0 fix). */
++static uint lab_eng_mask = 0xffff;
++module_param(lab_eng_mask, uint, 0644);
++MODULE_PARM_DESC(lab_eng_mask, "LAB: bitmask of clock engines to reprogram (0xfe7b = skip hub clocks)");
++
++/* LAB: manual target frequencies (kHz) for any pstate switch; 0 = take from VBIOS table.
++ * Capped at the card's own pstate 0f values, so this can never overclock. */
++static uint lab_gpc_khz, lab_rop_khz, lab_hub07_khz, lab_hub06_khz, lab_hub01_khz;
++module_param(lab_gpc_khz, uint, 0644);
++module_param(lab_rop_khz, uint, 0644);
++module_param(lab_hub07_khz, uint, 0644);
++module_param(lab_hub06_khz, uint, 0644);
++module_param(lab_hub01_khz, uint, 0644);
++MODULE_PARM_DESC(lab_gpc_khz, "LAB: override gpc (core) target kHz, max 1800000");
++MODULE_PARM_DESC(lab_rop_khz, "LAB: override rop target kHz, max 1907000");
++
++static u32
++lab_override(int idx, u32 freq)
++{
++	uint want = 0, cap = 0;
++	switch (idx) {
++	case 0x00: want = lab_gpc_khz;   cap = 1800000; break;
++	case 0x01: want = lab_rop_khz;   cap = 1907000; break;
++	case 0x02: want = lab_hub07_khz; cap = 1907000; break;
++	case 0x07: want = lab_hub06_khz; cap = 1645000; break;
++	case 0x08: want = lab_hub01_khz; cap = 1645000; break;
++	default: return freq;
++	}
++	if (!want)
++		return freq;
++	return min(want, cap);
++}
++
+ static int
+ calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
+ {
+@@ -282,6 +319,18 @@
+ 	if (!freq)
+ 		return 0;
+ 
++	if (lab_override(idx, freq) != freq) {
++		nvkm_info(&clk->base.subdev, "LAB calc idx %02x: table %u kHz overridden to %u kHz\n",
++			  idx, freq, lab_override(idx, freq));
++		freq = lab_override(idx, freq);
++	}
++
++	if (!(lab_eng_mask & (1u << idx))) {
++		nvkm_info(&clk->base.subdev, "LAB calc idx %02x dom %d: SKIPPED by lab_eng_mask, stays %u kHz (wanted %u)\n",
++			  idx, dom, read_clk(clk, idx), freq);
++		return 0;
++	}
++
+ 	/* first possible path, using only dividers */
+ 	clk0 = calc_src(clk, idx, freq, &src0, &div0);
+ 	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
+@@ -291,7 +340,9 @@
+ 		if (idx <= 7)
+ 			clk1 = calc_pll(clk, idx, freq, &info->coef);
+ 		else
+-			clk1 = cstate->domain[nv_clk_src_hubk06];
++			clk1 = (lab_eng_mask & (1u << 0x07)) ?
++			       lab_override(0x07, cstate->domain[nv_clk_src_hubk06]) :
++			       read_clk(clk, 0x07);
+ 		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
+ 	}
+ 
+@@ -318,6 +369,8 @@
  		info->freq = clk1;
  	}
  
@@ -122,7 +201,7 @@ index 163c1b2..c4a1667 100644
  	return 0;
  }
  
-@@ -377,10 +379,15 @@ gf100_clk_prog_2(struct gf100_clk *clk, int idx)
+@@ -377,10 +430,15 @@
  
  			/* Test PLL lock */
  			nvkm_mask(device, addr + 0x00, 0x00000010, 0x00000000);
@@ -140,7 +219,7 @@ index 163c1b2..c4a1667 100644
  			nvkm_mask(device, addr + 0x00, 0x00000010, 0x00000010);
  
  			/* Enable sync mode */
-@@ -395,12 +402,16 @@ gf100_clk_prog_3(struct gf100_clk *clk, int idx)
+@@ -395,12 +453,16 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -159,7 +238,7 @@ index 163c1b2..c4a1667 100644
  	}
  }
  
-@@ -428,6 +439,7 @@ gf100_clk_prog(struct nvkm_clk *base)
+@@ -428,6 +490,7 @@
  	int i, j;
  
  	for (i = 0; i < ARRAY_SIZE(stage); i++) {
@@ -167,17 +246,16 @@ index 163c1b2..c4a1667 100644
  		for (j = 0; j < ARRAY_SIZE(clk->eng); j++) {
  			if (!clk->eng[j].freq)
  				continue;
-@@ -477,5 +489,5 @@ gf100_clk_new(struct nvkm_device *device, enum nvkm_subdev_type type, int inst,
+@@ -477,5 +540,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
 -	return nvkm_clk_ctor(&gf100_clk, device, type, inst, false, &clk->base);
 +	return nvkm_clk_ctor(&gf100_clk, device, type, inst, true, &clk->base);
  }
-diff --git a/nvkm/subdev/fb/ramgf100.c b/nvkm/subdev/fb/ramgf100.c
-index b6b8398..993f0b8 100644
---- a/nvkm/subdev/fb/ramgf100.c
-+++ b/nvkm/subdev/fb/ramgf100.c
+diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n3/nvkm/subdev/fb/ramgf100.c
+--- base/nvkm/subdev/fb/ramgf100.c	2026-10-19 23:19:48.902667898 +0300
++++ lab-n3/nvkm/subdev/fb/ramgf100.c	2026-10-20 11:41:55.562787363 +0300
 @@ -25,6 +25,15 @@
  #include "ram.h"
  #include "ramfuc.h"
@@ -194,7 +272,7 @@ index b6b8398..993f0b8 100644
  #include <core/option.h>
  #include <subdev/bios.h>
  #include <subdev/bios/pll.h>
-@@ -142,6 +151,13 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
+@@ -142,6 +151,13 @@
  	int from, mode;
  	int N1, M1, P;
  	int ret;
@@ -208,7 +286,7 @@ index b6b8398..993f0b8 100644
  
  	/* lookup memory config data relevant to the target frequency */
  	rammap.data = nvbios_rammapEm(bios, freq / 1000, &ver, &rammap.size,
-@@ -268,7 +284,10 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
+@@ -268,7 +284,10 @@
  	ram_wr32(fuc, 0x100b0c, 0x00080012);
  // 0x00030014 // 0x00000000 // 0x02b5f070
  // 0x00030014 // 0x00010000 // 0x02b5f070
@@ -220,7 +298,7 @@ index b6b8398..993f0b8 100644
  // 0x00020034 // 0x0000000a
  // 0x00030020 // 0x00000001 // 0x00000000
  
-@@ -322,7 +341,7 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
+@@ -322,7 +341,7 @@
  		ram_wr32(fuc, 0x10f344, 0x00600009);
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700008);
@@ -229,7 +307,7 @@ index b6b8398..993f0b8 100644
  		ram_wr32(fuc, 0x10f830, 0x00300017);
  		gf100_ram_train(fuc, 0x80021001);
  		gf100_ram_train(fuc, 0x80081001);
-@@ -333,7 +352,8 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
+@@ -333,7 +352,8 @@
  // 0x00030020 // 0x00000000 // 0x00000000
  // 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -239,7 +317,7 @@ index b6b8398..993f0b8 100644
  	} else {
  		ram_wr32(fuc, 0x10f800, 0x00001800);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
-@@ -376,7 +396,7 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
+@@ -376,7 +396,7 @@
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700000);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
@@ -248,7 +326,7 @@ index b6b8398..993f0b8 100644
  
  		gf100_ram_train(fuc, 0x800e1008);
  
-@@ -386,7 +406,8 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
+@@ -386,7 +406,8 @@
  	// 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -258,3 +336,43 @@ index b6b8398..993f0b8 100644
  		ram_nsec(fuc, 100000);
  		ram_wr32(fuc, 0x10f9b0, 0x05313f41);
  		ram_wr32(fuc, 0x10f9b4, 0x00002f50);
+diff -ru base/nvkm/subdev/volt/base.c lab-n3/nvkm/subdev/volt/base.c
+--- base/nvkm/subdev/volt/base.c	2026-10-19 23:19:48.908584718 +0300
++++ lab-n3/nvkm/subdev/volt/base.c	2026-10-20 11:41:55.658295887 +0300
+@@ -28,6 +28,8 @@
+ #include <subdev/bios/volt.h>
+ #include <subdev/therm.h>
+ 
++#include <linux/moduleparam.h>
++
+ int
+ nvkm_volt_get(struct nvkm_volt *volt)
+ {
+@@ -156,6 +158,13 @@
+ 	return id ? id * 10000 : -ENODEV;
+ }
+ 
++/* LAB: minimum voltage for every pstate (0 = as in VBIOS table).
++ * Capped at 1.075 V - what this card itself uses at full load (pstate 0f). */
++#define LAB_VOLT_CAP_UV 1075000
++static int lab_volt_min_uv;
++module_param(lab_volt_min_uv, int, 0644);
++MODULE_PARM_DESC(lab_volt_min_uv, "LAB: voltage floor in uV for all pstates (0 = off, capped at 1075000)");
++
+ int
+ nvkm_volt_set_id(struct nvkm_volt *volt, u8 id, u8 min_id, u8 temp,
+ 		 int condition)
+@@ -166,6 +175,13 @@
+ 		return volt->func->set_id(volt, id, condition);
+ 
+ 	ret = nvkm_volt_map(volt, id, temp);
++	if (ret >= 0 && lab_volt_min_uv > 0) {
++		int floor = min(lab_volt_min_uv, LAB_VOLT_CAP_UV);
++		if (ret < floor) {
++			nvkm_info(&volt->subdev, "LAB volt: table %d uV raised to floor %d uV\n", ret, floor);
++			ret = floor;
++		}
++	}
+ 	if (ret >= 0) {
+ 		int prev = nvkm_volt_get(volt);
+ 		if (!condition || prev < 0 ||

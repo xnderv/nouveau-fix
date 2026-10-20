@@ -1,0 +1,48 @@
+Замер 2026-10-20 11:36:32
+  lab_core = Y
+  lab_disp_pause = 1
+  lab_eng_mask = 65145
+  lab_mem = N
+  lab_pcie = N
+  lab_volt_first = Y
+  lab_volt_min_uv = 0
+=== Режим 0f: AC: core 900 MHz memory 135 MHz, 41°C
+=======================================================
+    glmark2 2023.01
+=======================================================
+    OpenGL Information
+    GL_VENDOR:      Mesa
+    GL_RENDERER:    NVCE
+    GL_VERSION:     4.3 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+    Surface Config: buf=32 r=8 g=8 b=8 a=8 depth=24 stencil=0 samples=0
+    Surface Size:   800x600 windowed
+=======================================================
+[build] use-vbo=true: FPS: 120 FrameTime: 8.357 ms
+[texture] <default>: FPS: 505 FrameTime: 1.983 ms
+[shading] shading=phong: FPS: 231 FrameTime: 4.337 ms
+[refract] <default>: FPS: 29 FrameTime: 34.533 ms
+[desktop] <default>: FPS: 41 FrameTime: 24.752 ms
+=======================================================
+                                  glmark2 Score: 184 
+=======================================================
+=== Режим 0f: glmark2 Score: 184, после теста 40°C
+=== Режим 07: AC: core 405 MHz memory 135 MHz, 41°C
+=======================================================
+    glmark2 2023.01
+=======================================================
+    OpenGL Information
+    GL_VENDOR:      Mesa
+    GL_RENDERER:    NVCE
+    GL_VERSION:     4.3 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+    Surface Config: buf=32 r=8 g=8 b=8 a=8 depth=24 stencil=0 samples=0
+    Surface Size:   800x600 windowed
+=======================================================
+[build] use-vbo=true: FPS: 1636 FrameTime: 0.611 ms
+[texture] <default>: FPS: 1214 FrameTime: 0.824 ms
+[shading] shading=phong: FPS: 1061 FrameTime: 0.943 ms
+[refract] <default>: FPS: 93 FrameTime: 10.778 ms
+[desktop] <default>: FPS: 281 FrameTime: 3.569 ms
+=======================================================
+                                  glmark2 Score: 856 
+=======================================================
+=== Режим 07: glmark2 Score: 856, после теста 42°C

@@ -1,0 +1,106 @@
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=0 mem=0 core=1 volt_first=1
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie SKIPPED
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 950000 uV (id 1)
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 950000 uV (cstate voltage id 1)
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: SKIPPED by lab_eng_mask, stays 270000 kHz (wanted 810000)
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: SKIPPED by lab_eng_mask, stays 270000 kHz (wanted 810000)
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: SKIPPED by lab_eng_mask, stays 540000 kHz (wanted 810000)
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 20 11:04:11 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=0 mem=0 core=1 volt_first=1
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie SKIPPED
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: SKIPPED by lab_eng_mask, stays 270000 kHz (wanted 1907000)
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: SKIPPED by lab_eng_mask, stays 270000 kHz (wanted 1645000)
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: SKIPPED by lab_eng_mask, stays 540000 kHz (wanted 1645000)
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 00012809
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 01 PLL locked ctrl 00030001 coef 00012107
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 20 11:15:32 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=0 mem=0 core=1 volt_first=1
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: pcie SKIPPED
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 0)
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: memory SKIPPED (lab_mem=0)
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 0)
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 101000 got 100894 ssel 00000001 coef 0013470f dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 270000 got 270000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000a0a mdiv 00000000
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: SKIPPED by lab_eng_mask, stays 270000 kHz (wanted 270000)
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: SKIPPED by lab_eng_mask, stays 270000 kHz (wanted 270000)
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: SKIPPED by lab_eng_mask, stays 540000 kHz (wanted 540000)
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 135000 got 135000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000016
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 135000 got 135000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000016
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 0013470f
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 20 11:27:56 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=0 mem=0 core=1 volt_first=1
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie SKIPPED
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 950000 uV (id 1)
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 950000 uV (cstate voltage id 1)
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: SKIPPED by lab_eng_mask, stays 270000 kHz (wanted 810000)
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: SKIPPED by lab_eng_mask, stays 270000 kHz (wanted 810000)
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: SKIPPED by lab_eng_mask, stays 540000 kHz (wanted 810000)
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 20 11:28:50 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=0 mem=0 core=1 volt_first=1
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie SKIPPED
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: SKIPPED by lab_eng_mask, stays 270000 kHz (wanted 1907000)
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: SKIPPED by lab_eng_mask, stays 270000 kHz (wanted 1645000)
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: SKIPPED by lab_eng_mask, stays 540000 kHz (wanted 1645000)
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 00012809
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 01 PLL locked ctrl 00030001 coef 00012107
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 20 11:29:44 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=0 mem=0 core=1 volt_first=1
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie SKIPPED
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 1)
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 1)
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: SKIPPED by lab_eng_mask, stays 270000 kHz (wanted 810000)
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: SKIPPED by lab_eng_mask, stays 270000 kHz (wanted 810000)
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: SKIPPED by lab_eng_mask, stays 540000 kHz (wanted 810000)
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 20 11:33:52 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0

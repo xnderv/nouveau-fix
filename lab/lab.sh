@@ -11,6 +11,16 @@
 #   lab.sh exp A|B|C|D [07|0f] — опыты «по одному параметру», каждый = try <режим> 03 (по умолчанию 0f):
 #                      A — только напряжение; B — напряжение + память; C — напряжение + ядро;
 #                      D — всё вместе (напряжение поднимается первым).
+#   lab.sh exp E|F [07|0f] — «только ядро» по рецепту twilight0, карта ОСТАЁТСЯ в режиме для нагрузки:
+#                      E — ядро без узлов вывода (hub), напряжение по таблице карты;
+#                      F — то же + напряжение не ниже 1,075 В (как у самой карты в 0f).
+#   lab.sh load [мин] — нагрузка glmark2 (по умолчанию 10 мин) с записью в results/.
+#   lab.sh bench 03 07 0f — замер: в каждом режиме ~1 мин glmark2, счёт, температура, реальные частоты.
+#                      HEAVY=1 перед командой — тяжёлый замер (окно 1600x900, сцены, нагружающие карту).
+#   lab.sh at ЯДРО ROP [HUB07 HUB06 HUB01] — свои частоты в МГц (0 = узел не трогать): ставит их,
+#                      переключает в 0f, делает замер, затем возвращает 07 по таблице карты.
+#                      Выше заводских значений 0f драйвер не поднимет (1800/1907/1907/1645/1645).
+#   lab.sh ladder [N] — ЛЕСТНИЦА: все узлы, кроме памяти, по ступенькам от меньшего риска к большему.
 #   lab.sh flags     — показать текущие переключатели лабораторного драйвера.
 #   lab.sh disp 0|1|2 — как ставить на паузу вывод изображения при смене частоты памяти.
 #   lab.sh restore   — вернуть стабильный драйвер из резервной копии (потом перезагрузка).
@@ -24,6 +34,25 @@ KBUILD="/lib/modules/$KVER/build"
 SLOT="/lib/modules/$KVER/updates/nouveau-fix/nouveau.ko"
 BACKUP="$HOME/nouveau-build/stable-$KVER-nouveau.ko"
 WORK="$HOME/nouveau-build/lab-$KVER"
+
+preflight() {  # $1 = ожидаемая маска, $2..$6 = ожидаемые частоты gpc rop hub07 hub06 hub01 (кГц)
+    local P=/sys/module/nouveau/parameters ok=1 a
+    chk() { a="$(cat "$P/$1" 2>/dev/null || echo НЕТ)"
+            if [ "$a" = "$2" ]; then printf '  ✓ %-16s = %s\n' "$1" "$a"; else printf '  ✗ %-16s = %s (нужно %s)\n' "$1" "$a" "$2"; ok=0; fi; }
+    echo "--- Проверка окружения ---"
+    echo "  скрипт lab.sh: $(md5sum "$0" | cut -c1-8)"
+    if [ "$(modinfo -n nouveau)" = "$SLOT" ] && [ -e "$P/lab_gpc_khz" ]; then echo "  ✓ лабораторный драйвер загружен"; else echo "  ✗ лабораторный драйвер НЕ загружен"; ok=0; fi
+    chk lab_mem N; chk lab_pcie N; chk lab_core Y; chk lab_volt_first Y; chk lab_volt_min_uv 0
+    chk lab_eng_mask "$1"; chk lab_gpc_khz "$2"; chk lab_rop_khz "$3"
+    chk lab_hub07_khz "$4"; chk lab_hub06_khz "$5"; chk lab_hub01_khz "$6"
+    if [ "$(sysctl -n kernel.hardlockup_panic 2>/dev/null)" = 1 ] && lsmod | grep -q '^ramoops'; then echo "  ✓ ловушка: ramoops + остановка при жёстком зависании"
+    else echo "  ✗ ловушка не готова (нужно: sudo sysctl -w kernel.hardlockup_panic=1)"; ok=0; fi
+    [ -z "$(sudo ls -A /var/lib/systemd/pstore 2>/dev/null)" ] || echo "  ⚠ в /var/lib/systemd/pstore лежит старый улов — сохрани его, иначе перепутаем"
+    [ -w "$KIT/results" ] && echo "  ✓ results/ доступна для записи" || { echo "  ✗ results/ недоступна"; ok=0; }
+    echo "  режим сейчас: $(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate | head -n 1')"
+    [ "$ok" = 1 ] || { echo "--- СТОП: окружение не то. Опыт не запускаю."; exit 1; }
+    echo "--- Окружение верное"
+}
 
 case "${1:-}" in
 install)
@@ -76,25 +105,33 @@ flags|exp)
     PRM=/sys/module/nouveau/parameters
     [ -e "$PRM/lab_core" ] || { echo "Лабораторный драйвер не загружен (нет $PRM/lab_core). Сначала: lab.sh install и перезагрузка."; exit 1; }
     if [ "$1" = flags ]; then
-        for f in lab_pcie lab_mem lab_core lab_volt_first lab_disp_pause; do [ -e "$PRM/$f" ] && echo "$f = $(cat "$PRM/$f")"; done
+        for f in lab_pcie lab_mem lab_core lab_volt_first lab_disp_pause lab_eng_mask lab_volt_min_uv; do [ -e "$PRM/$f" ] && echo "$f = $(cat "$PRM/$f")"; done
         exit 0
     fi
     E="${2:-}"
     case "$E" in
-        A) F="0 0 0 1"; D="только напряжение (без PCIe, памяти и ядра)";;
-        B) F="0 1 0 1"; D="напряжение + память";;
-        C) F="0 0 1 1"; D="напряжение + ядро";;
-        D) F="1 1 1 1"; D="всё: PCIe + напряжение + память + ядро";;
-        *) echo "Укажи опыт: A, B, C или D"; exit 1;;
+        A) F="0 0 0 1 65535 0"; D="только напряжение (без PCIe, памяти и ядра)";;
+        B) F="0 1 0 1 65535 0"; D="напряжение + память";;
+        C) F="0 0 1 1 65535 0"; D="напряжение + ядро";;
+        D) F="1 1 1 1 65535 0"; D="всё: PCIe + напряжение + память + ядро";;
+        E) F="0 0 1 1 65147 0"; D="только ядро, узлы вывода (hub) не трогаем, напряжение по таблице";;
+        F) F="0 0 1 1 65147 1075000"; D="только ядро без hub + напряжение не ниже 1,075 В";;
+        *) echo "Укажи опыт: A, B, C, D, E или F"; exit 1;;
     esac
+    [ -e "$PRM/lab_eng_mask" ] || { echo "Загружен старый лабораторный драйвер без lab_eng_mask. Сначала: lab.sh install и перезагрузка."; exit 1; }
     T="${3:-0f}"; [[ "$T" =~ ^(07|0f)$ ]] || { echo "Режим опыта: 07 или 0f"; exit 1; }
     [ "$(id -u)" -eq 0 ] || exec sudo "$0" exp "$E" "$T"
-    read -r PC ME CO VF <<<"$F"
+    read -r PC ME CO VF EM VM <<<"$F"
     echo "$PC" > "$PRM/lab_pcie"; echo "$ME" > "$PRM/lab_mem"
     echo "$CO" > "$PRM/lab_core"; echo "$VF" > "$PRM/lab_volt_first"
+    echo "$EM" > "$PRM/lab_eng_mask"; echo "$VM" > "$PRM/lab_volt_min_uv"
     echo "=== Опыт $E ($T): $D"
-    for f in lab_pcie lab_mem lab_core lab_volt_first; do echo "    $f = $(cat "$PRM/$f")"; done
-    exec "$0" try "$T" 03
+    for f in lab_pcie lab_mem lab_core lab_volt_first lab_eng_mask lab_volt_min_uv; do echo "    $f = $(cat "$PRM/$f")"; done
+    case "$E" in
+        E|F) echo "=== Карта останется в режиме $T. Дальше нагрузка: ~/nouveau-fix/lab/lab.sh load"
+             exec "$0" try "$T" ;;
+        *)   exec "$0" try "$T" 03 ;;
+    esac
     ;;
 try)
     # Опыт со страховкой: переключить режим(ы) и ждать подтверждения «вижу экран».
@@ -106,7 +143,7 @@ try)
     mkdir -p "$KIT/results"
     RES="$KIT/results/try-$(date +%Y%m%d-%H%M%S).txt"
     PS="$(ls /sys/kernel/debug/dri/*/pstate | head -n 1)"
-    note() { echo "$(date +%T) $*" | tee -a "$RES"; sync; }
+    note() { echo "$(date +%T) $*" | tee -a "$RES"; [ -w /dev/pmsg0 ] && echo "LABTRY $(date +%T) $*" > /dev/pmsg0 2>/dev/null; sync; }
     temp() {  # температура GPU и вентилятор (если драйвер их сообщает)
         local h; h="$(ls -d /sys/class/drm/card*/device/hwmon/hwmon* 2>/dev/null | head -n 1)"
         [ -n "$h" ] || { echo "датчик не найден"; return; }
@@ -140,6 +177,11 @@ try)
         echo b > /proc/sysrq-trigger
         exit 1
     }
+    if [ -w /dev/pmsg0 ]; then  # «чёрный ящик» (trap.sh): журнал ядра на лету в память, переживающую Reset
+        dmesg -W > /dev/pmsg0 2>/dev/null & PM=$!
+        trap 'kill $PM 2>/dev/null || true' EXIT
+        note "Чёрный ящик: журнал пишется в /dev/pmsg0"
+    fi
     note "Опыт: режимы $* (драйвер: $(modinfo -n nouveau))"
     for f in /sys/module/nouveau/parameters/lab_*; do [ -e "$f" ] && note "  $(basename "$f") = $(cat "$f")"; done
     note "Исходно: $(grep '^AC' "$PS"); $(temp)"
@@ -156,6 +198,137 @@ try)
     note "Все режимы прошли. Карта остаётся в режиме ${*: -1} до перезагрузки."
     echo "Результат: $RES"
     ;;
+load)
+    # Нагрузка для проверки стабильности в текущем режиме. Запускать БЕЗ sudo.
+    M="${2:-10}"; [[ "$M" =~ ^[0-9]+$ ]] || { echo "Укажи минуты числом"; exit 1; }
+    command -v glmark2-wayland >/dev/null || command -v glmark2 >/dev/null || { echo "Нет glmark2: sudo apt install glmark2-wayland"; exit 1; }
+    G="$(command -v glmark2-wayland || command -v glmark2)"
+    mkdir -p "$KIT/results"; [ -w "$KIT/results" ] || { echo "Папка results принадлежит root. Выполни: sudo chown -R $USER: $KIT/results"; exit 1; }
+    OUT="$KIT/results/load-$(date +%Y%m%d-%H%M%S).txt"
+    PS="$(ls /sys/kernel/debug/dri/*/pstate 2>/dev/null | head -n 1 || true)"
+    { echo "Нагрузка $M мин, начало $(date +%T)"; sudo -n cat "$PS" 2>/dev/null | grep '^AC' || true; } | tee "$OUT"; sync
+    END=$(( $(date +%s) + M * 60 )); N=0
+    while [ "$(date +%s)" -lt "$END" ]; do
+        N=$((N+1)); echo "$(date +%T) прогон $N" | tee -a "$OUT"; sync
+        "$G" --run-forever -b build:use-vbo=true >/dev/null 2>&1 & GP=$!
+        sleep 60; kill "$GP" 2>/dev/null || true; wait "$GP" 2>/dev/null || true
+        H="$(ls -d /sys/class/drm/card*/device/hwmon/hwmon* 2>/dev/null | head -n 1)"
+        [ -n "$H" ] && echo "    GPU $(( $(cat "$H/temp1_input" 2>/dev/null || echo 0) / 1000 ))°C" | tee -a "$OUT"; sync
+    done
+    echo "$(date +%T) Нагрузка $M мин пройдена без зависания ✅" | tee -a "$OUT"; sync
+    ;;
+bench)
+    # Сравнение режимов. Переключатели лабораторного драйвера (опыт E/F) должны быть уже выставлены.
+    shift; [ "$#" -ge 1 ] || set -- 03 07 0f
+    for P in "$@"; do [[ "$P" =~ ^(03|07|0f)$ ]] || { echo "Неизвестный режим: $P"; exit 1; }; done
+    G="$(command -v glmark2-wayland || command -v glmark2 || true)"; [ -n "$G" ] || { echo "Нет glmark2"; exit 1; }
+    mkdir -p "$KIT/results"; [ -w "$KIT/results" ] || { echo "Выполни: sudo chown -R $USER: $KIT/results"; exit 1; }
+    OUT="$KIT/results/bench-$(date +%Y%m%d-%H%M%S).txt"
+    if [ "$(cat /sys/module/nouveau/parameters/lab_mem 2>/dev/null)" = Y ] && [[ " $* " == *" 0f "* || " $* " == *" 07 "* ]]; then
+        echo "СТОП: lab_mem=Y — смена режима потащит за собой память, а она у нас вешает систему."
+        echo "Сначала выставь опыт: lab.sh exp E 07 (или используй lab.sh at ...)."; exit 1
+    fi
+    sudo -v
+    PS="$(sudo sh -c 'ls /sys/kernel/debug/dri/*/pstate | head -n 1')"
+    H="$(ls -d /sys/class/drm/card*/device/hwmon/hwmon* 2>/dev/null | head -n 1)"
+    t() { [ -n "$H" ] && echo "$(( $(cat "$H/temp1_input" 2>/dev/null || echo 0) / 1000 ))°C" || echo "?"; }
+    { echo "Замер $(date '+%F %T') ($([ "${QUICK:-0}" = 1 ] && echo 'БЫСТРЫЙ ТЯЖЁЛЫЙ, 1600x900, 3 сцены' || { [ "${HEAVY:-0}" = 1 ] && echo 'ТЯЖЁЛЫЙ, 1600x900' || echo 'обычный, 800x600'; }))"; for f in /sys/module/nouveau/parameters/lab_*; do echo "  $(basename "$f") = $(cat "$f")"; done; } | tee "$OUT"
+    for P in "$@"; do
+        sudo sh -c "echo $P > $PS"; sleep 3
+        echo "=== Режим $P: $(sudo grep '^AC' "$PS"), $(t)" | tee -a "$OUT"; sync
+        if [ "${QUICK:-0}" = 1 ]; then  # быстрый тяжёлый замер для лестницы: 3 сцены, ~30 с
+            GA=(-s 1600x900 -b shading:shading=phong -b effect2d:kernel=0,1,0\;1,-4,1\;0,1,0\; -b refract)
+        elif [ "${HEAVY:-0}" = 1 ]; then  # тяжёлый замер: большое окно, сцены, упирающиеся в карту
+            GA=(-s 1600x900 -b shading:shading=phong -b bump:bump-render=high-poly -b effect2d:kernel=0,1,0\;1,-4,1\;0,1,0\; -b shadow -b refract)
+        else
+            GA=(-b build:use-vbo=true -b texture -b shading:shading=phong -b refract -b desktop)
+        fi
+        SC="$("$G" "${GA[@]}" 2>&1 | tee -a "$OUT" | grep -o 'Score: [0-9]*' | tail -n 1)"
+        echo "=== Режим $P: glmark2 $SC, после теста $(t)" | tee -a "$OUT"; sync
+    done
+    echo; grep '^=== ' "$OUT"
+    echo "Карта осталась в режиме ${*: -1}. Полный вывод: $OUT"
+    ;;
+at)
+    shift; [ "$#" -ge 2 ] || { echo "Пример: lab.sh at 1080 810   (ядро и ROP в МГц; 0 = не трогать)"; exit 1; }
+    PRM=/sys/module/nouveau/parameters
+    [ -e "$PRM/lab_gpc_khz" ] || { echo "Нужен новый лабораторный драйвер: lab.sh install и перезагрузка."; exit 1; }
+    for v in "$@"; do [[ "$v" =~ ^[0-9]+$ ]] || { echo "Частоты числами в МГц"; exit 1; }; done
+    NAMES=(gpc rop hub07 hub06 hub01); BITS=(1 2 4 128 256)
+    MASK=$((0xffff & ~(1|2|4|128|256)))   # все узлы, кроме ядра, ROP и hub — их включаем по запросу
+    A=("$@" 0 0 0 0 0)
+    for i in 0 1 2 3 4; do [ "${A[$i]}" -gt 0 ] && MASK=$((MASK | BITS[i])); done
+    sudo -v
+    # Шаг 0: только ядро/узлы — память и PCIe НЕ трогаем, напряжение первым, свои частоты сброшены.
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv"
+    for n in "${NAMES[@]}"; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
+    sudo sh -c "echo 65147 > $PRM/lab_eng_mask"
+    echo "=== Шаг 1: контрольный замер в 07 по таблице (ядро/ROP 810, hub не трогаем)"
+    preflight 65147 0 0 0 0 0
+    # Драйвер не перестраивает частоты, если режим не меняется, поэтому 07 «с нуля» — через 03.
+    "$0" pstate 03 >/dev/null
+    if [ "${NOCONTROL:-0}" = 1 ]; then "$0" pstate 07 >/dev/null; echo "    (контрольный замер пропущен — он сделан в начале лестницы)"; else "$0" bench 07; fi
+    # Шаг 2: свои частоты и переход в 0f.
+    for i in 0 1 2 3 4; do sudo sh -c "echo $((A[i]*1000)) > $PRM/lab_${NAMES[$i]}_khz"; done
+    sudo sh -c "echo $MASK > $PRM/lab_eng_mask"
+    echo "=== Шаг 2: 0f со своими частотами: ядро ${A[0]} МГц, ROP ${A[1]} МГц, hub ${A[2]}/${A[3]}/${A[4]} МГц (0 = не трогаем)"
+    preflight "$MASK" $((A[0]*1000)) $((A[1]*1000)) $((A[2]*1000)) $((A[3]*1000)) $((A[4]*1000))
+    [ "${NOCONFIRM:-0}" = 1 ] || read -r -p "Всё верно? Enter — запустить, Ctrl+C — отмена " _
+    "$0" bench 0f || true
+    # Шаг 3: обратно в 07 по таблице. Сначала 03 — там таблица карты = стартовые частоты hub,
+    # и тронутые в опыте hub разрешено перестроить (иначе они остались бы на опытных частотах).
+    for n in "${NAMES[@]}"; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
+    RM=65147; for i in 2 3 4; do [ "${A[$i]}" -gt 0 ] && RM=$((RM | BITS[i])); done
+    echo "=== Шаг 3: возвращаю 03 (hub на стартовые), затем 07 по таблице карты"
+    sudo sh -c "echo $RM > $PRM/lab_eng_mask"
+    "$0" pstate 03 >/dev/null
+    sudo sh -c "echo 65147 > $PRM/lab_eng_mask"
+    "$0" pstate 07
+    echo "--- Узлы после возврата (по журналу драйвера):"
+    journalctl -k -b 0 --no-pager | grep -E 'LAB calc idx 0[01278] ' | tail -n 5 | sed -E 's/.*(LAB calc)/  \1/; s/ ssel.*//'
+    ;;
+ladder)
+    # ЛЕСТНИЦА: все узлы, кроме памяти, по ступенькам от меньшего риска к большему.
+    # Каждая ступенька: 07 (через 03) → 0f со своими частотами → быстрый тяжёлый замер → возврат 07.
+    # Частоты — только те, что делитель даёт точно (3240 / n МГц), PLL не используется.
+    # lab.sh ladder [N] — начать со ступеньки N (после зависания — продолжить со следующей).
+    STEPS=(
+        "1620 810 0 0 0|ядро 1620 (≈эталон NVIDIA 1644), остальное как в 07"
+        "1620 1620 0 0 0|ядро и ROP 1620"
+        "810 810 810 0 0|hubk07 810 (значение таблицы 07)"
+        "810 810 0 810 0|hubk06 810 (значение таблицы 07)"
+        "810 810 0 0 810|hubk01 810 (значение таблицы 07)"
+        "810 810 810 810 810|весь 07 по таблице: все узлы 810 (вчера под нагрузкой висло)"
+        "1080 1080 1080 1080 1080|все узлы 1080"
+        "1620 1620 1620 1620 1620|все узлы 1620 (≈эталон NVIDIA, выше только заводской разгон)"
+    )
+    FROM="${2:-1}"; [[ "$FROM" =~ ^[1-8]$ ]] || { echo "Ступенька 1..8"; exit 1; }
+    mkdir -p "$KIT/results"; LOG="$KIT/results/ladder-$(date +%Y%m%d-%H%M%S).txt"
+    echo "=== ЛЕСТНИЦА (память не трогаем; напряжение 0f = 1,075 В). План:"
+    for i in "${!STEPS[@]}"; do n=$((i+1)); [ "$n" -ge "$FROM" ] && echo "  $n) ${STEPS[$i]#*|}   [ядро ROP hub07 hub06 hub01 = ${STEPS[$i]%%|*}]"; done
+    echo "Каждая ступенька ~1,5 мин. При зависании: подожди минуту, Reset, затем lab.sh ladder <номер+1>."
+    read -r -p "Начинаем? Enter — да, Ctrl+C — отмена " _
+    sudo -v
+    { echo "Лестница $(date '+%F %T'), отпечаток $(md5sum "$0" | cut -c1-8), с $FROM"; } | tee "$LOG"; sync
+    echo "=== Контрольный замер 07" | tee -a "$LOG"
+    PRM=/sys/module/nouveau/parameters
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv; echo 65147 > $PRM/lab_eng_mask"
+    for n in gpc rop hub07 hub06 hub01; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
+    "$0" pstate 03 >/dev/null
+    { QUICK=1 "$0" bench 07 | grep '^=== Режим' | tail -n 1 || true; } | tee -a "$LOG"; sync
+    for i in "${!STEPS[@]}"; do
+        n=$((i+1)); [ "$n" -ge "$FROM" ] || continue
+        F="${STEPS[$i]%%|*}"
+        echo "=== Ступенька $n НАЧАТА $(date +%T): ${STEPS[$i]#*|}" | tee -a "$LOG"; sync
+        # shellcheck disable=SC2086
+        R="$(QUICK=1 NOCONTROL=1 NOCONFIRM=1 "$0" at $F 2>&1 | tee /dev/stderr | grep -E '^=== Режим 0f: glmark2|^  ✗|^--- СТОП' | tail -n 3 || true)"
+        echo "$R" | sed 's/^/    /' | tee -a "$LOG"
+        if grep -q 'СТОП\|✗' <<<"$R"; then echo "=== Ступенька $n: окружение не то — лестница остановлена" | tee -a "$LOG"; sync; exit 1; fi
+        echo "=== Ступенька $n ПРОЙДЕНА $(date +%T), система жива" | tee -a "$LOG"; sync
+    done
+    echo "=== Лестница пройдена целиком ✅  Итог: $LOG" | tee -a "$LOG"
+    grep -E 'Ступенька|Режим' "$LOG"
+    ;;
 restore)
     [ -e "$BACKUP" ] || { echo "Нет резервной копии $BACKUP. Стабильный драйвер можно пересобрать: ~/nouveau-fix/rebuild.sh"; exit 1; }
     sudo install -m 644 "$BACKUP" "$SLOT"
@@ -163,5 +336,5 @@ restore)
     echo "=== Стабильный драйвер возвращён. Перезагрузись и проверь: ~/nouveau-fix/check.sh"
     ;;
 *)
-    sed -n '2,17p' "$0"; exit 1 ;;
+    sed -n '2,25p' "$0"; exit 1 ;;
 esac
