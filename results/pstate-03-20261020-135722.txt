@@ -1,0 +1,4 @@
+03: core 50 MHz memory 135 MHz AC DC *
+07: core 405 MHz memory 324 MHz
+0f: core 900 MHz memory 2004 MHz
+AC: core 607 MHz memory 135 MHz

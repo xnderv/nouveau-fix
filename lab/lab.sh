@@ -24,7 +24,11 @@
 #                      DIRECT=1 перед командой — каждая ступенька прыжком 03 → 0f, без промежуточного 07.
 #   lab.sh table 07|0f [мин] — режим ЦЕЛИКОМ по заводской таблице BIOS (все узлы), замер + нагрузка.
 #   lab.sh hold ЯДРО ROP [HUB07 HUB06 HUB01] — поставить свои частоты в 0f и оставить (для чтения регистров).
-#   lab.sh home      — вернуть рабочий 07 (ядро/ROP 810, hub на стартовых).
+#   lab.sh home      — вернуть рабочий 07 (ядро/ROP 810, hub на стартовых), lab_gpc_fix = 0.
+#   GPCFIX=1|2|3|4 перед at/hold — опыт с PLL ядра (1: снять 0x1000 в 0x137120 до переключения;
+#                      2: снять 0x200000 в 0x137008; 4: снять 0x1000 ПОСЛЕ переключения на PLL). В at — только на шаге 2.
+#   lab.sh calib [МГц …] — калибровка ядра: скорость вычислений на заданных частотах (по умолчанию 8 точек).
+#   lab.sh pllcmp    — ядро на одинаковой частоте через делитель и через PLL (P = 1, 2, 3, 4).
 #   lab.sh flags     — показать текущие переключатели лабораторного драйвера.
 #   lab.sh disp 0|1|2 — как ставить на паузу вывод изображения при смене частоты памяти.
 #   lab.sh restore   — вернуть стабильный драйвер из резервной копии (потом перезагрузка).
@@ -49,6 +53,8 @@ preflight() {  # $1 = ожидаемая маска, $2..$6 = ожидаемые
     chk lab_mem N; chk lab_pcie N; chk lab_core Y; chk lab_volt_first Y; chk lab_volt_min_uv 0
     chk lab_eng_mask "$1"; chk lab_gpc_khz "$2"; chk lab_rop_khz "$3"
     chk lab_hub07_khz "$4"; chk lab_hub06_khz "$5"; chk lab_hub01_khz "$6"
+    if [ -e "$P/lab_gpc_coef" ]; then chk lab_gpc_coef "${EXPCOEF:-0}"; elif [ "${EXPCOEF:-0}" != 0 ]; then echo "  ✗ lab_gpc_coef нет в драйвере (нужен lab.sh install)"; ok=0; fi
+    if [ -e "$P/lab_gpc_fix" ]; then chk lab_gpc_fix "${EXPFIX:-0}"; elif [ "${EXPFIX:-0}" != 0 ]; then echo "  ✗ lab_gpc_fix нет в драйвере (нужен lab.sh install)"; ok=0; fi
     if [ "$(sysctl -n kernel.hardlockup_panic 2>/dev/null)" = 1 ] && lsmod | grep -q '^ramoops'; then echo "  ✓ ловушка: ramoops + остановка при жёстком зависании"
     else echo "  ✗ ловушка не готова (нужно: sudo sysctl -w kernel.hardlockup_panic=1)"; ok=0; fi
     [ -z "$(sudo ls -A /var/lib/systemd/pstore 2>/dev/null)" ] || echo "  ⚠ в /var/lib/systemd/pstore лежит старый улов — сохрани его, иначе перепутаем"
@@ -237,11 +243,13 @@ bench)
     PS="$(sudo sh -c 'ls /sys/kernel/debug/dri/*/pstate | head -n 1')"
     H="$(ls -d /sys/class/drm/card*/device/hwmon/hwmon* 2>/dev/null | head -n 1)"
     t() { [ -n "$H" ] && echo "$(( $(cat "$H/temp1_input" 2>/dev/null || echo 0) / 1000 ))°C" || echo "?"; }
-    { echo "Замер $(date '+%F %T') ($([ "${QUICK:-0}" = 1 ] && echo 'БЫСТРЫЙ ТЯЖЁЛЫЙ, 1600x900, 3 сцены' || { [ "${HEAVY:-0}" = 1 ] && echo 'ТЯЖЁЛЫЙ, 1600x900' || echo 'обычный, 800x600'; }))"; for f in /sys/module/nouveau/parameters/lab_*; do echo "  $(basename "$f") = $(cat "$f")"; done; } | tee "$OUT"
+    { echo "Замер $(date '+%F %T') ($([ "${CORE:-0}" = 1 ] && echo 'ЯДРО: 400x300, вычисления' || { [ "${QUICK:-0}" = 1 ] && echo 'БЫСТРЫЙ ТЯЖЁЛЫЙ, 1600x900, 3 сцены' || { [ "${HEAVY:-0}" = 1 ] && echo 'ТЯЖЁЛЫЙ, 1600x900' || echo 'обычный, 800x600'; }; }))"; for f in /sys/module/nouveau/parameters/lab_*; do echo "  $(basename "$f") = $(cat "$f")"; done; } | tee "$OUT"
     for P in "$@"; do
         sudo sh -c "echo $P > $PS"; sleep 3
         echo "=== Режим $P: $(sudo grep '^AC' "$PS"), $(t)" | tee -a "$OUT"; sync
-        if [ "${QUICK:-0}" = 1 ]; then  # быстрый тяжёлый замер для лестницы: 3 сцены, ~30 с
+        if [ "${CORE:-0}" = 1 ]; then  # замер ЯДРА: маленькое окно, чистые вычисления, память почти не нужна
+            GA=(-s 400x300 -b loop:fragment-steps=20:fragment-loop=true -b function:fragment-steps=20:fragment-complexity=high)
+        elif [ "${QUICK:-0}" = 1 ]; then  # быстрый тяжёлый замер для лестницы: 3 сцены, ~30 с
             GA=(-s 1600x900 -b shading:shading=phong -b effect2d:kernel=0,1,0\;1,-4,1\;0,1,0\; -b refract)
         elif [ "${HEAVY:-0}" = 1 ]; then  # тяжёлый замер: большое окно, сцены, упирающиеся в карту
             GA=(-s 1600x900 -b shading:shading=phong -b bump:bump-render=high-poly -b effect2d:kernel=0,1,0\;1,-4,1\;0,1,0\; -b shadow -b refract)
@@ -266,6 +274,8 @@ at)
     sudo -v
     # Шаг 0: только ядро/узлы — память и PCIe НЕ трогаем, напряжение первым, свои частоты сброшены.
     sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv"
+    [ -e "$PRM/lab_gpc_fix" ] && sudo sh -c "echo ${EXPFIX:-0} > $PRM/lab_gpc_fix"
+    [ -e "$PRM/lab_gpc_coef" ] && sudo sh -c "echo 0 > $PRM/lab_gpc_coef"
     for n in "${NAMES[@]}"; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
     sudo sh -c "echo 65147 > $PRM/lab_eng_mask"
     echo "=== Шаг 1: контрольный замер в 07 по таблице (ядро/ROP 810, hub не трогаем)"
@@ -277,6 +287,8 @@ at)
     # Шаг 2: свои частоты и переход в 0f.
     for i in 0 1 2 3 4; do sudo sh -c "echo $((A[i]*1000)) > $PRM/lab_${NAMES[$i]}_khz"; done
     sudo sh -c "echo $MASK > $PRM/lab_eng_mask"
+    if [ "${GPCFIX:-0}" != 0 ]; then EXPFIX="$GPCFIX"; sudo sh -c "echo $EXPFIX > $PRM/lab_gpc_fix"; echo "=== Опыт с битами PLL ядра: lab_gpc_fix = $EXPFIX"; fi
+    if [ -n "${GPCCOEF:-}" ]; then EXPCOEF=$((GPCCOEF)); sudo sh -c "echo $EXPCOEF > $PRM/lab_gpc_coef"; echo "=== PLL ядра: принудительно коэффициенты $GPCCOEF"; fi
     echo "=== Шаг 2: 0f со своими частотами: ядро ${A[0]} МГц, ROP ${A[1]} МГц, hub ${A[2]}/${A[3]}/${A[4]} МГц (0 = не трогаем)"
     preflight "$MASK" $((A[0]*1000)) $((A[1]*1000)) $((A[2]*1000)) $((A[3]*1000)) $((A[4]*1000))
     [ "${NOCONFIRM:-0}" = 1 ] || read -r -p "Всё верно? Enter — запустить, Ctrl+C — отмена " _
@@ -286,6 +298,8 @@ at)
     for n in "${NAMES[@]}"; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
     RM=65147; for i in 2 3 4; do [ "${A[$i]}" -gt 0 ] && RM=$((RM | BITS[i])); done
     echo "=== Шаг 3: возвращаю 03 (hub на стартовые), затем 07 по таблице карты"
+    [ -e "$PRM/lab_gpc_fix" ] && sudo sh -c "echo 0 > $PRM/lab_gpc_fix"   # вернуть исходные биты PLL ядра
+    [ -e "$PRM/lab_gpc_coef" ] && sudo sh -c "echo 0 > $PRM/lab_gpc_coef"; EXPCOEF=0; EXPFIX=0
     sudo sh -c "echo $RM > $PRM/lab_eng_mask"
     "$0" pstate 03 >/dev/null
     sudo sh -c "echo 65147 > $PRM/lab_eng_mask"
@@ -319,6 +333,8 @@ ladder)
     echo "=== Контрольный замер 07" | tee -a "$LOG"
     PRM=/sys/module/nouveau/parameters
     sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv; echo 65147 > $PRM/lab_eng_mask"
+    [ -e "$PRM/lab_gpc_fix" ] && sudo sh -c "echo ${EXPFIX:-0} > $PRM/lab_gpc_fix"
+    [ -e "$PRM/lab_gpc_coef" ] && sudo sh -c "echo 0 > $PRM/lab_gpc_coef"
     for n in gpc rop hub07 hub06 hub01; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
     "$0" pstate 03 >/dev/null
     { QUICK=1 "$0" bench 07 | grep '^=== Режим' | tail -n 1 || true; } | tee -a "$LOG"; sync
@@ -343,6 +359,8 @@ table)
     PRM=/sys/module/nouveau/parameters
     sudo -v
     sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv"
+    [ -e "$PRM/lab_gpc_fix" ] && sudo sh -c "echo ${EXPFIX:-0} > $PRM/lab_gpc_fix"
+    [ -e "$PRM/lab_gpc_coef" ] && sudo sh -c "echo 0 > $PRM/lab_gpc_coef"
     for n in gpc rop hub07 hub06 hub01; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
     sudo sh -c "echo 65535 > $PRM/lab_eng_mask"
     echo "=== Режим $T ЦЕЛИКОМ по таблице BIOS (все узлы, включая hub; память не трогаем), из 03"
@@ -370,11 +388,15 @@ hold)
     for i in 0 1 2 3 4; do [ "${A[$i]}" -gt 0 ] && MASK=$((MASK | BITS[i])); done
     sudo -v
     sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv"
+    [ -e "$PRM/lab_gpc_fix" ] && sudo sh -c "echo ${EXPFIX:-0} > $PRM/lab_gpc_fix"
+    [ -e "$PRM/lab_gpc_coef" ] && sudo sh -c "echo 0 > $PRM/lab_gpc_coef"
     for i in 0 1 2 3 4; do sudo sh -c "echo $((A[i]*1000)) > $PRM/lab_${NAMES[$i]}_khz"; done
     sudo sh -c "echo $MASK > $PRM/lab_eng_mask"
+    "$0" pstate 03 >/dev/null   # сначала 03 с заводской настройкой PLL ядра
+    if [ "${GPCFIX:-0}" != 0 ]; then EXPFIX="$GPCFIX"; sudo sh -c "echo $EXPFIX > $PRM/lab_gpc_fix"; echo "=== Опыт с битами PLL ядра: lab_gpc_fix = $EXPFIX"; fi
+    if [ -n "${GPCCOEF:-}" ]; then EXPCOEF=$((GPCCOEF)); sudo sh -c "echo $EXPCOEF > $PRM/lab_gpc_coef"; echo "=== PLL ядра: принудительно коэффициенты $GPCCOEF"; fi
     echo "=== Держим 0f: ядро ${A[0]}, ROP ${A[1]}, hub ${A[2]}/${A[3]}/${A[4]} МГц (0 = не трогаем)"
     preflight "$MASK" $((A[0]*1000)) $((A[1]*1000)) $((A[2]*1000)) $((A[3]*1000)) $((A[4]*1000))
-    "$0" pstate 03 >/dev/null
     "$0" pstate 0f
     echo "=== Карта держится в этом режиме. Вернуть рабочий 07: ~/nouveau-fix/lab/lab.sh home"
     ;;
@@ -384,11 +406,55 @@ home)
     sudo -v
     for n in gpc rop hub07 hub06 hub01; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
     sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv; echo 65535 > $PRM/lab_eng_mask"
+    [ -e "$PRM/lab_gpc_fix" ] && sudo sh -c "echo ${EXPFIX:-0} > $PRM/lab_gpc_fix"
+    [ -e "$PRM/lab_gpc_coef" ] && sudo sh -c "echo 0 > $PRM/lab_gpc_coef"
     "$0" pstate 03 >/dev/null
     sudo sh -c "echo 65147 > $PRM/lab_eng_mask"
     "$0" pstate 07
     echo "--- Узлы (по журналу драйвера):"
     journalctl -k -b 0 --no-pager | grep -E 'LAB calc idx 0[01278] ' | tail -n 5 | sed -E 's/.*(LAB calc)/  \1/; s/ ssel.*//'
+    ;;
+calib)
+    # КАЛИБРОВКА ЯДРА: скорость чистых вычислений при ядре на делителе (известная частота)
+    # и на PLL (частота под вопросом). ROP 810, hub стартовые, память не трогаем.
+    if [ "$#" -gt 1 ]; then shift; PTS=(); for f in "$@"; do [[ "$f" =~ ^[0-9]+$ ]] || { echo "Частоты числами"; exit 1; }; PTS+=("$f ?"); done
+    else PTS=("405 делитель" "540 делитель" "810 делитель" "1080 делитель" "1620 делитель" "607 PLL" "1215 PLL" "1800 PLL"); fi
+    mkdir -p "$KIT/results"; LOG="$KIT/results/calib-$(date +%Y%m%d-%H%M%S).txt"
+    echo "=== КАЛИБРОВКА ЯДРА: ${#PTS[@]} точек по ~40 с, ROP 810, hub стартовые, память не трогаем. Ядро на PLL — с битом BIOS (lab_gpc_fix=0)."
+    read -r -p "Начинаем? Enter — да, Ctrl+C — отмена " _
+    sudo -v
+    echo "Калибровка $(date '+%F %T'), отпечаток $(md5sum "$0" | cut -c1-8)" | tee "$LOG"; sync
+    for p in "${PTS[@]}"; do
+        F="${p%% *}"; W="${p#* }"; [ "$W" = "?" ] && W="(источник см. ssel)"
+        echo "=== Точка: ядро $F ($W) НАЧАТА $(date +%T)" | tee -a "$LOG"; sync
+        R="$(GPCFIX=0 CORE=1 NOCONTROL=1 NOCONFIRM=1 "$0" at "$F" 810 2>&1 | tee /dev/stderr | grep -E '^=== Режим 0f: glmark2|^  ✗|^--- СТОП' | tail -n 1 || true)"
+        L="$(journalctl -k -b 0 --no-pager | grep -E "LAB calc idx 00 dom 19: want ${F}000 " | tail -n 1 | grep -oE 'got [0-9]+ ssel [0-9a-f]+' || true)"
+        T="$(journalctl -k -b 0 --no-pager --since '-2min' | grep -c 'prog_3 idx 00 SWITCH TIMEOUT' || true)"
+        printf '  ядро %-5s %-9s | %s | драйвер: %s | сбой переключения ядра: %s\n' "$F" "$W" "${R#=== Режим 0f: }" "$L" "$T" | tee -a "$LOG"; sync
+        grep -q 'СТОП\|✗' <<<"$R" && { echo "=== Окружение не то — остановлено" | tee -a "$LOG"; exit 1; }
+    done
+    echo "=== Калибровка завершена ✅"; grep '^  ядро' "$LOG"
+    ;;
+pllcmp)
+    # «ОДНА ЧАСТОТА — ДВА ПУТИ»: ядро на делителе и на PLL с одинаковой частотой.
+    # PLL: опора 405, M=5 (81 МГц на входе), N=20 (VCO 1620), меняется только выходной делитель P.
+    PTS=("810 -" "810 0x00021405" "540 -" "540 0x00031405" "405 -" "405 0x00041405" "1620 -" "1620 0x00011405" "1215 0x00010f05")
+    mkdir -p "$KIT/results"; LOG="$KIT/results/pllcmp-$(date +%Y%m%d-%H%M%S).txt"
+    echo "=== ОДНА ЧАСТОТА — ДВА ПУТИ: ${#PTS[@]} точек по ~40 с (замер ядра 400x300). ROP 810, hub стартовые, память не трогаем."
+    read -r -p "Начинаем? Enter — да, Ctrl+C — отмена " _
+    sudo -v
+    echo "Сравнение $(date '+%F %T'), отпечаток $(md5sum "$0" | cut -c1-8)" | tee "$LOG"; sync
+    for p in "${PTS[@]}"; do
+        F="${p%% *}"; C="${p#* }"
+        if [ "$C" = "-" ]; then W="делитель"; E=(); else W="PLL $C"; E=(GPCCOEF="$C"); fi
+        echo "=== Точка: ядро $F ($W) НАЧАТА $(date +%T)" | tee -a "$LOG"; sync
+        R="$(env "${E[@]}" GPCFIX=0 CORE=1 NOCONTROL=1 NOCONFIRM=1 "$0" at "$F" 810 2>&1 | tee /dev/stderr | grep -E '^=== Режим 0f: glmark2|^  ✗|^--- СТОП' | tail -n 1 || true)"
+        L="$(journalctl -k -b 0 --no-pager --since '-2min' | grep -E 'LAB calc idx 00 (FORCED|dom 19)' | tail -n 1 | grep -oE 'got [0-9]+ ssel [0-9a-f]+|coef [0-9a-f]+ \(N=[0-9]+ M=[0-9]+ P=[0-9]+\).*ssel [0-9a-f]+' || true)"
+        T="$(journalctl -k -b 0 --no-pager --since '-2min' | grep -cE 'idx 00 SWITCH TIMEOUT|idx 00 PLL NOT LOCKED|gpc_coef .*игнорирую' || true)"
+        printf '  ядро %-5s %-16s | %s | драйвер: %s | сбоев: %s\n' "$F" "$W" "${R#=== Режим 0f: }" "$L" "$T" | tee -a "$LOG"; sync
+        grep -q 'СТОП\|✗' <<<"$R" && { echo "=== Окружение не то — остановлено" | tee -a "$LOG"; exit 1; }
+    done
+    echo "=== Сравнение завершено ✅"; grep '^  ядро' "$LOG"
     ;;
 restore)
     [ -e "$BACKUP" ] || { echo "Нет резервной копии $BACKUP. Стабильный драйвер можно пересобрать: ~/nouveau-fix/rebuild.sh"; exit 1; }
@@ -397,5 +463,5 @@ restore)
     echo "=== Стабильный драйвер возвращён. Перезагрузись и проверь: ~/nouveau-fix/check.sh"
     ;;
 *)
-    sed -n '2,29p' "$0"; exit 1 ;;
+    sed -n '2,33p' "$0"; exit 1 ;;
 esac

@@ -1,6 +1,6 @@
-diff -ru base/nvkm/subdev/clk/base.c lab-n3/nvkm/subdev/clk/base.c
+diff -ru base/nvkm/subdev/clk/base.c lab-n6/nvkm/subdev/clk/base.c
 --- base/nvkm/subdev/clk/base.c	2026-10-19 23:19:48.901191091 +0300
-+++ lab-n3/nvkm/subdev/clk/base.c	2026-10-20 11:41:55.550834590 +0300
++++ lab-n6/nvkm/subdev/clk/base.c	2026-10-20 14:43:43.290586249 +0300
 @@ -34,6 +34,23 @@
  
  #include <core/option.h>
@@ -108,9 +108,9 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n3/nvkm/subdev/clk/base.c
  }
  
  static void
-diff -ru base/nvkm/subdev/clk/gf100.c lab-n3/nvkm/subdev/clk/gf100.c
+diff -ru base/nvkm/subdev/clk/gf100.c lab-n6/nvkm/subdev/clk/gf100.c
 --- base/nvkm/subdev/clk/gf100.c	2026-10-19 23:19:48.901228789 +0300
-+++ lab-n3/nvkm/subdev/clk/gf100.c	2026-10-20 11:42:03.018333254 +0300
++++ lab-n6/nvkm/subdev/clk/gf100.c	2026-10-20 14:43:43.399304642 +0300
 @@ -23,6 +23,8 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -120,7 +120,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n3/nvkm/subdev/clk/gf100.c
  #include "pll.h"
  
  #include <subdev/bios.h>
-@@ -270,6 +272,41 @@
+@@ -270,6 +272,47 @@
  	return ret;
  }
  
@@ -142,6 +142,12 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n3/nvkm/subdev/clk/gf100.c
 +MODULE_PARM_DESC(lab_gpc_khz, "LAB: override gpc (core) target kHz, max 1800000");
 +MODULE_PARM_DESC(lab_rop_khz, "LAB: override rop target kHz, max 1907000");
 +
++/* LAB: если не 0 — PLL ядра получает ровно эти коэффициенты (P<<16 | N<<8 | M), ядро на PLL.
++ * Проверяются пределы из BIOS: M 4-16, N 8-95, P 1-63, опора/M 25-100 МГц, VCO 1000-2000 МГц. */
++static uint lab_gpc_coef;
++module_param(lab_gpc_coef, uint, 0644);
++MODULE_PARM_DESC(lab_gpc_coef, "LAB: force gpc PLL coefficients (P<<16|N<<8|M), 0 = normal");
++
 +static u32
 +lab_override(int idx, u32 freq)
 +{
@@ -162,10 +168,32 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n3/nvkm/subdev/clk/gf100.c
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +319,18 @@
+@@ -282,6 +325,40 @@
  	if (!freq)
  		return 0;
  
++	/* LAB: прямое задание коэффициентов PLL ядра (опыт «одна частота — два пути»). */
++	if (idx == 0x00 && lab_gpc_coef) {
++		u32 P = (lab_gpc_coef >> 16) & 0x3f, N = (lab_gpc_coef >> 8) & 0xff, M = lab_gpc_coef & 0xff;
++		u32 ref = 405000, vco;
++		if (M < 4 || M > 16 || N < 8 || N > 95 || P < 1 || P > 63) {
++			nvkm_error(&clk->base.subdev, "LAB gpc_coef %08x: N/M/P вне пределов BIOS, игнорирую\n", lab_gpc_coef);
++		} else {
++			vco = ref / M * N;
++			if (ref / M < 25000 || ref / M > 100000 || vco < 1000000 || vco > 2000000) {
++				nvkm_error(&clk->base.subdev, "LAB gpc_coef %08x: VCO %u кГц вне 1000-2000 МГц, игнорирую\n", lab_gpc_coef, vco);
++			} else {
++				info->coef = lab_gpc_coef;
++				info->ssel = 1 << idx;
++				info->dsrc = info->ddiv = info->mdiv = 0;
++				info->freq = vco / P;
++				nvkm_info(&clk->base.subdev, "LAB calc idx 00 FORCED PLL coef %08x (N=%u M=%u P=%u): VCO %u kHz, out %u kHz ssel %08x\n",
++					  lab_gpc_coef, N, M, P, vco, info->freq, info->ssel);
++				return 0;
++			}
++		}
++	}
++
 +	if (lab_override(idx, freq) != freq) {
 +		nvkm_info(&clk->base.subdev, "LAB calc idx %02x: table %u kHz overridden to %u kHz\n",
 +			  idx, freq, lab_override(idx, freq));
@@ -181,7 +209,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n3/nvkm/subdev/clk/gf100.c
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +340,9 @@
+@@ -291,7 +368,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -192,7 +220,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n3/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +369,8 @@
+@@ -318,6 +397,8 @@
  		info->freq = clk1;
  	}
  
@@ -201,7 +229,58 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n3/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -377,10 +430,15 @@
+@@ -362,6 +443,43 @@
+ 	);
+ }
+ 
++/* LAB: опыт с PLL ядра (idx 0). У ядра, в отличие от ROP/hub, BIOS оставляет два бита,
++ * о которых nouveau не знает: 0x137120 бит 0x1000 (источник опоры PLL) и 0x137008 бит 0x200000.
++ * lab_gpc_fix: бит0 — снять 0x1000 в 0x137120; бит1 — снять 0x200000 в 0x137008;
++ *   бит2 — снять 0x1000 в 0x137120 ПОСЛЕ того, как ядро уже переключено на PLL (prog_3).
++ * 0 — вернуть исходные значения (если меняли). Применяется, пока PLL ядра выключен (prog_2). */
++static uint lab_gpc_fix;
++module_param(lab_gpc_fix, uint, 0644);
++MODULE_PARM_DESC(lab_gpc_fix, "LAB: gpc PLL experiment: bit0 clear 0x137120[12], bit1 clear 0x137008[21], 0 restore");
++static bool lab_gpc_saved;
++static u32 lab_gpc_orig120, lab_gpc_orig008;
++
++static void
++lab_gpc_fix_apply(struct gf100_clk *clk)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	struct nvkm_subdev *subdev = &clk->base.subdev;
++	u32 r120 = nvkm_rd32(device, 0x137120), r008 = nvkm_rd32(device, 0x137008);
++
++	if (lab_gpc_fix) {
++		if (!lab_gpc_saved) {
++			lab_gpc_orig120 = r120;
++			lab_gpc_orig008 = r008;
++			lab_gpc_saved = true;
++		}
++		nvkm_wr32(device, 0x137120, (lab_gpc_fix & 1) ? (lab_gpc_orig120 & ~0x00001000) : lab_gpc_orig120);
++		nvkm_wr32(device, 0x137008, (lab_gpc_fix & 2) ? (lab_gpc_orig008 & ~0x00200000) : lab_gpc_orig008);
++	} else if (lab_gpc_saved) {
++		nvkm_wr32(device, 0x137120, lab_gpc_orig120);
++		nvkm_wr32(device, 0x137008, lab_gpc_orig008);
++		lab_gpc_saved = false;
++	} else {
++		return;
++	}
++	nvkm_info(subdev, "LAB gpc_fix=%u: 0x137120 %08x -> %08x, 0x137008 %08x -> %08x\n",
++		  lab_gpc_fix, r120, nvkm_rd32(device, 0x137120), r008, nvkm_rd32(device, 0x137008));
++}
++
+ static void
+ gf100_clk_prog_2(struct gf100_clk *clk, int idx)
+ {
+@@ -372,15 +490,22 @@
+ 		nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000000);
+ 		nvkm_mask(device, addr + 0x00, 0x00000001, 0x00000000);
+ 		if (info->coef) {
++			if (idx == 0)
++				lab_gpc_fix_apply(clk);
+ 			nvkm_wr32(device, addr + 0x04, info->coef);
+ 			nvkm_mask(device, addr + 0x00, 0x00000001, 0x00000001);
  
  			/* Test PLL lock */
  			nvkm_mask(device, addr + 0x00, 0x00000010, 0x00000000);
@@ -219,7 +298,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n3/nvkm/subdev/clk/gf100.c
  			nvkm_mask(device, addr + 0x00, 0x00000010, 0x00000010);
  
  			/* Enable sync mode */
-@@ -395,12 +453,16 @@
+@@ -395,12 +520,27 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -235,10 +314,21 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n3/nvkm/subdev/clk/gf100.c
 +			nvkm_error(&clk->base.subdev, "LAB prog_3 idx %02x SWITCH TIMEOUT 0x137100=%08x pllctrl=%08x\n",
 +				   idx, nvkm_rd32(device, 0x137100),
 +				   idx <= 7 ? nvkm_rd32(device, 0x137000 + idx * 0x20) : 0);
++		else if (idx == 0 && (lab_gpc_fix & 4)) {
++			u32 r = nvkm_rd32(device, 0x137120);
++			if (!lab_gpc_saved) {
++				lab_gpc_orig120 = r;
++				lab_gpc_orig008 = nvkm_rd32(device, 0x137008);
++				lab_gpc_saved = true;
++			}
++			nvkm_wr32(device, 0x137120, r & ~0x00001000);
++			nvkm_info(&clk->base.subdev, "LAB gpc_fix&4 после переключения: 0x137120 %08x -> %08x, 0x137100=%08x\n",
++				  r, nvkm_rd32(device, 0x137120), nvkm_rd32(device, 0x137100));
++		}
  	}
  }
  
-@@ -428,6 +490,7 @@
+@@ -428,6 +568,7 @@
  	int i, j;
  
  	for (i = 0; i < ARRAY_SIZE(stage); i++) {
@@ -246,16 +336,16 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n3/nvkm/subdev/clk/gf100.c
  		for (j = 0; j < ARRAY_SIZE(clk->eng); j++) {
  			if (!clk->eng[j].freq)
  				continue;
-@@ -477,5 +540,5 @@
+@@ -477,5 +618,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
 -	return nvkm_clk_ctor(&gf100_clk, device, type, inst, false, &clk->base);
 +	return nvkm_clk_ctor(&gf100_clk, device, type, inst, true, &clk->base);
  }
-diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n3/nvkm/subdev/fb/ramgf100.c
+diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n6/nvkm/subdev/fb/ramgf100.c
 --- base/nvkm/subdev/fb/ramgf100.c	2026-10-19 23:19:48.902667898 +0300
-+++ lab-n3/nvkm/subdev/fb/ramgf100.c	2026-10-20 11:41:55.562787363 +0300
++++ lab-n6/nvkm/subdev/fb/ramgf100.c	2026-10-20 14:43:43.301221363 +0300
 @@ -25,6 +25,15 @@
  #include "ram.h"
  #include "ramfuc.h"
@@ -336,9 +426,9 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n3/nvkm/subdev/fb/ramgf100.c
  		ram_nsec(fuc, 100000);
  		ram_wr32(fuc, 0x10f9b0, 0x05313f41);
  		ram_wr32(fuc, 0x10f9b4, 0x00002f50);
-diff -ru base/nvkm/subdev/volt/base.c lab-n3/nvkm/subdev/volt/base.c
+diff -ru base/nvkm/subdev/volt/base.c lab-n6/nvkm/subdev/volt/base.c
 --- base/nvkm/subdev/volt/base.c	2026-10-19 23:19:48.908584718 +0300
-+++ lab-n3/nvkm/subdev/volt/base.c	2026-10-20 11:41:55.658295887 +0300
++++ lab-n6/nvkm/subdev/volt/base.c	2026-10-20 14:43:43.345205236 +0300
 @@ -28,6 +28,8 @@
  #include <subdev/bios/volt.h>
  #include <subdev/therm.h>
