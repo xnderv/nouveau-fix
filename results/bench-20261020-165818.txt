@@ -1,0 +1,37 @@
+Замер 2026-10-20 16:58:18 (ТЯЖЁЛЫЙ, 1600x900)
+  lab_core = Y
+  lab_disp_pause = 1
+  lab_eng_mask = 65535
+  lab_gpc_coef = 0
+  lab_gpc_fix = 0
+  lab_gpc_khz = 1800000
+  lab_gpc_ref_khz = 0
+  lab_gpc_seq = 5
+  lab_hub01_khz = 1620000
+  lab_hub06_khz = 1620000
+  lab_hub07_khz = 1907000
+  lab_mem = N
+  lab_pcie = N
+  lab_rop_khz = 1907000
+  lab_volt_first = Y
+  lab_volt_min_uv = 0
+=== Режим 0f: AC: core 900 MHz memory 135 MHz, 45°C
+=======================================================
+    glmark2 2023.01
+=======================================================
+    OpenGL Information
+    GL_VENDOR:      Mesa
+    GL_RENDERER:    NVCE
+    GL_VERSION:     4.3 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+    Surface Config: buf=32 r=8 g=8 b=8 a=8 depth=24 stencil=0 samples=0
+    Surface Size:   1600x900 windowed
+=======================================================
+[shading] shading=phong: FPS: 435 FrameTime: 2.301 ms
+[bump] bump-render=high-poly: FPS: 448 FrameTime: 2.234 ms
+[effect2d] kernel=0,1,0;1,-4,1;0,1,0;: FPS: 273 FrameTime: 3.668 ms
+[shadow] <default>: FPS: 423 FrameTime: 2.366 ms
+[refract] <default>: FPS: 44 FrameTime: 22.867 ms
+=======================================================
+                                  glmark2 Score: 323 
+=======================================================
+=== Режим 0f: glmark2 Score: 323, после теста 52°C

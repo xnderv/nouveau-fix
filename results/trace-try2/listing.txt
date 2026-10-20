@@ -1,0 +1,6 @@
+total 91480
+drwxr-xr-x 2 root root     4096 Oct 20 16:04 .
+drwxr-xr-x 4 1000 alex     4096 Oct 20 16:04 ..
+-rw-r--r-- 1 root root 93601792 Oct 20 16:04 mmiotrace.txt
+-rw-r--r-- 1 root root    59945 Oct 20 16:04 regs.txt
+-rw-r--r-- 1 root root      474 Oct 20 16:04 steps.txt

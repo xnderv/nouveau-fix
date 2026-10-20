@@ -1,0 +1,42 @@
+/mnt/u2204-trace/home/user/trace/:
+total 24
+drwxr-xr-x 3 1000 alex 4096 Oct 20 15:46 .
+drwxr-x--- 4 1000 alex 4096 Oct 20 15:46 ..
+drwxr-xr-x 2 root root 4096 Oct 20 15:46 out-20261020-124607
+-rw------- 1 1000 alex 1807 Oct 20 15:43 regdump.py
+-rwx--x--x 1 1000 alex 5092 Oct 20 15:43 run-trace.sh
+
+/mnt/u2204-trace/home/user/trace/out-20261020-124607:
+total 823032
+drwxr-xr-x 2 root root      4096 Oct 20 15:46 .
+drwxr-xr-x 3 1000 alex      4096 Oct 20 15:46 ..
+-rw-r--r-- 1 root root         0 Oct 20 15:46 glmark.txt
+-rw-r--r-- 1 root root 842661888 Oct 20 15:48 mmiotrace.txt
+-rw-r--r-- 1 root root       813 Oct 20 15:47 nvsettings.txt
+-rw-r--r-- 1 root root      2081 Oct 20 15:46 perfmodes.txt
+-rw-r--r-- 1 root root     89904 Oct 20 15:47 regs.txt
+-rw-r--r-- 1 root root       660 Oct 20 15:47 steps.txt
+-rw-r--r-- 1 root root       120 Oct 20 15:47 timeline.txt
+-rw-r--r-- 1 root root       896 Oct 20 15:46 xinit.txt
+
+/mnt/u2204-trace/var/log/:
+total 868
+drwxrwxr-x   5 root lpadmin   4096 Oct 20 15:46 .
+drwxr-xr-x  12 root root      4096 Oct 20 15:38 ..
+-rw-r--r--   1 root root     25900 Oct 20 15:46 Xorg.0.log
+-rw-r--r--   1 root root     14263 Oct 20 15:40 alternatives.log
+drwxr-xr-x   2 root root      4096 Oct 20 15:40 apt
+-rw-r-----   1 sssd adm       1228 Oct 20 15:46 auth.log
+-rw-r--r--   1 root root    109554 Oct 20 15:30 bootstrap.log
+-rw-rw----   1 root utmp         0 Oct 20 15:27 btmp
+-rw-r-----   1 root adm      77082 Oct 20 15:45 dmesg
+-rw-r--r--   1 root root    312444 Oct 20 15:40 dpkg.log
+-rw-r--r--   1 root root     32032 Oct 20 15:38 faillog
+-rw-r--r--   1 root root      1182 Oct 20 15:37 fontconfig.log
+drwxr-sr-x+  3 root syslog    4096 Oct 20 15:45 journal
+-rw-r-----   1 sssd adm     125546 Oct 20 15:47 kern.log
+-rw-rw-r--   1 root utmp    292292 Oct 20 15:45 lastlog
+drwx------   2 root root      4096 Oct 20 15:28 private
+-rw-r-----   1 sssd adm     152673 Oct 20 15:47 syslog
+-rw-r--r--   1 root root         0 Oct 20 15:30 ubuntu-advantage.log
+-rw-rw-r--   1 root utmp      1920 Oct 20 15:45 wtmp

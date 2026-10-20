@@ -1,0 +1,14 @@
+### 1 X11 запущен, простой 12:46:27
+  Attribute 'GPUCurrentPerfLevel' (u2204-trace:0.0): 1.
+  Attribute 'GPUCurrentPerfLevel' (u2204-trace:0[gpu:0]): 1.
+  Attribute 'GPUCurrentClockFreqs' (u2204-trace:0.0): 405,324.
+  Attribute 'GPUCurrentClockFreqs' (u2204-trace:0[gpu:0]): 405,324.
+  Attribute 'GPUCoreTemp' (u2204-trace:0.0): 39.
+  Attribute 'GPUCoreTemp' (u2204-trace:0[gpu:0]): 39.
+### 2 под нагрузкой, адаптивный 12:47:21
+  Attribute 'GPUCurrentPerfLevel' (u2204-trace:0.0): 0.
+  Attribute 'GPUCurrentPerfLevel' (u2204-trace:0[gpu:0]): 0.
+  Attribute 'GPUCurrentClockFreqs' (u2204-trace:0.0): 50,135.
+  Attribute 'GPUCurrentClockFreqs' (u2204-trace:0[gpu:0]): 50,135.
+  Attribute 'GPUCoreTemp' (u2204-trace:0.0): 38.
+  Attribute 'GPUCoreTemp' (u2204-trace:0[gpu:0]): 38.

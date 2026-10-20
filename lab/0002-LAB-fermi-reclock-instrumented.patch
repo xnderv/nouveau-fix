@@ -1,6 +1,6 @@
-diff -ru base/nvkm/subdev/clk/base.c lab-n7/nvkm/subdev/clk/base.c
+diff -ru base/nvkm/subdev/clk/base.c lab-n9/nvkm/subdev/clk/base.c
 --- base/nvkm/subdev/clk/base.c	2026-10-19 23:19:48.901191091 +0300
-+++ lab-n7/nvkm/subdev/clk/base.c	2026-10-20 15:00:49.173077183 +0300
++++ lab-n9/nvkm/subdev/clk/base.c	2026-10-20 15:00:49.173077183 +0300
 @@ -34,6 +34,23 @@
  
  #include <core/option.h>
@@ -108,9 +108,9 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n7/nvkm/subdev/clk/base.c
  }
  
  static void
-diff -ru base/nvkm/subdev/clk/gf100.c lab-n7/nvkm/subdev/clk/gf100.c
+diff -ru base/nvkm/subdev/clk/gf100.c lab-n9/nvkm/subdev/clk/gf100.c
 --- base/nvkm/subdev/clk/gf100.c	2026-10-19 23:19:48.901228789 +0300
-+++ lab-n7/nvkm/subdev/clk/gf100.c	2026-10-20 15:00:49.310690421 +0300
++++ lab-n9/nvkm/subdev/clk/gf100.c	2026-10-20 16:50:27.146728676 +0300
 @@ -23,6 +23,8 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -120,7 +120,72 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n7/nvkm/subdev/clk/gf100.c
  #include "pll.h"
  
  #include <subdev/bios.h>
-@@ -270,6 +272,51 @@
+@@ -45,6 +47,15 @@
+ 
+ static u32 read_div(struct gf100_clk *, int, u32, u32);
+ 
++/* lab_gpc_seq: последовательность как у NVIDIA 390 (по записи mmiotrace 20.10):
++ * бит0 — у ЯДРА после захвата НЕ ставить бит 0x10 в управлении PLL (блоб его не ставит никогда);
++ * бит1 — перед настройкой PLL ядра записать в 0x1371d0 младшее поле 0x06 (блоб: 81201e1e -> 81201e06);
++ * бит2 — не ставить бит 0x10 у ВСЕХ PLL (ROP, hubk07, hubk06 тоже);
++ * бит3 — опора PLL hubk06 (узел 7) через его делитель 0x13715c, как у узлов 0-2 (405, а не 1620). */
++static uint lab_gpc_seq;
++module_param(lab_gpc_seq, uint, 0644);
++MODULE_PARM_DESC(lab_gpc_seq, "LAB: blob-like PLL: bit0 gpc no 0x10, bit1 gpc 0x1371d0[5:0]=6, bit2 all PLL no 0x10, bit3 hubk06 PLL ref via divider");
++
+ static u32
+ read_vco(struct gf100_clk *clk, u32 dsrc)
+ {
+@@ -55,6 +66,25 @@
+ 	return nvkm_clk_read(&clk->base, nv_clk_src_sppll1);
+ }
+ 
++/* LAB бит3: опора PLL узлов 3..7 с учётом делителя опоры (nouveau учитывает его только для 0..2) */
++static u32
++lab_pll_ref(struct gf100_clk *clk, int idx)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 ssrc = nvkm_rd32(device, 0x137120 + idx * 4);
++	u32 sctl, sdiv = 2;
++
++	if ((ssrc & 0x00000003) != 3)
++		return 0;
++	sctl = nvkm_rd32(device, 0x137140 + idx * 4);
++	if (sctl & 0x80000000) {
++		if (ssrc & 0x100)
++			sctl >>= 8;
++		sdiv = (sctl & 0x3f) + 2;
++	}
++	return (read_vco(clk, 0x137120 + idx * 4) * 2) / sdiv;
++}
++
+ static u32
+ read_pll(struct gf100_clk *clk, u32 pll)
+ {
+@@ -86,6 +116,8 @@
+ 	case 0x137040:
+ 	case 0x1370e0:
+ 		sclk = read_div(clk, (pll & 0xff) / 0x20, 0x137120, 0x137140);
++		if (pll == 0x1370e0 && (lab_gpc_seq & 8) && lab_pll_ref(clk, 7))
++			sclk = lab_pll_ref(clk, 7);
+ 		break;
+ 	default:
+ 		return 0;
+@@ -259,6 +291,13 @@
+ 		return 0;
+ 
+ 	limits.refclk = read_div(clk, idx, 0x137120, 0x137140);
++	if (idx > 2 && (lab_gpc_seq & 8)) {
++		u32 r = lab_pll_ref(clk, idx);
++		nvkm_info(subdev, "LAB calc_pll idx %02x: опора nouveau %u kHz, с делителем опоры %u kHz (lab_gpc_seq&8)\n",
++			  idx, limits.refclk, r);
++		if (r)
++			limits.refclk = r;
++	}
+ 	if (!limits.refclk)
+ 		return 0;
+ 
+@@ -270,6 +309,51 @@
  	return ret;
  }
  
@@ -172,7 +237,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n7/nvkm/subdev/clk/gf100.c
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +329,41 @@
+@@ -282,6 +366,41 @@
  	if (!freq)
  		return 0;
  
@@ -214,7 +279,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n7/nvkm/subdev/clk/gf100.c
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +373,9 @@
+@@ -291,7 +410,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -225,7 +290,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n7/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +402,8 @@
+@@ -318,6 +439,8 @@
  		info->freq = clk1;
  	}
  
@@ -234,7 +299,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n7/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -362,6 +448,43 @@
+@@ -362,6 +485,43 @@
  	);
  }
  
@@ -278,12 +343,18 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n7/nvkm/subdev/clk/gf100.c
  static void
  gf100_clk_prog_2(struct gf100_clk *clk, int idx)
  {
-@@ -372,15 +495,22 @@
+@@ -372,16 +532,33 @@
  		nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000000);
  		nvkm_mask(device, addr + 0x00, 0x00000001, 0x00000000);
  		if (info->coef) {
 +			if (idx == 0)
 +				lab_gpc_fix_apply(clk);
++			if (idx == 0 && (lab_gpc_seq & 2)) {
++				u32 d0 = nvkm_rd32(device, 0x1371d0);
++				nvkm_mask(device, 0x1371d0, 0x8000003f, 0x80000006);
++				nvkm_info(&clk->base.subdev, "LAB gpc_seq&2: 0x1371d0 %08x -> %08x\n",
++					  d0, nvkm_rd32(device, 0x1371d0));
++			}
  			nvkm_wr32(device, addr + 0x04, info->coef);
  			nvkm_mask(device, addr + 0x00, 0x00000001, 0x00000001);
  
@@ -294,16 +365,22 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n7/nvkm/subdev/clk/gf100.c
  				if (nvkm_rd32(device, addr + 0x00) & 0x00020000)
  					break;
 -			);
+-			nvkm_mask(device, addr + 0x00, 0x00000010, 0x00000010);
 +			) < 0)
 +				nvkm_error(&clk->base.subdev, "LAB prog_2 idx %02x PLL NOT LOCKED ctrl %08x coef %08x\n",
 +					   idx, nvkm_rd32(device, addr + 0x00), nvkm_rd32(device, addr + 0x04));
 +			else
 +				nvkm_info(&clk->base.subdev, "LAB prog_2 idx %02x PLL locked ctrl %08x coef %08x\n",
 +					  idx, nvkm_rd32(device, addr + 0x00), nvkm_rd32(device, addr + 0x04));
- 			nvkm_mask(device, addr + 0x00, 0x00000010, 0x00000010);
++			if (!((idx == 0 && (lab_gpc_seq & 1)) || (lab_gpc_seq & 4)))
++				nvkm_mask(device, addr + 0x00, 0x00000010, 0x00000010);
++			else
++				nvkm_info(&clk->base.subdev, "LAB gpc_seq: idx %02x бит 0x10 не ставлю, ctrl %08x\n",
++					  idx, nvkm_rd32(device, addr + 0x00));
  
  			/* Enable sync mode */
-@@ -395,12 +525,27 @@
+ 			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
+@@ -395,12 +572,27 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -333,7 +410,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n7/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -428,6 +573,7 @@
+@@ -428,6 +620,7 @@
  	int i, j;
  
  	for (i = 0; i < ARRAY_SIZE(stage); i++) {
@@ -341,16 +418,16 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n7/nvkm/subdev/clk/gf100.c
  		for (j = 0; j < ARRAY_SIZE(clk->eng); j++) {
  			if (!clk->eng[j].freq)
  				continue;
-@@ -477,5 +623,5 @@
+@@ -477,5 +670,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
 -	return nvkm_clk_ctor(&gf100_clk, device, type, inst, false, &clk->base);
 +	return nvkm_clk_ctor(&gf100_clk, device, type, inst, true, &clk->base);
  }
-diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n7/nvkm/subdev/fb/ramgf100.c
+diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n9/nvkm/subdev/fb/ramgf100.c
 --- base/nvkm/subdev/fb/ramgf100.c	2026-10-19 23:19:48.902667898 +0300
-+++ lab-n7/nvkm/subdev/fb/ramgf100.c	2026-10-20 15:00:49.184688959 +0300
++++ lab-n9/nvkm/subdev/fb/ramgf100.c	2026-10-20 15:00:49.184688959 +0300
 @@ -25,6 +25,15 @@
  #include "ram.h"
  #include "ramfuc.h"
@@ -431,9 +508,9 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n7/nvkm/subdev/fb/ramgf100.c
  		ram_nsec(fuc, 100000);
  		ram_wr32(fuc, 0x10f9b0, 0x05313f41);
  		ram_wr32(fuc, 0x10f9b4, 0x00002f50);
-diff -ru base/nvkm/subdev/volt/base.c lab-n7/nvkm/subdev/volt/base.c
+diff -ru base/nvkm/subdev/volt/base.c lab-n9/nvkm/subdev/volt/base.c
 --- base/nvkm/subdev/volt/base.c	2026-10-19 23:19:48.908584718 +0300
-+++ lab-n7/nvkm/subdev/volt/base.c	2026-10-20 15:00:49.275397310 +0300
++++ lab-n9/nvkm/subdev/volt/base.c	2026-10-20 15:00:49.275397310 +0300
 @@ -28,6 +28,8 @@
  #include <subdev/bios/volt.h>
  #include <subdev/therm.h>
