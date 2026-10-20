@@ -23,6 +23,8 @@
 #   lab.sh ladder [N] — ЛЕСТНИЦА: все узлы, кроме памяти, по ступенькам от меньшего риска к большему.
 #                      DIRECT=1 перед командой — каждая ступенька прыжком 03 → 0f, без промежуточного 07.
 #   lab.sh table 07|0f [мин] — режим ЦЕЛИКОМ по заводской таблице BIOS (все узлы), замер + нагрузка.
+#   lab.sh hold ЯДРО ROP [HUB07 HUB06 HUB01] — поставить свои частоты в 0f и оставить (для чтения регистров).
+#   lab.sh home      — вернуть рабочий 07 (ядро/ROP 810, hub на стартовых).
 #   lab.sh flags     — показать текущие переключатели лабораторного драйвера.
 #   lab.sh disp 0|1|2 — как ставить на паузу вывод изображения при смене частоты памяти.
 #   lab.sh restore   — вернуть стабильный драйвер из резервной копии (потом перезагрузка).
@@ -358,6 +360,36 @@ table)
     echo "--- Узлы после возврата (по журналу драйвера):"
     journalctl -k -b 0 --no-pager | grep -E 'LAB calc idx 0[01278] ' | tail -n 5 | sed -E 's/.*(LAB calc)/  \1/; s/ ssel.*//'
     ;;
+hold)
+    # Поставить свои частоты в 0f и ОСТАВИТЬ карту так (без замера и возврата) — для чтения регистров.
+    shift; [ "$#" -ge 2 ] || { echo "Пример: lab.sh hold 1215 1215 1215 1215 1620"; exit 1; }
+    PRM=/sys/module/nouveau/parameters
+    for v in "$@"; do [[ "$v" =~ ^[0-9]+$ ]] || { echo "Частоты числами в МГц"; exit 1; }; done
+    NAMES=(gpc rop hub07 hub06 hub01); BITS=(1 2 4 128 256)
+    MASK=$((0xffff & ~(1|2|4|128|256))); A=("$@" 0 0 0 0 0)
+    for i in 0 1 2 3 4; do [ "${A[$i]}" -gt 0 ] && MASK=$((MASK | BITS[i])); done
+    sudo -v
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv"
+    for i in 0 1 2 3 4; do sudo sh -c "echo $((A[i]*1000)) > $PRM/lab_${NAMES[$i]}_khz"; done
+    sudo sh -c "echo $MASK > $PRM/lab_eng_mask"
+    echo "=== Держим 0f: ядро ${A[0]}, ROP ${A[1]}, hub ${A[2]}/${A[3]}/${A[4]} МГц (0 = не трогаем)"
+    preflight "$MASK" $((A[0]*1000)) $((A[1]*1000)) $((A[2]*1000)) $((A[3]*1000)) $((A[4]*1000))
+    "$0" pstate 03 >/dev/null
+    "$0" pstate 0f
+    echo "=== Карта держится в этом режиме. Вернуть рабочий 07: ~/nouveau-fix/lab/lab.sh home"
+    ;;
+home)
+    # Вернуть рабочий 07: свои частоты сброшены, через 03 (hub на стартовые), затем 07 (hub не трогаем).
+    PRM=/sys/module/nouveau/parameters
+    sudo -v
+    for n in gpc rop hub07 hub06 hub01; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv; echo 65535 > $PRM/lab_eng_mask"
+    "$0" pstate 03 >/dev/null
+    sudo sh -c "echo 65147 > $PRM/lab_eng_mask"
+    "$0" pstate 07
+    echo "--- Узлы (по журналу драйвера):"
+    journalctl -k -b 0 --no-pager | grep -E 'LAB calc idx 0[01278] ' | tail -n 5 | sed -E 's/.*(LAB calc)/  \1/; s/ ssel.*//'
+    ;;
 restore)
     [ -e "$BACKUP" ] || { echo "Нет резервной копии $BACKUP. Стабильный драйвер можно пересобрать: ~/nouveau-fix/rebuild.sh"; exit 1; }
     sudo install -m 644 "$BACKUP" "$SLOT"
@@ -365,5 +397,5 @@ restore)
     echo "=== Стабильный драйвер возвращён. Перезагрузись и проверь: ~/nouveau-fix/check.sh"
     ;;
 *)
-    sed -n '2,27p' "$0"; exit 1 ;;
+    sed -n '2,29p' "$0"; exit 1 ;;
 esac
