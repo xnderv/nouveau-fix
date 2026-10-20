@@ -1,0 +1,27 @@
+Циклы 2026-10-20 18:33:06, отпечаток 869cd5ed, циклов 3
+18:33:09 цикл 1 -> 07: core 405 MHz memory 324 MHz ✓
+18:33:11 цикл 1 -> 0f: core 900 MHz memory 2004 MHz ✓
+    замер в 0f: glmark2 Score: 2191, после теста 61°C
+18:33:47 цикл 1 -> 07: core 405 MHz memory 324 MHz ✓
+18:33:49 цикл 1 -> 03: core 50 MHz memory 135 MHz ✓
+18:33:51 цикл 1 -> 0f: core 900 MHz memory 2004 MHz ✓
+    замер в 0f: glmark2 Score: 2418, после теста 65°C
+18:34:27 цикл 1 -> 03: core 50 MHz memory 135 MHz ✓
+18:34:29 цикл 2 -> 07: core 405 MHz memory 324 MHz ✓
+18:34:31 цикл 2 -> 0f: core 900 MHz memory 2004 MHz ✓
+    замер в 0f: glmark2 Score: 2177, после теста 67°C
+18:35:07 цикл 2 -> 07: core 405 MHz memory 324 MHz ✓
+18:35:09 цикл 2 -> 03: core 50 MHz memory 135 MHz ✓
+18:35:11 цикл 2 -> 0f: core 900 MHz memory 2004 MHz ✓
+    замер в 0f: glmark2 Score: 2149, после теста 68°C
+18:35:47 цикл 2 -> 03: core 50 MHz memory 135 MHz ✓
+18:35:50 цикл 3 -> 07: core 405 MHz memory 324 MHz ✓
+18:35:52 цикл 3 -> 0f: core 900 MHz memory 2004 MHz ✓
+    замер в 0f: glmark2 Score: 2406, после теста 70°C
+18:36:28 цикл 3 -> 07: core 405 MHz memory 324 MHz ✓
+18:36:30 цикл 3 -> 03: core 50 MHz memory 135 MHz ✓
+18:36:32 цикл 3 -> 0f: core 900 MHz memory 2004 MHz ✓
+    замер в 0f: glmark2 Score: 2229, после теста 70°C
+18:37:08 цикл 3 -> 03: core 50 MHz memory 135 MHz ✓
+18:37:08 режим сейчас: /sys/kernel/debug/dri/0/pstate:AC: core 50 MHz memory 135 MHz
+=== Все переходы прошли ✅

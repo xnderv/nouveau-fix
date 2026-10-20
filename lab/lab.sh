@@ -34,6 +34,7 @@
 #   lab.sh mem07     — ПАМЯТЬ 135 -> 324 (03 -> 07) повтором скрипта NVIDIA, снимки до/после и сравнение с NVIDIA.
 #   lab.sh mem0f     — ПАМЯТЬ 324 -> 2004 (07 -> 0f, узлы как в H11) повтором скрипта NVIDIA; только после mem07.
 #   lab.sh memdown 07|03 — ПАМЯТЬ ВНИЗ (2004 -> 324 или 324 -> 135) повтором скриптов NVIDIA.
+#   lab.sh memcycle [N] — N циклов всех переходов с памятью (03/07/0f, вверх, вниз и прыжками).
 #   lab.sh calib [МГц …] — калибровка ядра: скорость вычислений на заданных частотах (по умолчанию 8 точек).
 #   lab.sh pllcmp    — ядро на одинаковой частоте через делитель и через PLL (P = 1, 2, 3, 4).
 #   lab.sh flags     — показать текущие переключатели лабораторного драйвера.
@@ -547,6 +548,52 @@ memdown)
     QUICK=1 "$0" bench "$T" || true
     echo "Снимки: $SN"
     ;;
+memcycle)
+    # ЦИКЛЫ СМЕНЫ РЕЖИМОВ с памятью (все пути скриптов NVIDIA): 03 -> 07 -> 0f -> 07 -> 03 -> 0f (прыжок) -> 03 (прыжок).
+    # После каждого перехода — проверка частоты памяти и ошибок в журнале; в 0f — быстрый тяжёлый замер.
+    N="${2:-3}"; [[ "$N" =~ ^[0-9]+$ ]] || { echo "Число циклов"; exit 1; }
+    PRM=/sys/module/nouveau/parameters
+    [ -e "$PRM/lab_mem_replay" ] || { echo "Нужен лабораторный драйвер v10."; exit 1; }
+    AC="$(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate | head -n 1')"
+    case "$AC" in *"memory 135 MHz"*) ;; *) echo "--- СТОП: начинать с памяти 135 (режим 03). Сейчас: $AC. Сначала: lab.sh memdown 03 (или перезагрузка)"; exit 1;; esac
+    mkdir -p "$KIT/results"; LOG="$KIT/results/memcycle-$(date +%Y%m%d-%H%M%S).txt"
+    sudo -v
+    for n in gpc rop hub07 hub06 hub01; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay; echo 0 > $PRM/lab_mem_order; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv; echo 65535 > $PRM/lab_eng_mask"
+    for f in lab_gpc_fix lab_gpc_coef lab_gpc_ref_khz; do [ -e "$PRM/$f" ] && sudo sh -c "echo 0 > $PRM/$f"; done
+    sudo sh -c "echo 13 > $PRM/lab_gpc_seq"
+    EXPFIX=0; EXPSEQ=13; EXPCOEF=0; EXPREF=0
+    preflight 65535 0 0 0 0 0
+    sudo sh -c "echo 15 > $PRM/lab_mem_replay; echo 1 > $PRM/lab_mem_order; echo 1 > $PRM/lab_mem"
+    echo "  lab_mem=$(cat $PRM/lab_mem) lab_mem_replay=$(cat $PRM/lab_mem_replay) lab_mem_order=$(cat $PRM/lab_mem_order) lab_gpc_seq=$(cat $PRM/lab_gpc_seq)"
+    echo "=== $N циклов: 03 -> 07 -> 0f -> 07 -> 03 -> 0f -> 03, в каждом 0f замер. Ошибки журнала считаются после каждого шага."
+    [ "${NOCONFIRM:-0}" = 1 ] || read -r -p "Всё верно? Enter — запустить, Ctrl+C — отмена " _
+    { echo "Циклы $(date '+%F %T'), отпечаток $(md5sum "$0" | cut -c1-8), циклов $N"; } | tee "$LOG"; sync
+    E0="$(journalctl -k -b 0 --no-pager | grep -cE 'nouveau.*(ERROR|FAULT|fault|timeout|TIMEOUT)' || true)"
+    ok=1
+    for c in $(seq 1 "$N"); do
+      for P in 07 0f 07 03 0f 03; do
+        case $P in 03) WANT=135;; 07) WANT=324;; 0f) WANT=2004;; esac
+        sudo sh -c "f=\$(ls /sys/kernel/debug/dri/*/pstate | head -n1); echo $P > \"\$f\""; sleep 2
+        AC="$(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate | head -n 1')"
+        E="$(journalctl -k -b 0 --no-pager | grep -cE 'nouveau.*(ERROR|FAULT|fault|timeout|TIMEOUT)' || true)"
+        R="?"; case "$AC" in *"memory $WANT MHz"*) R="✓";; *) R="✗"; ok=0;; esac
+        [ "$E" -gt "$E0" ] && { R="$R ошибки журнала: $((E - E0))"; ok=0; }
+        echo "$(date +%T) цикл $c -> $P: ${AC#*AC: } $R" | tee -a "$LOG"; sync
+        [ "$ok" = 1 ] || break 2
+        if [ "$P" = 0f ]; then   # замер в 0f с памятью 2004; на время замера смены памяти запрещены
+          sudo sh -c "echo 0 > $PRM/lab_mem"
+          SC="$(QUICK=1 "$0" bench 0f 2>&1 | grep -E '^=== Режим 0f: glmark2' | tail -n 1)"
+          sudo sh -c "echo 1 > $PRM/lab_mem"
+          echo "    замер в 0f: ${SC#=== Режим 0f: }" | tee -a "$LOG"; sync
+        fi
+      done
+    done
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay; echo 0 > $PRM/lab_mem_order"
+    echo "$(date +%T) режим сейчас: $(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate | head -n 1')" | tee -a "$LOG"
+    [ "$ok" = 1 ] && echo "=== Все переходы прошли ✅" | tee -a "$LOG" || echo "=== СТОП: переход не удался — см. выше и журнал" | tee -a "$LOG"
+    echo "Лог: $LOG"
+    ;;
 home)
     # Вернуть рабочий 07: свои частоты сброшены, через 03 (hub на стартовые), затем 07 (hub не трогаем).
     PRM=/sys/module/nouveau/parameters
@@ -612,5 +659,5 @@ restore)
     echo "=== Стабильный драйвер возвращён. Перезагрузись и проверь: ~/nouveau-fix/check.sh"
     ;;
 *)
-    sed -n '2,40p' "$0"; exit 1 ;;
+    sed -n '2,41p' "$0"; exit 1 ;;
 esac
