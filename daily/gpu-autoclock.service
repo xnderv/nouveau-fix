@@ -1,0 +1,11 @@
+[Unit]
+Description=GTX 560 Ti: режимы 03/07/0f по загрузке (лабораторный nouveau)
+After=graphical.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/sbin/gpu-autoclock.py
+Restart=no
+
+[Install]
+WantedBy=graphical.target

@@ -34,7 +34,8 @@
 #   lab.sh mem07     — ПАМЯТЬ 135 -> 324 (03 -> 07) повтором скрипта NVIDIA, снимки до/после и сравнение с NVIDIA.
 #   lab.sh mem0f     — ПАМЯТЬ 324 -> 2004 (07 -> 0f, узлы как в H11) повтором скрипта NVIDIA; только после mem07.
 #   lab.sh memdown 07|03 — ПАМЯТЬ ВНИЗ (2004 -> 324 или 324 -> 135) повтором скриптов NVIDIA.
-#   lab.sh memcycle [N] — N циклов всех переходов с памятью (03/07/0f, вверх, вниз и прыжками).
+#   lab.sh memcycle [N] — N циклов всех переходов с памятью (03/07/0f, вверх, вниз и прыжками). LOAD=1 — под нагрузкой.
+#   lab.sh occmp [R] — сравнение узлов (завод / делитель / эталон NVIDIA) при памяти 2004, R кругов.
 #   lab.sh calib [МГц …] — калибровка ядра: скорость вычислений на заданных частотах (по умолчанию 8 точек).
 #   lab.sh pllcmp    — ядро на одинаковой частоте через делитель и через PLL (P = 1, 2, 3, 4).
 #   lab.sh flags     — показать текущие переключатели лабораторного драйвера.
@@ -570,7 +571,12 @@ memcycle)
     [ "${NOCONFIRM:-0}" = 1 ] || read -r -p "Всё верно? Enter — запустить, Ctrl+C — отмена " _
     { echo "Циклы $(date '+%F %T'), отпечаток $(md5sum "$0" | cut -c1-8), циклов $N"; } | tee "$LOG"; sync
     E0="$(journalctl -k -b 0 --no-pager | grep -cE 'nouveau.*(ERROR|FAULT|fault|timeout|TIMEOUT)' || true)"
-    ok=1
+    ok=1; GP=""
+    if [ "${LOAD:-0}" = 1 ]; then   # ПЕРЕКЛЮЧЕНИЯ ПОД НАГРУЗКОЙ: тяжёлый glmark2 крутится всё время, замеры не делаем
+      G="$(command -v glmark2-wayland || command -v glmark2)"
+      "$G" --run-forever -s 1600x900 -b shading:shading=phong -b bump:bump-render=high-poly -b refract >/dev/null 2>&1 & GP=$!
+      echo "=== Нагрузка запущена (glmark2, pid $GP), переключаю режимы под ней" | tee -a "$LOG"; sleep 5
+    fi
     for c in $(seq 1 "$N"); do
       for P in 07 0f 07 03 0f 03; do
         case $P in 03) WANT=135;; 07) WANT=324;; 0f) WANT=2004;; esac
@@ -581,7 +587,8 @@ memcycle)
         [ "$E" -gt "$E0" ] && { R="$R ошибки журнала: $((E - E0))"; ok=0; }
         echo "$(date +%T) цикл $c -> $P: ${AC#*AC: } $R" | tee -a "$LOG"; sync
         [ "$ok" = 1 ] || break 2
-        if [ "$P" = 0f ]; then   # замер в 0f с памятью 2004; на время замера смены памяти запрещены
+        [ -n "$GP" ] && { kill -0 "$GP" 2>/dev/null || { echo "--- СТОП: glmark2 упал" | tee -a "$LOG"; ok=0; break 2; }; sleep 3; }
+        if [ "$P" = 0f ] && [ -z "$GP" ]; then   # замер в 0f с памятью 2004; на время замера смены памяти запрещены
           sudo sh -c "echo 0 > $PRM/lab_mem"
           SC="$(QUICK=1 "$0" bench 0f 2>&1 | grep -E '^=== Режим 0f: glmark2' | tail -n 1)"
           sudo sh -c "echo 1 > $PRM/lab_mem"
@@ -589,9 +596,64 @@ memcycle)
         fi
       done
     done
+    [ -n "$GP" ] && { kill "$GP" 2>/dev/null || true; wait "$GP" 2>/dev/null || true; }
     sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay; echo 0 > $PRM/lab_mem_order"
     echo "$(date +%T) режим сейчас: $(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate | head -n 1')" | tee -a "$LOG"
     [ "$ok" = 1 ] && echo "=== Все переходы прошли ✅" | tee -a "$LOG" || echo "=== СТОП: переход не удался — см. выше и журнал" | tee -a "$LOG"
+    echo "Лог: $LOG"
+    ;;
+occmp)
+    # СРАВНЕНИЕ НАСТРОЕК УЗЛОВ при памяти 2004 (узкое место убрано). Каждая точка — полный путь как у NVIDIA:
+    # 03 (135) -> 0f со своими узлами и памятью 2004 (скрипты A+B) -> тяжёлый замер + честный замер ядра -> 03 (C+D+D+E).
+    # Точки (ядро ROP hubk07 hubk06 hubk01, МГц), по кругу R раз, чтобы увидеть разброс:
+    #   ЗАВОД  1800 1907 1907 1645 1645  — заводской разгон Gigabyte (PLL)
+    #   ДЕЛИТ  1620 1620 1620 1620 1620  — всё на делителе, без PLL
+    #   РЕФ    1645 1907 1907 1645 1645  — ядро как у эталонной GTX 560 Ti (822/1645), остальное заводское
+    R="${2:-2}"; [[ "$R" =~ ^[0-9]+$ ]] || { echo "Число кругов"; exit 1; }
+    PRM=/sys/module/nouveau/parameters
+    [ -e "$PRM/lab_mem_replay" ] || { echo "Нужен лабораторный драйвер v10."; exit 1; }
+    AC="$(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate | head -n 1')"
+    case "$AC" in *"memory 135 MHz"*) ;; *) echo "--- СТОП: начинать с памяти 135 (режим 03). Сейчас: $AC"; exit 1;; esac
+    NAMES=(gpc rop hub07 hub06 hub01)
+    PTS=("ЗАВОД 1800 1907 1907 1645 1645" "ДЕЛИТ 1620 1620 1620 1620 1620" "РЕФ 1645 1907 1907 1645 1645")
+    mkdir -p "$KIT/results"; LOG="$KIT/results/occmp-$(date +%Y%m%d-%H%M%S).txt"
+    sudo -v
+    for n in "${NAMES[@]}"; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay; echo 0 > $PRM/lab_mem_order; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv; echo 65535 > $PRM/lab_eng_mask"
+    for f in lab_gpc_fix lab_gpc_coef lab_gpc_ref_khz; do [ -e "$PRM/$f" ] && sudo sh -c "echo 0 > $PRM/$f"; done
+    sudo sh -c "echo 13 > $PRM/lab_gpc_seq"
+    EXPFIX=0; EXPSEQ=13; EXPCOEF=0; EXPREF=0
+    preflight 65535 0 0 0 0 0
+    echo "=== Сравнение: ${#PTS[@]} точки × $R круга, память 2004 в каждой. Около $(( ${#PTS[@]} * R * 2 )) минут."
+    [ "${NOCONFIRM:-0}" = 1 ] || read -r -p "Начинаем? Enter — да, Ctrl+C — отмена " _
+    { echo "Сравнение узлов $(date '+%F %T'), отпечаток $(md5sum "$0" | cut -c1-8), кругов $R, память 2004"; } | tee "$LOG"; sync
+    E0="$(journalctl -k -b 0 --no-pager | grep -cE 'nouveau.*(ERROR|FAULT|fault|timeout|TIMEOUT)' || true)"
+    setpst() { sudo sh -c "f=\$(ls /sys/kernel/debug/dri/*/pstate | head -n1); echo $1 > \"\$f\""; sleep 2; }
+    for r in $(seq 1 "$R"); do
+      for p in "${PTS[@]}"; do
+        set -- $p; NM=$1; shift; A=("$@")
+        for i in 0 1 2 3 4; do sudo sh -c "echo $((A[i]*1000)) > $PRM/lab_${NAMES[$i]}_khz"; done
+        sudo sh -c "echo 15 > $PRM/lab_mem_replay; echo 1 > $PRM/lab_mem_order; echo 1 > $PRM/lab_mem"
+        setpst 0f
+        AC="$(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate | head -n 1')"
+        case "$AC" in *"memory 2004 MHz"*) ;; *) echo "--- СТОП: память не 2004 ($AC)" | tee -a "$LOG"; break 2;; esac
+        sudo sh -c "echo 0 > $PRM/lab_mem"
+        L="$(journalctl -k -b 0 --no-pager | grep -E 'LAB calc idx 0[0-8] dom' | tail -n 5 | grep -oE 'idx 0[0-8] dom [0-9]+: want [0-9]+ got [0-9]+ ssel [0-9a-f]+' | awk '{printf "%s:%d(%s) ", $2, $8/1000, ($10=="00000000"?"дел":"PLL")}')"
+        H="$(HEAVY=1 "$0" bench 0f 2>&1 | grep -E '^=== Режим 0f: glmark2' | tail -n 1 | grep -oE 'Score: [0-9]+, после теста [0-9]+°C')"
+        U="$(ALU=1 "$0" bench 0f 2>&1 | grep -E '^=== Режим 0f: glmark2' | tail -n 1 | grep -oE 'Score: [0-9]+')"
+        E="$(journalctl -k -b 0 --no-pager | grep -cE 'nouveau.*(ERROR|FAULT|fault|timeout|TIMEOUT)' || true)"
+        printf '%s круг %s %-6s %s | тяжёлый %s | ядро (ALU) %s | узлы: %s| ошибок журнала: %s\n' "$(date +%T)" "$r" "$NM" "${A[*]}" "$H" "$U" "$L" "$((E - E0))" | tee -a "$LOG"; sync
+        for n in "${NAMES[@]}"; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
+        sudo sh -c "echo 1 > $PRM/lab_mem"
+        setpst 03
+        AC="$(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate | head -n 1')"
+        case "$AC" in *"memory 135 MHz"*) ;; *) echo "--- СТОП: спуск не вернул память 135 ($AC)" | tee -a "$LOG"; break 2;; esac
+        [ "$E" -gt "$E0" ] && { echo "--- СТОП: ошибки в журнале" | tee -a "$LOG"; break 2; }
+      done
+    done
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay; echo 0 > $PRM/lab_mem_order"
+    for n in "${NAMES[@]}"; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
+    echo "=== Итог:"; grep ' круг ' "$LOG"
     echo "Лог: $LOG"
     ;;
 home)
@@ -659,5 +721,5 @@ restore)
     echo "=== Стабильный драйвер возвращён. Перезагрузись и проверь: ~/nouveau-fix/check.sh"
     ;;
 *)
-    sed -n '2,41p' "$0"; exit 1 ;;
+    sed -n '2,42p' "$0"; exit 1 ;;
 esac

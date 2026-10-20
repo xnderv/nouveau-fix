@@ -1,0 +1,16 @@
+Циклы 2026-10-20 18:55:30, отпечаток 04d0aa58, циклов 2
+=== Нагрузка запущена (glmark2, pid 12519), переключаю режимы под ней
+18:55:38 цикл 1 -> 07: core 405 MHz memory 324 MHz ✓
+18:55:43 цикл 1 -> 0f: core 900 MHz memory 2004 MHz ✓
+18:55:48 цикл 1 -> 07: core 405 MHz memory 324 MHz ✓
+18:55:53 цикл 1 -> 03: core 50 MHz memory 135 MHz ✓
+18:55:59 цикл 1 -> 0f: core 900 MHz memory 2004 MHz ✓
+18:56:04 цикл 1 -> 03: core 50 MHz memory 135 MHz ✓
+18:56:09 цикл 2 -> 07: core 405 MHz memory 324 MHz ✓
+18:56:14 цикл 2 -> 0f: core 900 MHz memory 2004 MHz ✓
+18:56:19 цикл 2 -> 07: core 405 MHz memory 324 MHz ✓
+18:56:25 цикл 2 -> 03: core 50 MHz memory 135 MHz ✓
+18:56:30 цикл 2 -> 0f: core 900 MHz memory 2004 MHz ✓
+18:56:35 цикл 2 -> 03: core 50 MHz memory 135 MHz ✓
+18:56:38 режим сейчас: /sys/kernel/debug/dri/0/pstate:AC: core 50 MHz memory 135 MHz
+=== Все переходы прошли ✅
