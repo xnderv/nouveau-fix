@@ -1,0 +1,5 @@
+Section "Device"
+    Identifier "nv"
+    Driver "nvidia"
+    Option "Coolbits" "8"
+EndSection

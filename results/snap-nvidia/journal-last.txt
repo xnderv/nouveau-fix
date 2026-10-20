@@ -1,0 +1,1011 @@
+Oct 20 17:19:00 u2204-trace kernel: microcode: microcode updated early to revision 0x21, date = 2019-02-13
+Oct 20 17:19:00 u2204-trace kernel: Linux version 5.15.0-198-generic (buildd@lcy02-amd64-040) (gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #208-Ubuntu SMP Fri Sep 4 10:22:38 UTC 2026 (Ubuntu 5.15.0-198.208-generic 5.15.216)
+Oct 20 17:19:00 u2204-trace kernel: Command line: BOOT_IMAGE=/boot/vmlinuz-5.15.0-198-generic root=UUID=b3bec440-3824-4571-921d-824258138b6f ro
+Oct 20 17:19:00 u2204-trace kernel: KERNEL supported cpus:
+Oct 20 17:19:00 u2204-trace kernel:   Intel GenuineIntel
+Oct 20 17:19:00 u2204-trace kernel:   AMD AuthenticAMD
+Oct 20 17:19:00 u2204-trace kernel:   Hygon HygonGenuine
+Oct 20 17:19:00 u2204-trace kernel:   Centaur CentaurHauls
+Oct 20 17:19:00 u2204-trace kernel:   zhaoxin   Shanghai  
+Oct 20 17:19:00 u2204-trace kernel: BIOS-provided physical RAM map:
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x0000000000000000-0x000000000009d7ff] usable
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x000000000009d800-0x000000000009ffff] reserved
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000000e0000-0x00000000000fffff] reserved
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x0000000000100000-0x00000000dde70fff] usable
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000dde71000-0x00000000de497fff] reserved
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000de498000-0x00000000de498fff] ACPI data
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000de499000-0x00000000de5c2fff] ACPI NVS
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000de5c3000-0x00000000ded9efff] reserved
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000ded9f000-0x00000000ded9ffff] usable
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000deda0000-0x00000000dede2fff] ACPI NVS
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000dede3000-0x00000000df599fff] usable
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000df59a000-0x00000000df7dafff] reserved
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000df7db000-0x00000000df7fffff] usable
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000f8000000-0x00000000fbffffff] reserved
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000fec00000-0x00000000fec00fff] reserved
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000fed00000-0x00000000fed03fff] reserved
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000fed1c000-0x00000000fed1ffff] reserved
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000fee00000-0x00000000fee00fff] reserved
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x00000000ff000000-0x00000000ffffffff] reserved
+Oct 20 17:19:00 u2204-trace kernel: BIOS-e820: [mem 0x0000000100000000-0x000000041effffff] usable
+Oct 20 17:19:00 u2204-trace kernel: NX (Execute Disable) protection: active
+Oct 20 17:19:00 u2204-trace kernel: SMBIOS 2.7 present.
+Oct 20 17:19:00 u2204-trace kernel: DMI: Gigabyte Technology Co., Ltd. To be filled by O.E.M./Z68X-UD3P-B3, BIOS U1g 11/13/2017
+Oct 20 17:19:00 u2204-trace kernel: tsc: Fast TSC calibration failed
+Oct 20 17:19:00 u2204-trace kernel: e820: update [mem 0x00000000-0x00000fff] usable ==> reserved
+Oct 20 17:19:00 u2204-trace kernel: e820: remove [mem 0x000a0000-0x000fffff] usable
+Oct 20 17:19:00 u2204-trace kernel: last_pfn = 0x41f000 max_arch_pfn = 0x400000000
+Oct 20 17:19:00 u2204-trace kernel: x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+Oct 20 17:19:00 u2204-trace kernel: total RAM covered: 16368M
+Oct 20 17:19:00 u2204-trace kernel: Found optimal setting for mtrr clean up
+Oct 20 17:19:00 u2204-trace kernel:  gran_size: 64K         chunk_size: 32M         num_reg: 7          lose cover RAM: 0G
+Oct 20 17:19:00 u2204-trace kernel: e820: update [mem 0xe0000000-0xffffffff] usable ==> reserved
+Oct 20 17:19:00 u2204-trace kernel: last_pfn = 0xdf800 max_arch_pfn = 0x400000000
+Oct 20 17:19:00 u2204-trace kernel: found SMP MP-table at [mem 0x000fd800-0x000fd80f]
+Oct 20 17:19:00 u2204-trace kernel: RAMDISK: [mem 0x2f077000-0x33832fff]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Early table checksum verification disabled
+Oct 20 17:19:00 u2204-trace kernel: ACPI: RSDP 0x00000000000F0490 000024 (v02 ALASKA)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: XSDT 0x00000000DE5A4078 000074 (v01 ALASKA A M I    01072009 AMI  00010013)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: FACP 0x00000000DE5AE380 0000F4 (v04 ALASKA A M I    01072009 AMI  00010013)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: DSDT 0x00000000DE5A4188 00A1F8 (v02 ALASKA A M I    00000012 INTL 20051117)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: FACS 0x00000000DE5C1F80 000040
+Oct 20 17:19:00 u2204-trace kernel: ACPI: APIC 0x00000000DE5AE478 000092 (v03 ALASKA A M I    01072009 AMI  00010013)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: MCFG 0x00000000DE5AE510 00003C (v01 ALASKA A M I    01072009 MSFT 00000097)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: HPET 0x00000000DE5AE550 000038 (v01 ALASKA A M I    01072009 AMI. 00000005)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: SSDT 0x00000000DE5AE588 00036D (v01 SataRe SataTabl 00001000 INTL 20091112)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: SSDT 0x00000000DE5AE8F8 0009AA (v01 PmRef  Cpu0Ist  00003000 INTL 20051117)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: SSDT 0x00000000DE5AF2A8 000A92 (v01 PmRef  CpuPm    00003000 INTL 20051117)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: DMAR 0x00000000DE5AFD40 000078 (v01 INTEL  SNB      00000001 INTL 00000001)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: BGRT 0x00000000DE5AFDB8 000038 (v00 ALASKA A M I    01072009 AMI  00010013)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: MATS 0x00000000DE5AFDF0 000034 (v02 ALASKA A M I    00000002 w x2 00000000)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Reserving FACP table memory at [mem 0xde5ae380-0xde5ae473]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Reserving DSDT table memory at [mem 0xde5a4188-0xde5ae37f]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Reserving FACS table memory at [mem 0xde5c1f80-0xde5c1fbf]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Reserving APIC table memory at [mem 0xde5ae478-0xde5ae509]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Reserving MCFG table memory at [mem 0xde5ae510-0xde5ae54b]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Reserving HPET table memory at [mem 0xde5ae550-0xde5ae587]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Reserving SSDT table memory at [mem 0xde5ae588-0xde5ae8f4]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Reserving SSDT table memory at [mem 0xde5ae8f8-0xde5af2a1]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Reserving SSDT table memory at [mem 0xde5af2a8-0xde5afd39]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Reserving DMAR table memory at [mem 0xde5afd40-0xde5afdb7]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Reserving BGRT table memory at [mem 0xde5afdb8-0xde5afdef]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Reserving MATS table memory at [mem 0xde5afdf0-0xde5afe23]
+Oct 20 17:19:00 u2204-trace kernel: No NUMA configuration found
+Oct 20 17:19:00 u2204-trace kernel: Faking a node at [mem 0x0000000000000000-0x000000041effffff]
+Oct 20 17:19:00 u2204-trace kernel: NODE_DATA(0) allocated [mem 0x41efcb000-0x41eff4fff]
+Oct 20 17:19:00 u2204-trace kernel: Zone ranges:
+Oct 20 17:19:00 u2204-trace kernel:   DMA      [mem 0x0000000000001000-0x0000000000ffffff]
+Oct 20 17:19:00 u2204-trace kernel:   DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
+Oct 20 17:19:00 u2204-trace kernel:   Normal   [mem 0x0000000100000000-0x000000041effffff]
+Oct 20 17:19:00 u2204-trace kernel:   Device   empty
+Oct 20 17:19:00 u2204-trace kernel: Movable zone start for each node
+Oct 20 17:19:00 u2204-trace kernel: Early memory node ranges
+Oct 20 17:19:00 u2204-trace kernel:   node   0: [mem 0x0000000000001000-0x000000000009cfff]
+Oct 20 17:19:00 u2204-trace kernel:   node   0: [mem 0x0000000000100000-0x00000000dde70fff]
+Oct 20 17:19:00 u2204-trace kernel:   node   0: [mem 0x00000000ded9f000-0x00000000ded9ffff]
+Oct 20 17:19:00 u2204-trace kernel:   node   0: [mem 0x00000000dede3000-0x00000000df599fff]
+Oct 20 17:19:00 u2204-trace kernel:   node   0: [mem 0x00000000df7db000-0x00000000df7fffff]
+Oct 20 17:19:00 u2204-trace kernel:   node   0: [mem 0x0000000100000000-0x000000041effffff]
+Oct 20 17:19:00 u2204-trace kernel: Initmem setup node 0 [mem 0x0000000000001000-0x000000041effffff]
+Oct 20 17:19:00 u2204-trace kernel: On node 0, zone DMA: 1 pages in unavailable ranges
+Oct 20 17:19:00 u2204-trace kernel: On node 0, zone DMA: 99 pages in unavailable ranges
+Oct 20 17:19:00 u2204-trace kernel: On node 0, zone DMA32: 3886 pages in unavailable ranges
+Oct 20 17:19:00 u2204-trace kernel: On node 0, zone DMA32: 67 pages in unavailable ranges
+Oct 20 17:19:00 u2204-trace kernel: On node 0, zone DMA32: 577 pages in unavailable ranges
+Oct 20 17:19:00 u2204-trace kernel: On node 0, zone Normal: 2048 pages in unavailable ranges
+Oct 20 17:19:00 u2204-trace kernel: On node 0, zone Normal: 4096 pages in unavailable ranges
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PM-Timer IO Port: 0x408
+Oct 20 17:19:00 u2204-trace kernel: ACPI: LAPIC_NMI (acpi_id[0xff] high edge lint[0x1])
+Oct 20 17:19:00 u2204-trace kernel: IOAPIC[0]: apic_id 2, version 32, address 0xfec00000, GSI 0-23
+Oct 20 17:19:00 u2204-trace kernel: ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Using ACPI (MADT) for SMP configuration information
+Oct 20 17:19:00 u2204-trace kernel: ACPI: HPET id: 0x8086a701 base: 0xfed00000
+Oct 20 17:19:00 u2204-trace kernel: TSC deadline timer available
+Oct 20 17:19:00 u2204-trace kernel: smpboot: Allowing 8 CPUs, 0 hotplug CPUs
+Oct 20 17:19:00 u2204-trace kernel: PM: hibernation: Registered nosave memory: [mem 0x00000000-0x00000fff]
+Oct 20 17:19:00 u2204-trace kernel: PM: hibernation: Registered nosave memory: [mem 0x0009d000-0x000fffff]
+Oct 20 17:19:00 u2204-trace kernel: PM: hibernation: Registered nosave memory: [mem 0xdde71000-0xded9efff]
+Oct 20 17:19:00 u2204-trace kernel: PM: hibernation: Registered nosave memory: [mem 0xdeda0000-0xdede2fff]
+Oct 20 17:19:00 u2204-trace kernel: PM: hibernation: Registered nosave memory: [mem 0xdf59a000-0xdf7dafff]
+Oct 20 17:19:00 u2204-trace kernel: PM: hibernation: Registered nosave memory: [mem 0xdf800000-0xffffffff]
+Oct 20 17:19:00 u2204-trace kernel: [mem 0xdf800000-0xf7ffffff] available for PCI devices
+Oct 20 17:19:00 u2204-trace kernel: Booting paravirtualized kernel on bare hardware
+Oct 20 17:19:00 u2204-trace kernel: clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645519600211568 ns
+Oct 20 17:19:00 u2204-trace kernel: setup_percpu: NR_CPUS:8192 nr_cpumask_bits:8 nr_cpu_ids:8 nr_node_ids:1
+Oct 20 17:19:00 u2204-trace kernel: percpu: Embedded 62 pages/cpu s217088 r8192 d28672 u262144
+Oct 20 17:19:00 u2204-trace kernel: pcpu-alloc: s217088 r8192 d28672 u262144 alloc=1*2097152
+Oct 20 17:19:00 u2204-trace kernel: pcpu-alloc: [0] 0 1 2 3 4 5 6 7 
+Oct 20 17:19:00 u2204-trace kernel: Built 1 zonelists, mobility grouping on.  Total pages: 4118004
+Oct 20 17:19:00 u2204-trace kernel: Policy zone: Normal
+Oct 20 17:19:00 u2204-trace kernel: Kernel command line: BOOT_IMAGE=/boot/vmlinuz-5.15.0-198-generic root=UUID=b3bec440-3824-4571-921d-824258138b6f ro
+Oct 20 17:19:00 u2204-trace kernel: Dentry cache hash table entries: 2097152 (order: 12, 16777216 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: Inode-cache hash table entries: 1048576 (order: 11, 8388608 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: mem auto-init: stack:off, heap alloc:on, heap free:off
+Oct 20 17:19:00 u2204-trace kernel: Memory: 16247032K/16734120K available (16393K kernel code, 4402K rwdata, 11004K rodata, 3296K init, 18764K bss, 486828K reserved, 0K cma-reserved)
+Oct 20 17:19:00 u2204-trace kernel: SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=8, Nodes=1
+Oct 20 17:19:00 u2204-trace kernel: Kernel/User page tables isolation: enabled
+Oct 20 17:19:00 u2204-trace kernel: ftrace: allocating 50925 entries in 199 pages
+Oct 20 17:19:00 u2204-trace kernel: ftrace: allocated 199 pages with 5 groups
+Oct 20 17:19:00 u2204-trace kernel: rcu: Hierarchical RCU implementation.
+Oct 20 17:19:00 u2204-trace kernel: rcu:         RCU restricting CPUs from NR_CPUS=8192 to nr_cpu_ids=8.
+Oct 20 17:19:00 u2204-trace kernel:         Rude variant of Tasks RCU enabled.
+Oct 20 17:19:00 u2204-trace kernel:         Tracing variant of Tasks RCU enabled.
+Oct 20 17:19:00 u2204-trace kernel: rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+Oct 20 17:19:00 u2204-trace kernel: rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=8
+Oct 20 17:19:00 u2204-trace kernel: NR_IRQS: 524544, nr_irqs: 488, preallocated irqs: 16
+Oct 20 17:19:00 u2204-trace kernel: random: crng init done
+Oct 20 17:19:00 u2204-trace kernel: Console: colour dummy device 80x25
+Oct 20 17:19:00 u2204-trace kernel: printk: console [tty0] enabled
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Core revision 20210730
+Oct 20 17:19:00 u2204-trace kernel: clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 133484882848 ns
+Oct 20 17:19:00 u2204-trace kernel: APIC: Switch to symmetric I/O mode setup
+Oct 20 17:19:00 u2204-trace kernel: DMAR: Host address width 36
+Oct 20 17:19:00 u2204-trace kernel: DMAR: DRHD base: 0x000000fed90000 flags: 0x1
+Oct 20 17:19:00 u2204-trace kernel: DMAR: dmar0: reg_base_addr fed90000 ver 1:0 cap c9008020660262 ecap f0105a
+Oct 20 17:19:00 u2204-trace kernel: DMAR: RMRR base: 0x000000de42f000 end: 0x000000de43bfff
+Oct 20 17:19:00 u2204-trace kernel: DMAR-IR: IOAPIC id 2 under DRHD base  0xfed90000 IOMMU 0
+Oct 20 17:19:00 u2204-trace kernel: DMAR-IR: HPET id 0 under DRHD base 0xfed90000
+Oct 20 17:19:00 u2204-trace kernel: DMAR-IR: Queued invalidation will be enabled to support x2apic and Intr-remapping.
+Oct 20 17:19:00 u2204-trace kernel: DMAR-IR: Enabled IRQ remapping in x2apic mode
+Oct 20 17:19:00 u2204-trace kernel: x2apic enabled
+Oct 20 17:19:00 u2204-trace kernel: Switched APIC routing to cluster x2apic.
+Oct 20 17:19:00 u2204-trace kernel: ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+Oct 20 17:19:00 u2204-trace kernel: tsc: PIT calibration matches HPET. 2 loops
+Oct 20 17:19:00 u2204-trace kernel: tsc: Detected 3531.058 MHz processor
+Oct 20 17:19:00 u2204-trace kernel: clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x32e5ec5dc25, max_idle_ns: 440795217151 ns
+Oct 20 17:19:00 u2204-trace kernel: Calibrating delay loop (skipped), value calculated using timer frequency.. 7062.11 BogoMIPS (lpj=14124232)
+Oct 20 17:19:00 u2204-trace kernel: CPU0: Thermal monitoring enabled (TM1)
+Oct 20 17:19:00 u2204-trace kernel: process: using mwait in idle threads
+Oct 20 17:19:00 u2204-trace kernel: Last level iTLB entries: 4KB 512, 2MB 8, 4MB 8
+Oct 20 17:19:00 u2204-trace kernel: Last level dTLB entries: 4KB 512, 2MB 32, 4MB 32, 1GB 0
+Oct 20 17:19:00 u2204-trace kernel: Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+Oct 20 17:19:00 u2204-trace kernel: Spectre V2 : Mitigation: Retpolines
+Oct 20 17:19:00 u2204-trace kernel: Spectre V2 : Spectre v2 / SpectreRSB: Filling RSB on context switch and VMEXIT
+Oct 20 17:19:00 u2204-trace kernel: Spectre V2 : Enabling Restricted Speculation for firmware calls
+Oct 20 17:19:00 u2204-trace kernel: Spectre V2 : mitigation: Enabling conditional Indirect Branch Prediction Barrier
+Oct 20 17:19:00 u2204-trace kernel: Spectre V2 : User space: Mitigation: STIBP via seccomp and prctl
+Oct 20 17:19:00 u2204-trace kernel: Speculative Store Bypass: Mitigation: Speculative Store Bypass disabled via prctl and seccomp
+Oct 20 17:19:00 u2204-trace kernel: MDS: Mitigation: Clear CPU buffers
+Oct 20 17:19:00 u2204-trace kernel: MMIO Stale Data: Unknown: No mitigations
+Oct 20 17:19:00 u2204-trace kernel: SRBDS: Vulnerable: No microcode
+Oct 20 17:19:00 u2204-trace kernel: VMSCAPE: Mitigation: IBPB before exit to userspace
+Oct 20 17:19:00 u2204-trace kernel: x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+Oct 20 17:19:00 u2204-trace kernel: x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+Oct 20 17:19:00 u2204-trace kernel: x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+Oct 20 17:19:00 u2204-trace kernel: x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+Oct 20 17:19:00 u2204-trace kernel: x86/fpu: Enabled xstate features 0x7, context size is 832 bytes, using 'standard' format.
+Oct 20 17:19:00 u2204-trace kernel: Freeing SMP alternatives memory: 44K
+Oct 20 17:19:00 u2204-trace kernel: pid_max: default: 32768 minimum: 301
+Oct 20 17:19:00 u2204-trace kernel: LSM: Security Framework initializing
+Oct 20 17:19:00 u2204-trace kernel: landlock: Up and running.
+Oct 20 17:19:00 u2204-trace kernel: Yama: becoming mindful.
+Oct 20 17:19:00 u2204-trace kernel: AppArmor: AppArmor initialized
+Oct 20 17:19:00 u2204-trace kernel: Mount-cache hash table entries: 32768 (order: 6, 262144 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: Mountpoint-cache hash table entries: 32768 (order: 6, 262144 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: smpboot: Estimated ratio of average max frequency by base frequency (times 1024): 1082
+Oct 20 17:19:00 u2204-trace kernel: smpboot: CPU0: Intel(R) Xeon(R) CPU E3-1270 V2 @ 3.50GHz (family: 0x6, model: 0x3a, stepping: 0x9)
+Oct 20 17:19:00 u2204-trace kernel: Performance Events: PEBS fmt1+, IvyBridge events, 16-deep LBR, full-width counters, Intel PMU driver.
+Oct 20 17:19:00 u2204-trace kernel: ... version:                3
+Oct 20 17:19:00 u2204-trace kernel: ... bit width:              48
+Oct 20 17:19:00 u2204-trace kernel: ... generic registers:      4
+Oct 20 17:19:00 u2204-trace kernel: ... value mask:             0000ffffffffffff
+Oct 20 17:19:00 u2204-trace kernel: ... max period:             00007fffffffffff
+Oct 20 17:19:00 u2204-trace kernel: ... fixed-purpose events:   3
+Oct 20 17:19:00 u2204-trace kernel: ... event mask:             000000070000000f
+Oct 20 17:19:00 u2204-trace kernel: signal: max sigframe size: 1776
+Oct 20 17:19:00 u2204-trace kernel: rcu: Hierarchical SRCU implementation.
+Oct 20 17:19:00 u2204-trace kernel: NMI watchdog: Enabled. Permanently consumes one hw-PMU counter.
+Oct 20 17:19:00 u2204-trace kernel: smp: Bringing up secondary CPUs ...
+Oct 20 17:19:00 u2204-trace kernel: x86: Booting SMP configuration:
+Oct 20 17:19:00 u2204-trace kernel: .... node  #0, CPUs:      #1 #2 #3 #4
+Oct 20 17:19:00 u2204-trace kernel: MDS CPU bug present and SMT on, data leak possible. See https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/mds.html for more details.
+Oct 20 17:19:00 u2204-trace kernel: VMSCAPE: SMT on, STIBP is required for full protection. See https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/vmscape.html for more details.
+Oct 20 17:19:00 u2204-trace kernel:  #5 #6 #7
+Oct 20 17:19:00 u2204-trace kernel: smp: Brought up 1 node, 8 CPUs
+Oct 20 17:19:00 u2204-trace kernel: smpboot: Max logical packages: 1
+Oct 20 17:19:00 u2204-trace kernel: smpboot: Total of 8 processors activated (56496.92 BogoMIPS)
+Oct 20 17:19:00 u2204-trace kernel: devtmpfs: initialized
+Oct 20 17:19:00 u2204-trace kernel: x86/mm: Memory block size: 128MB
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PM: Registering ACPI NVS region [mem 0xde499000-0xde5c2fff] (1220608 bytes)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PM: Registering ACPI NVS region [mem 0xdeda0000-0xdede2fff] (274432 bytes)
+Oct 20 17:19:00 u2204-trace kernel: clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+Oct 20 17:19:00 u2204-trace kernel: futex hash table entries: 2048 (order: 5, 131072 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: pinctrl core: initialized pinctrl subsystem
+Oct 20 17:19:00 u2204-trace kernel: PM: RTC time: 14:18:54, date: 2026-10-20
+Oct 20 17:19:00 u2204-trace kernel: NET: Registered PF_NETLINK/PF_ROUTE protocol family
+Oct 20 17:19:00 u2204-trace kernel: DMA: preallocated 2048 KiB GFP_KERNEL pool for atomic allocations
+Oct 20 17:19:00 u2204-trace kernel: DMA: preallocated 2048 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+Oct 20 17:19:00 u2204-trace kernel: DMA: preallocated 2048 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+Oct 20 17:19:00 u2204-trace kernel: audit: initializing netlink subsys (disabled)
+Oct 20 17:19:00 u2204-trace kernel: audit: type=2000 audit(1792505934.064:1): state=initialized audit_enabled=0 res=1
+Oct 20 17:19:00 u2204-trace kernel: thermal_sys: Registered thermal governor 'fair_share'
+Oct 20 17:19:00 u2204-trace kernel: thermal_sys: Registered thermal governor 'bang_bang'
+Oct 20 17:19:00 u2204-trace kernel: thermal_sys: Registered thermal governor 'step_wise'
+Oct 20 17:19:00 u2204-trace kernel: thermal_sys: Registered thermal governor 'user_space'
+Oct 20 17:19:00 u2204-trace kernel: thermal_sys: Registered thermal governor 'power_allocator'
+Oct 20 17:19:00 u2204-trace kernel: cpuidle: using governor ladder
+Oct 20 17:19:00 u2204-trace kernel: cpuidle: using governor menu
+Oct 20 17:19:00 u2204-trace kernel: ACPI FADT declares the system doesn't support PCIe ASPM, so disable it
+Oct 20 17:19:00 u2204-trace kernel: ACPI: bus type PCI registered
+Oct 20 17:19:00 u2204-trace kernel: acpiphp: ACPI Hot Plug PCI Controller Driver version: 0.5
+Oct 20 17:19:00 u2204-trace kernel: PCI: MMCONFIG for domain 0000 [bus 00-3f] at [mem 0xf8000000-0xfbffffff] (base 0xf8000000)
+Oct 20 17:19:00 u2204-trace kernel: PCI: MMCONFIG at [mem 0xf8000000-0xfbffffff] reserved in E820
+Oct 20 17:19:00 u2204-trace kernel: PCI: Using configuration type 1 for base access
+Oct 20 17:19:00 u2204-trace kernel: core: PMU erratum BJ122, BV98, HSD29 worked around, HT is on
+Oct 20 17:19:00 u2204-trace kernel: ENERGY_PERF_BIAS: Set to 'normal', was 'performance'
+Oct 20 17:19:00 u2204-trace kernel: kprobes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
+Oct 20 17:19:00 u2204-trace kernel: HugeTLB registered 2.00 MiB page size, pre-allocated 0 pages
+Oct 20 17:19:00 u2204-trace kernel: fbcon: Taking over console
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Added _OSI(Module Device)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Added _OSI(Processor Device)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Added _OSI(Processor Aggregator Device)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Added _OSI(Linux-Dell-Video)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Added _OSI(Linux-Lenovo-NV-HDMI-Audio)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Added _OSI(Linux-HPI-Hybrid-Graphics)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: 4 ACPI AML tables successfully acquired and loaded
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Dynamic OEM Table Load:
+Oct 20 17:19:00 u2204-trace kernel: ACPI: SSDT 0xFFFF8D4500B48000 00083B (v01 PmRef  Cpu0Cst  00003001 INTL 20051117)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Dynamic OEM Table Load:
+Oct 20 17:19:00 u2204-trace kernel: ACPI: SSDT 0xFFFF8D4501097C00 000303 (v01 PmRef  ApIst    00003000 INTL 20051117)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Dynamic OEM Table Load:
+Oct 20 17:19:00 u2204-trace kernel: ACPI: SSDT 0xFFFF8D450094BA00 000119 (v01 PmRef  ApCst    00003000 INTL 20051117)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Interpreter enabled
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PM: (supports S0 S3 S4 S5)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Using IOAPIC for interrupt routing
+Oct 20 17:19:00 u2204-trace kernel: PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+Oct 20 17:19:00 u2204-trace kernel: PCI: Using E820 reservations for host bridge windows
+Oct 20 17:19:00 u2204-trace kernel: ACPI: Enabled 15 GPEs in block 00 to 3F
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PM: Power Resource [FN00]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PM: Power Resource [FN01]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PM: Power Resource [FN02]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PM: Power Resource [FN03]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PM: Power Resource [FN04]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-3e])
+Oct 20 17:19:00 u2204-trace kernel: acpi PNP0A08:00: _OSC: OS supports [ExtendedConfig ASPM ClockPM Segments MSI EDR HPX-Type3]
+Oct 20 17:19:00 u2204-trace kernel: acpi PNP0A08:00: _OSC: platform does not support [PCIeHotplug SHPCHotplug PME]
+Oct 20 17:19:00 u2204-trace kernel: acpi PNP0A08:00: _OSC: OS now controls [AER PCIeCapability LTR DPC]
+Oct 20 17:19:00 u2204-trace kernel: acpi PNP0A08:00: FADT indicates ASPM is unsupported, using BIOS configuration
+Oct 20 17:19:00 u2204-trace kernel: PCI host bridge to bus 0000:00
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:00: root bus resource [io  0x0000-0x0cf7 window]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:00: root bus resource [io  0x0d00-0xffff window]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:00: root bus resource [mem 0x000a0000-0x000bffff window]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:00: root bus resource [mem 0x000d0000-0x000e7fff window]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:00: root bus resource [mem 0xe0000000-0xfeafffff window]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:00: root bus resource [bus 00-3e]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:00.0: [8086:0158] type 00 class 0x060000
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:01.0: [8086:0151] type 01 class 0x060400
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:01.0: PME# supported from D0 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:16.0: [8086:1c3a] type 00 class 0x078000
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:16.0: reg 0x10: [mem 0xf650b000-0xf650b00f 64bit]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:16.0: PME# supported from D0 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1a.0: [8086:1c2d] type 00 class 0x0c0320
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1a.0: reg 0x10: [mem 0xf6508000-0xf65083ff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1a.0: PME# supported from D0 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1b.0: [8086:1c20] type 00 class 0x040300
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1b.0: reg 0x10: [mem 0xf6500000-0xf6503fff 64bit]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1b.0: PME# supported from D0 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.0: [8086:1c10] type 01 class 0x060400
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.0: PME# supported from D0 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.3: [8086:1c16] type 01 class 0x060400
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.3: PME# supported from D0 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.4: [8086:1c18] type 01 class 0x060400
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.4: PME# supported from D0 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.5: [8086:1c1a] type 01 class 0x060400
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.5: PME# supported from D0 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.6: [8086:1c1c] type 01 class 0x060400
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.6: PME# supported from D0 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.7: [8086:1c1e] type 01 class 0x060400
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.7: PME# supported from D0 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1d.0: [8086:1c26] type 00 class 0x0c0320
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1d.0: reg 0x10: [mem 0xf6507000-0xf65073ff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1d.0: PME# supported from D0 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1f.0: [8086:1c44] type 00 class 0x060100
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1f.2: [8086:1c02] type 00 class 0x010601
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1f.2: reg 0x10: [io  0xf070-0xf077]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1f.2: reg 0x14: [io  0xf060-0xf063]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1f.2: reg 0x18: [io  0xf050-0xf057]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1f.2: reg 0x1c: [io  0xf040-0xf043]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1f.2: reg 0x20: [io  0xf020-0xf03f]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1f.2: reg 0x24: [mem 0xf6506000-0xf65067ff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1f.2: PME# supported from D3hot
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1f.3: [8086:1c22] type 00 class 0x0c0500
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1f.3: reg 0x10: [mem 0xf6505000-0xf65050ff 64bit]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1f.3: reg 0x20: [io  0xf000-0xf01f]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.0: [10de:1200] type 00 class 0x030000
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.0: reg 0x10: [mem 0xf4000000-0xf5ffffff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.0: reg 0x14: [mem 0xe0000000-0xe7ffffff 64bit pref]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.0: reg 0x1c: [mem 0xe8000000-0xebffffff 64bit pref]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.0: reg 0x24: [io  0xe000-0xe07f]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.0: reg 0x30: [mem 0xf6000000-0xf607ffff pref]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.0: enabling Extended Tags
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.0: Video device with shadowed ROM at [mem 0x000c0000-0x000dffff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.1: [10de:0e0c] type 00 class 0x040300
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.1: reg 0x10: [mem 0xf6080000-0xf6083fff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.1: enabling Extended Tags
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:01.0: PCI bridge to [bus 01]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:01.0:   bridge window [io  0xe000-0xefff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:01.0:   bridge window [mem 0xf4000000-0xf60fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:01.0:   bridge window [mem 0xe0000000-0xebffffff 64bit pref]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.0: PCI bridge to [bus 02]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:03:00.0: [1283:8892] type 01 class 0x060400
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:03:00.0: supports D1 D2
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:03:00.0: PME# supported from D0 D1 D2 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.3: PCI bridge to [bus 03-04]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.3:   bridge window [io  0xd000-0xdfff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.3:   bridge window [mem 0xf6400000-0xf64fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:04: extended config space not accessible
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:03:00.0: PCI bridge to [bus 04]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:03:00.0:   bridge window [io  0xd000-0xdfff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:03:00.0:   bridge window [mem 0xf6400000-0xf64fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:05:00.0: [1b6f:7023] type 00 class 0x0c0330
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:05:00.0: reg 0x10: [mem 0xf6300000-0xf6307fff 64bit]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:05:00.0: enabling Extended Tags
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:05:00.0: supports D1 D2
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:05:00.0: PME# supported from D0 D1 D2 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.4: PCI bridge to [bus 05]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.4:   bridge window [mem 0xf6300000-0xf63fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:06:00.0: [1b6f:7023] type 00 class 0x0c0330
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:06:00.0: reg 0x10: [mem 0xf6200000-0xf6207fff 64bit]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:06:00.0: enabling Extended Tags
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:06:00.0: supports D1 D2
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:06:00.0: PME# supported from D0 D1 D2 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.5: PCI bridge to [bus 06]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.5:   bridge window [mem 0xf6200000-0xf62fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:07:00.0: [10ec:8168] type 00 class 0x020000
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:07:00.0: reg 0x10: [io  0xc000-0xc0ff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:07:00.0: reg 0x18: [mem 0xec104000-0xec104fff 64bit pref]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:07:00.0: reg 0x20: [mem 0xec100000-0xec103fff 64bit pref]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:07:00.0: supports D1 D2
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:07:00.0: PME# supported from D0 D1 D2 D3hot D3cold
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.6: PCI bridge to [bus 07]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.6:   bridge window [io  0xc000-0xcfff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.6:   bridge window [mem 0xec100000-0xec1fffff 64bit pref]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.7: PCI bridge to [bus 08]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.7:   bridge window [io  0xb000-0xbfff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.7:   bridge window [mem 0xf6100000-0xf61fffff]
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PCI: Interrupt link LNKA configured for IRQ 11
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PCI: Interrupt link LNKB configured for IRQ 10
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PCI: Interrupt link LNKC configured for IRQ 3
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PCI: Interrupt link LNKD configured for IRQ 5
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PCI: Interrupt link LNKE configured for IRQ 0
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PCI: Interrupt link LNKE disabled
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PCI: Interrupt link LNKF configured for IRQ 0
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PCI: Interrupt link LNKF disabled
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PCI: Interrupt link LNKG configured for IRQ 4
+Oct 20 17:19:00 u2204-trace kernel: ACPI: PCI: Interrupt link LNKH configured for IRQ 11
+Oct 20 17:19:00 u2204-trace kernel: iommu: Default domain type: Translated 
+Oct 20 17:19:00 u2204-trace kernel: iommu: DMA domain TLB invalidation policy: lazy mode 
+Oct 20 17:19:00 u2204-trace kernel: SCSI subsystem initialized
+Oct 20 17:19:00 u2204-trace kernel: libata version 3.00 loaded.
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.0: vgaarb: setting as boot VGA device
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.0: vgaarb: VGA device added: decodes=io+mem,owns=io+mem,locks=none
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.0: vgaarb: bridge control possible
+Oct 20 17:19:00 u2204-trace kernel: vgaarb: loaded
+Oct 20 17:19:00 u2204-trace kernel: ACPI: bus type USB registered
+Oct 20 17:19:00 u2204-trace kernel: usbcore: registered new interface driver usbfs
+Oct 20 17:19:00 u2204-trace kernel: usbcore: registered new interface driver hub
+Oct 20 17:19:00 u2204-trace kernel: usbcore: registered new device driver usb
+Oct 20 17:19:00 u2204-trace kernel: pps_core: LinuxPPS API ver. 1 registered
+Oct 20 17:19:00 u2204-trace kernel: pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+Oct 20 17:19:00 u2204-trace kernel: PTP clock support registered
+Oct 20 17:19:00 u2204-trace kernel: EDAC MC: Ver: 3.0.0
+Oct 20 17:19:00 u2204-trace kernel: NetLabel: Initializing
+Oct 20 17:19:00 u2204-trace kernel: NetLabel:  domain hash size = 128
+Oct 20 17:19:00 u2204-trace kernel: NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+Oct 20 17:19:00 u2204-trace kernel: NetLabel:  unlabeled traffic allowed by default
+Oct 20 17:19:00 u2204-trace kernel: PCI: Using ACPI for IRQ routing
+Oct 20 17:19:00 u2204-trace kernel: PCI: pci_cache_line_size set to 64 bytes
+Oct 20 17:19:00 u2204-trace kernel: e820: reserve RAM buffer [mem 0x0009d800-0x0009ffff]
+Oct 20 17:19:00 u2204-trace kernel: e820: reserve RAM buffer [mem 0xdde71000-0xdfffffff]
+Oct 20 17:19:00 u2204-trace kernel: e820: reserve RAM buffer [mem 0xdeda0000-0xdfffffff]
+Oct 20 17:19:00 u2204-trace kernel: e820: reserve RAM buffer [mem 0xdf59a000-0xdfffffff]
+Oct 20 17:19:00 u2204-trace kernel: e820: reserve RAM buffer [mem 0xdf800000-0xdfffffff]
+Oct 20 17:19:00 u2204-trace kernel: e820: reserve RAM buffer [mem 0x41f000000-0x41fffffff]
+Oct 20 17:19:00 u2204-trace kernel: hpet0: at MMIO 0xfed00000, IRQs 2, 8, 0, 0, 0, 0, 0, 0
+Oct 20 17:19:00 u2204-trace kernel: hpet0: 8 comparators, 64-bit 14.318180 MHz counter
+Oct 20 17:19:00 u2204-trace kernel: clocksource: Switched to clocksource tsc-early
+Oct 20 17:19:00 u2204-trace kernel: VFS: Disk quotas dquot_6.6.0
+Oct 20 17:19:00 u2204-trace kernel: VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+Oct 20 17:19:00 u2204-trace kernel: AppArmor: AppArmor Filesystem Enabled
+Oct 20 17:19:00 u2204-trace kernel: pnp: PnP ACPI init
+Oct 20 17:19:00 u2204-trace kernel: system 00:00: [mem 0xfed40000-0xfed44fff] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:01: [io  0x0680-0x069f] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:01: [io  0x0200-0x020f] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:01: [io  0xffff] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:01: [io  0xffff] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:01: [io  0x0400-0x0453] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:01: [io  0x0458-0x047f] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:01: [io  0x0500-0x057f] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:03: [io  0x0454-0x0457] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:04: [io  0x0a00-0x0a0f] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:04: [io  0x0a30-0x0a3f] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:04: [io  0x0a20-0x0a2f] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:06: [io  0x04d0-0x04d1] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:07: [mem 0xfed1c000-0xfed1ffff] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:07: [mem 0xfed10000-0xfed17fff] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:07: [mem 0xfed18000-0xfed18fff] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:07: [mem 0xfed19000-0xfed19fff] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:07: [mem 0xf8000000-0xfbffffff] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:07: [mem 0xfed20000-0xfed3ffff] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:07: [mem 0xfed90000-0xfed93fff] could not be reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:07: [mem 0xfed45000-0xfed8ffff] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:07: [mem 0xff000000-0xffffffff] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:07: [mem 0xfee00000-0xfeefffff] could not be reserved
+Oct 20 17:19:00 u2204-trace kernel: system 00:07: [mem 0xec200000-0xec200fff] has been reserved
+Oct 20 17:19:00 u2204-trace kernel: pnp: PnP ACPI: found 8 devices
+Oct 20 17:19:00 u2204-trace kernel: clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+Oct 20 17:19:00 u2204-trace kernel: NET: Registered PF_INET protocol family
+Oct 20 17:19:00 u2204-trace kernel: IP idents hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: tcp_listen_portaddr_hash hash table entries: 8192 (order: 5, 131072 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: TCP established hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: TCP bind hash table entries: 65536 (order: 8, 1048576 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: TCP: Hash tables configured (established 131072 bind 65536)
+Oct 20 17:19:00 u2204-trace kernel: MPTCP token hash table entries: 16384 (order: 7, 393216 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: UDP hash table entries: 8192 (order: 6, 262144 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: UDP-Lite hash table entries: 8192 (order: 6, 262144 bytes, linear)
+Oct 20 17:19:00 u2204-trace kernel: NET: Registered PF_UNIX/PF_LOCAL protocol family
+Oct 20 17:19:00 u2204-trace kernel: NET: Registered PF_XDP protocol family
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:01.0: PCI bridge to [bus 01]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:01.0:   bridge window [io  0xe000-0xefff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:01.0:   bridge window [mem 0xf4000000-0xf60fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:01.0:   bridge window [mem 0xe0000000-0xebffffff 64bit pref]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.0: PCI bridge to [bus 02]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:03:00.0: PCI bridge to [bus 04]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:03:00.0:   bridge window [io  0xd000-0xdfff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:03:00.0:   bridge window [mem 0xf6400000-0xf64fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.3: PCI bridge to [bus 03-04]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.3:   bridge window [io  0xd000-0xdfff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.3:   bridge window [mem 0xf6400000-0xf64fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.4: PCI bridge to [bus 05]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.4:   bridge window [mem 0xf6300000-0xf63fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.5: PCI bridge to [bus 06]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.5:   bridge window [mem 0xf6200000-0xf62fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.6: PCI bridge to [bus 07]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.6:   bridge window [io  0xc000-0xcfff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.6:   bridge window [mem 0xec100000-0xec1fffff 64bit pref]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.7: PCI bridge to [bus 08]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.7:   bridge window [io  0xb000-0xbfff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1c.7:   bridge window [mem 0xf6100000-0xf61fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:00: resource 4 [io  0x0000-0x0cf7 window]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:00: resource 5 [io  0x0d00-0xffff window]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:00: resource 6 [mem 0x000a0000-0x000bffff window]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:00: resource 7 [mem 0x000d0000-0x000e7fff window]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:00: resource 8 [mem 0xe0000000-0xfeafffff window]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:01: resource 0 [io  0xe000-0xefff]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:01: resource 1 [mem 0xf4000000-0xf60fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:01: resource 2 [mem 0xe0000000-0xebffffff 64bit pref]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:03: resource 0 [io  0xd000-0xdfff]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:03: resource 1 [mem 0xf6400000-0xf64fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:04: resource 0 [io  0xd000-0xdfff]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:04: resource 1 [mem 0xf6400000-0xf64fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:05: resource 1 [mem 0xf6300000-0xf63fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:06: resource 1 [mem 0xf6200000-0xf62fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:07: resource 0 [io  0xc000-0xcfff]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:07: resource 2 [mem 0xec100000-0xec1fffff 64bit pref]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:08: resource 0 [io  0xb000-0xbfff]
+Oct 20 17:19:00 u2204-trace kernel: pci_bus 0000:08: resource 1 [mem 0xf6100000-0xf61fffff]
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1a.0: quirk_usb_early_handoff+0x0/0x160 took 26670 usecs
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:00:1d.0: quirk_usb_early_handoff+0x0/0x160 took 23383 usecs
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:01:00.1: D0 power state depends on 0000:01:00.0
+Oct 20 17:19:00 u2204-trace kernel: pci 0000:03:00.0: CLS mismatch (64 != 32), using 64 bytes
+Oct 20 17:19:00 u2204-trace kernel: PCI-DMA: Using software bounce buffering for IO (SWIOTLB)
+Oct 20 17:19:00 u2204-trace kernel: software IO TLB: mapped [mem 0x00000000d9e71000-0x00000000dde71000] (64MB)
+Oct 20 17:19:00 u2204-trace kernel: Trying to unpack rootfs image as initramfs...
+Oct 20 17:19:00 u2204-trace kernel: Initialise system trusted keyrings
+Oct 20 17:19:00 u2204-trace kernel: Key type blacklist registered
+Oct 20 17:19:00 u2204-trace kernel: workingset: timestamp_bits=36 max_order=22 bucket_order=0
+Oct 20 17:19:00 u2204-trace kernel: zbud: loaded
+Oct 20 17:19:00 u2204-trace kernel: squashfs: version 4.0 (2009/01/31) Phillip Lougher
+Oct 20 17:19:00 u2204-trace kernel: fuse: init (API version 7.34)
+Oct 20 17:19:00 u2204-trace kernel: integrity: Platform Keyring initialized
+Oct 20 17:19:00 u2204-trace kernel: Key type asymmetric registered
+Oct 20 17:19:00 u2204-trace kernel: Asymmetric key parser 'x509' registered
+Oct 20 17:19:00 u2204-trace kernel: Block layer SCSI generic (bsg) driver version 0.4 loaded (major 243)
+Oct 20 17:19:00 u2204-trace kernel: io scheduler mq-deadline registered
+Oct 20 17:19:00 u2204-trace kernel: pcieport 0000:00:1c.7: enabling device (0000 -> 0003)
+Oct 20 17:19:00 u2204-trace kernel: shpchp: Standard Hot Plug PCI Controller Driver version: 0.4
+Oct 20 17:19:00 u2204-trace kernel: input: Power Button as /devices/LNXSYSTM:00/LNXSYBUS:00/PNP0C0C:00/input/input0
+Oct 20 17:19:00 u2204-trace kernel: ACPI: button: Power Button [PWRB]
+Oct 20 17:19:00 u2204-trace kernel: input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input1
+Oct 20 17:19:00 u2204-trace kernel: ACPI: button: Power Button [PWRF]
+Oct 20 17:19:00 u2204-trace kernel: thermal LNXTHERM:00: registered as thermal_zone0
+Oct 20 17:19:00 u2204-trace kernel: ACPI: thermal: Thermal Zone [TZ00] (28 C)
+Oct 20 17:19:00 u2204-trace kernel: thermal LNXTHERM:01: registered as thermal_zone1
+Oct 20 17:19:00 u2204-trace kernel: ACPI: thermal: Thermal Zone [TZ01] (30 C)
+Oct 20 17:19:00 u2204-trace kernel: Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+Oct 20 17:19:00 u2204-trace kernel: Linux agpgart interface v0.103
+Oct 20 17:19:00 u2204-trace kernel: loop: module loaded
+Oct 20 17:19:00 u2204-trace kernel: tun: Universal TUN/TAP device driver, 1.6
+Oct 20 17:19:00 u2204-trace kernel: PPP generic driver version 2.4.2
+Oct 20 17:19:00 u2204-trace kernel: VFIO - User Level meta-driver version: 0.3
+Oct 20 17:19:00 u2204-trace kernel: ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+Oct 20 17:19:00 u2204-trace kernel: ehci-pci: EHCI PCI platform driver
+Oct 20 17:19:00 u2204-trace kernel: ehci-pci 0000:00:1a.0: EHCI Host Controller
+Oct 20 17:19:00 u2204-trace kernel: ehci-pci 0000:00:1a.0: new USB bus registered, assigned bus number 1
+Oct 20 17:19:00 u2204-trace kernel: ehci-pci 0000:00:1a.0: debug port 2
+Oct 20 17:19:00 u2204-trace kernel: ehci-pci 0000:00:1a.0: irq 16, io mem 0xf6508000
+Oct 20 17:19:00 u2204-trace kernel: ehci-pci 0000:00:1a.0: USB 2.0 started, EHCI 1.00
+Oct 20 17:19:00 u2204-trace kernel: usb usb1: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 5.15
+Oct 20 17:19:00 u2204-trace kernel: usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Oct 20 17:19:00 u2204-trace kernel: usb usb1: Product: EHCI Host Controller
+Oct 20 17:19:00 u2204-trace kernel: usb usb1: Manufacturer: Linux 5.15.0-198-generic ehci_hcd
+Oct 20 17:19:00 u2204-trace kernel: usb usb1: SerialNumber: 0000:00:1a.0
+Oct 20 17:19:00 u2204-trace kernel: hub 1-0:1.0: USB hub found
+Oct 20 17:19:00 u2204-trace kernel: hub 1-0:1.0: 2 ports detected
+Oct 20 17:19:00 u2204-trace kernel: ehci-pci 0000:00:1d.0: EHCI Host Controller
+Oct 20 17:19:00 u2204-trace kernel: ehci-pci 0000:00:1d.0: new USB bus registered, assigned bus number 2
+Oct 20 17:19:00 u2204-trace kernel: ehci-pci 0000:00:1d.0: debug port 2
+Oct 20 17:19:00 u2204-trace kernel: ehci-pci 0000:00:1d.0: irq 23, io mem 0xf6507000
+Oct 20 17:19:00 u2204-trace kernel: ehci-pci 0000:00:1d.0: USB 2.0 started, EHCI 1.00
+Oct 20 17:19:00 u2204-trace kernel: usb usb2: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 5.15
+Oct 20 17:19:00 u2204-trace kernel: usb usb2: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Oct 20 17:19:00 u2204-trace kernel: usb usb2: Product: EHCI Host Controller
+Oct 20 17:19:00 u2204-trace kernel: usb usb2: Manufacturer: Linux 5.15.0-198-generic ehci_hcd
+Oct 20 17:19:00 u2204-trace kernel: usb usb2: SerialNumber: 0000:00:1d.0
+Oct 20 17:19:00 u2204-trace kernel: hub 2-0:1.0: USB hub found
+Oct 20 17:19:00 u2204-trace kernel: hub 2-0:1.0: 2 ports detected
+Oct 20 17:19:00 u2204-trace kernel: ehci-platform: EHCI generic platform driver
+Oct 20 17:19:00 u2204-trace kernel: ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+Oct 20 17:19:00 u2204-trace kernel: ohci-pci: OHCI PCI platform driver
+Oct 20 17:19:00 u2204-trace kernel: ohci-platform: OHCI generic platform driver
+Oct 20 17:19:00 u2204-trace kernel: uhci_hcd: USB Universal Host Controller Interface driver
+Oct 20 17:19:00 u2204-trace kernel: i8042: PNP: PS/2 Controller [PNP0303:PS2K] at 0x60,0x64 irq 1
+Oct 20 17:19:00 u2204-trace kernel: i8042: PNP: PS/2 appears to have AUX port disabled, if this is incorrect please boot with i8042.nopnp
+Oct 20 17:19:00 u2204-trace kernel: serio: i8042 KBD port at 0x60,0x64 irq 1
+Oct 20 17:19:00 u2204-trace kernel: mousedev: PS/2 mouse device common for all mice
+Oct 20 17:19:00 u2204-trace kernel: rtc_cmos 00:02: RTC can wake from S4
+Oct 20 17:19:00 u2204-trace kernel: rtc_cmos 00:02: registered as rtc0
+Oct 20 17:19:00 u2204-trace kernel: rtc_cmos 00:02: setting system clock to 2026-10-20T14:18:54 UTC (1792505934)
+Oct 20 17:19:00 u2204-trace kernel: rtc_cmos 00:02: alarms up to one month, y3k, 242 bytes nvram
+Oct 20 17:19:00 u2204-trace kernel: i2c_dev: i2c /dev entries driver
+Oct 20 17:19:00 u2204-trace kernel: device-mapper: core: CONFIG_IMA_DISABLE_HTABLE is disabled. Duplicate IMA measurements will not be recorded in the IMA log.
+Oct 20 17:19:00 u2204-trace kernel: device-mapper: uevent: version 1.0.3
+Oct 20 17:19:00 u2204-trace kernel: device-mapper: ioctl: 4.45.0-ioctl (2021-03-22) initialised: dm-devel@redhat.com
+Oct 20 17:19:00 u2204-trace kernel: intel_pstate: Intel P-state driver initializing
+Oct 20 17:19:00 u2204-trace kernel: ledtrig-cpu: registered to indicate activity on CPUs
+Oct 20 17:19:00 u2204-trace kernel: vesafb: mode is 640x480x32, linelength=2560, pages=0
+Oct 20 17:19:00 u2204-trace kernel: vesafb: scrolling: redraw
+Oct 20 17:19:00 u2204-trace kernel: vesafb: Truecolor: size=8:8:8:8, shift=24:16:8:0
+Oct 20 17:19:00 u2204-trace kernel: vesafb: framebuffer at 0xe9000000, mapped to 0x00000000dc71b8f0, using 1216k, total 1216k
+Oct 20 17:19:00 u2204-trace kernel: Console: switching to colour frame buffer device 80x30
+Oct 20 17:19:00 u2204-trace kernel: fb0: VESA VGA frame buffer device
+Oct 20 17:19:00 u2204-trace kernel: drop_monitor: Initializing network drop monitor service
+Oct 20 17:19:00 u2204-trace kernel: NET: Registered PF_INET6 protocol family
+Oct 20 17:19:00 u2204-trace kernel: Freeing initrd memory: 73456K
+Oct 20 17:19:00 u2204-trace kernel: Segment Routing with IPv6
+Oct 20 17:19:00 u2204-trace kernel: In-situ OAM (IOAM) with IPv6
+Oct 20 17:19:00 u2204-trace kernel: NET: Registered PF_PACKET protocol family
+Oct 20 17:19:00 u2204-trace kernel: Key type dns_resolver registered
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1: new high-speed USB device number 2 using ehci-pci
+Oct 20 17:19:00 u2204-trace kernel: microcode: sig=0x306a9, pf=0x2, revision=0x21
+Oct 20 17:19:00 u2204-trace kernel: microcode: Microcode Update Driver: v2.2.
+Oct 20 17:19:00 u2204-trace kernel: IPI shorthand broadcast: enabled
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1: new high-speed USB device number 2 using ehci-pci
+Oct 20 17:19:00 u2204-trace kernel: sched_clock: Marking stable (564503776, -27992315)->(546759634, -10248173)
+Oct 20 17:19:00 u2204-trace kernel: registered taskstats version 1
+Oct 20 17:19:00 u2204-trace kernel: Loading compiled-in X.509 certificates
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Build time autogenerated kernel key: 07c83e5d391297488fe994d53b2750b233138d6e'
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Canonical Ltd. Live Patch Signing 2025 Kmod: d541cef61dc7e793b7eb7e899970a2eef0b5dc8c'
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Canonical Ltd. Live Patch Signing: 14df34d1a87cf37625abec039ef2bf521249b969'
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Canonical Ltd. Kernel Module Signing 2025 Kmod: 4627603d2357a2a3f81006370894c221175893e9'
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Canonical Ltd. Kernel Module Signing: 88f752e560a1e0737e31163a466ad7b70a850c19'
+Oct 20 17:19:00 u2204-trace kernel: blacklist: Loading compiled-in revocation X.509 certificates
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing: 61482aa2830d0ab2ad5af10b7250da9033ddcef0'
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1: New USB device found, idVendor=8087, idProduct=0024, bcdDevice= 0.00
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2017): 242ade75ac4a15e50d50c84b0d45ff3eae707a03'
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (ESM 2018): 365188c1d374d6b07c3c8f240f8ef722433d6a8b'
+Oct 20 17:19:00 u2204-trace kernel: hub 2-1:1.0: USB hub found
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2019): c0746fd6c5da3ae827864651ad66ae47fe24b3e8'
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1: New USB device found, idVendor=8087, idProduct=0024, bcdDevice= 0.00
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2021 v1): a8d54bbb3825cfb94fa13c9f8a594a195c107b8d'
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+Oct 20 17:19:00 u2204-trace kernel: hub 2-1:1.0: 8 ports detected
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2021 v2): 4cf046892d6fd3c9a5b03f98d845f90851dc6a8c'
+Oct 20 17:19:00 u2204-trace kernel: hub 1-1:1.0: USB hub found
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2021 v3): 100437bb6de6e469b581e61cd66bce3ef4ed53af'
+Oct 20 17:19:00 u2204-trace kernel: hub 1-1:1.0: 6 ports detected
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (Ubuntu Core 2019): c1d57b8f6b743f23ee41f4f7ee292f06eecadfb9'
+Oct 20 17:19:00 u2204-trace kernel: zswap: loaded using pool lzo/zbud
+Oct 20 17:19:00 u2204-trace kernel: Key type .fscrypt registered
+Oct 20 17:19:00 u2204-trace kernel: Key type fscrypt-provisioning registered
+Oct 20 17:19:00 u2204-trace kernel: Key type encrypted registered
+Oct 20 17:19:00 u2204-trace kernel: AppArmor: AppArmor sha1 policy hashing enabled
+Oct 20 17:19:00 u2204-trace kernel: ima: No TPM chip found, activating TPM-bypass!
+Oct 20 17:19:00 u2204-trace kernel: Loading compiled-in module X.509 certificates
+Oct 20 17:19:00 u2204-trace kernel: Loaded X.509 cert 'Build time autogenerated kernel key: 07c83e5d391297488fe994d53b2750b233138d6e'
+Oct 20 17:19:00 u2204-trace kernel: ima: Allocated hash algorithm: sha1
+Oct 20 17:19:00 u2204-trace kernel: ima: No architecture policies found
+Oct 20 17:19:00 u2204-trace kernel: evm: Initialising EVM extended attributes:
+Oct 20 17:19:00 u2204-trace kernel: evm: security.selinux
+Oct 20 17:19:00 u2204-trace kernel: evm: security.SMACK64
+Oct 20 17:19:00 u2204-trace kernel: evm: security.SMACK64EXEC
+Oct 20 17:19:00 u2204-trace kernel: evm: security.SMACK64TRANSMUTE
+Oct 20 17:19:00 u2204-trace kernel: evm: security.SMACK64MMAP
+Oct 20 17:19:00 u2204-trace kernel: evm: security.apparmor
+Oct 20 17:19:00 u2204-trace kernel: evm: security.ima
+Oct 20 17:19:00 u2204-trace kernel: evm: security.capability
+Oct 20 17:19:00 u2204-trace kernel: evm: HMAC attrs: 0x1
+Oct 20 17:19:00 u2204-trace kernel: PM:   Magic number: 14:284:334
+Oct 20 17:19:00 u2204-trace kernel: tty tty55: hash matches
+Oct 20 17:19:00 u2204-trace kernel: RAS: Correctable Errors collector initialized.
+Oct 20 17:19:00 u2204-trace kernel: clk: Disabling unused clocks
+Oct 20 17:19:00 u2204-trace kernel: Freeing unused decrypted memory: 2036K
+Oct 20 17:19:00 u2204-trace kernel: Freeing unused kernel image (initmem) memory: 3296K
+Oct 20 17:19:00 u2204-trace kernel: Write protecting the kernel read-only data: 30720k
+Oct 20 17:19:00 u2204-trace kernel: Freeing unused kernel image (text/rodata gap) memory: 2036K
+Oct 20 17:19:00 u2204-trace kernel: Freeing unused kernel image (rodata/data gap) memory: 1284K
+Oct 20 17:19:00 u2204-trace kernel: tsc: Refined TSC clocksource calibration: 3531.058 MHz
+Oct 20 17:19:00 u2204-trace kernel: clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x32e5ec5dc25, max_idle_ns: 440795217151 ns
+Oct 20 17:19:00 u2204-trace kernel: x86/mm: Checked W+X mappings: passed, no W+X pages found.
+Oct 20 17:19:00 u2204-trace kernel: x86/mm: Checking user space page tables
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.3: new high-speed USB device number 3 using ehci-pci
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.1: new low-speed USB device number 3 using ehci-pci
+Oct 20 17:19:00 u2204-trace kernel: clocksource: Switched to clocksource tsc
+Oct 20 17:19:00 u2204-trace kernel: x86/mm: Checked W+X mappings: passed, no W+X pages found.
+Oct 20 17:19:00 u2204-trace kernel: Run /init as init process
+Oct 20 17:19:00 u2204-trace kernel:   with arguments:
+Oct 20 17:19:00 u2204-trace kernel:     /init
+Oct 20 17:19:00 u2204-trace kernel:   with environment:
+Oct 20 17:19:00 u2204-trace kernel:     HOME=/
+Oct 20 17:19:00 u2204-trace kernel:     TERM=linux
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.1: New USB device found, idVendor=046d, idProduct=c30a, bcdDevice=15.00
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.3: New USB device found, idVendor=058f, idProduct=6366, bcdDevice= 1.00
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.1: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.3: Product: Mass Storage Device
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.1: Product: Logitech USB Keyboard
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.3: Manufacturer: Generic
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.1: Manufacturer: Logitech
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.3: SerialNumber: 058F63666471
+Oct 20 17:19:00 u2204-trace kernel: hid: raw HID events driver (C) Jiri Kosina
+Oct 20 17:19:00 u2204-trace kernel: usb-storage 2-1.3:1.0: USB Mass Storage device detected
+Oct 20 17:19:00 u2204-trace kernel: scsi host0: usb-storage 2-1.3:1.0
+Oct 20 17:19:00 u2204-trace kernel: usbcore: registered new interface driver usb-storage
+Oct 20 17:19:00 u2204-trace kernel: usbcore: registered new interface driver uas
+Oct 20 17:19:00 u2204-trace kernel: usbcore: registered new interface driver usbhid
+Oct 20 17:19:00 u2204-trace kernel: usbhid: USB HID core driver
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.2: new full-speed USB device number 4 using ehci-pci
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.7: new high-speed USB device number 4 using ehci-pci
+Oct 20 17:19:00 u2204-trace kernel: input: Logitech Logitech USB Keyboard as /devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.1/1-1.1:1.0/0003:046D:C30A.0001/input/input3
+Oct 20 17:19:00 u2204-trace kernel: logitech 0003:046D:C30A.0001: input,hidraw0: USB HID v1.10 Keyboard [Logitech Logitech USB Keyboard] on usb-0000:00:1a.0-1.1/input0
+Oct 20 17:19:00 u2204-trace kernel: input: Logitech Logitech USB Keyboard as /devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.1/1-1.1:1.1/0003:046D:C30A.0002/input/input4
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.7: New USB device found, idVendor=2109, idProduct=2211, bcdDevice= 5.33
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.2: New USB device found, idVendor=046d, idProduct=c084, bcdDevice= 7.03
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.7: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+Oct 20 17:19:00 u2204-trace kernel: logitech 0003:046D:C30A.0002: input,hidraw1: USB HID v1.10 Mouse [Logitech Logitech USB Keyboard] on usb-0000:00:1a.0-1.1/input1
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.2: Product: G102 Prodigy Gaming Mouse
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.2: Manufacturer: Logitech
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.7: Product: USB2.0 Hub             
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.2: SerialNumber: 056B386E3030
+Oct 20 17:19:00 u2204-trace kernel: input: Logitech G102 Prodigy Gaming Mouse as /devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.2/1-1.2:1.0/0003:046D:C084.0003/input/input5
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.7: Manufacturer: VIA Labs, Inc.         
+Oct 20 17:19:00 u2204-trace kernel: hid-generic 0003:046D:C084.0003: input,hidraw2: USB HID v1.11 Mouse [Logitech G102 Prodigy Gaming Mouse] on usb-0000:00:1a.0-1.2/input0
+Oct 20 17:19:00 u2204-trace kernel: hub 2-1.7:1.0: USB hub found
+Oct 20 17:19:00 u2204-trace kernel: input: Logitech G102 Prodigy Gaming Mouse Keyboard as /devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.2/1-1.2:1.1/0003:046D:C084.0004/input/input6
+Oct 20 17:19:00 u2204-trace kernel: hub 2-1.7:1.0: 4 ports detected
+Oct 20 17:19:00 u2204-trace kernel: hid-generic 0003:046D:C084.0004: input,hiddev0,hidraw3: USB HID v1.11 Keyboard [Logitech G102 Prodigy Gaming Mouse] on usb-0000:00:1a.0-1.2/input1
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.4: new high-speed USB device number 5 using ehci-pci
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.4: New USB device found, idVendor=041e, idProduct=40a0, bcdDevice=11.00
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.4: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.4: Product: Creative Live! Cam Sync 1080p V2
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.4: Manufacturer: Creative Technology Ltd.
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.4: SerialNumber: Creative Live! Cam Sync 1080p V2 Audio
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.6: new full-speed USB device number 6 using ehci-pci
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.6: New USB device found, idVendor=0bda, idProduct=8771, bcdDevice= 2.00
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.6: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.6: Product: Bluetooth Radio
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.6: Manufacturer: Realtek
+Oct 20 17:19:00 u2204-trace kernel: usb 1-1.6: SerialNumber: 00E04C239987
+Oct 20 17:19:00 u2204-trace kernel: scsi 0:0:0:0: Direct-Access     Multi    Flash Reader     1.00 PQ: 0 ANSI: 0
+Oct 20 17:19:00 u2204-trace kernel: sd 0:0:0:0: Attached scsi generic sg0 type 0
+Oct 20 17:19:00 u2204-trace kernel: sd 0:0:0:0: [sda] Media removed, stopped polling
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.7.3: new full-speed USB device number 5 using ehci-pci
+Oct 20 17:19:00 u2204-trace kernel: sd 0:0:0:0: [sda] Attached SCSI removable disk
+Oct 20 17:19:00 u2204-trace kernel: ACPI Warning: SystemIO range 0x0000000000000428-0x000000000000042F conflicts with OpRegion 0x0000000000000400-0x000000000000047F (\PMIO) (20210730/utaddress-204)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: OSL: Resource conflict; ACPI support missing from driver?
+Oct 20 17:19:00 u2204-trace kernel: ACPI Warning: SystemIO range 0x0000000000000540-0x000000000000054F conflicts with OpRegion 0x0000000000000500-0x0000000000000563 (\GPIO) (20210730/utaddress-204)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: OSL: Resource conflict; ACPI support missing from driver?
+Oct 20 17:19:00 u2204-trace kernel: ACPI Warning: SystemIO range 0x0000000000000530-0x000000000000053F conflicts with OpRegion 0x0000000000000500-0x0000000000000563 (\GPIO) (20210730/utaddress-204)
+Oct 20 17:19:00 u2204-trace kernel: ACPI: OSL: Resource conflict; ACPI support missing from driver?
+Oct 20 17:19:00 u2204-trace kernel: ACPI Warning: SystemIO range 0x0000000000000500-0x000000000000052F conflicts with OpRegion 0x0000000000000500-0x000000000000051F (\LED) (20210730/utaddress-204)
+Oct 20 17:19:00 u2204-trace kernel: ACPI Warning: SystemIO range 0x0000000000000500-0x000000000000052F conflicts with OpRegion 0x0000000000000500-0x0000000000000563 (\GPIO) (20210730/utaddress-204)
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.7.3: New USB device found, idVendor=1462, idProduct=3fa4, bcdDevice= 0.00
+Oct 20 17:19:00 u2204-trace kernel: ACPI: OSL: Resource conflict; ACPI support missing from driver?
+Oct 20 17:19:00 u2204-trace kernel: xhci_hcd 0000:05:00.0: xHCI Host Controller
+Oct 20 17:19:00 u2204-trace kernel: xhci_hcd 0000:05:00.0: new USB bus registered, assigned bus number 3
+Oct 20 17:19:00 u2204-trace kernel: xhci_hcd 0000:05:00.0: hcc params 0x040050af hci version 0x100 quirks 0x0000000000080490
+Oct 20 17:19:00 u2204-trace kernel: xhci_hcd 0000:05:00.0: xHCI Host Controller
+Oct 20 17:19:00 u2204-trace kernel: xhci_hcd 0000:05:00.0: new USB bus registered, assigned bus number 4
+Oct 20 17:19:00 u2204-trace kernel: xhci_hcd 0000:05:00.0: Host supports USB 3.0 SuperSpeed
+Oct 20 17:19:00 u2204-trace kernel: usb usb3: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 5.15
+Oct 20 17:19:00 u2204-trace kernel: usb usb3: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Oct 20 17:19:00 u2204-trace kernel: usb usb3: Product: xHCI Host Controller
+Oct 20 17:19:00 u2204-trace kernel: usb usb3: Manufacturer: Linux 5.15.0-198-generic xhci-hcd
+Oct 20 17:19:00 u2204-trace kernel: usb usb3: SerialNumber: 0000:05:00.0
+Oct 20 17:19:00 u2204-trace kernel: hub 3-0:1.0: USB hub found
+Oct 20 17:19:00 u2204-trace kernel: hub 3-0:1.0: 2 ports detected
+Oct 20 17:19:00 u2204-trace kernel: usb usb4: We don't know the algorithms for LPM for this host, disabling LPM.
+Oct 20 17:19:00 u2204-trace kernel: usb usb4: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 5.15
+Oct 20 17:19:00 u2204-trace kernel: usb usb4: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Oct 20 17:19:00 u2204-trace kernel: usb usb4: Product: xHCI Host Controller
+Oct 20 17:19:00 u2204-trace kernel: usb usb4: Manufacturer: Linux 5.15.0-198-generic xhci-hcd
+Oct 20 17:19:00 u2204-trace kernel: usb usb4: SerialNumber: 0000:05:00.0
+Oct 20 17:19:00 u2204-trace kernel: hub 4-0:1.0: USB hub found
+Oct 20 17:19:00 u2204-trace kernel: hub 4-0:1.0: 2 ports detected
+Oct 20 17:19:00 u2204-trace kernel: xhci_hcd 0000:06:00.0: xHCI Host Controller
+Oct 20 17:19:00 u2204-trace kernel: xhci_hcd 0000:06:00.0: new USB bus registered, assigned bus number 5
+Oct 20 17:19:00 u2204-trace kernel: xhci_hcd 0000:06:00.0: hcc params 0x040050af hci version 0x100 quirks 0x0000000000080490
+Oct 20 17:19:00 u2204-trace kernel: xhci_hcd 0000:06:00.0: xHCI Host Controller
+Oct 20 17:19:00 u2204-trace kernel: xhci_hcd 0000:06:00.0: new USB bus registered, assigned bus number 6
+Oct 20 17:19:00 u2204-trace kernel: xhci_hcd 0000:06:00.0: Host supports USB 3.0 SuperSpeed
+Oct 20 17:19:00 u2204-trace kernel: usb usb5: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 5.15
+Oct 20 17:19:00 u2204-trace kernel: usb usb5: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Oct 20 17:19:00 u2204-trace kernel: usb usb5: Product: xHCI Host Controller
+Oct 20 17:19:00 u2204-trace kernel: usb usb5: Manufacturer: Linux 5.15.0-198-generic xhci-hcd
+Oct 20 17:19:00 u2204-trace kernel: usb usb5: SerialNumber: 0000:06:00.0
+Oct 20 17:19:00 u2204-trace kernel: hub 5-0:1.0: USB hub found
+Oct 20 17:19:00 u2204-trace kernel: hub 5-0:1.0: 2 ports detected
+Oct 20 17:19:00 u2204-trace kernel: usb usb6: We don't know the algorithms for LPM for this host, disabling LPM.
+Oct 20 17:19:00 u2204-trace kernel: usb usb6: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 5.15
+Oct 20 17:19:00 u2204-trace kernel: usb usb6: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Oct 20 17:19:00 u2204-trace kernel: usb usb6: Product: xHCI Host Controller
+Oct 20 17:19:00 u2204-trace kernel: usb usb6: Manufacturer: Linux 5.15.0-198-generic xhci-hcd
+Oct 20 17:19:00 u2204-trace kernel: usb usb6: SerialNumber: 0000:06:00.0
+Oct 20 17:19:00 u2204-trace kernel: hub 6-0:1.0: USB hub found
+Oct 20 17:19:00 u2204-trace kernel: hub 6-0:1.0: 2 ports detected
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.7.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Oct 20 17:19:00 u2204-trace kernel: lpc_ich: Resource conflict(s) found affecting gpio_ich
+Oct 20 17:19:00 u2204-trace kernel: i801_smbus 0000:00:1f.3: SMBus using PCI interrupt
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.7.3: Product: MSI Gaming Controller
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.7.3: Manufacturer: MS
+Oct 20 17:19:00 u2204-trace kernel: r8169 0000:07:00.0 eth0: RTL8168evl/8111evl, XX:XX:XX:XX:XX:XX, XID 2c9, IRQ 28
+Oct 20 17:19:00 u2204-trace kernel: usb 2-1.7.3: SerialNumber: A02019010700
+Oct 20 17:19:00 u2204-trace kernel: r8169 0000:07:00.0 eth0: jumbo features [frames: 9194 bytes, tx checksumming: ko]
+Oct 20 17:19:00 u2204-trace kernel: ahci 0000:00:1f.2: version 3.0
+Oct 20 17:19:00 u2204-trace kernel: input: MS MSI Gaming Controller as /devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.7/2-1.7.3/2-1.7.3:1.0/0003:1462:3FA4.0005/input/input9
+Oct 20 17:19:00 u2204-trace kernel: hid-generic 0003:1462:3FA4.0005: input,hiddev1,hidraw4: USB HID v1.10 Device [MS MSI Gaming Controller] on usb-0000:00:1d.0-1.7.3/input0
+Oct 20 17:19:00 u2204-trace kernel: ahci 0000:00:1f.2: AHCI 0001.0300 32 slots 6 ports 6 Gbps 0xf impl SATA mode
+Oct 20 17:19:00 u2204-trace kernel: ahci 0000:00:1f.2: flags: 64bit ncq led clo pio slum part ems apst 
+Oct 20 17:19:00 u2204-trace kernel: r8169 0000:07:00.0 enp7s0: renamed from eth0
+Oct 20 17:19:00 u2204-trace kernel: scsi host1: ahci
+Oct 20 17:19:00 u2204-trace kernel: scsi host2: ahci
+Oct 20 17:19:00 u2204-trace kernel: scsi host3: ahci
+Oct 20 17:19:00 u2204-trace kernel: scsi host4: ahci
+Oct 20 17:19:00 u2204-trace kernel: scsi host5: ahci
+Oct 20 17:19:00 u2204-trace kernel: scsi host6: ahci
+Oct 20 17:19:00 u2204-trace kernel: ata1: SATA max UDMA/133 abar m2048@0xf6506000 port 0xf6506100 irq 29
+Oct 20 17:19:00 u2204-trace kernel: ata2: SATA max UDMA/133 abar m2048@0xf6506000 port 0xf6506180 irq 29
+Oct 20 17:19:00 u2204-trace kernel: ata3: SATA max UDMA/133 abar m2048@0xf6506000 port 0xf6506200 irq 29
+Oct 20 17:19:00 u2204-trace kernel: ata4: SATA max UDMA/133 abar m2048@0xf6506000 port 0xf6506280 irq 29
+Oct 20 17:19:00 u2204-trace kernel: ata5: DUMMY
+Oct 20 17:19:00 u2204-trace kernel: ata6: DUMMY
+Oct 20 17:19:00 u2204-trace kernel: ata4: SATA link up 3.0 Gbps (SStatus 123 SControl 300)
+Oct 20 17:19:00 u2204-trace kernel: ata2: SATA link up 6.0 Gbps (SStatus 133 SControl 300)
+Oct 20 17:19:00 u2204-trace kernel: ata1: SATA link up 6.0 Gbps (SStatus 133 SControl 300)
+Oct 20 17:19:00 u2204-trace kernel: ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PCI0.SAT0.SPT3._GTF.DSSP], AE_NOT_FOUND (20210730/psargs-332)
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Local Variables are initialized for Method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Arguments are initialized for method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT3._GTF due to previous error (AE_NOT_FOUND) (20210730/psparse-529)
+Oct 20 17:19:00 u2204-trace kernel: ata3: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+Oct 20 17:19:00 u2204-trace kernel: ata4.00: ATA-8: ST31000528AS, CC46, max UDMA/133
+Oct 20 17:19:00 u2204-trace kernel: ata4.00: 1953525168 sectors, multi 16: LBA48 NCQ (depth 32)
+Oct 20 17:19:00 u2204-trace kernel: ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PCI0.SAT0.SPT1._GTF.DSSP], AE_NOT_FOUND (20210730/psargs-332)
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Local Variables are initialized for Method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Arguments are initialized for method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT1._GTF due to previous error (AE_NOT_FOUND) (20210730/psparse-529)
+Oct 20 17:19:00 u2204-trace kernel: ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PCI0.SAT0.SPT2._GTF.DSSP], AE_NOT_FOUND (20210730/psargs-332)
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Local Variables are initialized for Method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Arguments are initialized for method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT2._GTF due to previous error (AE_NOT_FOUND) (20210730/psparse-529)
+Oct 20 17:19:00 u2204-trace kernel: ata3.00: ATAPI: ASUS    DRW-24B3LT, 1.00, max UDMA/100
+Oct 20 17:19:00 u2204-trace kernel: ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PCI0.SAT0.SPT0._GTF.DSSP], AE_NOT_FOUND (20210730/psargs-332)
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Local Variables are initialized for Method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Arguments are initialized for method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT0._GTF due to previous error (AE_NOT_FOUND) (20210730/psparse-529)
+Oct 20 17:19:00 u2204-trace kernel: ata2.00: ATA-8: ST120FN0021, B550, max UDMA/133
+Oct 20 17:19:00 u2204-trace kernel: ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PCI0.SAT0.SPT3._GTF.DSSP], AE_NOT_FOUND (20210730/psargs-332)
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Local Variables are initialized for Method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Arguments are initialized for method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT3._GTF due to previous error (AE_NOT_FOUND) (20210730/psparse-529)
+Oct 20 17:19:00 u2204-trace kernel: ata1.00: supports DRM functions and may not be fully accessible
+Oct 20 17:19:00 u2204-trace kernel: ata1.00: ATA-11: Samsung SSD 870 EVO 500GB, SVT02B6Q, max UDMA/133
+Oct 20 17:19:00 u2204-trace kernel: ata2.00: 234441648 sectors, multi 16: LBA48 NCQ (depth 32), AA
+Oct 20 17:19:00 u2204-trace kernel: ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PCI0.SAT0.SPT2._GTF.DSSP], AE_NOT_FOUND (20210730/psargs-332)
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Local Variables are initialized for Method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Arguments are initialized for method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT2._GTF due to previous error (AE_NOT_FOUND) (20210730/psparse-529)
+Oct 20 17:19:00 u2204-trace kernel: ata3.00: configured for UDMA/100
+Oct 20 17:19:00 u2204-trace kernel: ata4.00: configured for UDMA/133
+Oct 20 17:19:00 u2204-trace kernel: ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PCI0.SAT0.SPT1._GTF.DSSP], AE_NOT_FOUND (20210730/psargs-332)
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Local Variables are initialized for Method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Arguments are initialized for method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT1._GTF due to previous error (AE_NOT_FOUND) (20210730/psparse-529)
+Oct 20 17:19:00 u2204-trace kernel: ata1.00: 976773168 sectors, multi 1: LBA48 NCQ (depth 32), AA
+Oct 20 17:19:00 u2204-trace kernel: ata2.00: configured for UDMA/133
+Oct 20 17:19:00 u2204-trace kernel: ata1.00: Features: Trust Dev-Sleep NCQ-sndrcv
+Oct 20 17:19:00 u2204-trace kernel: ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PCI0.SAT0.SPT0._GTF.DSSP], AE_NOT_FOUND (20210730/psargs-332)
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Local Variables are initialized for Method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: No Arguments are initialized for method [_GTF]
+Oct 20 17:19:00 u2204-trace kernel: 
+Oct 20 17:19:00 u2204-trace kernel: ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT0._GTF due to previous error (AE_NOT_FOUND) (20210730/psparse-529)
+Oct 20 17:19:00 u2204-trace kernel: ata1.00: supports DRM functions and may not be fully accessible
+Oct 20 17:19:00 u2204-trace kernel: ata1.00: configured for UDMA/133
+Oct 20 17:19:00 u2204-trace kernel: scsi 1:0:0:0: Direct-Access     ATA      Samsung SSD 870  2B6Q PQ: 0 ANSI: 5
+Oct 20 17:19:00 u2204-trace kernel: ata1.00: Enabling discard_zeroes_data
+Oct 20 17:19:00 u2204-trace kernel: sd 1:0:0:0: Attached scsi generic sg1 type 0
+Oct 20 17:19:00 u2204-trace kernel: sd 1:0:0:0: [sdb] 976773168 512-byte logical blocks: (500 GB/466 GiB)
+Oct 20 17:19:00 u2204-trace kernel: scsi 2:0:0:0: Direct-Access     ATA      ST120FN0021      B550 PQ: 0 ANSI: 5
+Oct 20 17:19:00 u2204-trace kernel: sd 1:0:0:0: [sdb] Write Protect is off
+Oct 20 17:19:00 u2204-trace kernel: sd 2:0:0:0: Attached scsi generic sg2 type 0
+Oct 20 17:19:00 u2204-trace kernel: sd 2:0:0:0: [sdc] 234441648 512-byte logical blocks: (120 GB/112 GiB)
+Oct 20 17:19:00 u2204-trace kernel: sd 2:0:0:0: [sdc] 4096-byte physical blocks
+Oct 20 17:19:00 u2204-trace kernel: sd 2:0:0:0: [sdc] Write Protect is off
+Oct 20 17:19:00 u2204-trace kernel: sd 2:0:0:0: [sdc] Mode Sense: 00 3a 00 00
+Oct 20 17:19:00 u2204-trace kernel: sd 2:0:0:0: [sdc] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+Oct 20 17:19:00 u2204-trace kernel:  sdc: sdc1
+Oct 20 17:19:00 u2204-trace kernel: sd 2:0:0:0: [sdc] Attached SCSI disk
+Oct 20 17:19:00 u2204-trace kernel: sd 1:0:0:0: [sdb] Mode Sense: 00 3a 00 00
+Oct 20 17:19:00 u2204-trace kernel: sd 1:0:0:0: [sdb] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+Oct 20 17:19:00 u2204-trace kernel: scsi 3:0:0:0: CD-ROM            ASUS     DRW-24B3LT       1.00 PQ: 0 ANSI: 5
+Oct 20 17:19:00 u2204-trace kernel: ata1.00: Enabling discard_zeroes_data
+Oct 20 17:19:00 u2204-trace kernel:  sdb: sdb1
+Oct 20 17:19:00 u2204-trace kernel: ata1.00: Enabling discard_zeroes_data
+Oct 20 17:19:00 u2204-trace kernel: sd 1:0:0:0: [sdb] supports TCG Opal
+Oct 20 17:19:00 u2204-trace kernel: sd 1:0:0:0: [sdb] Attached SCSI disk
+Oct 20 17:19:00 u2204-trace kernel: sr 3:0:0:0: [sr0] scsi3-mmc drive: 48x/48x writer dvd-ram cd/rw xa/form2 cdda tray
+Oct 20 17:19:00 u2204-trace kernel: cdrom: Uniform CD-ROM driver Revision: 3.20
+Oct 20 17:19:00 u2204-trace kernel: sr 3:0:0:0: Attached scsi CD-ROM sr0
+Oct 20 17:19:00 u2204-trace kernel: sr 3:0:0:0: Attached scsi generic sg3 type 5
+Oct 20 17:19:00 u2204-trace kernel: scsi 4:0:0:0: Direct-Access     ATA      ST31000528AS     CC46 PQ: 0 ANSI: 5
+Oct 20 17:19:00 u2204-trace kernel: sd 4:0:0:0: Attached scsi generic sg4 type 0
+Oct 20 17:19:00 u2204-trace kernel: sd 4:0:0:0: [sdd] 1953525168 512-byte logical blocks: (1.00 TB/932 GiB)
+Oct 20 17:19:00 u2204-trace kernel: sd 4:0:0:0: [sdd] Write Protect is off
+Oct 20 17:19:00 u2204-trace kernel: sd 4:0:0:0: [sdd] Mode Sense: 00 3a 00 00
+Oct 20 17:19:00 u2204-trace kernel: sd 4:0:0:0: [sdd] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+Oct 20 17:19:00 u2204-trace kernel:  sdd: sdd1
+Oct 20 17:19:00 u2204-trace kernel: sd 4:0:0:0: [sdd] Attached SCSI disk
+Oct 20 17:19:00 u2204-trace kernel: EXT4-fs (sdc1): mounted filesystem with ordered data mode. Opts: (null). Quota mode: none.
+Oct 20 17:19:00 u2204-trace systemd[1]: Inserted module 'autofs4'
+Oct 20 17:19:00 u2204-trace systemd[1]: systemd 249.11-0ubuntu3.23 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY -P11KIT -QRENCODE +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified)
+Oct 20 17:19:00 u2204-trace systemd[1]: Detected architecture x86-64.
+Oct 20 17:19:00 u2204-trace systemd[1]: Hostname set to <u2204-trace>.
+Oct 20 17:19:00 u2204-trace systemd[1]: Queued start job for default target Graphical Interface.
+Oct 20 17:19:00 u2204-trace systemd[1]: Created slice Slice /system/modprobe.
+Oct 20 17:19:00 u2204-trace systemd[1]: Created slice User and Session Slice.
+Oct 20 17:19:00 u2204-trace systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+Oct 20 17:19:00 u2204-trace systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+Oct 20 17:19:00 u2204-trace systemd[1]: Set up automount Arbitrary Executable File Formats File System Automount Point.
+Oct 20 17:19:00 u2204-trace systemd[1]: Reached target Local Encrypted Volumes.
+Oct 20 17:19:00 u2204-trace systemd[1]: Reached target Remote File Systems.
+Oct 20 17:19:00 u2204-trace systemd[1]: Reached target Slice Units.
+Oct 20 17:19:00 u2204-trace systemd[1]: Reached target Swaps.
+Oct 20 17:19:00 u2204-trace systemd[1]: Reached target Local Verity Protected Volumes.
+Oct 20 17:19:00 u2204-trace systemd[1]: Listening on Syslog Socket.
+Oct 20 17:19:00 u2204-trace systemd[1]: Listening on fsck to fsckd communication Socket.
+Oct 20 17:19:00 u2204-trace systemd[1]: Listening on initctl Compatibility Named Pipe.
+Oct 20 17:19:00 u2204-trace systemd[1]: Listening on Journal Audit Socket.
+Oct 20 17:19:00 u2204-trace systemd[1]: Listening on Journal Socket (/dev/log).
+Oct 20 17:19:00 u2204-trace systemd[1]: Listening on Journal Socket.
+Oct 20 17:19:00 u2204-trace systemd[1]: Listening on udev Control Socket.
+Oct 20 17:19:00 u2204-trace systemd[1]: Listening on udev Kernel Socket.
+Oct 20 17:19:00 u2204-trace systemd[1]: Mounting Huge Pages File System...
+Oct 20 17:19:00 u2204-trace systemd[1]: Mounting POSIX Message Queue File System...
+Oct 20 17:19:00 u2204-trace systemd[1]: Mounting Kernel Debug File System...
+Oct 20 17:19:00 u2204-trace systemd[1]: Mounting Kernel Trace File System...
+Oct 20 17:19:00 u2204-trace systemd[1]: Starting Journal Service...
+Oct 20 17:19:00 u2204-trace systemd[1]: Starting Set the console keyboard layout...
+Oct 20 17:19:00 u2204-trace systemd[1]: Starting Create List of Static Device Nodes...
+Oct 20 17:19:00 u2204-trace systemd[1]: Starting Load Kernel Module configfs...
+Oct 20 17:19:00 u2204-trace systemd[1]: Starting Load Kernel Module drm...
+Oct 20 17:19:00 u2204-trace systemd[1]: Starting Load Kernel Module efi_pstore...
+Oct 20 17:19:00 u2204-trace systemd[1]: Starting Load Kernel Module fuse...
+Oct 20 17:19:00 u2204-trace systemd[1]: Condition check resulted in File System Check on Root Device being skipped.
+Oct 20 17:19:00 u2204-trace systemd[1]: Starting Load Kernel Modules...
+Oct 20 17:19:00 u2204-trace systemd[1]: Starting Remount Root and Kernel File Systems...
+Oct 20 17:19:00 u2204-trace kernel: EXT4-fs (sdc1): re-mounted. Opts: errors=remount-ro. Quota mode: none.
+Oct 20 17:19:01 u2204-trace systemd[1]: Starting Coldplug All udev Devices...
+Oct 20 17:19:01 u2204-trace systemd[1]: Started Journal Service.
+Oct 20 17:19:01 u2204-trace kernel: EDAC ie31200: No ECC support
+Oct 20 17:19:01 u2204-trace kernel: EDAC ie31200: No ECC support
+Oct 20 17:19:01 u2204-trace kernel: mc: Linux media interface: v0.10
+Oct 20 17:19:01 u2204-trace kernel: Bluetooth: Core ver 2.22
+Oct 20 17:19:01 u2204-trace kernel: NET: Registered PF_BLUETOOTH protocol family
+Oct 20 17:19:01 u2204-trace kernel: Bluetooth: HCI device and connection manager initialized
+Oct 20 17:19:01 u2204-trace kernel: Bluetooth: HCI socket layer initialized
+Oct 20 17:19:01 u2204-trace kernel: Bluetooth: L2CAP socket layer initialized
+Oct 20 17:19:01 u2204-trace kernel: Bluetooth: SCO socket layer initialized
+Oct 20 17:19:01 u2204-trace kernel: videodev: Linux video capture interface: v2.00
+Oct 20 17:19:01 u2204-trace kernel: RAPL PMU: API unit is 2^-32 Joules, 2 fixed counters, 163840 ms ovfl timer
+Oct 20 17:19:01 u2204-trace kernel: RAPL PMU: hw unit of domain pp0-core 2^-16 Joules
+Oct 20 17:19:01 u2204-trace kernel: RAPL PMU: hw unit of domain package 2^-16 Joules
+Oct 20 17:19:01 u2204-trace kernel: cryptd: max_cpu_qlen set to 1000
+Oct 20 17:19:01 u2204-trace kernel: AVX version of gcm_enc/dec engaged.
+Oct 20 17:19:01 u2204-trace kernel: AES CTR mode by8 optimization enabled
+Oct 20 17:19:01 u2204-trace kernel: usbcore: registered new interface driver snd-usb-audio
+Oct 20 17:19:01 u2204-trace kernel: snd_hda_intel 0000:01:00.1: Disabling MSI
+Oct 20 17:19:01 u2204-trace kernel: snd_hda_intel 0000:01:00.1: Handle vga_switcheroo audio client
+Oct 20 17:19:01 u2204-trace kernel: usb 1-1.4: Found UVC 1.00 device Creative Live! Cam Sync 1080p V2 (041e:40a0)
+Oct 20 17:19:01 u2204-trace kernel: input: Creative Live! Cam Sync 1080p V as /devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.4/1-1.4:1.0/input/input10
+Oct 20 17:19:01 u2204-trace kernel: input: HDA NVidia HDMI/DP,pcm=3 as /devices/pci0000:00/0000:00:01.0/0000:01:00.1/sound/card2/input11
+Oct 20 17:19:01 u2204-trace kernel: usbcore: registered new interface driver btusb
+Oct 20 17:19:01 u2204-trace kernel: Bluetooth: hci0: RTL: examining hci_ver=0a hci_rev=000b lmp_ver=0a lmp_subver=8761
+Oct 20 17:19:01 u2204-trace kernel: Bluetooth: hci0: RTL: rom_version status=0 version=1
+Oct 20 17:19:01 u2204-trace kernel: Bluetooth: hci0: RTL: loading rtl_bt/rtl8761bu_fw.bin
+Oct 20 17:19:01 u2204-trace kernel: Bluetooth: hci0: RTL: loading rtl_bt/rtl8761bu_config.bin
+Oct 20 17:19:01 u2204-trace kernel: Bluetooth: hci0: RTL: cfg_sz 6, total sz 30210
+Oct 20 17:19:01 u2204-trace kernel: intel_rapl_common: Found RAPL domain package
+Oct 20 17:19:01 u2204-trace kernel: intel_rapl_common: Found RAPL domain core
+Oct 20 17:19:01 u2204-trace kernel: usbcore: registered new interface driver uvcvideo
+Oct 20 17:19:01 u2204-trace kernel: input: HDA NVidia HDMI/DP,pcm=7 as /devices/pci0000:00/0000:00:01.0/0000:01:00.1/sound/card2/input12
+Oct 20 17:19:01 u2204-trace kernel: input: HDA NVidia HDMI/DP,pcm=8 as /devices/pci0000:00/0000:00:01.0/0000:01:00.1/sound/card2/input13
+Oct 20 17:19:01 u2204-trace kernel: input: HDA NVidia HDMI/DP,pcm=9 as /devices/pci0000:00/0000:00:01.0/0000:01:00.1/sound/card2/input14
+Oct 20 17:19:01 u2204-trace kernel: snd_hda_codec_realtek hdaudioC0D2: autoconfig for ALC889: line_outs=4 (0x14/0x15/0x16/0x17/0x0) type:line
+Oct 20 17:19:01 u2204-trace kernel: snd_hda_codec_realtek hdaudioC0D2:    speaker_outs=0 (0x0/0x0/0x0/0x0/0x0)
+Oct 20 17:19:01 u2204-trace kernel: snd_hda_codec_realtek hdaudioC0D2:    hp_outs=1 (0x1b/0x0/0x0/0x0/0x0)
+Oct 20 17:19:01 u2204-trace kernel: snd_hda_codec_realtek hdaudioC0D2:    mono: mono_out=0x0
+Oct 20 17:19:01 u2204-trace kernel: snd_hda_codec_realtek hdaudioC0D2:    dig-out=0x11/0x1e
+Oct 20 17:19:01 u2204-trace kernel: snd_hda_codec_realtek hdaudioC0D2:    inputs:
+Oct 20 17:19:01 u2204-trace kernel: snd_hda_codec_realtek hdaudioC0D2:      Front Mic=0x19
+Oct 20 17:19:01 u2204-trace kernel: snd_hda_codec_realtek hdaudioC0D2:      Rear Mic=0x18
+Oct 20 17:19:01 u2204-trace kernel: snd_hda_codec_realtek hdaudioC0D2:      Line=0x1a
+Oct 20 17:19:01 u2204-trace kernel: input: HDA Intel PCH Front Mic as /devices/pci0000:00/0000:00:1b.0/sound/card0/input15
+Oct 20 17:19:01 u2204-trace kernel: input: HDA Intel PCH Rear Mic as /devices/pci0000:00/0000:00:1b.0/sound/card0/input16
+Oct 20 17:19:01 u2204-trace kernel: input: HDA Intel PCH Line as /devices/pci0000:00/0000:00:1b.0/sound/card0/input17
+Oct 20 17:19:01 u2204-trace kernel: input: HDA Intel PCH Line Out Front as /devices/pci0000:00/0000:00:1b.0/sound/card0/input18
+Oct 20 17:19:01 u2204-trace kernel: input: HDA Intel PCH Line Out Surround as /devices/pci0000:00/0000:00:1b.0/sound/card0/input19
+Oct 20 17:19:01 u2204-trace kernel: input: HDA Intel PCH Line Out CLFE as /devices/pci0000:00/0000:00:1b.0/sound/card0/input20
+Oct 20 17:19:01 u2204-trace kernel: input: HDA Intel PCH Line Out Side as /devices/pci0000:00/0000:00:1b.0/sound/card0/input21
+Oct 20 17:19:01 u2204-trace kernel: input: HDA Intel PCH Front Headphone as /devices/pci0000:00/0000:00:1b.0/sound/card0/input22
+Oct 20 17:19:01 u2204-trace kernel: Bluetooth: hci0: RTL: fw version 0xdfc6d922
+Oct 20 17:19:23 u2204-trace kernel: IPMI message handler: version 39.2
+Oct 20 17:19:23 u2204-trace kernel: ipmi device interface
+Oct 20 17:19:23 u2204-trace kernel: nvidia: loading out-of-tree module taints kernel.
+Oct 20 17:19:23 u2204-trace kernel: nvidia: module license 'NVIDIA' taints kernel.
+Oct 20 17:19:23 u2204-trace kernel: Disabling lock debugging due to kernel taint
+Oct 20 17:19:23 u2204-trace kernel: nvidia: module verification failed: signature and/or required key missing - tainting kernel
+Oct 20 17:19:23 u2204-trace kernel: nvidia-nvlink: Nvlink Core is being initialized, major device number 237
+Oct 20 17:19:23 u2204-trace kernel: nvidia 0000:01:00.0: vgaarb: changed VGA decodes: olddecodes=io+mem,decodes=none:owns=io+mem
+Oct 20 17:19:23 u2204-trace kernel: NVRM: loading NVIDIA UNIX x86_64 Kernel Module  390.157  Wed Oct 12 09:19:07 UTC 2022 (using threaded interrupts)
+Oct 20 17:19:23 u2204-trace kernel: nvidia-modeset: Loading NVIDIA Kernel Mode Setting Driver for UNIX platforms  390.157  Wed Oct 12 09:15:25 UTC 2022
+Oct 20 17:19:23 u2204-trace kernel: [drm] [nvidia-drm] [GPU ID 0x00000100] Loading driver
+Oct 20 17:19:23 u2204-trace kernel: [drm] Initialized nvidia-drm 0.0.0 20160202 for 0000:01:00.0 on minor 0
+Oct 20 17:19:23 u2204-trace kernel: resource sanity check: requesting [mem 0x000e0000-0x000fffff], which spans more than PCI Bus 0000:00 [mem 0x000d0000-0x000e7fff window]
+Oct 20 17:19:23 u2204-trace kernel: caller os_map_kernel_space.part.0+0x10d/0x160 [nvidia] mapping multiple BARs
+Oct 20 17:19:23 u2204-trace kernel: resource sanity check: requesting [mem 0x000c0000-0x000fffff], which spans more than PCI Bus 0000:00 [mem 0x000d0000-0x000e7fff window]
+Oct 20 17:19:23 u2204-trace kernel: caller os_map_kernel_space.part.0+0x10d/0x160 [nvidia] mapping multiple BARs
+Oct 20 17:19:29 u2204-trace kernel: hrtimer: interrupt took 21511698 ns
+Oct 20 17:19:29 u2204-trace kernel: clocksource: timekeeping watchdog on CPU6: hpet wd-wd read-back delay of 3750756ns
+Oct 20 17:19:29 u2204-trace kernel: clocksource: wd-tsc-wd read-back delay of 925327ns, clock-skew test skipped!
+Oct 20 17:20:11 u2204-trace kernel: NVRM: GPU at PCI:0000:01:00: GPU-34818e1d-a8f5-fb2e-566d-2171a106b899
+Oct 20 17:20:11 u2204-trace kernel: NVRM: Xid (PCI:0000:01:00): 79, GPU has fallen off the bus.
+Oct 20 17:20:11 u2204-trace kernel: NVRM: GPU at 0000:01:00.0 has fallen off the bus.
+Oct 20 17:20:11 u2204-trace kernel: NVRM: A GPU crash dump has been created. If possible, please run
+                                    NVRM: nvidia-bug-report.sh as root to collect this data before
+                                    NVRM: the NVIDIA kernel module is unloaded.

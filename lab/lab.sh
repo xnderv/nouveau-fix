@@ -31,6 +31,9 @@
 #   GPCSEQ=биты перед at/hold/calib — PLL как у NVIDIA 390: 1 ядро без бита 0x10; 2 ядро 0x1371d0=..06 до PLL;
 #                      4 ВСЕ PLL без бита 0x10; 8 опора PLL hubk06 через его делитель (405). Пример: GPCSEQ=13.
 #   ALU=1 [ALUSTEPS=2000] перед bench/at/calib — честный замер ядра (цикл вычислений вне экрана), важнее CORE=1.
+#   lab.sh mem07     — ПАМЯТЬ 135 -> 324 (03 -> 07) повтором скрипта NVIDIA, снимки до/после и сравнение с NVIDIA.
+#   lab.sh mem0f     — ПАМЯТЬ 324 -> 2004 (07 -> 0f, узлы как в H11) повтором скрипта NVIDIA; только после mem07.
+#   lab.sh memdown 07|03 — ПАМЯТЬ ВНИЗ (2004 -> 324 или 324 -> 135) повтором скриптов NVIDIA.
 #   lab.sh calib [МГц …] — калибровка ядра: скорость вычислений на заданных частотах (по умолчанию 8 точек).
 #   lab.sh pllcmp    — ядро на одинаковой частоте через делитель и через PLL (P = 1, 2, 3, 4).
 #   lab.sh flags     — показать текущие переключатели лабораторного драйвера.
@@ -423,6 +426,127 @@ hold)
     "$0" pstate 0f
     echo "=== Карта держится в этом режиме. Вернуть рабочий 07: ~/nouveau-fix/lab/lab.sh home"
     ;;
+mem07)
+    # ПАМЯТЬ, первый шаг: 135 -> 324 МГц повтором скрипта NVIDIA (шаг A из записи) при переходе 03 -> 07.
+    # Узлы — по таблице карты для 07 (как в проверенном «table 07»), память — после узлов, как у NVIDIA.
+    # До и после — снимок регистров (только чтение, проверенные диапазоны) и сравнение с эталоном NVIDIA в 07.
+    PRM=/sys/module/nouveau/parameters
+    REF="$KIT/results/snap-nvidia/snap2-20261020-143554/regs.txt"
+    [ -e "$PRM/lab_mem_replay" ] || { echo "Нужен новый лабораторный драйвер (lab_mem_replay): lab.sh install и перезагрузка."; exit 1; }
+    [ -e "$REF" ] || { echo "Нет эталона NVIDIA: $REF"; exit 1; }
+    mkdir -p "$KIT/results"; SN="$KIT/results/mem07-$(date +%Y%m%d-%H%M%S).txt"
+    sudo -v
+    # Шаг 0: всё лабораторное — в исходное, память пока не трогаем.
+    for n in gpc rop hub07 hub06 hub01; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay; echo 0 > $PRM/lab_mem_order; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv; echo 65535 > $PRM/lab_eng_mask"
+    for f in lab_gpc_fix lab_gpc_seq lab_gpc_coef lab_gpc_ref_khz; do [ -e "$PRM/$f" ] && sudo sh -c "echo 0 > $PRM/$f"; done
+    EXPFIX=0; EXPSEQ=0; EXPCOEF=0; EXPREF=0
+    echo "=== Шаг 1: режим 03 (память не трогаем)"
+    "$0" pstate 03
+    AC="$(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate | head -n 1')"
+    case "$AC" in *"memory 135 MHz"*) ;; *) echo "--- СТОП: память сейчас не 135 МГц ($AC). Нужна перезагрузка (после неё память 135)."; exit 1;; esac
+    preflight 65535 0 0 0 0 0
+    sudo python3 "$HERE/regsnap.py" "nouveau 03 до опыта (память 135)" "$SN"
+    echo "    снимок «до» записан"
+    # Шаг 2: включаем повтор только шага A и порядок «узлы, потом память».
+    sudo sh -c "echo 1 > $PRM/lab_mem_replay; echo 1 > $PRM/lab_mem_order; echo 1 > $PRM/lab_mem"
+    echo "=== Шаг 2: 03 -> 07, память 135 -> 324 скриптом NVIDIA (шаг A)"
+    echo "  lab_mem=$(cat $PRM/lab_mem) lab_mem_replay=$(cat $PRM/lab_mem_replay) lab_mem_order=$(cat $PRM/lab_mem_order) lab_eng_mask=$(cat $PRM/lab_eng_mask) lab_disp_pause=$(cat $PRM/lab_disp_pause)"
+    [ "$(cat $PRM/lab_mem_replay)" = 1 ] && [ "$(cat $PRM/lab_mem)" = Y ] && [ "$(cat $PRM/lab_mem_order)" = Y ] || { echo "--- СТОП: переключатели памяти не встали"; sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay"; exit 1; }
+    [ "${NOCONFIRM:-0}" = 1 ] || read -r -p "Всё верно? Enter — запустить, Ctrl+C — отмена " _
+    sync
+    "$0" pstate 07 || true
+    # Сразу запретить любые дальнейшие смены памяти.
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay; echo 0 > $PRM/lab_mem_order"
+    echo "--- Журнал драйвера (память):"
+    journalctl -k -b 0 --no-pager --since "-2min" | grep -E 'LAB (replay|ram calc|ram prog|pstate [0-9]+: (memory|подъём|done))|WAIT VBLANK|fault|timeout|error' | tail -n 25 | sed -E 's/.*nouveau [^ ]+ //'
+    sleep 3
+    sudo python3 "$HERE/regsnap.py" "nouveau 07 после шага A" "$SN"
+    echo "=== Сравнение с NVIDIA в 07:"
+    python3 "$HERE/memcmp.py" "$SN" "$REF" "07 B" | tee -a "$SN.cmp"
+    echo "=== Шаг 3: быстрый тяжёлый замер (видеопамять под нагрузкой)"
+    QUICK=1 "$0" bench 07 || true
+    echo "Снимки: $SN, сравнение: $SN.cmp"
+    ;;
+mem0f)
+    # ПАМЯТЬ, второй шаг: 324 -> 2004 МГц повтором скрипта NVIDIA (шаг B) при переходе 07 -> 0f.
+    # Узлы — по таблице карты для 0f (1800 / 1907 / 1907 / 1645 / 1645) с исправлениями PLL (lab_gpc_seq=13), как в H11.
+    # Перед этим память должна быть 324 после mem07 в ЭТОЙ загрузке. Обратно скриптом не спускаемся: возврат — перезагрузка.
+    PRM=/sys/module/nouveau/parameters
+    REF="$KIT/results/snap-nvidia/snap2-20261020-143554/regs.txt"
+    [ -e "$PRM/lab_mem_replay" ] || { echo "Нужен лабораторный драйвер v10: lab.sh install и перезагрузка."; exit 1; }
+    [ -e "$REF" ] || { echo "Нет эталона NVIDIA: $REF"; exit 1; }
+    NA="$(journalctl -k -b 0 --no-pager | grep -c 'LAB replay A 135->324: выполнен, ret 0' || true)"
+    [ "${NA:-0}" -gt 0 ] || { echo "--- СТОП: в этой загрузке не было удачного mem07. Сначала: lab.sh mem07"; exit 1; }
+    echo "=== В этой загрузке удачный mem07 найден ($NA)"
+    AC="$(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate | head -n 1')"
+    case "$AC" in *"memory 324 MHz"*) ;; *) echo "--- СТОП: память сейчас не 324 МГц ($AC)."; exit 1;; esac
+    mkdir -p "$KIT/results"; SN="$KIT/results/mem0f-$(date +%Y%m%d-%H%M%S).txt"
+    sudo -v
+    for n in gpc rop hub07 hub06 hub01; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay; echo 0 > $PRM/lab_mem_order; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv; echo 65535 > $PRM/lab_eng_mask"
+    for f in lab_gpc_fix lab_gpc_coef lab_gpc_ref_khz; do [ -e "$PRM/$f" ] && sudo sh -c "echo 0 > $PRM/$f"; done
+    sudo sh -c "echo 13 > $PRM/lab_gpc_seq"
+    EXPFIX=0; EXPSEQ=13; EXPCOEF=0; EXPREF=0
+    echo "=== Шаг 1: проверка, снимок «до» (07, память 324)"
+    preflight 65535 0 0 0 0 0
+    sudo python3 "$HERE/regsnap.py" "nouveau 07 до шага B (память 324)" "$SN"
+    echo "    снимок «до» записан"
+    sudo sh -c "echo 2 > $PRM/lab_mem_replay; echo 1 > $PRM/lab_mem_order; echo 1 > $PRM/lab_mem"
+    echo "=== Шаг 2: 07 -> 0f: напряжение, узлы по таблице 0f (PLL как у NVIDIA), затем память 324 -> 2004 скриптом NVIDIA (шаг B)"
+    echo "  lab_mem=$(cat $PRM/lab_mem) lab_mem_replay=$(cat $PRM/lab_mem_replay) lab_mem_order=$(cat $PRM/lab_mem_order) lab_eng_mask=$(cat $PRM/lab_eng_mask) lab_gpc_seq=$(cat $PRM/lab_gpc_seq) lab_disp_pause=$(cat $PRM/lab_disp_pause)"
+    [ "$(cat $PRM/lab_mem_replay)" = 2 ] && [ "$(cat $PRM/lab_mem)" = Y ] && [ "$(cat $PRM/lab_mem_order)" = Y ] && [ "$(cat $PRM/lab_gpc_seq)" = 13 ] || { echo "--- СТОП: переключатели не встали"; sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay"; exit 1; }
+    [ "${NOCONFIRM:-0}" = 1 ] || read -r -p "Всё верно? Enter — запустить, Ctrl+C — отмена " _
+    sync
+    "$0" pstate 0f || true
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay; echo 0 > $PRM/lab_mem_order"
+    echo "--- Журнал драйвера (узлы и память):"
+    journalctl -k -b 0 --no-pager --since "-2min" | grep -E 'LAB (replay|ram calc|ram prog|pstate [0-9]+: (memory|подъём|done)|calc idx 0[0-8] dom|prog_3 idx|gpc_seq)|WAIT VBLANK|SWITCH|NOT LOCKED|FAULT|fault|ERROR|timeout' | tail -n 30 | sed -E 's/.*nouveau [^ ]+ //'
+    sleep 3
+    sudo python3 "$HERE/regsnap.py" "nouveau 0f после шага B" "$SN"
+    echo "=== Сравнение с NVIDIA в 0f:"
+    python3 "$HERE/memcmp.py" "$SN" "$REF" "07 A" | tee -a "$SN.cmp"
+    echo "=== Шаг 3: быстрый тяжёлый замер в 0f"
+    QUICK=1 "$0" bench 0f || true
+    echo "Снимки: $SN, сравнение: $SN.cmp"
+    echo "Карта остаётся в 0f с памятью 2004. home НЕ запускать (спуск памяти ещё не проверен) — вернуться можно перезагрузкой."
+    ;;
+memdown)
+    # ПАМЯТЬ ВНИЗ повтором скриптов NVIDIA: lab.sh memdown 07 (2004 -> 324: C + D) или lab.sh memdown 03 (324 -> 135: D + E).
+    # Порядок как у NVIDIA при спуске: сначала память, потом узлы. Каждый шаг разрешается своим битом.
+    T="${2:-}"; [[ "$T" =~ ^(07|03)$ ]] || { echo "Укажи: lab.sh memdown 07  или  lab.sh memdown 03"; exit 1; }
+    PRM=/sys/module/nouveau/parameters
+    REF="$KIT/results/snap-nvidia/snap2-20261020-143554/regs.txt"
+    [ -e "$PRM/lab_mem_replay" ] || { echo "Нужен лабораторный драйвер v10."; exit 1; }
+    AC="$(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate | head -n 1')"
+    if [ "$T" = 07 ]; then NEED="memory 2004 MHz"; BIT=4; else NEED="memory 324 MHz"; BIT=8; fi
+    case "$AC" in *"$NEED"*) ;; *) echo "--- СТОП: для memdown $T память должна быть ${NEED#memory } сейчас: $AC"; exit 1;; esac
+    mkdir -p "$KIT/results"; SN="$KIT/results/memdown$T-$(date +%Y%m%d-%H%M%S).txt"
+    sudo -v
+    for n in gpc rop hub07 hub06 hub01; do sudo sh -c "echo 0 > $PRM/lab_${n}_khz"; done
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay; echo 0 > $PRM/lab_mem_order; echo 0 > $PRM/lab_pcie; echo 1 > $PRM/lab_volt_first; echo 1 > $PRM/lab_core; echo 0 > $PRM/lab_volt_min_uv; echo 65535 > $PRM/lab_eng_mask"
+    for f in lab_gpc_fix lab_gpc_coef lab_gpc_ref_khz; do [ -e "$PRM/$f" ] && sudo sh -c "echo 0 > $PRM/$f"; done
+    sudo sh -c "echo 13 > $PRM/lab_gpc_seq"
+    EXPFIX=0; EXPSEQ=13; EXPCOEF=0; EXPREF=0
+    preflight 65535 0 0 0 0 0
+    sudo python3 "$HERE/regsnap.py" "nouveau до спуска в $T" "$SN"
+    sudo sh -c "echo $BIT > $PRM/lab_mem_replay; echo 1 > $PRM/lab_mem_order; echo 1 > $PRM/lab_mem"
+    echo "=== Спуск в $T: сначала память скриптами NVIDIA, потом узлы по таблице $T"
+    echo "  lab_mem=$(cat $PRM/lab_mem) lab_mem_replay=$(cat $PRM/lab_mem_replay) lab_mem_order=$(cat $PRM/lab_mem_order) lab_eng_mask=$(cat $PRM/lab_eng_mask) lab_gpc_seq=$(cat $PRM/lab_gpc_seq)"
+    [ "$(cat $PRM/lab_mem_replay)" = "$BIT" ] && [ "$(cat $PRM/lab_mem)" = Y ] && [ "$(cat $PRM/lab_mem_order)" = Y ] || { echo "--- СТОП: переключатели не встали"; sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay"; exit 1; }
+    [ "${NOCONFIRM:-0}" = 1 ] || read -r -p "Всё верно? Enter — запустить, Ctrl+C — отмена " _
+    sync
+    "$0" pstate "$T" || true
+    sudo sh -c "echo 0 > $PRM/lab_mem; echo 0 > $PRM/lab_mem_replay; echo 0 > $PRM/lab_mem_order"
+    echo "--- Журнал драйвера (память и узлы):"
+    journalctl -k -b 0 --no-pager --since "-2min" | grep -E 'LAB (replay|ram calc|ram prog|pstate [0-9]+: (memory|подъём|done))|WAIT VBLANK|SWITCH|NOT LOCKED|FAULT|fault|ERROR|timeout' | tail -n 30 | sed -E 's/.*nouveau [^ ]+ //'
+    sleep 3
+    sudo python3 "$HERE/regsnap.py" "nouveau после спуска в $T" "$SN"
+    if [ "$T" = 07 ]; then echo "=== Сравнение с NVIDIA в 07 (его снимок тоже сделан после спуска из 0f):"; python3 "$HERE/memcmp.py" "$SN" "$REF" "07 B" | tee -a "$SN.cmp"; fi
+    echo "=== Быстрый тяжёлый замер в $T"
+    QUICK=1 "$0" bench "$T" || true
+    echo "Снимки: $SN"
+    ;;
 home)
     # Вернуть рабочий 07: свои частоты сброшены, через 03 (hub на стартовые), затем 07 (hub не трогаем).
     PRM=/sys/module/nouveau/parameters
@@ -488,5 +612,5 @@ restore)
     echo "=== Стабильный драйвер возвращён. Перезагрузись и проверь: ~/nouveau-fix/check.sh"
     ;;
 *)
-    sed -n '2,37p' "$0"; exit 1 ;;
+    sed -n '2,40p' "$0"; exit 1 ;;
 esac
