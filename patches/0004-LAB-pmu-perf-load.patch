@@ -1,0 +1,1339 @@
+From: Alex <xnderv@yandex.com>
+Subject: [PATCH] LAB drm/nouveau/pmu/gf100: PERF process — GPU load accounting in PMU firmware (step 1: measure; step 2: in-driver governor)
+
+nouveau's gf100 PMU firmware has an empty PERF process. NVIDIA's driver lets its PMU
+firmware accumulate the PMU idle/busy counters and the host decides on performance
+levels from those totals. Step 1 of doing the same, staged so that each piece can be
+switched on separately:
+
+- fuc/perf.fuc: the PERF process is ASLEEP after the firmware loads (no counter writes,
+  no timer). PERF_MSG_START(data0 = period in PMU ticks) programs the PMU counters
+  exactly as NVIDIA 390 does on GF114 (1 = video, 3 = graphics+copy, 7 = all ticks)
+  and samples them every period (31-bit counters wrap in ~10 s, deltas are taken
+  modulo 2^31); START(0) puts it back to sleep. PERF_MSG_LOAD returns graphics and
+  video load in permille since the previous query (+ sample count) and resets the totals.
+- fuc/gf100.fuc3.h regenerated with envyas (before this change the rebuilt header was
+  byte-identical to the shipped one).
+- gf100.c: lab_perf_ticks (0 = leave the PERF process asleep) and lab_perf_ms
+  (0 = no queries); results in /sys/module/nouveau/parameters/lab_perf_{gr,vid,samples}.
+  Nothing is reclocked by this part.
+- gf100.c, step 2: lab_gov — pstate governor on the PMU load, same rules as the
+  gpu-autoclock service (0f at >=50 %, 03->07 at >=15 %, 0f->07 after 15 s <15 %,
+  07->03 after 30 s <5 %, 5 s minimum dwell). 0 = off (default), 1 = shadow: only logs
+  where it would switch, 2 = switches itself via nvkm_clk_ustate().
+
+diff -ruN a/nvkm/subdev/pmu/fuc/gf100.fuc3.h b/nvkm/subdev/pmu/fuc/gf100.fuc3.h
+--- a/nvkm/subdev/pmu/fuc/gf100.fuc3.h
++++ b/nvkm/subdev/pmu/fuc/gf100.fuc3.h
+@@ -69,8 +69,8 @@
+ 	0x00000000,
+ 	0x00000000,
+ 	0x46524550,
+-	0x00000758,
+-	0x00000756,
++	0x00000986,
++	0x0000082c,
+ 	0x00000000,
+ 	0x00000000,
+ 	0x00000000,
+@@ -91,8 +91,8 @@
+ 	0x00000000,
+ 	0x00000000,
+ 	0x5f433249,
+-	0x00000b88,
+-	0x00000a2b,
++	0x00000db6,
++	0x00000c59,
+ 	0x00000000,
+ 	0x00000000,
+ 	0x00000000,
+@@ -113,8 +113,8 @@
+ 	0x00000000,
+ 	0x00000000,
+ 	0x54534554,
+-	0x00000bb1,
+-	0x00000b8a,
++	0x00000ddf,
++	0x00000db8,
+ 	0x00000000,
+ 	0x00000000,
+ 	0x00000000,
+@@ -135,8 +135,8 @@
+ 	0x00000000,
+ 	0x00000000,
+ 	0x454c4449,
+-	0x00000bbd,
+-	0x00000bbb,
++	0x00000deb,
++	0x00000de9,
+ 	0x00000000,
+ 	0x00000000,
+ 	0x00000000,
+@@ -835,7 +835,16 @@
+ 	0x00000000,
+ 	0x00000000,
+ /* 0x0ccc: memx_train_tail */
+-/* 0x0ccc: i2c_scl_map */
++/* 0x0ccc: perf_data */
++	0x00000000,
++	0x00000000,
++	0x00000000,
++	0x00000000,
++	0x00000000,
++	0x00000000,
++	0x00000000,
++	0x00000000,
++/* 0x0cec: i2c_scl_map */
+ 	0x00001000,
+ 	0x00004000,
+ 	0x00010000,
+@@ -846,7 +855,7 @@
+ 	0x01000000,
+ 	0x04000000,
+ 	0x10000000,
+-/* 0x0cf4: i2c_sda_map */
++/* 0x0d14: i2c_sda_map */
+ 	0x00002000,
+ 	0x00008000,
+ 	0x00020000,
+@@ -857,7 +866,7 @@
+ 	0x02000000,
+ 	0x08000000,
+ 	0x20000000,
+-/* 0x0d1c: i2c_ctrl */
++/* 0x0d3c: i2c_ctrl */
+ 	0x0000e138,
+ 	0x0000e150,
+ 	0x0000e168,
+@@ -907,14 +916,6 @@
+ 	0x00000000,
+ 	0x00000000,
+ 	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+ };
+ 
+ static uint32_t gf100_pmu_code[] = {
+@@ -1451,365 +1452,502 @@
+ 	0xf400d6b0,
+ 	0x00f8d80b,
+ /* 0x0754: memx_init */
+-/* 0x0756: perf_recv */
+-	0x00f800f8,
+-/* 0x0758: perf_init */
+-/* 0x075a: i2c_drive_scl */
+-	0x36b000f8,
+-	0x110bf400,
+-	0x07e007f1,
++/* 0x0756: perf_snap */
++	0x67f100f8,
++	0x17f10ccc,
++	0x14b60578,
++	0x0011cf06,
++	0xf1006180,
++	0xb6053817,
++	0x11cf0614,
++	0x01618000,
++	0x051817f1,
++	0xcf0614b6,
++	0x61800011,
++	0x03608002,
++	0x80046080,
++	0x60800560,
++/* 0x078f: perf_sample */
++	0xf100f806,
++	0xf10ccc67,
++	0xf1ffff57,
++	0xf17fff53,
++	0xb6057817,
++	0x11cf0614,
++	0x00629800,
++	0xbb006180,
++	0x15fd0212,
++	0x03629804,
++	0x800021bb,
++	0x17f10362,
++	0x14b60538,
++	0x0011cf06,
++	0x80016298,
++	0x12bb0161,
++	0x0415fd02,
++	0xbb046298,
++	0x62800021,
++	0x1817f104,
++	0x0614b605,
++	0x980011cf,
++	0x61800262,
++	0x0212bb02,
++	0x980415fd,
++	0x21bb0562,
++	0x05628000,
++	0xf1036198,
++	0xf1000027,
++	0xb8400023,
++	0x1ef40612,
++	0x0115b61b,
++	0x98036180,
++	0x15b60461,
++	0x04618001,
++	0xb6056198,
++	0x61800115,
++/* 0x0821: perf_sample_count */
++	0x06619805,
++	0x800110b6,
++	0x00f80661,
++/* 0x082c: perf_recv */
++	0x4e4917f1,
++	0x525413f1,
++	0xf406e1b8,
++	0xd6b0291b,
++	0xae1bf501,
++	0xcc67f100,
++	0x0761980c,
++	0xf50016b0,
++	0xf500a00b,
++	0xf1078f21,
++	0x980ccc67,
++	0x21f5076e,
++	0x00f80256,
++/* 0x0860: perf_recv_host */
++	0x545317f1,
++	0x545213f1,
++	0xf406d1b8,
++	0x67f11f1b,
++	0x61980ccc,
++	0x076c8007,
++	0xf40016b0,
++	0xc6b0701b,
++	0x6a0bf400,
++	0x08ed21f5,
++/* 0x088a: perf_recv_load */
++	0x17f100f8,
++	0x13f14f4c,
++	0xd1b84441,
++	0x561bf406,
++	0x0ccc67f1,
++	0xb0076198,
++	0x0bf40016,
++	0xf9e0f90f,
++	0x8f21f5d0,
++	0xfcd0fc07,
++/* 0x08b1: perf_recv_answer */
++	0xcc67f1e0,
++	0xbdc4bd0c,
++	0x036398b4,
++	0x03e833ec,
++	0xf40036b0,
++	0x6c980f0b,
++	0xccc3ff04,
++	0xff056b98,
++/* 0x08d2: perf_recv_reply */
++	0x6498bcb3,
++	0x1044b606,
++	0x8005b4fd,
++	0x60800360,
++	0x05608004,
++	0xf5066080,
++/* 0x08eb: perf_recv_done */
++	0xf8033621,
++/* 0x08ed: perf_start */
++	0x7017f100,
++	0x0013f000,
++	0x051407f1,
+ 	0xd00604b6,
+ 	0x04bd0001,
+-/* 0x076e: i2c_drive_scl_lo */
+-	0x07f100f8,
+-	0x04b607e4,
++	0x000117f1,
++	0xf11813f0,
++	0xb6053407,
++	0x01d00604,
++	0xf104bd00,
++	0xf1008017,
++	0xb6054407,
++	0x01d00604,
++	0xf104bd00,
++	0xf1000017,
++	0xf1200013,
++	0xb6055407,
++	0x01d00604,
++	0xf004bd00,
++	0x07f10217,
++	0x04b6051c,
+ 	0x0001d006,
+-	0x00f804bd,
+-/* 0x077c: i2c_drive_sda */
++	0x07f104bd,
++	0x04b6053c,
++	0x0001d006,
++	0x07f104bd,
++	0x04b6054c,
++	0x0001d006,
++	0x07f104bd,
++	0x04b6055c,
++	0x0001d006,
++	0x17f004bd,
++	0x7c07f103,
++	0x0604b605,
++	0xbd0001d0,
++	0x5621f504,
++	0x02ceb907,
++	0x025621f5,
++/* 0x0986: perf_init */
++	0x00f800f8,
++/* 0x0988: i2c_drive_scl */
+ 	0xf40036b0,
+ 	0x07f1110b,
+ 	0x04b607e0,
+-	0x0002d006,
++	0x0001d006,
+ 	0x00f804bd,
+-/* 0x0790: i2c_drive_sda_lo */
++/* 0x099c: i2c_drive_scl_lo */
+ 	0x07e407f1,
+ 	0xd00604b6,
++	0x04bd0001,
++/* 0x09aa: i2c_drive_sda */
++	0x36b000f8,
++	0x110bf400,
++	0x07e007f1,
++	0xd00604b6,
+ 	0x04bd0002,
+-/* 0x079e: i2c_sense_scl */
+-	0x32f400f8,
+-	0xc437f101,
+-	0x0634b607,
+-	0xfd0033cf,
+-	0x0bf40431,
+-	0x0131f406,
+-/* 0x07b4: i2c_sense_scl_done */
+-/* 0x07b6: i2c_sense_sda */
+-	0x32f400f8,
+-	0xc437f101,
+-	0x0634b607,
+-	0xfd0033cf,
+-	0x0bf40432,
+-	0x0131f406,
+-/* 0x07cc: i2c_sense_sda_done */
+-/* 0x07ce: i2c_raise_scl */
+-	0x40f900f8,
+-	0x089847f1,
+-	0xf50137f0,
+-/* 0x07db: i2c_raise_scl_wait */
+-	0xf1075a21,
+-	0xf403e8e7,
+-	0x21f57e21,
+-	0x01f4079e,
+-	0x0142b609,
+-/* 0x07ef: i2c_raise_scl_done */
+-	0xfcef1bf4,
+-/* 0x07f3: i2c_start */
+-	0xf500f840,
+-	0xf4079e21,
+-	0x21f50d11,
+-	0x11f407b6,
+-	0x300ef406,
+-/* 0x0804: i2c_start_rep */
+-	0xf50037f0,
+-	0xf0075a21,
+-	0x21f50137,
+-	0x76bb077c,
+-	0x0465b600,
+-	0x659450f9,
+-	0x0256bb04,
+-	0x75fd50bd,
+-	0xf550fc04,
+-	0xb607ce21,
+-	0x11f40464,
+-/* 0x0831: i2c_start_send */
+-	0x0037f01f,
+-	0x077c21f5,
+-	0x1388e7f1,
+-	0xf07e21f4,
+-	0x21f50037,
+-	0xe7f1075a,
+-	0x21f41388,
+-/* 0x084d: i2c_start_out */
+-/* 0x084f: i2c_stop */
+-	0xf000f87e,
+-	0x21f50037,
+-	0x37f0075a,
+-	0x7c21f500,
+-	0xe8e7f107,
++/* 0x09be: i2c_drive_sda_lo */
++	0x07f100f8,
++	0x04b607e4,
++	0x0002d006,
++	0x00f804bd,
++/* 0x09cc: i2c_sense_scl */
++	0xf10132f4,
++	0xb607c437,
++	0x33cf0634,
++	0x0431fd00,
++	0xf4060bf4,
++/* 0x09e2: i2c_sense_scl_done */
++	0x00f80131,
++/* 0x09e4: i2c_sense_sda */
++	0xf10132f4,
++	0xb607c437,
++	0x33cf0634,
++	0x0432fd00,
++	0xf4060bf4,
++/* 0x09fa: i2c_sense_sda_done */
++	0x00f80131,
++/* 0x09fc: i2c_raise_scl */
++	0x47f140f9,
++	0x37f00898,
++	0x8821f501,
++/* 0x0a09: i2c_raise_scl_wait */
++	0xe8e7f109,
+ 	0x7e21f403,
+-	0xf50137f0,
+-	0xf1075a21,
+-	0xf41388e7,
+-	0x37f07e21,
+-	0x7c21f501,
+-	0x88e7f107,
+-	0x7e21f413,
+-/* 0x0882: i2c_bitw */
+-	0x21f500f8,
+-	0xe7f1077c,
+-	0x21f403e8,
+-	0x0076bb7e,
+-	0xf90465b6,
+-	0x04659450,
+-	0xbd0256bb,
+-	0x0475fd50,
+-	0x21f550fc,
+-	0x64b607ce,
+-	0x1811f404,
+-	0x1388e7f1,
+-	0xf07e21f4,
++	0x09cc21f5,
++	0xb60901f4,
++	0x1bf40142,
++/* 0x0a1d: i2c_raise_scl_done */
++	0xf840fcef,
++/* 0x0a21: i2c_start */
++	0xcc21f500,
++	0x0d11f409,
++	0x09e421f5,
++	0xf40611f4,
++/* 0x0a32: i2c_start_rep */
++	0x37f0300e,
++	0x8821f500,
++	0x0137f009,
++	0x09aa21f5,
++	0xb60076bb,
++	0x50f90465,
++	0xbb046594,
++	0x50bd0256,
++	0xfc0475fd,
++	0xfc21f550,
++	0x0464b609,
++/* 0x0a5f: i2c_start_send */
++	0xf01f11f4,
+ 	0x21f50037,
+-	0xe7f1075a,
++	0xe7f109aa,
+ 	0x21f41388,
+-/* 0x08c1: i2c_bitw_out */
+-/* 0x08c3: i2c_bitr */
+-	0xf000f87e,
+-	0x21f50137,
+-	0xe7f1077c,
+-	0x21f403e8,
+-	0x0076bb7e,
+-	0xf90465b6,
+-	0x04659450,
+-	0xbd0256bb,
+-	0x0475fd50,
+-	0x21f550fc,
+-	0x64b607ce,
+-	0x1b11f404,
+-	0x07b621f5,
++	0x0037f07e,
++	0x098821f5,
++	0x1388e7f1,
++/* 0x0a7b: i2c_start_out */
++	0xf87e21f4,
++/* 0x0a7d: i2c_stop */
++	0x0037f000,
++	0x098821f5,
+ 	0xf50037f0,
+-	0xf1075a21,
++	0xf109aa21,
++	0xf403e8e7,
++	0x37f07e21,
++	0x8821f501,
++	0x88e7f109,
++	0x7e21f413,
++	0xf50137f0,
++	0xf109aa21,
+ 	0xf41388e7,
+-	0x3cf07e21,
+-	0x0131f401,
+-/* 0x0908: i2c_bitr_done */
+-/* 0x090a: i2c_get_byte */
+-	0x57f000f8,
+-	0x0847f000,
+-/* 0x0910: i2c_get_byte_next */
+-	0xbb0154b6,
++	0x00f87e21,
++/* 0x0ab0: i2c_bitw */
++	0x09aa21f5,
++	0x03e8e7f1,
++	0xbb7e21f4,
+ 	0x65b60076,
+ 	0x9450f904,
+ 	0x56bb0465,
+ 	0xfd50bd02,
+ 	0x50fc0475,
+-	0x08c321f5,
++	0x09fc21f5,
+ 	0xf40464b6,
+-	0x53fd2b11,
+-	0x0142b605,
+-	0xf0d81bf4,
+-	0x76bb0137,
+-	0x0465b600,
+-	0x659450f9,
+-	0x0256bb04,
+-	0x75fd50bd,
+-	0xf550fc04,
+-	0xb6088221,
+-/* 0x095a: i2c_get_byte_done */
+-	0x00f80464,
+-/* 0x095c: i2c_put_byte */
+-/* 0x095f: i2c_put_byte_next */
+-	0xb60847f0,
+-	0x54ff0142,
+-	0x0076bb38,
++	0xe7f11811,
++	0x21f41388,
++	0x0037f07e,
++	0x098821f5,
++	0x1388e7f1,
++/* 0x0aef: i2c_bitw_out */
++	0xf87e21f4,
++/* 0x0af1: i2c_bitr */
++	0x0137f000,
++	0x09aa21f5,
++	0x03e8e7f1,
++	0xbb7e21f4,
++	0x65b60076,
++	0x9450f904,
++	0x56bb0465,
++	0xfd50bd02,
++	0x50fc0475,
++	0x09fc21f5,
++	0xf40464b6,
++	0x21f51b11,
++	0x37f009e4,
++	0x8821f500,
++	0x88e7f109,
++	0x7e21f413,
++	0xf4013cf0,
++/* 0x0b36: i2c_bitr_done */
++	0x00f80131,
++/* 0x0b38: i2c_get_byte */
++	0xf00057f0,
++/* 0x0b3e: i2c_get_byte_next */
++	0x54b60847,
++	0x0076bb01,
+ 	0xf90465b6,
+ 	0x04659450,
+ 	0xbd0256bb,
+ 	0x0475fd50,
+ 	0x21f550fc,
+-	0x64b60882,
+-	0x3411f404,
+-	0xf40046b0,
+-	0x76bbd81b,
+-	0x0465b600,
+-	0x659450f9,
+-	0x0256bb04,
+-	0x75fd50bd,
+-	0xf550fc04,
+-	0xb608c321,
+-	0x11f40464,
+-	0x0076bb0f,
+-	0xf40136b0,
+-	0x32f4061b,
+-/* 0x09b5: i2c_put_byte_done */
+-/* 0x09b7: i2c_addr */
+-	0xbb00f801,
++	0x64b60af1,
++	0x2b11f404,
++	0xb60553fd,
++	0x1bf40142,
++	0x0137f0d8,
++	0xb60076bb,
++	0x50f90465,
++	0xbb046594,
++	0x50bd0256,
++	0xfc0475fd,
++	0xb021f550,
++	0x0464b60a,
++/* 0x0b88: i2c_get_byte_done */
++/* 0x0b8a: i2c_put_byte */
++	0x47f000f8,
++/* 0x0b8d: i2c_put_byte_next */
++	0x0142b608,
++	0xbb3854ff,
+ 	0x65b60076,
+ 	0x9450f904,
+ 	0x56bb0465,
+ 	0xfd50bd02,
+ 	0x50fc0475,
+-	0x07f321f5,
++	0x0ab021f5,
+ 	0xf40464b6,
+-	0xc3e72911,
+-	0x34b6012e,
+-	0x0553fd01,
++	0x46b03411,
++	0xd81bf400,
+ 	0xb60076bb,
+ 	0x50f90465,
+ 	0xbb046594,
+ 	0x50bd0256,
+ 	0xfc0475fd,
+-	0x5c21f550,
+-	0x0464b609,
+-/* 0x09fc: i2c_addr_done */
+-/* 0x09fe: i2c_acquire_addr */
+-	0xcec700f8,
+-	0x02e4b6f8,
+-	0x0d1ce0b7,
+-	0xf800ee98,
+-/* 0x0a0d: i2c_acquire */
+-	0xfe21f500,
+-	0x0421f409,
+-	0xf403d9f0,
+-	0x00f84021,
+-/* 0x0a1c: i2c_release */
+-	0x09fe21f5,
+-	0xf00421f4,
+-	0x21f403da,
+-/* 0x0a2b: i2c_recv */
+-	0xf400f840,
+-	0xc1c70132,
+-	0x0214b6f8,
+-	0xf52816b0,
+-	0xa0013a1f,
+-	0x980cf413,
+-	0x13a00032,
+-	0x31980ccc,
+-	0x0231f400,
+-	0xe0f9d0f9,
+-	0x67f1d0f9,
+-	0x63f10000,
+-	0x67921000,
+-	0x0076bb01,
+-	0xf90465b6,
+-	0x04659450,
+-	0xbd0256bb,
+-	0x0475fd50,
+-	0x21f550fc,
+-	0x64b60a0d,
+-	0xb0d0fc04,
+-	0x1bf500d6,
+-	0x57f000b3,
++	0xf121f550,
++	0x0464b60a,
++	0xbb0f11f4,
++	0x36b00076,
++	0x061bf401,
++/* 0x0be3: i2c_put_byte_done */
++	0xf80132f4,
++/* 0x0be5: i2c_addr */
+ 	0x0076bb00,
+ 	0xf90465b6,
+ 	0x04659450,
+ 	0xbd0256bb,
+ 	0x0475fd50,
+ 	0x21f550fc,
+-	0x64b609b7,
+-	0xd011f504,
+-	0xe0c5c700,
+-	0xb60076bb,
+-	0x50f90465,
+-	0xbb046594,
+-	0x50bd0256,
+-	0xfc0475fd,
+-	0x5c21f550,
+-	0x0464b609,
+-	0x00ad11f5,
+-	0xbb0157f0,
++	0x64b60a21,
++	0x2911f404,
++	0x012ec3e7,
++	0xfd0134b6,
++	0x76bb0553,
++	0x0465b600,
++	0x659450f9,
++	0x0256bb04,
++	0x75fd50bd,
++	0xf550fc04,
++	0xb60b8a21,
++/* 0x0c2a: i2c_addr_done */
++	0x00f80464,
++/* 0x0c2c: i2c_acquire_addr */
++	0xb6f8cec7,
++	0xe0b702e4,
++	0xee980d3c,
++/* 0x0c3b: i2c_acquire */
++	0xf500f800,
++	0xf40c2c21,
++	0xd9f00421,
++	0x4021f403,
++/* 0x0c4a: i2c_release */
++	0x21f500f8,
++	0x21f40c2c,
++	0x03daf004,
++	0xf84021f4,
++/* 0x0c59: i2c_recv */
++	0x0132f400,
++	0xb6f8c1c7,
++	0x16b00214,
++	0x3a1ff528,
++	0x1413a001,
++	0x0032980d,
++	0x0cec13a0,
++	0xf4003198,
++	0xd0f90231,
++	0xd0f9e0f9,
++	0x000067f1,
++	0x100063f1,
++	0xbb016792,
+ 	0x65b60076,
+ 	0x9450f904,
+ 	0x56bb0465,
+ 	0xfd50bd02,
+ 	0x50fc0475,
+-	0x09b721f5,
+-	0xf50464b6,
+-	0xbb008a11,
++	0x0c3b21f5,
++	0xfc0464b6,
++	0x00d6b0d0,
++	0x00b31bf5,
++	0xbb0057f0,
+ 	0x65b60076,
+ 	0x9450f904,
+ 	0x56bb0465,
+ 	0xfd50bd02,
+ 	0x50fc0475,
+-	0x090a21f5,
+-	0xf40464b6,
+-	0x5bcb6a11,
+-	0x0076bbe0,
++	0x0be521f5,
++	0xf50464b6,
++	0xc700d011,
++	0x76bbe0c5,
++	0x0465b600,
++	0x659450f9,
++	0x0256bb04,
++	0x75fd50bd,
++	0xf550fc04,
++	0xb60b8a21,
++	0x11f50464,
++	0x57f000ad,
++	0x0076bb01,
+ 	0xf90465b6,
+ 	0x04659450,
+ 	0xbd0256bb,
+ 	0x0475fd50,
+ 	0x21f550fc,
+-	0x64b6084f,
+-	0x025bb904,
+-	0x0ef474bd,
+-/* 0x0b31: i2c_recv_not_rd08 */
+-	0x01d6b043,
+-	0xf03d1bf4,
+-	0x21f50057,
+-	0x11f409b7,
+-	0xe0c5c733,
+-	0x095c21f5,
+-	0xf02911f4,
+-	0x21f50057,
+-	0x11f409b7,
+-	0xe0b5c71f,
+-	0x095c21f5,
+-	0xf51511f4,
+-	0xbd084f21,
+-	0x08c5c774,
+-	0xf4091bf4,
+-	0x0ef40232,
+-/* 0x0b71: i2c_recv_not_wr08 */
+-/* 0x0b71: i2c_recv_done */
+-	0xf8cec703,
+-	0x0a1c21f5,
+-	0xd0fce0fc,
+-	0xb90a12f4,
+-	0x21f5027c,
+-/* 0x0b86: i2c_recv_exit */
+-	0x00f80336,
+-/* 0x0b88: i2c_init */
+-/* 0x0b8a: test_recv */
+-	0x17f100f8,
+-	0x14b605d8,
+-	0x0011cf06,
+-	0xf10110b6,
+-	0xb605d807,
+-	0x01d00604,
+-	0xf104bd00,
+-	0xf1d900e7,
+-	0xf5134fe3,
+-	0xf8025621,
+-/* 0x0bb1: test_init */
+-	0x00e7f100,
+-	0x5621f508,
+-/* 0x0bbb: idle_recv */
+-	0xf800f802,
+-/* 0x0bbd: idle */
+-	0x0031f400,
+-	0x05d417f1,
++	0x64b60be5,
++	0x8a11f504,
++	0x0076bb00,
++	0xf90465b6,
++	0x04659450,
++	0xbd0256bb,
++	0x0475fd50,
++	0x21f550fc,
++	0x64b60b38,
++	0x6a11f404,
++	0xbbe05bcb,
++	0x65b60076,
++	0x9450f904,
++	0x56bb0465,
++	0xfd50bd02,
++	0x50fc0475,
++	0x0a7d21f5,
++	0xb90464b6,
++	0x74bd025b,
++/* 0x0d5f: i2c_recv_not_rd08 */
++	0xb0430ef4,
++	0x1bf401d6,
++	0x0057f03d,
++	0x0be521f5,
++	0xc73311f4,
++	0x21f5e0c5,
++	0x11f40b8a,
++	0x0057f029,
++	0x0be521f5,
++	0xc71f11f4,
++	0x21f5e0b5,
++	0x11f40b8a,
++	0x7d21f515,
++	0xc774bd0a,
++	0x1bf408c5,
++	0x0232f409,
++/* 0x0d9f: i2c_recv_not_wr08 */
++/* 0x0d9f: i2c_recv_done */
++	0xc7030ef4,
++	0x21f5f8ce,
++	0xe0fc0c4a,
++	0x12f4d0fc,
++	0x027cb90a,
++	0x033621f5,
++/* 0x0db4: i2c_recv_exit */
++/* 0x0db6: i2c_init */
++	0x00f800f8,
++/* 0x0db8: test_recv */
++	0x05d817f1,
+ 	0xcf0614b6,
+ 	0x10b60011,
+-	0xd407f101,
++	0xd807f101,
+ 	0x0604b605,
+ 	0xbd0001d0,
+-/* 0x0bd9: idle_loop */
+-	0x5817f004,
+-/* 0x0bdf: idle_proc */
+-/* 0x0bdf: idle_proc_exec */
+-	0xf90232f4,
+-	0x021eb910,
+-	0x033f21f5,
+-	0x11f410fc,
+-	0x0231f409,
+-/* 0x0bf3: idle_proc_next */
+-	0xb6ef0ef4,
+-	0x1fb85810,
+-	0xe61bf406,
+-	0xf4dd02f4,
+-	0x0ef40028,
+-	0x000000bb,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
+-	0x00000000,
++	0x00e7f104,
++	0x4fe3f1d9,
++	0x5621f513,
++/* 0x0ddf: test_init */
++	0xf100f802,
++	0xf50800e7,
++	0xf8025621,
++/* 0x0de9: idle_recv */
++/* 0x0deb: idle */
++	0xf400f800,
++	0x17f10031,
++	0x14b605d4,
++	0x0011cf06,
++	0xf10110b6,
++	0xb605d407,
++	0x01d00604,
++/* 0x0e07: idle_loop */
++	0xf004bd00,
++	0x32f45817,
++/* 0x0e0d: idle_proc */
++/* 0x0e0d: idle_proc_exec */
++	0xb910f902,
++	0x21f5021e,
++	0x10fc033f,
++	0xf40911f4,
++	0x0ef40231,
++/* 0x0e21: idle_proc_next */
++	0x5810b6ef,
++	0xf4061fb8,
++	0x02f4e61b,
++	0x0028f4dd,
++	0x00bb0ef4,
+ 	0x00000000,
+ 	0x00000000,
+ 	0x00000000,
+diff -ruN a/nvkm/subdev/pmu/fuc/perf.fuc b/nvkm/subdev/pmu/fuc/perf.fuc
+--- a/nvkm/subdev/pmu/fuc/perf.fuc
++++ b/nvkm/subdev/pmu/fuc/perf.fuc
+@@ -22,6 +22,19 @@
+  * Authors: Ben Skeggs
+  */
+ 
++/* PERF: учёт загрузки видеокарты, как в прошивке PMU драйвера NVIDIA (Fermi).
++ * ПОСЛЕ ЗАГРУЗКИ ПРОЦЕСС СПИТ: ни счётчиков, ни таймера — прошивка ведёт себя как раньше.
++ * Работать он начинает только по команде драйвера PERF_MSG_START (data0 = период в тактах).
++ * Счётчики простоя/занятости PMU настраиваются так же, как их настраивает драйвер NVIDIA 390
++ * на GF114: счётчик 1 — видео, счётчик 3 — графика + копирование, счётчик 7 — все такты.
++ * Процесс раз в ~100 мс читает счётчики (они 31-битные и переполняются примерно за 10 с,
++ * поэтому разница считается с учётом переполнения) и копит суммы. По запросу драйвера
++ * (PERF_MSG_LOAD) отвечает загрузкой графики и видео в промилле за время с прошлого запроса
++ * и обнуляет суммы. Решение о смене режима принимает драйвер, как у NVIDIA.
++ */
++#define PERF_MSG_LOAD  0x44414f4c
++#define PERF_MSG_START 0x54525453
++
+ #ifdef INCLUDE_PROC
+ process(PROC_PERF, #perf_init, #perf_recv)
+ #endif
+@@ -30,6 +43,16 @@
+  * PERF data segment
+  *****************************************************************************/
+ #ifdef INCLUDE_DATA
++// данные лежат далеко (после буферов memx), поэтому обращаемся через базу $r6 = #perf_data
++perf_data:
++.b32 0	// 0x00 last_total
++.b32 0	// 0x04 last_gr
++.b32 0	// 0x08 last_vid
++.b32 0	// 0x0c acc_total
++.b32 0	// 0x10 acc_gr
++.b32 0	// 0x14 acc_vid
++.b32 0	// 0x18 samples
++.b32 0	// 0x1c ticks: период замеров; 0 — процесс спит
+ #endif
+ 
+ /******************************************************************************
+@@ -37,8 +60,60 @@
+  *****************************************************************************/
+ #ifdef INCLUDE_CODE
+ 
+-// description
+-//
++// прочитать счётчик, прибавить разницу с прошлым чтением (по модулю 2^31) к сумме
++// $r5 - 0x7fffffff, $r6 - #perf_data, портит $r1 $r2
++#define perf_acc(ior,last,acc) /*
++*/	nv_iord($r1, ior) /*
++*/	ld b32 $r2 D[$r6 + last] /*
++*/	st b32 D[$r6 + last] $r1 /*
++*/	sub b32 $r1 $r2 /*
++*/	and $r1 $r5 /*
++*/	ld b32 $r2 D[$r6 + acc] /*
++*/	add b32 $r2 $r1 /*
++*/	st b32 D[$r6 + acc] $r2
++
++// запомнить текущие значения счётчиков, обнулить суммы
++perf_snap:
++	mov $r6 #perf_data
++	nv_iord($r1, 0x578)
++	st b32 D[$r6 + 0x00] $r1
++	nv_iord($r1, 0x538)
++	st b32 D[$r6 + 0x04] $r1
++	nv_iord($r1, 0x518)
++	st b32 D[$r6 + 0x08] $r1
++	st b32 D[$r6 + 0x0c] $r0
++	st b32 D[$r6 + 0x10] $r0
++	st b32 D[$r6 + 0x14] $r0
++	st b32 D[$r6 + 0x18] $r0
++	ret
++
++// один замер: добавить приращения счётчиков к суммам
++perf_sample:
++	mov $r6 #perf_data
++	imm32($r5, 0x7fffffff)
++	perf_acc(0x578, 0x00, 0x0c)
++	perf_acc(0x538, 0x04, 0x10)
++	perf_acc(0x518, 0x08, 0x14)
++	// драйвер давно не спрашивал (сумма > 2^30 тактов, ~5 с) — делим все суммы пополам,
++	// доля загрузки от этого не меняется, а переполнения не будет
++	ld b32 $r1 D[$r6 + 0x0c]
++	imm32($r2, 0x40000000)
++	cmp b32 $r1 $r2
++	bra l #perf_sample_count
++		shr b32 $r1 1
++		st b32 D[$r6 + 0x0c] $r1
++		ld b32 $r1 D[$r6 + 0x10]
++		shr b32 $r1 1
++		st b32 D[$r6 + 0x10] $r1
++		ld b32 $r1 D[$r6 + 0x14]
++		shr b32 $r1 1
++		st b32 D[$r6 + 0x14] $r1
++	perf_sample_count:
++	ld b32 $r1 D[$r6 + 0x18]
++	add b32 $r1 1
++	st b32 D[$r6 + 0x18] $r1
++	ret
++
+ // $r15 - current (perf)
+ // $r14 - sender process name
+ // $r13 - message
+@@ -46,10 +121,99 @@
+ // $r11 - data1
+ // $r0  - zero
+ perf_recv:
++	imm32($r1, PROC_KERN)
++	cmp b32 $r14 $r1
++	bra ne #perf_recv_host
++		// таймер: замер и следующий таймер
++		cmp b32 $r13 KMSG_ALARM
++		bra ne #perf_recv_done
++		mov $r6 #perf_data
++		ld b32 $r1 D[$r6 + 0x1c]
++		cmp b32 $r1 0
++		bra e #perf_recv_done
++		call(perf_sample)
++		mov $r6 #perf_data
++		ld b32 $r14 D[$r6 + 0x1c]
++		call(timer)
++		ret
++	perf_recv_host:
++	imm32($r1, PERF_MSG_START)
++	cmp b32 $r13 $r1
++	bra ne #perf_recv_load
++		// уже работает — только сменить период; иначе настроить счётчики и завести таймер
++		mov $r6 #perf_data
++		ld b32 $r1 D[$r6 + 0x1c]
++		st b32 D[$r6 + 0x1c] $r12
++		cmp b32 $r1 0
++		bra ne #perf_recv_done
++		cmp b32 $r12 0
++		bra e #perf_recv_done
++		call(perf_start)
++		ret
++	perf_recv_load:
++	imm32($r1, PERF_MSG_LOAD)
++	cmp b32 $r13 $r1
++	bra ne #perf_recv_done
++		// процесс спит — замер не делаем, ответ будет нулевой (0 замеров)
++		mov $r6 #perf_data
++		ld b32 $r1 D[$r6 + 0x1c]
++		cmp b32 $r1 0
++		bra e #perf_recv_answer
++		push $r14
++		push $r13
++		call(perf_sample)
++		pop $r13
++		pop $r14
++		perf_recv_answer:
++		mov $r6 #perf_data
++		// ответ: data0 = графика, промилле; data1 = видео, промилле | число замеров << 16
++		clear b32 $r12
++		clear b32 $r11
++		ld b32 $r3 D[$r6 + 0x0c]
++		div $r3 $r3 1000
++		cmp b32 $r3 0
++		bra e #perf_recv_reply
++			ld b32 $r12 D[$r6 + 0x10]
++			div $r12 $r12 $r3
++			ld b32 $r11 D[$r6 + 0x14]
++			div $r11 $r11 $r3
++		perf_recv_reply:
++		ld b32 $r4 D[$r6 + 0x18]
++		shl b32 $r4 16
++		or $r11 $r4
++		st b32 D[$r6 + 0x0c] $r0
++		st b32 D[$r6 + 0x10] $r0
++		st b32 D[$r6 + 0x14] $r0
++		st b32 D[$r6 + 0x18] $r0
++		call(send)
++	perf_recv_done:
++	ret
++
++// запуск по команде драйвера: счётчики как у NVIDIA, снимок, таймер
++// $r12 - период в тактах
++perf_start:
++	// счётчики PMU — как у драйвера NVIDIA 390 на GF114
++	imm32($r1, 0x00000070)
++	nv_iowr(0x514, $r1)
++	imm32($r1, 0x00180001)
++	nv_iowr(0x534, $r1)
++	mov $r1 0x80
++	nv_iowr(0x544, $r1)
++	imm32($r1, 0x20000000)
++	nv_iowr(0x554, $r1)
++	mov $r1 2
++	nv_iowr(0x51c, $r1)
++	nv_iowr(0x53c, $r1)
++	nv_iowr(0x54c, $r1)
++	nv_iowr(0x55c, $r1)
++	mov $r1 3
++	nv_iowr(0x57c, $r1)
++	call(perf_snap)
++	mov b32 $r14 $r12
++	call(timer)
+ 	ret
+ 
+-// description
+-//
++// после загрузки процесс спит
+ // $r15 - current (perf)
+ // $r0  - zero
+ perf_init:
+diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
+--- a/nvkm/subdev/pmu/gf100.c
++++ b/nvkm/subdev/pmu/gf100.c
+@@ -25,6 +25,197 @@
+ #include "fuc/gf100.fuc3.h"
+ 
+ #include <subdev/mc.h>
++#include <subdev/clk.h>
++
++#include <linux/moduleparam.h>
++#include <linux/workqueue.h>
++
++/* LAB: учёт загрузки в прошивке PMU (процесс PERF, fuc/perf.fuc), как у драйвера NVIDIA.
++ * Прошивка сама раз в ~100 мс читает счётчики занятости и копит суммы; драйвер раз в
++ * lab_perf_ms спрашивает итог (PERF_MSG_LOAD) и получает загрузку графики и видео в промилле.
++ * После загрузки процесс в прошивке СПИТ. Включается по шагам, по одному за раз:
++ *   lab_perf_ticks > 0 — драйвер командует прошивке начать замеры с этим периодом (такты PMU,
++ *                        20300000 ~ 100 мс); 0 — остановить замеры (после перезагрузки/сна прошивка спит сама);
++ *   lab_perf_ms > 0    — драйвер раз в N мс спрашивает итог; значения в lab_perf_{gr,vid,samples},
++ *                        при lab_perf_log=1 — в журнал.
++ * Режимы этот код НЕ переключает. */
++static int lab_perf_ticks;
++module_param(lab_perf_ticks, int, 0644);
++MODULE_PARM_DESC(lab_perf_ticks, "LAB: start PMU PERF sampling with this period in PMU ticks (0 = leave it asleep)");
++static int lab_perf_ms;
++module_param(lab_perf_ms, int, 0644);
++MODULE_PARM_DESC(lab_perf_ms, "LAB: query PMU PERF load every N ms (0 = off)");
++static bool lab_perf_log;
++module_param(lab_perf_log, bool, 0644);
++MODULE_PARM_DESC(lab_perf_log, "LAB: log each PMU PERF load reply");
++static int lab_perf_gr, lab_perf_vid, lab_perf_samples;
++module_param(lab_perf_gr, int, 0444);
++MODULE_PARM_DESC(lab_perf_gr, "LAB: last graphics+copy load from PMU, permille");
++module_param(lab_perf_vid, int, 0444);
++MODULE_PARM_DESC(lab_perf_vid, "LAB: last video load from PMU, permille");
++module_param(lab_perf_samples, int, 0444);
++MODULE_PARM_DESC(lab_perf_samples, "LAB: PMU samples behind the last reply");
++
++/* LAB, ступень 2: решение о режиме в драйвере (как у NVIDIA: прошивка считает, драйвер решает).
++ * Правила — те же, что у службы gpu-autoclock (обкатаны 21.10), загрузка = max(графика, видео):
++ *   в 0f:     >= 50 % два замера подряд (из 03 или 07);   03 -> 07: >= 15 % два замера подряд;
++ *   0f -> 07: < 15 % в течение 15 с;                       07 -> 03: < 5 % в течение 30 с;
++ *   после любого переключения — не меньше 5 с в новом режиме.
++ * lab_gov: 0 — выключено; 1 — ТЕНЬ: драйвер ведёт свой воображаемый режим и только пишет в журнал,
++ *          куда бы переключил (переключает служба); 2 — драйвер переключает сам (ступень 2б).
++ * Работает только при включённых замерах и опросе (lab_perf_ticks > 0, lab_perf_ms > 0). */
++static int lab_gov;
++module_param(lab_gov, int, 0644);
++MODULE_PARM_DESC(lab_gov, "LAB: in-driver pstate governor on PMU PERF load (0 off, 1 shadow/log only, 2 act)");
++
++static struct {
++	int mode;		/* с каким lab_gov работали в прошлый раз */
++	int cur;		/* режим (id pstate) по мнению регулятора */
++	int hi, mid, low;	/* замеров подряд выше/ниже порогов */
++	unsigned long last;	/* jiffies последнего переключения */
++} lab_gov_st;
++
++static int
++lab_gov_cur_pstate(struct nvkm_clk *clk)
++{
++	struct nvkm_pstate *pstate;
++	int i = 0;
++
++	list_for_each_entry(pstate, &clk->states, head) {
++		if (i++ == clk->pstate)
++			return pstate->pstate;
++	}
++	return -1;
++}
++
++static void
++lab_gov_step(struct nvkm_pmu *pmu, u32 gr, u32 vid, int ms)
++{
++	struct nvkm_clk *clk = pmu->subdev.device->clk;
++	int mode = READ_ONCE(lab_gov);
++	u32 load = max(gr, vid);
++	int per_s = 1000 / max(ms, 1), nxt = -1, ret;
++	const char *why = "";
++
++	if (!clk || (mode != 1 && mode != 2)) {
++		lab_gov_st.mode = 0;
++		return;
++	}
++	if (lab_gov_st.mode != mode) {	/* только что включили: начинаем с текущего режима карты */
++		lab_gov_st.mode = mode;
++		lab_gov_st.cur = lab_gov_cur_pstate(clk);
++		lab_gov_st.hi = lab_gov_st.mid = lab_gov_st.low = 0;
++		lab_gov_st.last = jiffies;
++		nvkm_info(&pmu->subdev, "LAB gov: включён (%s), режим сейчас %02x\n",
++			  mode == 1 ? "тень — только журнал" : "переключает сам", lab_gov_st.cur);
++	}
++	if (mode == 2)	/* сам переключает — сверяемся с картой (режим мог сменить кто-то ещё) */
++		lab_gov_st.cur = lab_gov_cur_pstate(clk);
++
++	lab_gov_st.hi  = load >= 500 ? lab_gov_st.hi + 1 : 0;
++	lab_gov_st.mid = load >= 150 ? lab_gov_st.mid + 1 : 0;
++	if (lab_gov_st.cur == 0x0f)
++		lab_gov_st.low = load < 150 ? lab_gov_st.low + 1 : 0;
++	else
++		lab_gov_st.low = load < 50 ? lab_gov_st.low + 1 : 0;
++	if (time_before(jiffies, lab_gov_st.last + msecs_to_jiffies(5000)))
++		return;
++
++	if (lab_gov_st.cur != 0x0f && lab_gov_st.hi >= 2)
++		nxt = 0x0f, why = "загрузка >= 50 % два замера";
++	else if (lab_gov_st.cur == 0x03 && lab_gov_st.mid >= 2)
++		nxt = 0x07, why = "загрузка >= 15 % два замера";
++	else if (lab_gov_st.cur == 0x0f && lab_gov_st.low >= 15 * per_s)
++		nxt = 0x07, why = "загрузка < 15 % 15 с";
++	else if (lab_gov_st.cur == 0x07 && lab_gov_st.low >= 30 * per_s)
++		nxt = 0x03, why = "загрузка < 5 % 30 с";
++	if (nxt < 0)
++		return;
++
++	if (mode == 1) {
++		nvkm_info(&pmu->subdev, "LAB gov: ТЕНЬ -> %02x (%s, загрузка %u‰)\n", nxt, why, load);
++	} else {
++		ret = nvkm_clk_ustate(clk, nxt, 0);
++		ret |= nvkm_clk_ustate(clk, nxt, 1);
++		nvkm_info(&pmu->subdev, "LAB gov: -> %02x (%s, загрузка %u‰), ret %d, режим теперь %02x\n",
++			  nxt, why, load, ret, lab_gov_cur_pstate(clk));
++	}
++	lab_gov_st.cur = nxt;
++	lab_gov_st.hi = lab_gov_st.mid = lab_gov_st.low = 0;
++	lab_gov_st.last = jiffies;
++}
++
++#define LAB_PROC_PERF     0x46524550
++#define LAB_PERF_MSG_LOAD 0x44414f4c
++#define LAB_PERF_MSG_START 0x54525453
++
++static struct {
++	struct delayed_work work;
++	struct nvkm_pmu *pmu;
++	bool inited, on;
++	int started;	/* какой период уже отправлен прошивке после её загрузки (0 — спит) */
++} lab_perf;
++
++static void
++lab_perf_work(struct work_struct *w)
++{
++	struct nvkm_pmu *pmu = lab_perf.pmu;
++	int ms = READ_ONCE(lab_perf_ms);
++	int ticks = READ_ONCE(lab_perf_ticks);
++	u32 reply[2];
++
++	if (pmu && ticks > 0 && ticks != lab_perf.started &&
++	    !nvkm_pmu_send(pmu, NULL, LAB_PROC_PERF, LAB_PERF_MSG_START, ticks, 0)) {
++		nvkm_info(&pmu->subdev, "LAB perf: прошивке дана команда начать замеры, период %d тактов\n", ticks);
++		lab_perf.started = ticks;
++	}
++	if (pmu && ticks <= 0 && lab_perf.started &&
++	    !nvkm_pmu_send(pmu, NULL, LAB_PROC_PERF, LAB_PERF_MSG_START, 0, 0)) {
++		nvkm_info(&pmu->subdev, "LAB perf: прошивке дана команда прекратить замеры\n");
++		lab_perf.started = 0;
++	}
++	if (ms > 0 && pmu &&
++	    !nvkm_pmu_send(pmu, reply, LAB_PROC_PERF, LAB_PERF_MSG_LOAD, 0, 0)) {
++		WRITE_ONCE(lab_perf_gr, reply[0]);
++		WRITE_ONCE(lab_perf_vid, reply[1] & 0xffff);
++		WRITE_ONCE(lab_perf_samples, reply[1] >> 16);
++		if (READ_ONCE(lab_perf_log))
++			nvkm_info(&pmu->subdev, "LAB perf: графика %u‰, видео %u‰, замеров %u\n",
++				  reply[0], reply[1] & 0xffff, reply[1] >> 16);
++		lab_gov_step(pmu, reply[0], reply[1] & 0xffff, ms);
++	}
++	if (READ_ONCE(lab_perf.on))
++		schedule_delayed_work(&lab_perf.work, msecs_to_jiffies(ms > 0 ? ms : 1000));
++}
++
++static int
++gf100_pmu_init_lab(struct nvkm_pmu *pmu)
++{
++	int ret = gt215_pmu_init(pmu);
++
++	if (ret)
++		return ret;
++	if (!lab_perf.inited) {
++		INIT_DELAYED_WORK(&lab_perf.work, lab_perf_work);
++		lab_perf.inited = true;
++	}
++	lab_perf.pmu = pmu;
++	lab_perf.started = 0;	/* прошивка только что загружена — процесс PERF спит */
++	lab_gov_st.mode = 0;	/* регулятор начнёт заново с текущего режима */
++	WRITE_ONCE(lab_perf.on, true);
++	schedule_delayed_work(&lab_perf.work, msecs_to_jiffies(1000));
++	return 0;
++}
++
++static void
++gf100_pmu_fini_lab(struct nvkm_pmu *pmu)
++{
++	if (lab_perf.inited) {
++		WRITE_ONCE(lab_perf.on, false);
++		cancel_delayed_work_sync(&lab_perf.work);
++	}
++	gt215_pmu_fini(pmu);
++}
+ 
+ void
+ gf100_pmu_reset(struct nvkm_pmu *pmu)
+@@ -49,8 +240,8 @@
+ 	.data.size = sizeof(gf100_pmu_data),
+ 	.enabled = gf100_pmu_enabled,
+ 	.reset = gf100_pmu_reset,
+-	.init = gt215_pmu_init,
+-	.fini = gt215_pmu_fini,
++	.init = gf100_pmu_init_lab,	/* LAB: было gt215_pmu_init */
++	.fini = gf100_pmu_fini_lab,	/* LAB: было gt215_pmu_fini */
+ 	.intr = gt215_pmu_intr,
+ 	.send = gt215_pmu_send,
+ 	.recv = gt215_pmu_recv,

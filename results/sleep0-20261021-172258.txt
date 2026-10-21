@@ -1,0 +1,23 @@
+Сон без наших частот 2026-10-21 17:23:03, отпечаток 05af295e, ядро 7.0.0-38-generic
+до сна: /sys/kernel/debug/dri/0/pstate:AC: core 50 MHz memory 135 MHz
+17:23:03 засыпаю (pm_trace включён)...
+проснулся (код 0), часы сейчас: 17:23:10 — могут врать из-за pm_trace
+после сна: /sys/kernel/debug/dri/0/pstate:AC: core 50 MHz memory 135 MHz
+--- журнал с момента сна (сон, пробуждение, драйвер):
+PM: Enabling pm_trace changes system date and time during resume.
+                                PM: Correct system time has to be restored manually after resume.
+PM: suspend entry (deep)
+ACPI: PM: Preparing to enter system sleep state S3
+ACPI: PM: Saving platform NVS memory
+ACPI: PM: Low-level resume complete
+ACPI: PM: Restoring platform NVS memory
+ACPI: PM: Waking up from system sleep state S3
+PM: Possible incorrect RTC due to pm_trace, please use 'ntpdate' or 'rdate' to reset it.
+PM: suspend exit
+ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT0._GTF due to previous error (AE_NOT_FOUND) (20251212/psparse-529)
+ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT0._GTF due to previous error (AE_NOT_FOUND) (20251212/psparse-529)
+ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT2._GTF due to previous error (AE_NOT_FOUND) (20251212/psparse-529)
+ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT2._GTF due to previous error (AE_NOT_FOUND) (20251212/psparse-529)
+=== Сон без наших частот: компьютер проснулся ✅
+Служба автопереключения выключена. Включить снова: sudo systemctl enable --now gpu-autoclock.service
+Лог: ~/nouveau-fix/results/sleep0-20261021-172258.txt

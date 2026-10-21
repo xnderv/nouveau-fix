@@ -1,0 +1,18 @@
+Чтение «чёрного ящика» 2026-10-21 16:16:56
+PM:   Magic number: 12:472:524
+--- пред. загрузка: последние строки журнала
+16:13:09 host systemd[1956]: Started app-gnome-xdg\x2dterminal\x2dexec-5239.scope - Application launched by gsd-media-keys.
+16:13:09 host systemd[1956]: Started ptyxis-spawn-0a031cfb-ae66-438f-8bd3-125d9247a677.scope - [systemd-run] /usr/bin/bash.
+16:13:45 host sudo[5387]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+16:13:45 host sudo[5387]: alex : TTY=/dev/pts/0 ; PWD=/home/user ; USER=root ; COMMAND=/usr/bin/sh -c grep \"^AC\" /sys/kernel/debug/dri/*/pstate | head -n 1
+16:13:45 host sudo[5387]: pam_unix(sudo:session): session closed for user root
+16:13:49 host sudo[5402]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+16:13:49 host sudo[5402]: alex : TTY=/dev/pts/0 ; PWD=/home/user ; USER=root ; COMMAND=/usr/bin/sh -c grep \"^AC\" /sys/kernel/debug/dri/*/pstate | head -n 1
+16:13:49 host sudo[5402]: pam_unix(sudo:session): session closed for user root
+16:13:49 host sudo[5412]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+16:13:49 host sudo[5412]: alex : TTY=/dev/pts/0 ; PWD=/home/user ; USER=root ; COMMAND=/usr/bin/sh -c echo 1 > /sys/power/pm_print_times; echo 1 > /sys/power/pm_trace
+16:13:49 host sudo[5412]: pam_unix(sudo:session): session closed for user root
+16:13:49 host kernel: PM: Enabling pm_trace changes system date and time during resume.
+                                PM: Correct system time has to be restored manually after resume.
+16:13:49 host sudo[5420]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+16:13:49 host sudo[5420]: alex : TTY=/dev/pts/0 ; PWD=/home/user ; USER=root ; COMMAND=/usr/bin/sh -c echo mem > /sys/power/state

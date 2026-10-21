@@ -1,0 +1,51 @@
+Сон из 0f 2026-10-21 17:29:35, отпечаток d65b4639, ядро 7.0.0-38-generic, вид сна s2idle [deep]
+до сна: core 900 MHz memory 2004 MHz ✓
+до сна: настройки счётчиков на месте; счётчик тактов за 1 с: 216018875
+17:29:38 засыпаю на 20 с...
+17:30:08 проснулся (rtcwake вернул 0)
+после сна: core 900 MHz memory 2004 MHz ✓ тот же режим
+после сна: настройки счётчиков ПОТЕРЯНЫ: 10a514=00000000(нужно 00000070) 10a534=00000000(нужно 00180001) 10a544=00000000(нужно 00000080) 10a554=00000000(нужно 20000000) 10a57c=00000000(нужно 00000003); счётчик тактов за 1 с: 0
+ошибок драйвера в журнале за сон: 0
+--- журнал драйвера с момента сна (главное):
+PM: suspend entry (deep)
+nouveau 0000:01:00.0: PM: calling pci_pm_suspend @ 6129, parent: 0000:00:01.0
+nouveau 0000:01:00.0: PM: pci_pm_suspend returned 0 after 491832 usecs
+nouveau 0000:01:00.0: PM: calling pci_pm_suspend_late @ 6091, parent: 0000:00:01.0
+nouveau 0000:01:00.0: PM: pci_pm_suspend_late returned 0 after 0 usecs
+nouveau 0000:01:00.0: PM: calling pci_pm_suspend_noirq @ 6129, parent: 0000:00:01.0
+nouveau 0000:01:00.0: PM: pci_pm_suspend_noirq returned 0 after 1 usecs
+ACPI: PM: Preparing to enter system sleep state S3
+ACPI: PM: Saving platform NVS memory
+ACPI: PM: Low-level resume complete
+ACPI: PM: Restoring platform NVS memory
+ACPI: PM: Waking up from system sleep state S3
+nouveau 0000:01:00.0: PM: calling pci_pm_resume_noirq @ 6101, parent: 0000:00:01.0
+nouveau 0000:01:00.0: PM: pci_pm_resume_noirq returned 0 after 241 usecs
+nouveau 0000:01:00.0: PM: calling pci_pm_resume_early @ 6135, parent: 0000:00:01.0
+nouveau 0000:01:00.0: PM: pci_pm_resume_early returned 0 after 0 usecs
+nouveau 0000:01:00.0: PM: calling pci_pm_resume @ 6131, parent: 0000:00:01.0
+nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+nouveau 0000:01:00.0: fb: LAB replay: память сейчас 135 МГц, цель 2004 МГц, шагов 2 (lab_mem_replay=15)
+nouveau 0000:01:00.0: fb: LAB replay A 135->324: в memx 62 записей, 8 ожиданий, 9 пауз, пропущено 9 операций, ~195 слов
+nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 493
+nouveau 0000:01:00.0: fb: LAB replay A 135->324: выполнен за 349 мкс (op13×1), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18010000 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+nouveau 0000:01:00.0: fb: LAB replay B 324->2004: в memx 81 записей, 6 ожиданий, 12 пауз, пропущено 11 операций, ~235 слов
+nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 16
+nouveau 0000:01:00.0: fb: LAB replay B 324->2004: выполнен за 584 мкс (op13×1), ret 0; 0x137310=89200816 0x1373f0=00000002 0x132000=18030101 0x10f290=0c3c362a 0x10f300=00000a4d 0x611200=00000030
+nouveau 0000:01:00.0: fb: LAB replay: прямых записей после скрипта: 8
+nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+nouveau 0000:01:00.0: PM: pci_pm_resume returned 0 after 166466 usecs
+PM: suspend exit
+регистров памяти изменилось за сон: 3 из 65
+  10f210: 80005353 -> 80001010
+  10f634: accaaacc -> aacaaaca
+  10fb08: 55550408 -> 55550608
+--- круг переключений после сна:
+17:30:12 -> 07: core 405 MHz memory 324 MHz ✓
+17:30:14 -> 0f: core 900 MHz memory 2004 MHz ✓
+17:30:16 -> 07: core 405 MHz memory 324 MHz ✓
+17:30:18 -> 03: core 50 MHz memory 135 MHz ✓
+=== Сон из 0f: круг после сна прошёл ✅ (посмотри, были ли на экране артефакты)
+служба автопереключения снова запущена
+Лог: ~/nouveau-fix/results/sleep-0f-20261021-172916.txt
+Регистры: ~/nouveau-fix/results/sleep-0f-20261021-172916-regs.txt

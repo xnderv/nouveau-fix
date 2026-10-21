@@ -1,0 +1,59 @@
+Сон из 03 2026-10-21 17:27:09, отпечаток d65b4639, ядро 7.0.0-38-generic, вид сна s2idle [deep]
+до сна: core 50 MHz memory 135 MHz ✓
+до сна: настройки счётчиков на месте; счётчик тактов за 1 с: 216017408
+17:27:12 засыпаю на 20 с...
+17:27:43 проснулся (rtcwake вернул 0)
+после сна: core 50 MHz memory 135 MHz ✓ тот же режим
+после сна: настройки счётчиков ПОТЕРЯНЫ: 10a514=00000000(нужно 00000070) 10a534=00000000(нужно 00180001) 10a544=00000000(нужно 00000080) 10a554=00000000(нужно 20000000) 10a57c=00000000(нужно 00000003); счётчик тактов за 1 с: 0
+ошибок драйвера в журнале за сон: 0
+--- журнал драйвера с момента сна (главное):
+PM: suspend entry (deep)
+nouveau 0000:01:00.0: PM: calling pci_pm_suspend @ 6110, parent: 0000:00:01.0
+nouveau 0000:01:00.0: PM: pci_pm_suspend returned 0 after 1158346 usecs
+nouveau 0000:01:00.0: PM: calling pci_pm_suspend_late @ 6094, parent: 0000:00:01.0
+nouveau 0000:01:00.0: PM: pci_pm_suspend_late returned 0 after 0 usecs
+nouveau 0000:01:00.0: PM: calling pci_pm_suspend_noirq @ 6110, parent: 0000:00:01.0
+nouveau 0000:01:00.0: PM: pci_pm_suspend_noirq returned 0 after 0 usecs
+ACPI: PM: Preparing to enter system sleep state S3
+ACPI: PM: Saving platform NVS memory
+ACPI: PM: Low-level resume complete
+ACPI: PM: Restoring platform NVS memory
+ACPI: PM: Waking up from system sleep state S3
+nouveau 0000:01:00.0: PM: calling pci_pm_resume_noirq @ 339, parent: 0000:00:01.0
+nouveau 0000:01:00.0: PM: pci_pm_resume_noirq returned 0 after 118 usecs
+nouveau 0000:01:00.0: PM: calling pci_pm_resume_early @ 341, parent: 0000:00:01.0
+nouveau 0000:01:00.0: PM: pci_pm_resume_early returned 0 after 0 usecs
+nouveau 0000:01:00.0: PM: calling pci_pm_resume @ 6093, parent: 0000:00:01.0
+nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+nouveau 0000:01:00.0: fb: LAB replay: память сейчас 135 МГц, цель 135 МГц, шагов 0 (lab_mem_replay=15)
+nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+nouveau 0000:01:00.0: PM: pci_pm_resume returned 0 after 169575 usecs
+PM: suspend exit
+регистров памяти изменилось за сон: 18 из 65
+  100760: ff00ff00 -> 59005900
+  100764: 0000ff00 -> 00005900
+  100768: ff00ff00 -> 59005900
+  10f090: 4000007e -> 00000000
+  10f210: 80000e0e -> 80007777
+  10f2a0: 42e10069 -> 42e18069
+  10f604: f0000020 -> f0000320
+  10f610: 40044f77 -> 20044f77
+  10f614: 40044f77 -> 20044f77
+  10f808: 48020050 -> 08220050
+  10f824: 00007877 -> 000079f7
+  10f830: 08300017 -> 08100017
+  10f910: 00021001 -> 00020000
+  10f914: 00021001 -> 00020000
+  10f998: 00010a00 -> 00011b02
+  132000: 18010000 -> 18010002
+  132100: 00000001 -> 00000000
+  137360: 00000001 -> 00000003
+--- круг переключений после сна:
+17:27:47 -> 07: core 405 MHz memory 324 MHz ✓
+17:27:49 -> 0f: core 900 MHz memory 2004 MHz ✓
+17:27:51 -> 07: core 405 MHz memory 324 MHz ✓
+17:27:53 -> 03: core 50 MHz memory 135 MHz ✓
+=== Сон из 03: круг после сна прошёл ✅ (посмотри, были ли на экране артефакты)
+служба автопереключения снова запущена
+Лог: ~/nouveau-fix/results/sleep-03-20261021-172708.txt
+Регистры: ~/nouveau-fix/results/sleep-03-20261021-172708-regs.txt

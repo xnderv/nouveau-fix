@@ -1,0 +1,30 @@
+From: Alex <xnderv@yandex.com>
+Subject: [PATCH] drm/nouveau/disp: don't refuse HDMI when SCDC is unsupported below 340 MHz
+
+nvkm_uoutp_mthd_hdmi() returns -EINVAL whenever the sink advertises SCDC
+but the SOR has no hdmi->scdc hook (everything before GM200). The caller,
+nv50_hdmi_enable(), then bails out, so HDMI mode is never enabled and no
+AVI/vendor InfoFrames are sent: the output silently degrades to DVI-style
+TMDS. This happens with any HDMI 2.x monitor (e.g. 2560x1440@60, 241.5 MHz)
+on Fermi/Kepler. SCDC is only required above 340 MHz (TMDS bit-clock ratio
+1/40 and scrambling); below that the sink must accept a plain HDMI 1.4
+signal, and nv50_hdmi_enable() already clears scrambling over DDC.
+
+Only refuse when the requested clock actually needs SCDC.
+
+Seen on GF114 (GTX 560 Ti) + MSI MPG271QX OLED:
+  [HDMI head:0 enable:1 ... khz:241500 scdc:1 scdc_scrambling:1 scdc_low_rates:0] (ret:-22)
+
+---
+diff --git a/nvkm/engine/disp/uoutp.c b/nvkm/engine/disp/uoutp.c
+--- a/nvkm/engine/disp/uoutp.c
++++ b/nvkm/engine/disp/uoutp.c
+@@ -254,7 +254,7 @@
+ 	if (!ior->func->hdmi ||
+ 	    args->v0.max_ac_packet > 0x1f ||
+ 	    args->v0.rekey > 0x7f ||
+-	    (args->v0.scdc && !ior->func->hdmi->scdc))
++	    (args->v0.scdc && !ior->func->hdmi->scdc && args->v0.khz > 340000))
+ 		return -EINVAL;
+ 
+ 	if (!args->v0.enable) {

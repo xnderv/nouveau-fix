@@ -10,7 +10,14 @@
 #   0f -> 07:    загрузка <  DOWN_MAX % в течение HOLD_MAX с
 #   07 -> 03:    загрузка <  DOWN_MID % в течение HOLD_MID с
 #   после любого переключения — не меньше MIN_DWELL с в новом режиме.
+# Посекундная запись загрузки (только для опытов): пока существует файл /run/gpu-autoclock.debug.
+# После сна (S3) настройки счётчиков сбрасываются — служба замечает это и ставит их заново (21.10).
 # Если после переключения память не на ожидаемой частоте — служба перестаёт переключать и пишет об этом в журнал.
+# 21.10, ступень 2в: если в драйвере есть регулятор (lab_gov, патч 0004), РЕШАЕТ ДРАЙВЕР, как у NVIDIA:
+# прошивка PMU считает загрузку, драйвер раз в секунду спрашивает итог и переключает по тем же правилам.
+# Служба тогда только выставляет параметры, ставит стартовый 07, включает регулятор и спит; при остановке
+# службы регулятор выключается (режим остаётся как есть). Вернуть решение службе: создать файл
+# /etc/gpu-autoclock.legacy и перезапустить службу.
 import glob, mmap, os, struct, sys, time
 
 UP_MAX, UP_MID = 50, 15
@@ -106,13 +113,49 @@ def main():
     cur = '07'
     if not setp(cur, 'старт'):
         log('СТОП: стартовое переключение не удалось, дальше не переключаю'); return 2
+
+    legacy = os.path.exists('/etc/gpu-autoclock.legacy')
+    if os.path.exists(prm + '/lab_gov') and not legacy:
+        import signal
+
+        def drv(vals):
+            for k, v in vals:
+                with open(f'{prm}/{k}', 'w') as f:
+                    f.write(v)
+
+        def stop(sig, frm):
+            drv([('lab_gov', '0'), ('lab_perf_ms', '0')])
+            log('служба остановлена — регулятор в драйвере выключен, режим остаётся как есть')
+            sys.exit(0)
+        signal.signal(signal.SIGTERM, stop)
+        signal.signal(signal.SIGINT, stop)
+        drv([('lab_perf_ticks', '20300000'), ('lab_perf_ms', '1000'), ('lab_perf_log', '0'), ('lab_gov', '2')])
+        log('решает ДРАЙВЕР, как у NVIDIA: прошивка PMU считает загрузку, драйвер раз в секунду решает и переключает '
+            '(lab_gov=2). Служба только выставила параметры и спит. '
+            'Вернуть решение службе: sudo touch /etc/gpu-autoclock.legacy && sudo systemctl restart gpu-autoclock')
+        while True:
+            time.sleep(3600)
+    if os.path.exists(prm + '/lab_gov'):
+        with open(prm + '/lab_gov', 'w') as f:
+            f.write('0')
+    log('решает служба (старый способ)' + (': есть /etc/gpu-autoclock.legacy' if legacy else ': в драйвере нет регулятора lab_gov'))
     last = time.monotonic(); hi = mid = 0; low_s = 0
     prev = [cnt(1), cnt(3), cnt(7)]
     while True:
         time.sleep(1.0)
+        if rd(0x10a57c) != 3:
+            # 21.10: после сна (S3) карта обесточивается и настройки счётчиков PMU сбрасываются в 0 —
+            # без этого служба видела бы загрузку 0 % и никогда не поднимала режим. Ставим заново, замер пропускаем.
+            for a, v in CFG:
+                wr(a, v)
+            log('счётчики PMU сброшены (было пробуждение после сна?) — настроены заново')
+            prev = [cnt(1), cnt(3), cnt(7)]
+            continue
         now = [cnt(1), cnt(3), cnt(7)]
         d = [(now[i] - prev[i]) & 0x7fffffff for i in range(3)]
         prev = now
+        if d[2] == 0:
+            continue
         load = 100 * max(d[0], d[1]) // max(d[2], 1)
         hi = hi + 1 if load >= UP_MAX else 0
         mid = mid + 1 if load >= UP_MID else 0
@@ -120,6 +163,8 @@ def main():
             low_s = low_s + 1 if load < DOWN_MAX else 0
         else:
             low_s = low_s + 1 if load < DOWN_MID else 0
+        if os.path.exists('/run/gpu-autoclock.debug'):   # 21.10: посекундная запись для сверки с регулятором драйвера
+            log(f'загрузка {1000 * max(d[0], d[1]) // max(d[2], 1)}‰ (графика {1000 * d[1] // max(d[2], 1)}‰, видео {1000 * d[0] // max(d[2], 1)}‰) режим {cur} hi {hi} mid {mid} low {low_s}')
         if time.monotonic() - last < MIN_DWELL:
             continue
         nxt = None

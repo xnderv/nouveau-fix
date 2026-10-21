@@ -1,5 +1,5 @@
 #!/bin/bash
-# Установка / удаление службы автоматических режимов карты.
+# Установка / удаление службы автоматических режимов карты (+ её остановка на время сна).
 #   ~/nouveau-fix/daily/autoclock.sh install   — поставить и запустить службу + напоминание о новом ядре (пароль)
 #   ~/nouveau-fix/daily/autoclock.sh remove    — остановить и удалить; карта остаётся в текущем режиме до перезагрузки
 #   ~/nouveau-fix/daily/autoclock.sh status    — состояние и последние переключения
@@ -10,23 +10,25 @@ case "${1:-}" in
 install)
     sudo install -m 0755 "$HERE/gpu-autoclock.py" /usr/local/sbin/gpu-autoclock.py
     sudo install -m 0644 "$HERE/gpu-autoclock.service" /etc/systemd/system/gpu-autoclock.service
+    sudo install -m 0644 "$HERE/gpu-autoclock-sleep.service" /etc/systemd/system/gpu-autoclock-sleep.service
     sudo install -m 0755 "$HERE/kernel-remind.sh" /etc/kernel/postinst.d/zz-nouveau-fix-remind
     chmod +x "$HERE/notify-newkernel.sh" "$HERE/open-newkernel.sh"
     mkdir -p "$HOME/.local/share/applications"
     sed "s|@HOME@|$HOME|g" "$HERE/nouveau-newkernel.desktop" > "$HOME/.local/share/applications/nouveau-newkernel.desktop"
     sudo systemctl daemon-reload
-    sudo systemctl enable gpu-autoclock.service
+    sudo systemctl enable gpu-autoclock.service gpu-autoclock-sleep.service
     sudo systemctl restart gpu-autoclock.service
     sleep 3; systemctl --no-pager status gpu-autoclock.service | head -n 12 ;;
 remove)
     sudo systemctl disable --now gpu-autoclock.service 2>/dev/null || true
-    sudo rm -f /etc/systemd/system/gpu-autoclock.service /usr/local/sbin/gpu-autoclock.py /etc/kernel/postinst.d/zz-nouveau-fix-remind
+    sudo systemctl disable gpu-autoclock-sleep.service 2>/dev/null || true
+    sudo rm -f /etc/systemd/system/gpu-autoclock.service /etc/systemd/system/gpu-autoclock-sleep.service /usr/local/sbin/gpu-autoclock.py /etc/kernel/postinst.d/zz-nouveau-fix-remind
     rm -f "$HOME/.local/share/applications/nouveau-newkernel.desktop"
     sudo systemctl daemon-reload
     echo "Служба удалена. Карта в текущем режиме до перезагрузки." ;;
 status)
     systemctl --no-pager status gpu-autoclock.service | head -n 5 || true
-    journalctl -u gpu-autoclock.service -b 0 --no-pager | tail -n 20 ;;
+    journalctl -u gpu-autoclock.service -u gpu-autoclock-sleep.service -b 0 --no-pager | tail -n 20 ;;
 watch)
     journalctl -u gpu-autoclock.service -f --no-pager ;;
 *)

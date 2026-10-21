@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Проверка пикселей</title>
+<style>
+  html,body{margin:0;background:#fff;color:#000;font:16px sans-serif}
+  #info{padding:8px 12px;background:#ffe;border-bottom:1px solid #cc9}
+  canvas{display:block;image-rendering:pixelated}
+  .warn{color:#b00;font-weight:bold}
+</style></head><body>
+<div id="info"></div>
+<canvas id="c"></canvas>
+<script>
+// Узор рисуется в НАСТОЯЩИХ пикселях экрана: если по пути картинки что-то масштабирует,
+// полоски в 1 пиксель сольются в серое пятно или пойдут «волнами» (муаром).
+const dpr = window.devicePixelRatio || 1;
+const info = document.getElementById('info');
+info.innerHTML = 'Экран ' + screen.width + '×' + screen.height + ', масштаб страницы (devicePixelRatio) = <b>' + dpr + '</b>' +
+  (dpr !== 1 ? ' <span class="warn">— должно быть 1! Нажми Ctrl+0 и обнови страницу (F5).</span>' : ' ✓ (страница не масштабируется)');
+const W = 1200, H = 760;
+const c = document.getElementById('c');
+c.width = W; c.height = H; c.style.width = (W / dpr) + 'px'; c.style.height = (H / dpr) + 'px';
+const g = c.getContext('2d');
+g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+function block(x, y, w, h, f) { const im = g.createImageData(w, h);
+  for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) { const [r, gg, b] = f(i, j), k = (j * w + i) * 4;
+    im.data[k] = r; im.data[k + 1] = gg; im.data[k + 2] = b; im.data[k + 3] = 255; }
+  g.putImageData(im, x, y); }
+const BW = v => v ? [0, 0, 0] : [255, 255, 255];
+g.fillStyle = '#000'; g.font = '16px sans-serif';
+const L = (t, x, y) => g.fillText(t, x, y);
+L('1 — вертикальные полоски 1 px', 20, 30);   block(20, 40, 260, 160, (i) => BW(i % 2));
+L('2 — горизонтальные полоски 1 px', 310, 30); block(310, 40, 260, 160, (i, j) => BW(j % 2));
+L('3 — шахматка 1 px', 600, 30);               block(600, 40, 260, 160, (i, j) => BW((i + j) % 2));
+L('4 — полоски 2 px', 890, 30);                block(890, 40, 260, 160, (i) => BW((i >> 1) % 2));
+L('5 — цветные столбцы 1 px: R G B чёрный', 20, 240);
+block(20, 250, 260, 160, (i) => [[255, 0, 0], [0, 255, 0], [0, 0, 255], [0, 0, 0]][i % 4]);
+L('6 — одиночные линии 1 px через 8 px', 310, 240); block(310, 250, 260, 160, (i, j) => BW(i % 8 === 0 || j % 8 === 0));
+L('7 — серый 50% (сравнить с 1–3 издалека)', 600, 240); block(600, 250, 260, 160, () => [188, 188, 188]);
+L('8 — полоски 3 px', 890, 240);               block(890, 250, 260, 160, (i) => BW(Math.floor(i / 3) % 2));
+g.font = '13px sans-serif';
+L('9 — мелкий текст: Съешь же ещё этих мягких французских булок, да выпей чаю. 0123456789 Il1| O0', 20, 460);
+g.font = '16px serif';
+L('Съешь же ещё этих мягких французских булок, да выпей чаю. 0123456789 Il1| O0', 20, 490);
+L('Как читать: в 1–3 должны быть видны чёткие отдельные полоски/клетки (вблизи — как сетка), без серой каши,', 20, 560);
+L('без волн и без цветной бахромы. Сфотографируй 1, 3 и 5 телефоном ВПЛОТНУЮ (2–5 см, с увеличением).', 20, 585);
+</script></body></html>

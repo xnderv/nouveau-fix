@@ -1,0 +1,15 @@
+Запись сбоя сна 2026-10-21 17:48:02, отпечаток 678028c1, ядро 7.0.0-38-generic, служба pid 8752
+режим карты: /sys/kernel/debug/dri/0/pstate:AC: core 405 MHz memory 324 MHz
+--- служба перед сном: состояние, где ждёт в ядре, стек ядра
+State:	S (sleeping)
+voluntary_ctxt_switches:	442
+nonvoluntary_ctxt_switches:	1
+wchan: hrtimer_nanosleep
+[<0>] hrtimer_nanosleep+0x8b/0x110
+[<0>] common_nsleep_timens+0x41/0xa0
+[<0>] __x64_sys_clock_nanosleep+0xee/0x190
+[<0>] x64_sys_call+0x2375/0x2390
+[<0>] do_syscall_64+0x105/0x5a0
+[<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+отображения карты: 1
+17:48:02 настройки записи включены, переключаю экран на консоль 3 и засыпаю (systemctl suspend)

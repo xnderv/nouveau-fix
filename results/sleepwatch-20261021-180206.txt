@@ -1,0 +1,510 @@
+=== 18:02:11.314
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:12.392
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:13.485
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:14.574
+D:   14075 D    synchronize_rcu_normal           [kworker/5:1+events]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:26.373
+systemd-sleep 14888: State:	S (sleeping) ждёт: do_wait
+  дочерний 14987: (system-sleep)  | State:	S (sleeping) | ждёт: do_wait
+    внук 14988: /bin/sh /usr/lib/systemd/system-sleep/hdparm post suspend  | State:	S (sleeping) | ждёт: 
+    внук 14990:  |  | ждёт: 
+    внук 14991:  |  | ждёт: 
+    внук 14994:  |  | ждёт: 
+D:     335 D    msleep                           [scsi_eh_4]
+D:    1468 Dsl  r8169_apply_firmware             /usr/sbin/NetworkManager --no-daemon
+D:    2797 Dl   rtnl_dumpit                      /usr/libexec/goa-daemon
+D:   10926 D    synchronize_rcu_normal           [kworker/4:2+events]
+D:   14944 D    blk_execute_rq                   [kworker/u32:39+events_freezable_pwr_efficient]
+D:   15154 Ds   flush_work                       grub-editenv /boot/grub/grubenv unset recordfail
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:27.768
+D:     335 D    msleep                           [scsi_eh_4]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:28.884
+D:     335 D    msleep                           [scsi_eh_4]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:29.985
+D:     335 D    msleep                           [scsi_eh_4]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:31.084
+D:     335 D    msleep                           [scsi_eh_4]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:32.190
+D:     335 D    msleep                           [scsi_eh_4]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:33.290
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:34.385
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:35.477
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:36.567
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:37.665
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:38.768
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:39.867
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:40.969
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:42.055
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:43.168
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:44.266
+D:    2458 Dsl  -                                /usr/bin/gnome-shell --mode=ubuntu
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:45.366
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:46.449
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:47.549
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:48.648
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:49.743
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:50.830
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:51.925
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:53.008
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:54.093
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:55.186
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:56.286
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:57.368
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:58.452
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:02:59.545
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:00.632
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:01.720
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:02.826
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:03.950
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:05.055
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:06.147
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:07.247
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:08.350
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:09.442
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:10.542
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:11.636
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:12.737
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:13.831
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:14.924
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:16.019
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:17.111
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:18.205
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:19.299
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:20.400
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:21.493
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:22.597
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:23.715
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:24.808
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:25.900
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:26.984
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:28.072
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:29.162
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:30.256
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:31.348
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:32.438
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:33.522
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:34.614
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:35.714
+D:   16448 D<   dma_fence_default_wait           [kworker/u33:6+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:36.816
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:37.899
+D:   14915 D    base507c_ntfy_wait_begun         [kworker/u32:10+events_unbound]
+D:   16447 D<   dma_fence_default_wait           [kworker/u33:4+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:38.994
+D:   16448 D<   dma_fence_default_wait           [kworker/u33:6+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:40.093
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:41.185
+D:   16447 D<   dma_fence_default_wait           [kworker/u33:4+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:42.274
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:43.362
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:44.457
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:45.554
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:46.643
+D:   16447 D<   dma_fence_default_wait           [kworker/u33:4+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:47.735
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:48.825
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:49.903
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:50.989
+D:   16447 D<   dma_fence_default_wait           [kworker/u33:4+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:52.077
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:53.164
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:54.255
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:55.345
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:56.433
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:57.521
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:58.602
+D:   14916 D    -                                [kworker/u32:11+events_unbound]
+D:   16447 D<   dma_fence_default_wait           [kworker/u33:4+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:03:59.695
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:00.792
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:01.877
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:02.957
+D:   16447 D<   dma_fence_default_wait           [kworker/u33:4+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:04.052
+D:   16447 D<   dma_fence_default_wait           [kworker/u33:4+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:05.145
+D:   16448 D<   dma_fence_default_wait           [kworker/u33:6+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:06.233
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:07.328
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:08.412
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:09.544
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:10.679
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:11.771
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:12.854
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:13.943
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:15.025
+D:   16447 D<   dma_fence_default_wait           [kworker/u33:4+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:16.119
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:17.221
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:18.318
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:19.412
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:20.491
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:21.595
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:22.695
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:23.848
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:24.943
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:26.059
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:27.158
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:28.248
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:29.347
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:30.446
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:31.543
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:32.636
+D:   16447 D<   dma_fence_default_wait           [kworker/u33:4+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:33.728
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:34.818
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:35.913
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:37.013
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:38.109
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:39.209
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:40.301
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:41.428
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:42.515
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:43.601
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:44.696
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:45.788
+D:   14952 D    rcu_barrier.part.0               [kworker/1:1+events]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:46.878
+D:   18901 D<   dma_fence_default_wait           [kworker/u33:11+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:47.965
+D:   14943 D    -                                [kworker/u32:38+events_unbound]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:49.056
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:50.148
+D:   18901 D<   dma_fence_default_wait           [kworker/u33:11+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:51.234
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:52.332
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:53.417
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:54.509
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:55.593
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:56.686
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:57.819
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:04:58.905
+D:   18901 D<   dma_fence_default_wait           [kworker/u33:11+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:00.004
+D:   18901 D<   dma_fence_default_wait           [kworker/u33:11+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:01.097
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:02.195
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:03.285
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:04.369
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:05.465
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:06.555
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:07.653
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:08.744
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:09.831
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:10.921
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:12.010
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:13.100
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:14.188
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:15.295
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:16.386
+D:   16447 D<   dma_fence_default_wait           [kworker/u33:4+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:17.483
+D:   18901 D<   dma_fence_default_wait           [kworker/u33:11+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:18.569
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:19.664
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:20.764
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:21.854
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:22.939
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:24.030
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:25.122
+D:   10176 D<   dma_fence_default_wait           [kworker/u33:5+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:26.209
+D:   14938 D    -                                [kworker/u32:33+events_unbound]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:27.297
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:28.392
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:29.481
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:30.569
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:31.664
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:32.767
+D:   10176 D<   dma_fence_default_wait           [kworker/u33:5+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:33.864
+D:   10176 D<   dma_fence_default_wait           [kworker/u33:5+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:34.951
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:36.049
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:37.142
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:38.232
+D:    3024 D<   dma_fence_default_wait           [kworker/u33:3+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:39.325
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:40.420
+D:   10176 D<   dma_fence_default_wait           [kworker/u33:5+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:41.527
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:42.624
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:43.722
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:44.813
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:45.907
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:47.005
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:48.094
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:49.181
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:50.273
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:51.359
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:52.448
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:53.533
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:54.624
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:55.719
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:56.814
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:57.907
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:05:59.005
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:00.098
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:01.182
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:02.274
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:03.368
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:04.462
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:05.558
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:06.653
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:07.752
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:08.844
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:09.939
+D:    3024 D<   -                                [kworker/u33:3+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:11.033
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:12.133
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:13.229
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:14.316
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:15.401
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:16.501
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:17.596
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:18.685
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:19.774
+D:   14943 D    base507c_ntfy_wait_begun         [kworker/u32:38+events_unbound]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:20.888
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:21.983
+D:   10176 D<   dma_fence_default_wait           [kworker/u33:5+ttm]
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:23.076
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:24.172
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:25.265
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:26.357
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:27.450
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:28.539
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:29.633
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:30.727
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:31.810
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep
+=== 18:06:32.904
+служба: State:	S (sleeping) ждёт: hrtimer_nanosleep

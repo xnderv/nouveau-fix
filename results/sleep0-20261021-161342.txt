@@ -1,0 +1,3 @@
+Сон без наших частот 2026-10-21 16:13:48, отпечаток 05af295e, ядро 7.0.0-38-generic
+до сна: /sys/kernel/debug/dri/0/pstate:AC: core 50 MHz memory 135 MHz
+16:13:49 засыпаю (pm_trace включён)...

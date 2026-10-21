@@ -1,0 +1,16 @@
+[Unit]
+# 21.10: с работающей службой автопереключения компьютер не засыпал (systemctl suspend — зависание),
+# с остановленной — засыпает и просыпается нормально. Поэтому перед сном служба останавливается,
+# а после пробуждения запускается снова (заодно заново настраивает счётчики PMU, которые сон обнуляет).
+Description=GTX 560 Ti: остановить автопереключение режимов на время сна
+Before=sleep.target
+StopWhenUnneeded=yes
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/systemctl stop gpu-autoclock.service
+ExecStop=/usr/bin/systemctl --no-block start gpu-autoclock.service
+
+[Install]
+WantedBy=sleep.target

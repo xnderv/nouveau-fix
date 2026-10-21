@@ -1,3 +1,5 @@
 *.ko
 *.o
 *.log
+*.rom
+results/trace-*/mmiotrace-full*
