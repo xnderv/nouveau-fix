@@ -1,5 +1,5 @@
 #!/bin/bash
-# Установка / удаление службы автоматических режимов карты (+ её остановка на время сна).
+# Установка / удаление службы автоматических режимов карты .
 #   ~/nouveau-fix/daily/autoclock.sh install   — поставить и запустить службу + напоминание о новом ядре (пароль)
 #   ~/nouveau-fix/daily/autoclock.sh remove    — остановить и удалить; карта остаётся в текущем режиме до перезагрузки
 #   ~/nouveau-fix/daily/autoclock.sh status    — состояние и последние переключения
@@ -10,13 +10,16 @@ case "${1:-}" in
 install)
     sudo install -m 0755 "$HERE/gpu-autoclock.py" /usr/local/sbin/gpu-autoclock.py
     sudo install -m 0644 "$HERE/gpu-autoclock.service" /etc/systemd/system/gpu-autoclock.service
-    sudo install -m 0644 "$HERE/gpu-autoclock-sleep.service" /etc/systemd/system/gpu-autoclock-sleep.service
+    # 21.10: «ассистент сна» (остановка службы на время сна) не нужен — служба сну не мешает, а с регулятором
+    # в драйвере решения идут через сон без неё. Если стоял — убираем.
+    sudo systemctl disable gpu-autoclock-sleep.service 2>/dev/null || true
+    sudo rm -f /etc/systemd/system/gpu-autoclock-sleep.service
     sudo install -m 0755 "$HERE/kernel-remind.sh" /etc/kernel/postinst.d/zz-nouveau-fix-remind
     chmod +x "$HERE/notify-newkernel.sh" "$HERE/open-newkernel.sh"
     mkdir -p "$HOME/.local/share/applications"
     sed "s|@HOME@|$HOME|g" "$HERE/nouveau-newkernel.desktop" > "$HOME/.local/share/applications/nouveau-newkernel.desktop"
     sudo systemctl daemon-reload
-    sudo systemctl enable gpu-autoclock.service gpu-autoclock-sleep.service
+    sudo systemctl enable gpu-autoclock.service
     sudo systemctl restart gpu-autoclock.service
     sleep 3; systemctl --no-pager status gpu-autoclock.service | head -n 12 ;;
 remove)
