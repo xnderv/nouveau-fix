@@ -1,0 +1,37 @@
+From: Alex <xnderv@yandex.com>
+Subject: [PATCH LAB] drm/nouveau/disp: optional IT content flag in the HDMI AVI InfoFrame
+
+Lab experiment, one variable: module parameter lab_hdmi_itc (default 0 =
+unchanged). With 1, the AVI InfoFrame carries ITC=1 and content type
+"graphics", exactly as NVIDIA 390 sends on GF114 (mmiotrace 2026-10-20:
+PB3=0x88). Takes effect on the next HDMI enable (modeset or screen off/on).
+
+---
+diff --git a/dispnv50/disp.c b/dispnv50/disp.c
+--- a/dispnv50/disp.c
++++ b/dispnv50/disp.c
+@@ -774,6 +774,12 @@
+ /******************************************************************************
+  * HDMI
+  *****************************************************************************/
++/* LAB: 1 = set the IT content flag (ITC) in the AVI InfoFrame, as the NVIDIA
++ * driver does; applied on the next HDMI enable (modeset / screen off-on). */
++static int nouveau_lab_hdmi_itc;
++module_param_named(lab_hdmi_itc, nouveau_lab_hdmi_itc, int, 0644);
++MODULE_PARM_DESC(lab_hdmi_itc, "LAB: AVI InfoFrame IT content flag (0 off, 1 on)");
++
+ static void
+ nv50_hdmi_enable(struct drm_encoder *encoder, struct nouveau_crtc *nv_crtc,
+ 		 struct nouveau_connector *nv_connector, struct drm_atomic_state *state,
+@@ -829,6 +835,11 @@
+ 	if (!drm_hdmi_avi_infoframe_from_display_mode(&infoframe.avi, &nv_connector->base, mode)) {
+ 		drm_hdmi_avi_infoframe_quant_range(&infoframe.avi, &nv_connector->base, mode,
+ 						   HDMI_QUANTIZATION_RANGE_FULL);
++		if (nouveau_lab_hdmi_itc) {
++			/* as NVIDIA 390 on GF114: IT content, content type "graphics" */
++			infoframe.avi.itc = true;
++			infoframe.avi.content_type = HDMI_CONTENT_TYPE_GRAPHICS;
++		}
+ 
+ 		size = hdmi_infoframe_pack(&infoframe, args->data, data_len);
+ 	} else {
