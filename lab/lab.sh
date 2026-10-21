@@ -46,7 +46,7 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 KIT="$(dirname "$HERE")"
-KVER="$(uname -r)"
+KVER="${KVER:-$(uname -r)}"   # KVER=версия перед командой — собрать под другое (новое) ядро
 KBUILD="/lib/modules/$KVER/build"
 SLOT="/lib/modules/$KVER/updates/nouveau-fix/nouveau.ko"
 BACKUP="$HOME/nouveau-build/stable-$KVER-nouveau.ko"
@@ -92,12 +92,19 @@ install)
     git -C "$WORK/src" checkout -q
     cp -r "$WORK/src/drivers/gpu/drm/nouveau" "$WORK/nouveau"; rm -rf "$WORK/src"
     cd "$WORK/nouveau"
-    git apply -p1 "$KIT/patches/0001-nouveau-abi16-idle-channel-before-engobj-del.patch"
-    git apply -p1 "$HERE/0002-LAB-fermi-reclock-instrumented.patch"
+    for P in "$KIT/patches/0001-nouveau-abi16-idle-channel-before-engobj-del.patch" "$HERE/0002-LAB-fermi-reclock-instrumented.patch"; do
+        if git apply --check -p1 "$P" 2>/dev/null; then git apply -p1 "$P"
+        else
+            echo "--- СТОП: $(basename "$P") не накладывается на nouveau из Linux $UPV (ядро $KVER)."
+            git apply -R --check -p1 "$P" 2>/dev/null && echo "    Похоже, это исправление УЖЕ ЕСТЬ в этой версии Linux."
+            echo "    Ничего не установлено. Покажи этот вывод ассистенту — патч нужно обновить."; exit 2
+        fi
+    done
     echo "=== Исправление гонки + лабораторный патч наложены. Собираю (несколько минут)..."
     if ! make -C "$KBUILD" M="$WORK/nouveau" -j"$(nproc)" modules > "$WORK/build.log" 2>&1; then
         echo "Сборка НЕ удалась, ничего не установлено. Лог: $WORK/build.log"; tail -n 20 "$WORK/build.log"; exit 3
     fi
+    grep -q "vermagic: *$KVER " <(modinfo "$WORK/nouveau/nouveau.ko") || { echo "Собранный модуль не совпадает с ядром $KVER. Ничего не установлено."; exit 3; }
     if [ ! -e "$BACKUP" ]; then
         [ -e "$SLOT" ] || { echo "Нет стабильного драйвера в $SLOT. Сначала запусти ~/nouveau-fix/rebuild.sh"; exit 1; }
         cp "$SLOT" "$BACKUP"

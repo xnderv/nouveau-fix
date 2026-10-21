@@ -31,10 +31,36 @@ PARAMS = {  # всё, что нашли 20.10: PLL как у NVIDIA, памят�
 def log(msg):
     print(msg, flush=True)
 
+def notify(mode, tries=60):
+    """Уведомление с кнопкой «Подготовить драйвер» всем вошедшим пользователям; ждёт сеанс до tries×10 с."""
+    import subprocess, pwd
+    for _ in range(tries):
+        sent = False
+        for b in glob.glob('/run/user/*/bus'):
+            st = os.stat(b)
+            if st.st_uid < 1000:
+                continue
+            pw = pwd.getpwuid(st.st_uid)
+            n = os.path.join(pw.pw_dir, 'nouveau-fix/daily/notify-newkernel.sh')
+            if not os.access(n, os.X_OK):
+                continue
+            r = subprocess.run(['sudo', '-u', pw.pw_name, 'env', f'DBUS_SESSION_BUS_ADDRESS=unix:path={b}',
+                                f'XDG_RUNTIME_DIR=/run/user/{st.st_uid}', 'setsid', '-f', n, mode, os.uname().release],
+                               stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            sent = sent or r.returncode == 0
+        if sent:
+            return True
+        time.sleep(10)
+    return False
+
 def main():
     prm = '/sys/module/nouveau/parameters'
     if not os.path.exists(prm + '/lab_mem_replay'):
-        log('Нет лабораторного драйвера с lab_mem_replay — выхожу, ничего не трогаю'); return 1
+        m = (f'Загружен не наш драйвер nouveau (ядро {os.uname().release}): частоты не управляются, карта на стартовых. '
+             'Если это новое ядро: ~/nouveau-fix/newkernel.sh и перезагрузка.')
+        log('Нет лабораторного драйвера с lab_mem_replay — ничего не трогаю. ' + m)
+        notify('notloaded')
+        return 1
     for k, v in PARAMS.items():
         if not os.path.exists(f'{prm}/{k}'):
             log(f'нет параметра {k} в драйвере — пропускаю'); continue
