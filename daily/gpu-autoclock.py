@@ -25,6 +25,7 @@ PARAMS = {  # всё, что нашли 20.10: PLL как у NVIDIA, памят�
     'lab_gpc_khz': '0', 'lab_rop_khz': '0', 'lab_hub07_khz': '0', 'lab_hub06_khz': '0', 'lab_hub01_khz': '0',
     'lab_gpc_fix': '0', 'lab_gpc_coef': '0', 'lab_gpc_ref_khz': '0', 'lab_gpc_seq': '13',
     'lab_mem_replay': '15', 'lab_mem_order': '1', 'lab_mem': '1',
+    'lab_mem_op13': '1',   # 21.10: операция 0x13 скрипта E — 1 мкс, а не 1 мс (иначе недобор дисплея на 07 -> 03, опыт flicker)
 }
 
 def log(msg):
@@ -35,6 +36,8 @@ def main():
     if not os.path.exists(prm + '/lab_mem_replay'):
         log('Нет лабораторного драйвера с lab_mem_replay — выхожу, ничего не трогаю'); return 1
     for k, v in PARAMS.items():
+        if not os.path.exists(f'{prm}/{k}'):
+            log(f'нет параметра {k} в драйвере — пропускаю'); continue
         with open(f'{prm}/{k}', 'w') as f:
             f.write(v)
     ps = sorted(glob.glob('/sys/kernel/debug/dri/*/pstate'))
