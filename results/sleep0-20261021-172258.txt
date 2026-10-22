@@ -20,4 +20,4 @@ ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT2._GTF due to previous error (AE_N
 ACPI Error: Aborting method \_SB.PCI0.SAT0.SPT2._GTF due to previous error (AE_NOT_FOUND) (20251212/psparse-529)
 === Сон без наших частот: компьютер проснулся ✅
 Служба автопереключения выключена. Включить снова: sudo systemctl enable --now gpu-autoclock.service
-Лог: ~/nouveau-fix/results/sleep0-20261021-172258.txt
+Лог: /home/user/nouveau-fix/results/sleep0-20261021-172258.txt

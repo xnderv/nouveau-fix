@@ -27,4 +27,4 @@ LAB gov: температура 45 °C — тормоз ОЧЕНЬ ГОРЯЧО:
 LAB gov: -> 03 (температура: очень горячо, загрузка 988‰), ret 0, режим теперь 03
 LAB gov: -> 0f (загрузка >= 50 % два замера, загрузка 995‰), ret 0, режим теперь 0f
 1) core 405 MHz memory 324 MHz | 2) core 50 MHz memory 135 MHz | 3) core 900 MHz memory 2004 MHz
-=== Тормоз работает ✅ (пороги возвращены: hot=90 crit=95). Лог: ~/nouveau-fix/results/therm-20261022-134225.txt
+=== Тормоз работает ✅ (пороги возвращены: hot=90 crit=95). Лог: /home/user/nouveau-fix/results/therm-20261022-134225.txt

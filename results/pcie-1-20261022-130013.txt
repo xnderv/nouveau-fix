@@ -7,4 +7,4 @@
   13:00:55 цикл 3 -> 07: AC: core 405 MHz memory 324 MHz | линия: Speed 2.5GT/s | драйвер: pcie done
   13:01:03 цикл 4 -> 0f: AC: core 900 MHz memory 2004 MHz | линия: Speed 5GT/s | драйвер: pcie done
   13:01:11 цикл 4 -> 07: AC: core 405 MHz memory 324 MHz | линия: Speed 2.5GT/s | драйвер: pcie done
-ошибок драйвера за опыт: 0; регулятор снова lab_gov=2; lab_pcie оставлен = 1. Лог: ~/nouveau-fix/results/pcie-1-20261022-130013.txt
+ошибок драйвера за опыт: 0; регулятор снова lab_gov=2; lab_pcie оставлен = 1. Лог: /home/user/nouveau-fix/results/pcie-1-20261022-130013.txt

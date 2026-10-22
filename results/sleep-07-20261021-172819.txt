@@ -49,5 +49,5 @@ PM: suspend exit
 17:29:03 -> 03: core 50 MHz memory 135 MHz ✓
 === Сон из 07: круг после сна прошёл ✅ (посмотри, были ли на экране артефакты)
 служба автопереключения снова запущена
-Лог: ~/nouveau-fix/results/sleep-07-20261021-172819.txt
-Регистры: ~/nouveau-fix/results/sleep-07-20261021-172819-regs.txt
+Лог: /home/user/nouveau-fix/results/sleep-07-20261021-172819.txt
+Регистры: /home/user/nouveau-fix/results/sleep-07-20261021-172819-regs.txt

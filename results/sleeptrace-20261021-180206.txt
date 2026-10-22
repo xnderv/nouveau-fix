@@ -9,6 +9,6 @@ lrwxrwxrwx 1 root root  75 Oct 19 10:36 kfl_hook.sh -> /var/opt/<антивир�
 -rwxr-xr-x 1 root root 231 Jan 12  2026 sysstat.sleep
 -rwxr-xr-x 1 root root 219 Mar 27  2026 unattended-upgrades
 --- служба перед сном: State:	S (sleeping), ждёт: hrtimer_nanosleep
-наблюдатель пишет в ~/nouveau-fix/results/sleepwatch-20261021-180206.txt
+наблюдатель пишет в /home/user/nouveau-fix/results/sleepwatch-20261021-180206.txt
 18:02:13 засыпаю: systemctl suspend
 18:06:33 вернулся

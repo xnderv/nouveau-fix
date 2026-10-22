@@ -51,4 +51,4 @@ PCIe → память → вентилятор → напряжение ↑ → 
 3. Подготовить письмо разработчикам nouveau: исправление гонки (0001) + данные по reclock и fence UAF.
 
 
-Заметка: `results/` создаётся от root (скрипт try) — обычные команды не могут туда писать (`sudo chown -R alex: ~/nouveau-fix/results`).
+Заметка: `results/` создаётся от root (скрипт try) — обычные команды не могут туда писать (`sudo chown -R $USER: ~/nouveau-fix/results`).
