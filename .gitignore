@@ -3,3 +3,6 @@
 *.log
 *.rom
 results/trace-*/mmiotrace-full*
+fonttest/
+photo_bios/
+nouveau-archive/
