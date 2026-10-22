@@ -21,10 +21,14 @@ switched on separately:
   gpu-autoclock service (0f at >=50 %, 03->07 at >=15 %, 0f->07 after 15 s <15 %,
   07->03 after 30 s <5 %, 5 s minimum dwell). 0 = off (default), 1 = shadow: only logs
   where it would switch, 2 = switches itself via nvkm_clk_ustate().
+- gf100.c, 22.10: temperature brake for the governor (nouveau itself never lowers clocks on
+  heat; NVIDIA does). lab_gov_hot: at or above this temperature the governor stays out of 0f
+  (and leaves it for 07); lab_gov_crit: drops to 03 and stays; released lab_gov_hyst degrees
+  below the threshold. Both 0 by default (= off). lab_gov_temp shows the last reading.
 
 diff -ruN a/nvkm/subdev/pmu/fuc/gf100.fuc3.h b/nvkm/subdev/pmu/fuc/gf100.fuc3.h
---- a/nvkm/subdev/pmu/fuc/gf100.fuc3.h
-+++ b/nvkm/subdev/pmu/fuc/gf100.fuc3.h
+--- a/nvkm/subdev/pmu/fuc/gf100.fuc3.h	2026-10-22 13:29:18.537972372 +0300
++++ b/nvkm/subdev/pmu/fuc/gf100.fuc3.h	2026-10-22 13:28:49.070012540 +0300
 @@ -69,8 +69,8 @@
  	0x00000000,
  	0x00000000,
@@ -921,8 +925,8 @@ diff -ruN a/nvkm/subdev/pmu/fuc/gf100.fuc3.h b/nvkm/subdev/pmu/fuc/gf100.fuc3.h
  	0x00000000,
  	0x00000000,
 diff -ruN a/nvkm/subdev/pmu/fuc/perf.fuc b/nvkm/subdev/pmu/fuc/perf.fuc
---- a/nvkm/subdev/pmu/fuc/perf.fuc
-+++ b/nvkm/subdev/pmu/fuc/perf.fuc
+--- a/nvkm/subdev/pmu/fuc/perf.fuc	2026-10-22 13:29:18.538247309 +0300
++++ b/nvkm/subdev/pmu/fuc/perf.fuc	2026-10-22 13:28:49.070332420 +0300
 @@ -22,6 +22,19 @@
   * Authors: Ben Skeggs
   */
@@ -1126,13 +1130,14 @@ diff -ruN a/nvkm/subdev/pmu/fuc/perf.fuc b/nvkm/subdev/pmu/fuc/perf.fuc
  // $r0  - zero
  perf_init:
 diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
---- a/nvkm/subdev/pmu/gf100.c
-+++ b/nvkm/subdev/pmu/gf100.c
-@@ -25,6 +25,197 @@
+--- a/nvkm/subdev/pmu/gf100.c	2026-10-22 13:29:18.538274487 +0300
++++ b/nvkm/subdev/pmu/gf100.c	2026-10-22 13:29:02.567432488 +0300
+@@ -25,6 +25,250 @@
  #include "fuc/gf100.fuc3.h"
  
  #include <subdev/mc.h>
 +#include <subdev/clk.h>
++#include <subdev/therm.h>
 +
 +#include <linux/moduleparam.h>
 +#include <linux/workqueue.h>
@@ -1174,13 +1179,59 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 +static int lab_gov;
 +module_param(lab_gov, int, 0644);
 +MODULE_PARM_DESC(lab_gov, "LAB: in-driver pstate governor on PMU PERF load (0 off, 1 shadow/log only, 2 act)");
++/* LAB 22.10: температурный тормоз (у nouveau его нет: до 135 °C он только крутит вентилятор; у NVIDIA
++ * частоты при перегреве снижаются). lab_gov_hot: при температуре >= hot не подниматься в 0f, а из 0f уйти
++ * в 07; lab_gov_crit: >= crit — уйти в 03 и сидеть; отпускает, когда остынет на lab_gov_hyst градусов
++ * ниже порога. 0 — тормоз выключен. Термодатчик тот же, что у вентилятора (nvkm_therm_temp_get). */
++static int lab_gov_hot;
++module_param(lab_gov_hot, int, 0644);
++MODULE_PARM_DESC(lab_gov_hot, "LAB: temperature (C) above which the governor stays out of 0f (0 = off)");
++static int lab_gov_crit;
++module_param(lab_gov_crit, int, 0644);
++MODULE_PARM_DESC(lab_gov_crit, "LAB: temperature (C) above which the governor drops to 03 (0 = off)");
++static int lab_gov_hyst = 5;
++module_param(lab_gov_hyst, int, 0644);
++MODULE_PARM_DESC(lab_gov_hyst, "LAB: hysteresis (C) for the temperature brake");
++static int lab_gov_temp;
++module_param(lab_gov_temp, int, 0444);
++MODULE_PARM_DESC(lab_gov_temp, "LAB: last temperature seen by the governor (C)");
 +
 +static struct {
 +	int mode;		/* с каким lab_gov работали в прошлый раз */
 +	int cur;		/* режим (id pstate) по мнению регулятора */
 +	int hi, mid, low;	/* замеров подряд выше/ниже порогов */
 +	unsigned long last;	/* jiffies последнего переключения */
++	int brake;		/* температурный тормоз: 0 нет, 1 «горячо» (не выше 07), 2 «очень горячо» (03) */
 +} lab_gov_st;
++
++/* ступень тормоза по температуре с гистерезисом; -1 — датчика нет */
++static int
++lab_gov_brake(struct nvkm_pmu *pmu)
++{
++	struct nvkm_therm *therm = pmu->subdev.device->therm;
++	int hot = READ_ONCE(lab_gov_hot), crit = READ_ONCE(lab_gov_crit), hyst = READ_ONCE(lab_gov_hyst);
++	int temp, b = lab_gov_st.brake;
++
++	if (!therm || (hot <= 0 && crit <= 0))
++		return 0;
++	temp = nvkm_therm_temp_get(therm);
++	if (temp < 0)
++		return -1;
++	WRITE_ONCE(lab_gov_temp, temp);
++	if (crit > 0 && temp >= crit)
++		b = 2;
++	else if (hot > 0 && temp >= hot && b < 1)
++		b = 1;
++	if (b == 2 && (crit <= 0 || temp < crit - hyst))
++		b = 1;
++	if (b == 1 && (hot <= 0 || temp < hot - hyst))
++		b = 0;
++	if (b != lab_gov_st.brake)
++		nvkm_info(&pmu->subdev, "LAB gov: температура %d °C — тормоз %s\n", temp,
++			  b == 2 ? "ОЧЕНЬ ГОРЯЧО: только 03" : b == 1 ? "горячо: не выше 07" : "снят");
++	lab_gov_st.brake = b;
++	return b;
++}
 +
 +static int
 +lab_gov_cur_pstate(struct nvkm_clk *clk)
@@ -1201,7 +1252,7 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 +	struct nvkm_clk *clk = pmu->subdev.device->clk;
 +	int mode = READ_ONCE(lab_gov);
 +	u32 load = max(gr, vid);
-+	int per_s = 1000 / max(ms, 1), nxt = -1, ret;
++	int per_s = 1000 / max(ms, 1), nxt = -1, ret, brake;
 +	const char *why = "";
 +
 +	if (!clk || (mode != 1 && mode != 2)) {
@@ -1212,6 +1263,7 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 +		lab_gov_st.mode = mode;
 +		lab_gov_st.cur = lab_gov_cur_pstate(clk);
 +		lab_gov_st.hi = lab_gov_st.mid = lab_gov_st.low = 0;
++		lab_gov_st.brake = 0;
 +		lab_gov_st.last = jiffies;
 +		nvkm_info(&pmu->subdev, "LAB gov: включён (%s), режим сейчас %02x\n",
 +			  mode == 1 ? "тень — только журнал" : "переключает сам", lab_gov_st.cur);
@@ -1228,9 +1280,14 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 +	if (time_before(jiffies, lab_gov_st.last + msecs_to_jiffies(5000)))
 +		return;
 +
-+	if (lab_gov_st.cur != 0x0f && lab_gov_st.hi >= 2)
++	brake = lab_gov_brake(pmu);
++	if (brake == 2 && lab_gov_st.cur != 0x03)
++		nxt = 0x03, why = "температура: очень горячо";
++	else if (brake == 1 && lab_gov_st.cur == 0x0f)
++		nxt = 0x07, why = "температура: горячо";
++	else if (brake <= 0 && lab_gov_st.cur != 0x0f && lab_gov_st.hi >= 2)
 +		nxt = 0x0f, why = "загрузка >= 50 % два замера";
-+	else if (lab_gov_st.cur == 0x03 && lab_gov_st.mid >= 2)
++	else if (brake <= 1 && lab_gov_st.cur == 0x03 && lab_gov_st.mid >= 2)
 +		nxt = 0x07, why = "загрузка >= 15 % два замера";
 +	else if (lab_gov_st.cur == 0x0f && lab_gov_st.low >= 15 * per_s)
 +		nxt = 0x07, why = "загрузка < 15 % 15 с";
@@ -1326,7 +1383,7 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
  
  void
  gf100_pmu_reset(struct nvkm_pmu *pmu)
-@@ -49,8 +240,8 @@
+@@ -49,8 +293,8 @@
  	.data.size = sizeof(gf100_pmu_data),
  	.enabled = gf100_pmu_enabled,
  	.reset = gf100_pmu_reset,
