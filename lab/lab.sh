@@ -112,9 +112,13 @@ install)
     fi
     read -r -p "Поставить ЛАБОРАТОРНЫЙ драйвер вместо стабильного? Пароль. [y/N] " ans
     case "$ans" in y|Y|д|Д) ;; *) echo "Не ставлю."; exit 0 ;; esac
+    # 22.10: если для этого ядра стоит СТАБИЛЬНЫЙ драйвер через DKMS — снять его, чтобы в updates/ был один nouveau.ko
+    if command -v dkms >/dev/null && dkms status nouveau-gf114/1.0 -k "$KVER" 2>/dev/null | grep -q installed; then
+        sudo dkms uninstall nouveau-gf114/1.0 -k "$KVER" && echo "=== Стабильный драйвер (DKMS) для $KVER отключён; вернуть: ~/nouveau-fix/stable/stable.sh install"
+    fi
     sudo install -m 644 "$WORK/nouveau/nouveau.ko" "$SLOT"
     sudo depmod -a "$KVER"; sudo update-initramfs -u -k "$KVER"
-    echo "=== Готово. Перезагрузись. Вернуть стабильный: ~/nouveau-fix/lab/lab.sh restore"
+    echo "=== Готово. Перезагрузись. Вернуть стабильный: ~/nouveau-fix/stable/stable.sh install (или lab.sh restore — только исправление гонки)"
     ;;
 pstate)
     P="${2:-}"; [[ "$P" =~ ^(03|07|0f)$ ]] || { echo "Укажи режим: 03, 07 или 0f"; exit 1; }
@@ -723,6 +727,9 @@ pllcmp)
     ;;
 restore)
     [ -e "$BACKUP" ] || { echo "Нет резервной копии $BACKUP. Стабильный драйвер можно пересобрать: ~/nouveau-fix/rebuild.sh"; exit 1; }
+    if command -v dkms >/dev/null && dkms status nouveau-gf114/1.0 -k "$KVER" 2>/dev/null | grep -q installed; then
+        sudo dkms uninstall nouveau-gf114/1.0 -k "$KVER"
+    fi
     sudo install -m 644 "$BACKUP" "$SLOT"
     sudo depmod -a "$KVER"; sudo update-initramfs -u -k "$KVER"
     echo "=== Стабильный драйвер возвращён. Перезагрузись и проверь: ~/nouveau-fix/check.sh"

@@ -1,0 +1,10 @@
+Опыт PCIe lab_pcie=1, 4 циклов, 2026-10-22 13:00:13; линия сейчас: Speed 2.5GT/s
+  13:00:17 цикл 1 -> 0f: AC: core 900 MHz memory 2004 MHz | линия: Speed 5GT/s | драйвер: pcie done
+  13:00:25 цикл 1 -> 07: AC: core 405 MHz memory 324 MHz | линия: Speed 2.5GT/s | драйвер: pcie done
+  13:00:32 цикл 2 -> 0f: AC: core 900 MHz memory 2004 MHz | линия: Speed 5GT/s | драйвер: pcie done
+  13:00:40 цикл 2 -> 07: AC: core 405 MHz memory 324 MHz | линия: Speed 2.5GT/s | драйвер: pcie done
+  13:00:48 цикл 3 -> 0f: AC: core 900 MHz memory 2004 MHz | линия: Speed 5GT/s | драйвер: pcie done
+  13:00:55 цикл 3 -> 07: AC: core 405 MHz memory 324 MHz | линия: Speed 2.5GT/s | драйвер: pcie done
+  13:01:03 цикл 4 -> 0f: AC: core 900 MHz memory 2004 MHz | линия: Speed 5GT/s | драйвер: pcie done
+  13:01:11 цикл 4 -> 07: AC: core 405 MHz memory 324 MHz | линия: Speed 2.5GT/s | драйвер: pcie done
+ошибок драйвера за опыт: 0; регулятор снова lab_gov=2; lab_pcie оставлен = 1. Лог: ~/nouveau-fix/results/pcie-1-20261022-130013.txt

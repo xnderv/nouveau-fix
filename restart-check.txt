@@ -1,0 +1,6 @@
+== before launch: 0 processes
+== after launch
+    PID                  STARTED COMMAND
+   9356 Wed Oct 21 20:08:03 2026 /opt/yandex/browser/yandex_browser
+   9376 Wed Oct 21 20:08:03 2026 /opt/yandex/browser/yandex_browser --type=zygote --no-zygote-sandbox --user-id=0a0a580c-a172-4399-89de-080400a2b892 --brand-id=yandex --crashpad-handler-pid=9367 --enable-crash-reporter=,stable --change-stack-guard-on-fork=enable
+== now: Wed Oct 21 08:08:09 PM MSK 2026

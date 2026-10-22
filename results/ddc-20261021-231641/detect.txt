@@ -1,0 +1,12 @@
+Display 1
+   I2C bus:  /dev/i2c-4
+   DRM_connector:           card0-HDMI-A-1
+   EDID synopsis:
+      Mfg id:               MSI - Microstep
+      Model:                MPG271QX OLED
+      Product code:         15575  (0x3cd7)
+      Serial number:        
+      Binary serial number: 16843009 (0x01010101)
+      Manufacture year:     2024,  Week: 3
+   VCP version:         2.1
+

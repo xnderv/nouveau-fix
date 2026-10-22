@@ -1,0 +1,575 @@
+== cmdline
+BOOT_IMAGE=/boot/vmlinuz-7.0.0-38-generic root=UUID=8a895fc3-d38d-42c3-a875-351b55115818 ro quiet splash nouveau.hdmimhz=297 memmap=16M$0x41e000000 ramoops.mem_address=0x41e000000 ramoops.mem_size=0x1000000 ramoops.record_size=0x200000 ramoops.pmsg_size=0x400000 ramoops.console_size=0x200000 nmi_watchdog=panic,1 softlockup_panic=1 panic=10 crash_kexec_post_notifiers crashkernel=2G-4G:320M,4G-32G:512M,32G-64G:1024M,64G-128G:2048M,128G-:4096M
+== gpu
+01:00.0 VGA compatible controller [0300]: NVIDIA Corporation GF114 [GeForce GTX 560 Ti] [10de:1200] (rev a1)
+	Subsystem: Gigabyte Technology Co., Ltd Device [1458:3515]
+	Kernel driver in use: nouveau
+	Kernel modules: nvidiafb, nouveau
+== state
+plane[52]: base-0
+	crtc=head-0
+	fb=75
+		allocated by = gnome-shell
+		refcount=2
+		format=AB30 little-endian (0x30334241)
+		modifier=0x3000000004fe014
+		size=2560x1440
+		layers:
+			size[0]=2560x1440
+			pitch[0]=10240
+			offset[0]=0
+			obj[0]:
+				name=0
+				refcount=3
+				start=0010e041
+				size=15728640
+				imported=no
+	crtc-pos=2560x1440+0+0
+	src-pos=2560.000000x1440.000000+0.000000+0.000000
+	rotation=1
+	normalized-zpos=0
+	color-encoding=ITU-R BT.601 YCbCr
+	color-range=YCbCr limited range
+	color_mgmt_changed=0
+	color-pipeline=0
+plane[55]: ovly-0
+	crtc=(null)
+	fb=0
+	crtc-pos=0x0+0+0
+	src-pos=0.000000x0.000000+0.000000+0.000000
+	rotation=1
+	normalized-zpos=1
+	color-encoding=ITU-R BT.601 YCbCr
+	color-range=YCbCr limited range
+	color_mgmt_changed=0
+	color-pipeline=0
+plane[58]: curs-0
+	crtc=head-0
+	fb=80
+		allocated by = KMS thread
+		refcount=1
+		format=AR24 little-endian (0x34325241)
+		modifier=0x0
+		size=64x64
+		layers:
+			size[0]=64x64
+			pitch[0]=256
+			offset[0]=0
+			obj[0]:
+				name=0
+				refcount=4
+				start=00116470
+				size=16384
+				imported=no
+	crtc-pos=64x64+900+1274
+	src-pos=64.000000x64.000000+0.000000+0.000000
+	rotation=1
+	normalized-zpos=1
+	color-encoding=ITU-R BT.601 YCbCr
+	color-range=YCbCr limited range
+	color_mgmt_changed=0
+	color-pipeline=0
+plane[62]: base-1
+	crtc=(null)
+	fb=0
+	crtc-pos=0x0+0+0
+	src-pos=0.000000x0.000000+0.000000+0.000000
+	rotation=1
+	normalized-zpos=0
+	color-encoding=ITU-R BT.601 YCbCr
+	color-range=YCbCr limited range
+	color_mgmt_changed=0
+	color-pipeline=0
+plane[65]: ovly-1
+	crtc=(null)
+	fb=0
+	crtc-pos=0x0+0+0
+	src-pos=0.000000x0.000000+0.000000+0.000000
+	rotation=1
+	normalized-zpos=1
+	color-encoding=ITU-R BT.601 YCbCr
+	color-range=YCbCr limited range
+	color_mgmt_changed=0
+	color-pipeline=0
+plane[68]: curs-1
+	crtc=(null)
+	fb=0
+	crtc-pos=0x0+0+0
+	src-pos=0.000000x0.000000+0.000000+0.000000
+	rotation=1
+	normalized-zpos=ff
+	color-encoding=ITU-R BT.601 YCbCr
+	color-range=YCbCr limited range
+	color_mgmt_changed=0
+	color-pipeline=0
+crtc[61]: head-0
+	enable=1
+	active=1
+	self_refresh_active=0
+	planes_changed=1
+	mode_changed=0
+	active_changed=0
+	connectors_changed=0
+	color_mgmt_changed=0
+	plane_mask=5
+	connector_mask=4
+	encoder_mask=10
+	mode: "2560x1440": 60 241500 2560 2608 2640 2720 1440 1443 1448 1481 0x48 0x9
+crtc[71]: head-1
+	enable=0
+	active=0
+	self_refresh_active=0
+	planes_changed=0
+	mode_changed=0
+	active_changed=0
+	connectors_changed=0
+	color_mgmt_changed=0
+	plane_mask=0
+	connector_mask=0
+	encoder_mask=0
+	mode: "": 0 0 0 0 0 0 0 0 0 0 0x0 0x0
+connector[44]: DVI-I-1
+	crtc=(null)
+	self_refresh_aware=0
+	interlace_allowed=0
+	ycbcr_420_allowed=0
+	max_requested_bpc=0
+	colorspace=Default
+connector[47]: DVI-I-2
+	crtc=(null)
+	self_refresh_aware=0
+	interlace_allowed=0
+	ycbcr_420_allowed=0
+	max_requested_bpc=0
+	colorspace=Default
+connector[50]: HDMI-A-1
+	crtc=head-0
+	self_refresh_aware=0
+	interlace_allowed=1
+	ycbcr_420_allowed=0
+	max_requested_bpc=0
+	colorspace=Default
+	broadcast_rgb=Automatic
+	is_limited_range=n
+	output_bpc=0
+	output_format=RGB
+	tmds_char_rate=0
+plane[52]: base-0
+	crtc=head-0
+== modetest
+opened device `nVidia Riva/TNT/GeForce/Quadro/Tesla/Tegra K1+` on driver `nouveau` (version 1.4.2 at 0)
+Connectors:
+id	encoder	status		name		size (mm)	modes	encoders
+44	0	disconnected	DVI-I-1        	0x0		0	45, 46
+  props:
+	1 EDID:
+		flags: immutable blob
+		blobs:
+
+		value:
+	2 DPMS:
+		flags: enum
+		enums: On=0 Standby=1 Suspend=2 Off=3
+		value: 0
+	5 link-status:
+		flags: enum
+		enums: Good=0 Bad=1
+		value: 0
+	7 non-desktop:
+		flags: immutable range
+		values: 0 1
+		value: 0
+	4 TILE:
+		flags: immutable blob
+		blobs:
+
+		value:
+	36 subconnector:
+		flags: immutable enum
+		enums: Unknown=0 DVI-D=3 DVI-A=4
+		value: 0
+	39 underscan:
+		flags: enum
+		enums: auto=2 off=0 on=1
+		value: 0
+	40 underscan hborder:
+		flags: range
+		values: 0 128
+		value: 0
+	41 underscan vborder:
+		flags: range
+		values: 0 128
+		value: 0
+	42 vibrant hue:
+		flags: range
+		values: 0 180
+		value: 90
+	43 color vibrance:
+		flags: range
+		values: 0 200
+		value: 150
+	34 scaling mode:
+		flags: enum
+		enums: None=0 Full=1 Center=2 Full aspect=3
+		value: 0
+	37 dithering mode:
+		flags: enum
+		enums: auto=34 off=0 static 2x2=25 dynamic 2x2=17
+		value: 34
+	38 dithering depth:
+		flags: enum
+		enums: auto=3 6 bpc=0 8 bpc=2
+		value: 3
+47	0	disconnected	DVI-I-2        	0x0		0	48, 49
+  props:
+	1 EDID:
+		flags: immutable blob
+		blobs:
+
+		value:
+	2 DPMS:
+		flags: enum
+		enums: On=0 Standby=1 Suspend=2 Off=3
+		value: 0
+	5 link-status:
+		flags: enum
+		enums: Good=0 Bad=1
+		value: 0
+	7 non-desktop:
+		flags: immutable range
+		values: 0 1
+		value: 0
+	4 TILE:
+		flags: immutable blob
+		blobs:
+
+		value:
+	36 subconnector:
+		flags: immutable enum
+		enums: Unknown=0 DVI-D=3 DVI-A=4
+		value: 0
+	39 underscan:
+		flags: enum
+		enums: auto=2 off=0 on=1
+		value: 0
+	40 underscan hborder:
+		flags: range
+		values: 0 128
+		value: 0
+	41 underscan vborder:
+		flags: range
+		values: 0 128
+		value: 0
+	42 vibrant hue:
+		flags: range
+		values: 0 180
+		value: 90
+	43 color vibrance:
+		flags: range
+		values: 0 200
+		value: 150
+	34 scaling mode:
+		flags: enum
+		enums: None=0 Full=1 Center=2 Full aspect=3
+		value: 0
+	37 dithering mode:
+		flags: enum
+		enums: auto=34 off=0 static 2x2=25 dynamic 2x2=17
+		value: 34
+	38 dithering depth:
+		flags: enum
+		enums: auto=3 6 bpc=0 8 bpc=2
+		value: 3
+50	51	connected	HDMI-A-1       	610x340		29	51
+  modes:
+	index name refresh (Hz) hdisp hss hse htot vdisp vss vse vtot
+  #0 2560x1440 59.95 2560 2608 2640 2720 1440 1443 1448 1481 241500 flags: phsync, nvsync; type: preferred, driver
+  #1 1920x1080 120.00 1920 2008 2052 2200 1080 1084 1089 1125 297000 flags: phsync, pvsync; type: driver
+  #2 1920x1080 119.88 1920 2008 2052 2200 1080 1084 1089 1125 296703 flags: phsync, pvsync; type: driver
+  #3 1920x1080 60.00 1920 2008 2052 2200 1080 1084 1089 1125 148500 flags: phsync, pvsync; type: driver
+  #4 1920x1080 59.94 1920 2008 2052 2200 1080 1084 1089 1125 148352 flags: phsync, pvsync; type: driver
+  #5 1680x1050 59.88 1680 1728 1760 1840 1050 1053 1059 1080 119000 flags: phsync, nvsync; type: driver
+  #6 1280x1024 75.02 1280 1296 1440 1688 1024 1025 1028 1066 135000 flags: phsync, pvsync; type: driver
+  #7 1280x1024 60.02 1280 1328 1440 1688 1024 1025 1028 1066 108000 flags: phsync, pvsync; type: driver
+  #8 1440x900 59.90 1440 1488 1520 1600 900 903 909 926 88750 flags: phsync, nvsync; type: driver
+  #9 1280x720 120.00 1280 1390 1430 1650 720 725 730 750 148500 flags: phsync, pvsync; type: driver
+  #10 1280x720 119.88 1280 1390 1430 1650 720 725 730 750 148352 flags: phsync, pvsync; type: driver
+  #11 1280x720 60.00 1280 1390 1430 1650 720 725 730 750 74250 flags: phsync, pvsync; type: driver
+  #12 1280x720 59.94 1280 1390 1430 1650 720 725 730 750 74176 flags: phsync, pvsync; type: driver
+  #13 1280x720 50.00 1280 1720 1760 1980 720 725 730 750 74250 flags: phsync, pvsync; type: driver
+  #14 1024x768 75.03 1024 1040 1136 1312 768 769 772 800 78750 flags: phsync, pvsync; type: driver
+  #15 1024x768 70.07 1024 1048 1184 1328 768 771 777 806 75000 flags: nhsync, nvsync; type: driver
+  #16 1024x768 60.00 1024 1048 1184 1344 768 771 777 806 65000 flags: nhsync, nvsync; type: driver
+  #17 800x600 75.00 800 816 896 1056 600 601 604 625 49500 flags: phsync, pvsync; type: driver
+  #18 800x600 72.19 800 856 976 1040 600 637 643 666 50000 flags: phsync, pvsync; type: driver
+  #19 800x600 60.32 800 840 968 1056 600 601 605 628 40000 flags: phsync, pvsync; type: driver
+  #20 800x600 56.25 800 824 896 1024 600 601 603 625 36000 flags: phsync, pvsync; type: driver
+  #21 720x576 50.00 720 732 796 864 576 581 586 625 27000 flags: nhsync, nvsync; type: driver
+  #22 720x480 60.00 720 736 798 858 480 489 495 525 27027 flags: nhsync, nvsync; type: driver
+  #23 720x480 59.94 720 736 798 858 480 489 495 525 27000 flags: nhsync, nvsync; type: driver
+  #24 640x480 75.00 640 656 720 840 480 481 484 500 31500 flags: nhsync, nvsync; type: driver
+  #25 640x480 72.81 640 664 704 832 480 489 492 520 31500 flags: nhsync, nvsync; type: driver
+  #26 640x480 66.67 640 704 768 864 480 483 486 525 30240 flags: nhsync, nvsync; type: driver
+  #27 640x480 60.00 640 656 752 800 480 490 492 525 25200 flags: nhsync, nvsync; type: driver
+  #28 640x480 59.94 640 656 752 800 480 490 492 525 25175 flags: nhsync, nvsync; type: driver
+  props:
+	1 EDID:
+		flags: immutable blob
+		blobs:
+
+		value:
+			00ffffffffffff003669d73c01010101
+			03220103803d2278eeb9f5af4d3db624
+			0e50543fcf0081809500b30001010101
+			010101010101565e00a0a0a029503020
+			35005e582100001a000000fd0030ff1e
+			ffaa000a202020202020000000fc004d
+			50473237315158204f4c4544000000ff
+			000a20202020202020202020202001dd
+			02035371e2780247031213042f103f23
+			0907078301000067030c00100018446d
+			d85dc40178806302000083641d741a00
+			00030330f0eca08c024f026801000000
+			0000e305e001e60605018c6602e20f00
+			e2006a6fc200a0a0a05550302035005e
+			582100001a6af480f070387f40602035
+			005e582100001a000000000000000007
+	2 DPMS:
+		flags: enum
+		enums: On=0 Standby=1 Suspend=2 Off=3
+		value: 0
+	5 link-status:
+		flags: enum
+		enums: Good=0 Bad=1
+		value: 0
+	7 non-desktop:
+		flags: immutable range
+		values: 0 1
+		value: 0
+	4 TILE:
+		flags: immutable blob
+		blobs:
+
+		value:
+	39 underscan:
+		flags: enum
+		enums: auto=2 off=0 on=1
+		value: 0
+	40 underscan hborder:
+		flags: range
+== edid
+/sys/class/drm/card0-HDMI-A-1/edid
+edid-decode (hex):
+
+00 ff ff ff ff ff ff 00 36 69 d7 3c 01 01 01 01
+03 22 01 03 80 3d 22 78 ee b9 f5 af 4d 3d b6 24
+0e 50 54 3f cf 00 81 80 95 00 b3 00 01 01 01 01
+01 01 01 01 01 01 56 5e 00 a0 a0 a0 29 50 30 20
+35 00 5e 58 21 00 00 1a 00 00 00 fd 00 30 ff 1e
+ff aa 00 0a 20 20 20 20 20 20 00 00 00 fc 00 4d
+50 47 32 37 31 51 58 20 4f 4c 45 44 00 00 00 ff
+00 0a 20 20 20 20 20 20 20 20 20 20 20 20 01 dd
+
+02 03 53 71 e2 78 02 47 03 12 13 04 2f 10 3f 23
+09 07 07 83 01 00 00 67 03 0c 00 10 00 18 44 6d
+d8 5d c4 01 78 80 63 02 00 00 83 64 1d 74 1a 00
+00 03 03 30 f0 ec a0 8c 02 4f 02 68 01 00 00 00
+00 00 e3 05 e0 01 e6 06 05 01 8c 66 02 e2 0f 00
+e2 00 6a 6f c2 00 a0 a0 a0 55 50 30 20 35 00 5e
+58 21 00 00 1a 6a f4 80 f0 70 38 7f 40 60 20 35
+00 5e 58 21 00 00 1a 00 00 00 00 00 00 00 00 07
+
+----------------
+
+Block 0, Base EDID:
+  EDID Structure Version & Revision: 1.3
+  Vendor & Product Identification:
+    Manufacturer: MSI
+    Model: 15575
+    Serial Number: 16843009
+    Made in: week 3 of 2024
+  Basic Display Parameters & Features:
+    Digital display
+    Maximum image size: 61 cm x 34 cm
+    Gamma: 2.20
+    DPMS levels: Standby Suspend Off
+    RGB color display
+    Default (sRGB) color space is primary color space
+    First detailed timing is the preferred timing
+  Color Characteristics:
+    Red  : 0.6855, 0.3037
+    Green: 0.2402, 0.7119
+    Blue : 0.1435, 0.0576
+    White: 0.3134, 0.3291
+  Established Timings I & II:
+    DMT 0x04:   640x480    59.940476 Hz   4:3     31.469 kHz     25.175000 MHz
+    Apple   :   640x480    66.666667 Hz   4:3     35.000 kHz     30.240000 MHz
+    DMT 0x05:   640x480    72.808802 Hz   4:3     37.861 kHz     31.500000 MHz
+    DMT 0x06:   640x480    75.000000 Hz   4:3     37.500 kHz     31.500000 MHz
+    DMT 0x08:   800x600    56.250000 Hz   4:3     35.156 kHz     36.000000 MHz
+    DMT 0x09:   800x600    60.316541 Hz   4:3     37.879 kHz     40.000000 MHz
+    DMT 0x0a:   800x600    72.187572 Hz   4:3     48.077 kHz     50.000000 MHz
+    DMT 0x0b:   800x600    75.000000 Hz   4:3     46.875 kHz     49.500000 MHz
+    DMT 0x10:  1024x768    60.003840 Hz   4:3     48.363 kHz     65.000000 MHz
+    DMT 0x11:  1024x768    70.069359 Hz   4:3     56.476 kHz     75.000000 MHz
+    DMT 0x12:  1024x768    75.028582 Hz   4:3     60.023 kHz     78.750000 MHz
+    DMT 0x24:  1280x1024   75.024675 Hz   5:4     79.976 kHz    135.000000 MHz
+  Standard Timings:
+    DMT 0x23:  1280x1024   60.019740 Hz   5:4     63.981 kHz    108.000000 MHz
+    DMT 0x2f:  1440x900    59.887445 Hz  16:10    55.935 kHz    106.500000 MHz
+    DMT 0x3a:  1680x1050   59.954250 Hz  16:10    65.290 kHz    146.250000 MHz
+  Detailed Timing Descriptors:
+    DTD 1:  2560x1440   59.950550 Hz  16:9     88.787 kHz    241.500000 MHz (606 mm x 344 mm)
+                 Hfront   48 Hsync  32 Hback   80 Hpol P
+                 Vfront    3 Vsync   5 Vback   33 Vpol N
+    Display Range Limits:
+      Monitor ranges (GTF): 48-255 Hz V, 30-255 kHz H, max dotclock 1700 MHz
+    Display Product Name: 'MPG271QX OLED'
+    Display Product Serial Number: ''
+  Extension blocks: 1
+Checksum: 0xdd
+
+----------------
+
+Block 1, CTA-861 Extension Block:
+  Revision: 3
+  Basic audio support
+  Supports YCbCr 4:4:4
+  Supports YCbCr 4:2:2
+  Native detailed modes: 1
+  HDMI Forum EDID Extension Override Data Block:
+    EDID Extension Block Count: 2
+  Video Data Block:
+    VIC   3:   720x480    59.940060 Hz  16:9     31.469 kHz     27.000000 MHz
+    VIC  18:   720x576    50.000000 Hz  16:9     31.250 kHz     27.000000 MHz
+    VIC  19:  1280x720    50.000000 Hz  16:9     37.500 kHz     74.250000 MHz
+    VIC   4:  1280x720    60.000000 Hz  16:9     45.000 kHz     74.250000 MHz
+    VIC  47:  1280x720   120.000000 Hz  16:9     90.000 kHz    148.500000 MHz
+    VIC  16:  1920x1080   60.000000 Hz  16:9     67.500 kHz    148.500000 MHz
+    VIC  63:  1920x1080  120.000000 Hz  16:9    135.000 kHz    297.000000 MHz
+  Audio Data Block:
+    Linear PCM:
+      Max channels: 2
+      Supported sample rates (kHz): 48 44.1 32
+      Supported sample sizes (bits): 24 20 16
+  Speaker Allocation Data Block:
+    FL/FR - Front Left/Right
+  Vendor-Specific Data Block (HDMI), OUI 00-0C-03:
+    Source physical address: 1.0.0.0
+    DC_30bit
+    DC_Y444
+    Maximum TMDS clock: 340 MHz
+  Vendor-Specific Data Block (HDMI Forum), OUI C4-5D-D8:
+    Version: 1
+    Maximum TMDS Character Rate: 600 MHz
+    SCDC Present
+    Max Fixed Rate Link: 3 and 6 Gbps per lane on 3 lanes, 6, 8, 10 and 12 Gbps on 4 lanes
+    Supports 12-bits/component Deep Color 4:2:0 Pixel Encoding
+    Supports 10-bits/component Deep Color 4:2:0 Pixel Encoding
+    Supports Auto Low-Latency Mode
+    Supports VESA DSC 1.2a compression
+    Supports 12 bpc Compressed Video Transport
+    Supports 10 bpc Compressed Video Transport
+    DSC Max Slices: up to 8 slices and up to (340 MHz/Ksliceadjust) pixel clock per slice
+    DSC Max Fixed Rate Link: 3 and 6 Gbps per lane on 3 lanes, 6, 8, 10 and 12 Gbps on 4 lanes
+    Maximum number of bytes in a line of chunks: 30720
+  Vendor-Specific Data Block (AMD), OUI 00-00-1A:
+    Version: 3.3
+    Minimum Refresh Rate: 48 Hz
+    Maximum Refresh Rate: 240 Hz
+    Flags 1.x: 0xec (MCCS)
+    Flags 2.x: 0xa0
+    Maximum luminance: 140 (1037.472 cd/m^2)
+    Minimum luminance: 2 (0.001 cd/m^2)
+    Unknown: 0x4f 0x02
+  Colorimetry Data Block:
+    BT2020cYCC
+    BT2020YCC
+    BT2020RGB
+    Reserved MD0
+  HDR Static Metadata Data Block:
+    Electro optical transfer functions:
+      Traditional gamma - SDR luminance range
+      SMPTE ST2084
+    Supported static metadata descriptors:
+      Static metadata type 1
+    Desired content max luminance: 140 (1037.472 cd/m^2)
+    Desired content max frame-average luminance: 102 (455.515 cd/m^2)
+    Desired content min luminance: 2 (0.001 cd/m^2)
+  YCbCr 4:2:0 Capability Map Data Block:
+    Empty Capability Map
+  Video Capability Data Block:
+    YCbCr quantization: No Data
+    RGB quantization: Selectable (via AVI Q)
+    PT scan behavior: Always Underscanned
+    IT scan behavior: Always Underscanned
+    CE scan behavior: Always Underscanned
+  Detailed Timing Descriptors:
+    DTD 2:  2560x1440  119.997589 Hz  16:9    182.996 kHz    497.750000 MHz (606 mm x 344 mm)
+                 Hfront   48 Hsync  32 Hback   80 Hpol P
+                 Vfront    3 Vsync   5 Vback   77 Vpol N
+    DTD 3:  1920x1080  239.996625 Hz  16:9    289.676 kHz    625.700000 MHz (606 mm x 344 mm)
+                 Hfront   96 Hsync  32 Hback  112 Hpol P
+                 Vfront    3 Vsync   5 Vback  119 Vpol N
+Checksum: 0x07
+== dmesg
+[    6.108928] nouveau 0000:01:00.0: vgaarb: deactivate vga console
+[    6.131074] nouveau 0000:01:00.0: fb: 1024 MiB GDDR5
+[    6.140380] nouveau 0000:01:00.0: iccsense: found invalid sensor id: 1, power readingmight be invalid
+[    6.141385] nouveau 0000:01:00.0: iccsense: found invalid sensor id: 2, power readingmight be invalid
+[    6.142390] nouveau 0000:01:00.0: iccsense: found invalid sensor id: 3, power readingmight be invalid
+[    6.191134] nouveau 0000:01:00.0: drm: VRAM: 1024 MiB
+[    6.191142] nouveau 0000:01:00.0: drm: GART: 1048576 MiB
+[    6.191147] nouveau 0000:01:00.0: drm: TMDS table version 2.0
+[    6.191886] nouveau 0000:01:00.0: drm: failed to create ce channel, -22
+[    6.262217] nouveau 0000:01:00.0: drm: MM: using M2MF for buffer copies
+[    6.263868] nouveau 0000:01:00.0: [drm] Registered 2 planes with drm panic
+[    6.267341] [drm] Initialized nouveau 1.4.2 for 0000:01:00.0 on minor 0
+[    6.368916] fbcon: nouveaudrmfb (fb0) is primary device
+[    6.368930] nouveau 0000:01:00.0: [drm] fb0: nouveaudrmfb frame buffer device
+[    6.470990] nouveau 0000:01:00.0: drm: [DRM/00000004:kmsOutp] [HDMI head:0 enable:1 max_ac_packet:2 rekey:56 khz:241500 scdc:1 scdc_scrambling:1 scdc_low_rates:0] (ret:-22)
+[    9.485459] systemd[1]: systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch skipped, unmet condition check ConditionPathExists=!/run/plymouth/pid
+[   10.534693] input: HDA NVidia HDMI/DP,pcm=3 as /devices/pci0000:00/0000:00:01.0/0000:01:00.1/sound/card1/input10
+[   10.534746] input: HDA NVidia HDMI/DP,pcm=7 as /devices/pci0000:00/0000:00:01.0/0000:01:00.1/sound/card1/input11
+[   10.534792] input: HDA NVidia HDMI/DP,pcm=8 as /devices/pci0000:00/0000:00:01.0/0000:01:00.1/sound/card1/input20
+[   10.534844] input: HDA NVidia HDMI/DP,pcm=9 as /devices/pci0000:00/0000:00:01.0/0000:01:00.1/sound/card1/input21
+[   31.314036] nouveau 0000:01:00.0: Direct firmware load for nouveau/nvce_fuc084 failed with error -2
+[   31.314071] nouveau 0000:01:00.0: Direct firmware load for nouveau/nvce_fuc084d failed with error -2
+[   31.314075] nouveau 0000:01:00.0: msvld: unable to load firmware data
+[   31.314080] nouveau 0000:01:00.0: msvld: init failed, -19
+[   31.351444] nouveau 0000:01:00.0: gr: TRAP ch 3 [003fa86000 gst-plugin-scan[2598]]
+[   31.351468] nouveau 0000:01:00.0: gr: GPC0/PROP trap: 00000020 [RT_HEIGHT_OVERRUN] x = 16, y = 16, format = 37, storage type = 0
+[   31.351483] nouveau 0000:01:00.0: gr: GPC1/PROP trap: 00000020 [RT_HEIGHT_OVERRUN] x = 0, y = 16, format = 37, storage type = 0
+[   33.873428] nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=0 mem=1 core=1 volt_first=1
+[   33.873436] nouveau 0000:01:00.0: clk: LAB pstate 1: pcie SKIPPED
+[   33.873454] nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 950000 uV (id 1)
+[   33.873455] nouveau 0000:01:00.0: clk: LAB pstate 1: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+[   33.873457] nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+[   33.873471] nouveau 0000:01:00.0: clk: LAB voltage after raise: 950000 uV (cstate voltage id 1)
+[   33.873476] nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+[   33.873482] nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+[   33.873498] nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+[   33.873505] nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+[   33.873511] nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+[   33.873518] nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+[   33.873525] nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+[   33.873531] nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+[   33.873535] nouveau 0000:01:00.0: clk: LAB prog stage 0
+[   33.873543] nouveau 0000:01:00.0: clk: LAB prog stage 1
+[   33.873566] nouveau 0000:01:00.0: clk: LAB prog stage 2
+[   33.873581] nouveau 0000:01:00.0: clk: LAB prog stage 3
+[   33.873584] nouveau 0000:01:00.0: clk: LAB prog stage 4
+[   33.873614] nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+[   33.873618] nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+[   33.873624] nouveau 0000:01:00.0: fb: LAB replay: память сейчас 135 МГц, цель 324 МГц, шагов 1 (lab_mem_replay=15)
+[   33.875530] nouveau 0000:01:00.0: fb: LAB replay A 135->324: в memx 62 записей, 8 ожиданий, 9 пауз, пропущено 9 операций, ~195 слов
+[   33.875536] nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+[   33.875569] nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 493
+[   33.884605] nouveau 0000:01:00.0: fb: LAB replay A 135->324: выполнен за 9024 мкс (op13×1), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18010000 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+[   33.884614] nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+[   33.884617] nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+[   60.280272] nouveau-engobj-idle: idling chid 6 before deleting oclass 9097
+[   60.280291] nouveau-engobj-idle: idling chid 6 before deleting oclass 902d
+[   60.280302] nouveau-engobj-idle: idling chid 6 before deleting oclass 9039
+[   60.280312] nouveau-engobj-idle: idling chid 6 before deleting oclass 90c0
+[   60.280455] nouveau-engobj-idle: idling chid 6 before deleting oclass fffffff9
