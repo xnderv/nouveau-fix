@@ -29,6 +29,13 @@ else
 fi
 cd nouveau
 for P in "$HERE"/patches/*.patch; do
+    # <patch>.needs = "file|pattern": apply only while the pattern is still in the file (i.e. the bug is still there)
+    if [ -r "$P.needs" ]; then
+        NF="$(cut -d'|' -f1 "$P.needs")"; NP="$(cut -d'|' -f2- "$P.needs")"
+        if ! grep -qF -- "$NP" "$NF" 2>/dev/null; then
+            echo "nouveau-gf114: $(basename "$P") not needed for Linux $UPV (already fixed upstream), skipped"; continue
+        fi
+    fi
     if patch -p1 -s -N --dry-run < "$P" >/dev/null 2>&1; then
         patch -p1 -s -N < "$P"; echo "nouveau-gf114: applied $(basename "$P")"
     elif patch -p1 -s -R --dry-run < "$P" >/dev/null 2>&1; then

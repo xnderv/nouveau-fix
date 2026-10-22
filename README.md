@@ -1,3 +1,46 @@
+# nouveau-fix: full reclocking for GeForce GTX 560 Ti (GF114) on Linux
+
+**English summary — the rest of this file is in Russian.**
+
+Upstream nouveau leaves Fermi cards at their boot clocks (GTX 560 Ti: core 50 MHz, memory 135 MHz),
+because its memory reclock sequence for GF100-class chips was recorded from one old board and does not
+work on others. This repository contains a nouveau driver build in which a GTX 560 Ti runs at its
+full factory clocks, switching between performance levels automatically, the way the NVIDIA driver does:
+
+| Level | Core / shader | Memory | When |
+|---|---|---|---|
+| 03 | 50 / 101 MHz | 135 MHz | idle |
+| 07 | 405 / 810 MHz | 324 MHz | desktop, video |
+| 0f | 900 / 1800 MHz | 2004 MHz (4 GT/s) | 3D load |
+
+How it was done: the NVIDIA 390 driver was traced with mmiotrace on this board; the PMU memory scripts,
+PLL settings, voltages, PCIe link speed, busy-counter setup and the order of operations were extracted
+from the trace and reproduced in nouveau, one change at a time, each verified on the hardware
+(`docs/`, `results/`). The load accounting runs in the PMU firmware (a new `PERF` process), the decision
+is taken in the driver once a second; a thermal brake lowers the level at 90 / 95 °C.
+
+**Patches** (`patches/`, on top of the nouveau in Linux 7.0.x):
+- `0001` — fix for a GPU hang when a Chromium-based app deletes an engine object while the channel is busy
+  (`nouveau_abi16.c`, candidate for upstream);
+- `0003` — HDMI mode was refused (fell back to DVI, no audio/InfoFrames) whenever the monitor supports SCDC
+  and the GPU does not; only refuse above 340 MHz. Fixed upstream independently in Sept 2026
+  (commit `1717fcc5be57`); kept here for 7.0.x kernels and skipped automatically once the fix is present;
+- `0010` — the reclocking itself. Board-gated: active only on Gigabyte GV-N560 (PCI subsystem 1458:3515);
+  everywhere else the driver behaves like upstream. `nouveau.gf114_board=1` enables it on any GF114 board
+  (untested — the memory scripts come from this board's VBIOS, yours may differ; watch for VRAM errors),
+  `nouveau.gf114_gov=0` disables the governor, `/sys/module/nouveau/parameters/gf114_*` shows load and temperature.
+
+**Install** (Ubuntu, kernel 7.0.x; needs `dkms build-essential patch git linux-headers-generic`):
+`bash stable/stable.sh install`, reboot, `bash stable/stable.sh status`. DKMS rebuilds the module for every
+new kernel. `lab/` holds the instrumented driver (`lab/0002-*.patch`, `patches/0004`, `0005`) with runtime
+switches for every step, and the scripts of all experiments; `trace/` is the mmiotrace tooling.
+
+Known differences from the NVIDIA driver and open questions are listed in `docs/2026-10-22/review-driver.md`.
+Reports from other GTX 560 / 560 Ti boards are welcome (open an issue with `dmesg | grep -i nouveau` and
+`stable.sh status` output).
+
+---
+
 # nouveau-fix — исправление зависаний GTX 560 Ti (Fermi) в Ubuntu
 
 ## Что это и зачем

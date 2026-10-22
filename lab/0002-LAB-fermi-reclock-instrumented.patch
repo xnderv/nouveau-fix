@@ -1,17 +1,23 @@
-diff -ru base/nvkm/subdev/clk/base.c lab-n12/nvkm/subdev/clk/base.c
---- base/nvkm/subdev/clk/base.c	2026-10-22 12:42:38.239576714 +0300
-+++ lab-n12/nvkm/subdev/clk/base.c	2026-10-22 12:42:38.312024742 +0300
-@@ -34,6 +34,26 @@
+diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
+--- base/nvkm/subdev/clk/base.c	2026-10-22 15:46:27.112235201 +0300
++++ lab-n13/nvkm/subdev/clk/base.c	2026-10-22 15:46:27.314690095 +0300
+@@ -33,6 +33,31 @@
+ #include <subdev/volt.h>
  
  #include <core/option.h>
- 
++#include <subdev/pci.h>
++
 +#include <linux/moduleparam.h>
 +
 +/* LAB: управление этапами смены режима (можно менять на ходу через
 + * /sys/module/nouveau/parameters/lab_*). */
-+static bool lab_pcie = true;
-+module_param(lab_pcie, bool, 0644);
-+MODULE_PARM_DESC(lab_pcie, "LAB: change PCIe link on pstate switch");
++/* 22.10: 0 — шину не трогать; 1 — менять скорость при каждой смене уровня (как NVIDIA; на Z68 два
++ * обрыва шины под нагрузкой за день); 2 — один раз поднять до 5 GT/s при первой смене уровня (шина
++ * пуста) и больше не переобучать; после сна nvkm_pcie_init восстанавливает заданную скорость сам. */
++static int lab_pcie = 0;
++module_param(lab_pcie, int, 0644);
++MODULE_PARM_DESC(lab_pcie, "LAB: PCIe link: 0 leave, 1 switch per pstate (NVIDIA), 2 raise to 5 GT/s once");
++static bool lab_pcie_raised;
 +static bool lab_mem = true;
 +module_param(lab_mem, bool, 0644);
 +MODULE_PARM_DESC(lab_mem, "LAB: reclock memory on pstate switch");
@@ -24,11 +30,10 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n12/nvkm/subdev/clk/base.c
 +static bool lab_volt_first;
 +module_param(lab_volt_first, bool, 0644);
 +MODULE_PARM_DESC(lab_volt_first, "LAB: raise voltage before memory reclock");
-+
+ 
  /******************************************************************************
   * misc
-  *****************************************************************************/
-@@ -190,12 +210,19 @@
+@@ -190,12 +215,19 @@
  			nvkm_error(subdev, "failed to raise voltage: %d\n", ret);
  			return ret;
  		}
@@ -52,7 +57,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n12/nvkm/subdev/clk/base.c
  	}
  
  	if (volt) {
-@@ -203,6 +230,7 @@
+@@ -203,6 +235,7 @@
  				       pstate->base.voltage, clk->temp, -1);
  		if (ret && ret != -ENODEV)
  			nvkm_error(subdev, "failed to lower voltage: %d\n", ret);
@@ -60,7 +65,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n12/nvkm/subdev/clk/base.c
  	}
  
  	if (therm) {
-@@ -263,14 +291,41 @@
+@@ -263,14 +296,41 @@
  /******************************************************************************
   * P-States
   *****************************************************************************/
@@ -103,7 +108,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n12/nvkm/subdev/clk/base.c
  
  	list_for_each_entry(pstate, &clk->states, head) {
  		if (idx++ == pstatei)
-@@ -278,22 +333,37 @@
+@@ -278,22 +338,41 @@
  	}
  
  	nvkm_debug(subdev, "setting performance state %d\n", pstatei);
@@ -123,12 +128,16 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n12/nvkm/subdev/clk/base.c
 -		ram->func->tidy(ram);
 +	nvkm_info(subdev, "LAB pstate %d: flags pcie=%d mem=%d core=%d volt_first=%d\n",
 +		  pstatei, lab_pcie, lab_mem, lab_core, lab_volt_first);
-+	if (lab_pcie) {
++	if (lab_pcie == 1) {
 +		nvkm_info(subdev, "LAB pstate %d: pcie speed %d width %d\n", pstatei, pstate->pcie_speed, pstate->pcie_width);
 +		nvkm_pcie_set_link(pci, pstate->pcie_speed, pstate->pcie_width);
 +		nvkm_info(subdev, "LAB pstate %d: pcie done\n", pstatei);
++	} else if (lab_pcie == 2 && !lab_pcie_raised) {
++		int r = nvkm_pcie_set_link(pci, NVKM_PCIE_SPEED_5_0, pstate->pcie_width ? pstate->pcie_width : 16);
++		lab_pcie_raised = true;
++		nvkm_info(subdev, "LAB pstate %d: pcie raised to 5 GT/s once (ret %d), no further retraining\n", pstatei, r);
 +	} else {
-+		nvkm_info(subdev, "LAB pstate %d: pcie SKIPPED\n", pstatei);
++		nvkm_info(subdev, "LAB pstate %d: pcie SKIPPED (lab_pcie=%d)\n", pstatei, lab_pcie);
  	}
  
 -	return nvkm_cstate_prog(clk, pstate, NVKM_CLK_CSTATE_HIGHEST);
@@ -153,9 +162,9 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n12/nvkm/subdev/clk/base.c
  }
  
  static void
-diff -ru base/nvkm/subdev/clk/gf100.c lab-n12/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-22 12:42:38.239625574 +0300
-+++ lab-n12/nvkm/subdev/clk/gf100.c	2026-10-22 12:42:38.312384693 +0300
+diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
+--- base/nvkm/subdev/clk/gf100.c	2026-10-22 15:46:27.112391106 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-22 15:46:27.282717127 +0300
 @@ -23,6 +23,8 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -470,9 +479,9 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n12/nvkm/subdev/clk/gf100.c
 -	return nvkm_clk_ctor(&gf100_clk, device, type, inst, false, &clk->base);
 +	return nvkm_clk_ctor(&gf100_clk, device, type, inst, true, &clk->base);
  }
-diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n12/nvkm/subdev/fb/ramgf100.c
---- base/nvkm/subdev/fb/ramgf100.c	2026-10-22 12:42:38.243079685 +0300
-+++ lab-n12/nvkm/subdev/fb/ramgf100.c	2026-10-22 12:42:38.374192803 +0300
+diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
+--- base/nvkm/subdev/fb/ramgf100.c	2026-10-22 15:46:27.121287900 +0300
++++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-22 15:46:27.283508950 +0300
 @@ -25,6 +25,16 @@
  #include "ram.h"
  #include "ramfuc.h"
@@ -1322,9 +1331,9 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n12/nvkm/subdev/fb/ramgf100.c
  	ram_exec(&ram->fuc, false);
  }
  
-diff -ru base/nvkm/subdev/volt/base.c lab-n12/nvkm/subdev/volt/base.c
---- base/nvkm/subdev/volt/base.c	2026-10-22 12:42:38.260409523 +0300
-+++ lab-n12/nvkm/subdev/volt/base.c	2026-10-22 12:42:38.313473268 +0300
+diff -ru base/nvkm/subdev/volt/base.c lab-n13/nvkm/subdev/volt/base.c
+--- base/nvkm/subdev/volt/base.c	2026-10-22 15:46:27.161236166 +0300
++++ lab-n13/nvkm/subdev/volt/base.c	2026-10-22 15:46:27.283844658 +0300
 @@ -28,6 +28,8 @@
  #include <subdev/bios/volt.h>
  #include <subdev/therm.h>

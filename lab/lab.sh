@@ -59,7 +59,7 @@ preflight() {  # $1 = ожидаемая маска, $2..$6 = ожидаемые
     echo "--- Проверка окружения ---"
     echo "  скрипт lab.sh: $(md5sum "$0" | cut -c1-8)"
     if [ "$(modinfo -n nouveau)" = "$SLOT" ] && [ -e "$P/lab_gpc_khz" ]; then echo "  ✓ лабораторный драйвер загружен"; else echo "  ✗ лабораторный драйвер НЕ загружен"; ok=0; fi
-    chk lab_mem N; chk lab_pcie N; chk lab_core Y; chk lab_volt_first Y; chk lab_volt_min_uv 0
+    chk lab_mem N; chk lab_pcie 0; chk lab_core Y; chk lab_volt_first Y; chk lab_volt_min_uv 0
     chk lab_eng_mask "$1"; chk lab_gpc_khz "$2"; chk lab_rop_khz "$3"
     chk lab_hub07_khz "$4"; chk lab_hub06_khz "$5"; chk lab_hub01_khz "$6"
     if [ -e "$P/lab_gpc_ref_khz" ]; then chk lab_gpc_ref_khz "${EXPREF:-0}"; elif [ "${EXPREF:-0}" != 0 ]; then echo "  ✗ lab_gpc_ref_khz нет в драйвере (нужен lab.sh install)"; ok=0; fi

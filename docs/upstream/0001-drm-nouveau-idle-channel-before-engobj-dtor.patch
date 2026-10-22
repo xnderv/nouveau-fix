@@ -1,0 +1,85 @@
+From: Alex <xnderv@yandex.com>
+Subject: [PATCH] drm/nouveau: idle the channel before destroying an engine object via abi16
+
+Cc: dri-devel@lists.freedesktop.org, nouveau@lists.freedesktop.org
+
+nouveau_abi16_ioctl_del() destroys an engine object (ENGOBJ) created by
+nouveau_abi16_ioctl_new() without waiting for the owning channel to go
+idle.  The legacy path, nouveau_abi16_ioctl_gpuobj_free(), does call
+nouveau_channel_idle() first ("synchronize with the user channel and
+destroy the gpu object"), the new ioctl does not.
+
+Chromium-based applications (Chrome, Yandex Browser, Electron apps)
+create and immediately delete probe 3D objects at startup.  If the GPU
+is busy with other work at that moment (compositor animation while the
+app is launched from the GNOME dash, cursor movement), the engine
+context is unbound while the channel still references it, and the GPU
+faults:
+
+  nouveau 0000:01:00.0: fifo: fault 00 [VIRT_READ] at 0000000000000000
+    engine 00 [GR] client 0f [HUB/CTXCTL] reason 00 [PDE] on channel 5
+  nouveau 0000:01:00.0: fifo: ... PAGE_NOT_PRESENT ... channel 5 killed!
+
+after which the desktop freezes.  Observed on GF114 (GeForce GTX 560 Ti)
+with Linux 7.0.x, reproducible almost every time by launching a Chromium
+app from the dash; not seen in 10 consecutive launches with this patch.
+
+Remember the channel an engine object was created on, drop the reference
+when the channel is destroyed first, and idle the channel before
+nvif_object_dtor() like the gpuobj_free path does.
+
+Signed-off-by: Alex <xnderv@yandex.com>
+---
+ drivers/gpu/drm/nouveau/nouveau_abi16.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+--- a/drivers/gpu/drm/nouveau/nouveau_abi16.c
++++ b/drivers/gpu/drm/nouveau/nouveau_abi16.c
+@@ -89,6 +89,7 @@
+ 		ENGOBJ,
+ 	} type;
+ 	u64 object;
++	struct nouveau_abi16_chan *chan;
+ 
+ 	struct nvif_object engobj;
+ 
+@@ -173,6 +174,13 @@
+ 			struct nouveau_abi16_chan *chan)
+ {
+ 	struct nouveau_abi16_ntfy *ntfy, *temp;
++	struct nouveau_abi16_obj *obj;
++
++	/* Forget references to this channel held by engine objects. */
++	list_for_each_entry(obj, &abi16->objects, head) {
++		if (obj->chan == chan)
++			obj->chan = NULL;
++	}
+ 
+ 	/* Cancel all jobs from the entity's queue. */
+ 	if (chan->sched)
+@@ -749,8 +757,16 @@
+ 
+ 	obj = nouveau_abi16_obj_find(abi16, ioctl->object);
+ 	if (obj) {
+-		if (obj->type == ENGOBJ)
++		if (obj->type == ENGOBJ) {
++			/* Synchronize with the user channel before destroying the
++			 * engine object, as the legacy GPUOBJ_FREE path does.  The
++			 * channel may still have work queued that needs the engine
++			 * context which is about to be unbound.
++			 */
++			if (obj->chan && obj->chan->chan)
++				nouveau_channel_idle(obj->chan->chan);
+ 			nvif_object_dtor(&obj->engobj);
++		}
+ 		nouveau_abi16_obj_del(obj);
+ 	}
+ 
+@@ -791,6 +807,7 @@
+ 	obj = nouveau_abi16_obj_new(abi16, ENGOBJ, args->object);
+ 	if (IS_ERR(obj))
+ 		return PTR_ERR(obj);
++	obj->chan = chan;
+ 
+ 	ret = nvif_object_ctor(&chan->chan->user, "abi16EngObj", args->handle, args->oclass,
+ 			       NULL, 0, &obj->engobj);

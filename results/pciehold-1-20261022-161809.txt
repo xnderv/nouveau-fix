@@ -1,0 +1,36 @@
+Опыт удержания PCIe, способ 1, 3 мин, 2026-10-22 16:18:09
+  до сброса: линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr+ NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr-
+  после сброса флага: линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr-
+  16:18:11 уровень 0f: core 900 MHz memory 2004 MHz | линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr-
+  после переобучения (ошибки переобучения — норма): линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr-
+  флаг сброшен ещё раз, дальше — только работа на этой скорости. ДЕЛАЙ СНИМКИ ЭКРАНА.
+  16:18:41 +30 с: линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:19:11 +60 с: линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:19:41 +90 с: линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:20:11 +120 с: линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:20:42 +150 с: линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:21:12 +180 с: линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:21:13 уровень 07: core 405 MHz memory 324 MHz | линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr-
+регулятор lab_gov=2, lab_pcie=0. Лог: ~/nouveau-fix/results/pciehold-1-20261022-161809.txt

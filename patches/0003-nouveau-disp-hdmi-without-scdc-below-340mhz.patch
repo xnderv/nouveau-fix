@@ -12,6 +12,11 @@ signal, and nv50_hdmi_enable() already clears scrambling over DDC.
 
 Only refuse when the requested clock actually needs SCDC.
 
+Note (2026-10-22): fixed independently upstream by commit 1717fcc5be57 ("drm/nouveau/disp:
+don't reject HDMI config on cards without SCDC", Giuseppe Ranieri, 2026-09-17), which drops
+the SCDC term altogether. This patch is kept for 7.0.x kernels; prepare.sh skips it once the
+upstream fix is present (see 0003-*.patch.needs).
+
 Seen on GF114 (GTX 560 Ti) + MSI MPG271QX OLED:
   [HDMI head:0 enable:1 ... khz:241500 scdc:1 scdc_scrambling:1 scdc_low_rates:0] (ret:-22)
 

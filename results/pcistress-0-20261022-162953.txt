@@ -1,0 +1,22 @@
+Опыт PCIe-нагрузка lab_pcie=0, 10 циклов, 2026-10-22 16:29:53; линия: 2.5 GT/s PCIe. ДЕЛАЙ СНИМКИ ЭКРАНА (PrtSc).
+  16:29:57 цикл 1 -> 0f: AC: core 900 MHz memory 2004 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:30:02 цикл 1 -> 07: AC: core 405 MHz memory 324 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:30:08 цикл 2 -> 0f: AC: core 900 MHz memory 2004 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:30:14 цикл 2 -> 07: AC: core 405 MHz memory 324 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:30:19 цикл 3 -> 0f: AC: core 900 MHz memory 2004 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:30:25 цикл 3 -> 07: AC: core 405 MHz memory 324 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:30:30 цикл 4 -> 0f: AC: core 900 MHz memory 2004 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:30:36 цикл 4 -> 07: AC: core 405 MHz memory 324 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:30:42 цикл 5 -> 0f: AC: core 900 MHz memory 2004 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:30:47 цикл 5 -> 07: AC: core 405 MHz memory 324 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:30:53 цикл 6 -> 0f: AC: core 900 MHz memory 2004 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:30:59 цикл 6 -> 07: AC: core 405 MHz memory 324 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:31:04 цикл 7 -> 0f: AC: core 900 MHz memory 2004 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:31:10 цикл 7 -> 07: AC: core 405 MHz memory 324 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:31:16 цикл 8 -> 0f: AC: core 900 MHz memory 2004 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:31:21 цикл 8 -> 07: AC: core 405 MHz memory 324 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:31:27 цикл 9 -> 0f: AC: core 900 MHz memory 2004 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:31:33 цикл 9 -> 07: AC: core 405 MHz memory 324 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:31:38 цикл 10 -> 0f: AC: core 900 MHz memory 2004 MHz | линия 2.5 GT/s PCIe | ошибок +0
+  16:31:44 цикл 10 -> 07: AC: core 405 MHz memory 324 MHz | линия 2.5 GT/s PCIe | ошибок +0
+ошибок драйвера за опыт: 0; lab_pcie возвращён = 0, регулятор lab_gov=2. Лог: ~/nouveau-fix/results/pcistress-0-20261022-162953.txt

@@ -43,7 +43,7 @@ sudo -v || exit 1
 # --- окружение
 ok=1
 if [ "$(modinfo -n nouveau)" = "/lib/modules/$(uname -r)/updates/nouveau-fix/nouveau.ko" ] && [ -e "$PRM/lab_mem_replay" ]; then echo "  ✓ лабораторный драйвер загружен"; else echo "  ✗ лабораторный драйвер НЕ загружен"; ok=0; fi
-for kv in lab_mem_replay=15 lab_mem_op13=1 lab_gpc_seq=13 lab_mem_order=Y lab_mem=Y lab_pcie=N; do
+for kv in lab_mem_replay=15 lab_mem_op13=1 lab_gpc_seq=13 lab_mem_order=Y lab_mem=Y; do
     k="${kv%=*}"; v="${kv#*=}"; a="$(cat "$PRM/$k" 2>/dev/null || echo НЕТ)"
     [ "$a" = "$v" ] || { [ "$v" = Y ] && [ "$a" = 1 ]; } && printf '  ✓ %-15s = %s\n' "$k" "$a" || { printf '  ✗ %-15s = %s (нужно %s)\n' "$k" "$a" "$v"; ok=0; }
 done

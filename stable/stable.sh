@@ -27,6 +27,7 @@ install)
     sudo install -m 755 "$HERE/prepare.sh" "$SRC/prepare.sh"
     for p in 0001-nouveau-abi16-idle-channel-before-engobj-del 0003-nouveau-disp-hdmi-without-scdc-below-340mhz 0010-nouveau-gf114-reclock; do
         sudo install -m 644 "$KIT/patches/$p.patch" "$SRC/patches/$p.patch"
+        [ -e "$KIT/patches/$p.patch.needs" ] && sudo install -m 644 "$KIT/patches/$p.patch.needs" "$SRC/patches/$p.patch.needs"
     done
     sudo dkms add "$NAME/$VER" || exit 1
     echo "=== Собираю под $KVER (несколько минут)..."
@@ -65,7 +66,7 @@ status)
         echo "стабильный драйвер GF114 НЕ загружен ($( [ -e $P/lab_gov ] && echo 'загружен лабораторный' || echo 'загружен штатный nouveau'))"
     fi
     H="$(for h in /sys/class/hwmon/hwmon*; do grep -q nouveau "$h/name" 2>/dev/null && echo "$h"; done | head -n1)"
-    [ -n "$H" ] && echo "датчик: $(( $(cat $H/temp1_input) / 1000 )) °C, вентилятор $(cat $H/fan1_input 2>/dev/null) об/мин, ШИМ $(( $(cat $H/pwm1) * 100 / 255 )) %"
+    [ -n "$H" ] && echo "датчик: $(( $(cat $H/temp1_input) / 1000 )) °C, вентилятор $(cat $H/fan1_input 2>/dev/null) об/мин, обороты задания $(cat $H/pwm1) %"
     echo "режим: $(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate 2>/dev/null | head -n1' 2>/dev/null || echo '(нужен пароль для режима)')"
     DEV="$(for d in /sys/bus/pci/devices/*; do grep -q 0x10de "$d/vendor" 2>/dev/null && grep -q '^0x03' "$d/class" && basename "$d"; done | head -n1)"
     [ -n "$DEV" ] && echo "PCIe: $(cat /sys/bus/pci/devices/$DEV/current_link_speed 2>/dev/null)"

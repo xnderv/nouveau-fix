@@ -4,11 +4,12 @@
 #   pcietest.sh on  [N]  — lab_pcie=1 и N (по умолчанию 4) циклов 07 -> 0f -> 07 под нагрузкой, с проверкой
 #                          скорости линии (lspci) в каждом режиме
 #   pcietest.sh off [N]  — контроль с lab_pcie=0
+#   pcietest.sh static [N] — lab_pcie=2: один раз поднять до 5 GT/s, дальше не переобучать (ожидание: 5 GT/s на всех уровнях)
 # На время опыта регулятор выключается и в конце включается обратно. Если экран встанет: Alt+PrtSc, S, B.
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; KIT="$(dirname "$HERE")"; mkdir -p "$KIT/results"
 P=/sys/module/nouveau/parameters
-case "${1:-}" in on) V=1;; off) V=0;; *) sed -n '2,7p' "$0"; exit 1;; esac
+case "${1:-}" in on) V=1;; off) V=0;; static) V=2;; nvidia) V=3;; *) sed -n '2,8p' "$0"; exit 1;; esac
 N="${2:-4}"
 G="$(command -v glmark2-wayland || command -v glmark2 || true)"; [ -n "$G" ] || { echo "--- СТОП: нет glmark2"; exit 1; }
 sudo -v || exit 1
@@ -36,4 +37,4 @@ kill $GP 2>/dev/null; wait $GP 2>/dev/null
 E1="$(errs)"
 sudo sh -c "echo $GOV > $P/lab_gov"
 echo "ошибок драйвера за опыт: $((E1 - E0)); регулятор снова lab_gov=$GOV; lab_pcie оставлен = $V. Лог: $LOG" | tee -a "$LOG"
-echo "Ожидание при on: в 0f «Speed 5GT/s», в 07 «Speed 2.5GT/s» (как у NVIDIA)."
+echo "Ожидание при on: в 0f «Speed 5GT/s», в 07 «Speed 2.5GT/s» (как у NVIDIA); при static: 5GT/s везде; при off: 2.5GT/s везде."

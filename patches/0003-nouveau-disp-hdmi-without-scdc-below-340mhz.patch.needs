@@ -1,0 +1,1 @@
+nvkm/engine/disp/uoutp.c|args->v0.scdc && !ior->func->hdmi->scdc

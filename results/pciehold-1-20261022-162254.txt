@@ -1,0 +1,126 @@
+Опыт удержания PCIe, способ 1, 3 мин, 2026-10-22 16:22:54
+  до сброса: линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr-
+  после сброса флага: линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr-
+  16:22:55 уровень 0f: core 900 MHz memory 2004 MHz | линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr-
+  после переобучения (ошибки переобучения — норма): линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr-
+  флаг сброшен ещё раз, дальше — только работа на этой скорости. ДЕЛАЙ СНИМКИ ЭКРАНА.
+  16:23:01 +5 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:23:06 +10 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:23:11 +15 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:23:16 +20 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:23:21 +25 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:23:26 +30 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:23:32 +35 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:23:37 +40 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:23:42 +45 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:23:47 +50 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:23:52 +55 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:23:57 +60 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:24:03 +65 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:24:08 +70 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:24:13 +75 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:24:18 +80 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:24:23 +85 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:24:28 +90 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:24:33 +95 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:24:39 +100 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:24:44 +105 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:24:49 +110 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:24:54 +115 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:24:59 +120 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:25:04 +125 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:25:09 +130 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:25:15 +135 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:25:20 +140 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:25:25 +145 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:25:30 +150 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:25:35 +155 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:25:40 +160 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:25:45 +165 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:25:51 +170 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:25:56 +175 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:26:01 +180 с: линия 5.0 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | ошибок драйвера +0
+  16:26:02 уровень 07: core 405 MHz memory 324 MHz | линия 2.5 GT/s PCIe | карта: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr- | порт: CorrErr- NonFatalErr- FatalErr-
+CorrErr- NonFatalErr- FatalErr-
+регулятор lab_gov=2, lab_pcie=0. Лог: ~/nouveau-fix/results/pciehold-1-20261022-162254.txt
