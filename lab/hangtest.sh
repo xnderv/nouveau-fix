@@ -50,7 +50,7 @@ case "$LOAD" in
     B="$(command -v yandex-browser || command -v chromium || command -v google-chrome || true)"
     [ -n "$B" ] || { echo "Браузер не найден"; exit 1; }
     # отдельный профиль: иначе уже открытый браузер получает страницу, а новый процесс сразу завершается
-    PROF="$HOME/.cache/nouveau-hangtest-profile"; mkdir -p "$PROF"
+    PROF="$HOME/.cache/nouveau-hangtest-profile"; rm -rf "$PROF"; mkdir -p "$PROF"   # свежий профиль каждый раз: иначе восстановление сессии прячет страницу
     "$B" --user-data-dir="$PROF" --no-first-run --no-default-browser-check --disable-sync --new-window \
          --app="file://$HERE/hangload.html" >/dev/null 2>&1 & LP=$!
     echo "$(date +%T) нагрузка: $B (pid $LP, профиль $PROF), страница hangload.html; прогрев 10 с" | tee -a "$LOG"; sleep 10 ;;
@@ -61,7 +61,12 @@ case "$LOAD" in
   none) echo "$(date +%T) без нагрузки (контроль)" | tee -a "$LOG" ;;
   *) echo "LOAD=browser|glmark2|none"; exit 1 ;;
 esac
-echo "$(date +%T) загрузка GR перед циклами: $(gr)‰ (ожидается > 500 при нагрузке)" | tee -a "$LOG"; sync
+G="$(gr)"
+if [ "$LOAD" != none ]; then
+    for i in 1 2 3 4; do [ "$G" -ge 300 ] 2>/dev/null && break; sleep 5; G="$(gr)"; done
+    [ "$G" -ge 300 ] 2>/dev/null || { echo "$(date +%T) СТОП: нагрузка не поднялась (gr $G‰): окно нагрузки не на виду или без ускорения. Тест не начат." | tee -a "$LOG"; exit 1; }
+fi
+echo "$(date +%T) загрузка GR перед циклами: $G‰" | tee -a "$LOG"; sync
 DONE=0
 for c in $(seq 1 "$N"); do
     [ -n "$LP" ] && ! kill -0 "$LP" 2>/dev/null && { echo "$(date +%T) СТОП: нагрузка завершилась сама" | tee -a "$LOG"; break; }
