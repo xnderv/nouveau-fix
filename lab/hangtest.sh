@@ -43,7 +43,11 @@ T0="$(date '+%Y-%m-%d %H:%M:%S')"
   echo "параметры: $(for p in lab_mem_order lab_mem_op13 lab_mem_op34 lab_mem_op3a lab_mem_replay lab_pcie lab_gpc_seq; do printf '%s=%s ' $p "$(cat $PRM/$p)"; done)"
 } | tee "$LOG"; sync
 sudo sh -c "echo 0 > $PRM/lab_gov"
+# память должна быть 324 МГц (уровень 07) даже при lab_mem=0: иначе при 135 МГц GR голодает и показывает 1000‰ без зависания
+MEM0="$(cat $PRM/lab_mem)"
+case "$(ac)" in *"memory 324 MHz"*) ;; *) sudo sh -c "echo 1 > $PRM/lab_mem"; pstate 07; sleep 3; sudo sh -c "echo $MEM0 > $PRM/lab_mem";; esac
 pstate 07; sleep 3
+case "$(ac)" in *"memory 324 MHz"*) ;; *) echo "СТОП: не удалось поставить память 324 МГц: $(ac)" | tee -a "$LOG"; exit 1;; esac
 echo "$(date +%T) старт: $(ac)" | tee -a "$LOG"; sync
 case "$LOAD" in
   browser)
@@ -81,6 +85,14 @@ for c in $(seq 1 "$N"); do
     done
     AC="$(ac)"
     echo "$(date +%T) подъём $c/$N в $TS: gr до $G0‰, скрипт B $(bdur), после: $AC, gr $(gr)‰${hung:+ — ЗАВИСАНИЕ: $hung}" | tee -a "$LOG"; sync
+    if [ -n "$hung" ]; then
+        # подтверждение от ядра: «failed to idle channel» приходит через ~35-45 с после зависания; ждём до 90 с
+        echo "$(date +%T) подозрение на зависание ($hung) — жду подтверждения ядра до 90 с, не перезагружайте" | tee -a "$LOG"; sync
+        for s in $(seq 1 18); do sleep 5; E="$(errs)"; [ "${E:-0}" -gt 0 ] && break; done
+        if [ "${E:-0}" -gt 0 ]; then hung="$hung; ядро подтвердило: $(journalctl -k -b 0 --no-pager --since "$T0" | grep -m1 -oE 'failed to idle[^$]*|SCHED_ERROR[^$]*' | cut -c1-80)"
+        elif [ "$(gr)" -lt 999 ] 2>/dev/null; then echo "$(date +%T) ложная тревога: GR освободился, ядро ошибок не дало — продолжаю" | tee -a "$LOG"; hung=""; pstate 07; sleep 2; DONE=$c; continue
+        else hung="$hung; ядро за 90 с НЕ подтвердило (GR всё ещё 1000‰) — считать зависанием только если экран замер"; fi
+    fi
     if [ -n "$hung" ]; then
         HUNG=1
         { echo "=== ЗАВИСАНИЕ ВОСПРОИЗВЕДЕНО на подъёме $c (нагрузка $LOAD). Нагрузка оставлена, lab_gov=0."

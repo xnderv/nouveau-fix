@@ -6,3 +6,4 @@ results/trace-*/mmiotrace-full*
 fonttest/
 photo_bios/
 nouveau-archive/
+lab/__pycache__/

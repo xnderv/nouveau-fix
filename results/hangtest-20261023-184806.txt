@@ -1,0 +1,8 @@
+hangtest 2026-10-23 18:48:09: подъёмов 60, нагрузка browser, удержание 0f 6с, lab_gov был 2, ядро 7.0.0-38-generic
+параметры: lab_mem_order=Y lab_mem_op13=1 lab_mem_op34=1 lab_mem_replay=15 lab_pcie=1 lab_gpc_seq=13 
+18:48:12 старт: core 405 MHz memory 324 MHz
+18:48:12 нагрузка: /usr/bin/yandex-browser (pid 10460), страница hangload.html; прогрев 10 с
+18:48:22 загрузка GR перед циклами: 825‰ (ожидается > 500 при нагрузке)
+18:48:23 СТОП: нагрузка завершилась сама
+=== 60 подъёмов без зависания (нагрузка browser). Лог: /home/alex/Home/nouveau-fix/results/hangtest-20261023-184806.txt
+18:48:23 регулятор возвращён (lab_gov=2), режим: core 405 MHz memory 324 MHz

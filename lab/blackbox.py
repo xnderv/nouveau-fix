@@ -97,7 +97,7 @@ while True:
     tail = (tail + [line])[-15:]
     try: busy = busy + 1 if int(gr) >= 999 else 0
     except ValueError: busy = 0
-    if (busy == HANG_SEC or trig) and time.monotonic() - last_snap > REARM_SEC:
+    if (busy >= HANG_SEC or trig) and time.monotonic() - last_snap > REARM_SEC:   # >=: GR мог быть занят ещё до подъёма
         try:
             name = snapshot(trig or f'gr >= 999‰ {HANG_SEC} с подряд', tail)
             out.write(f'{time.strftime("%T")} | СНИМОК {name}\n'.encode()); os.fsync(out.fileno())
