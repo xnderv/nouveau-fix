@@ -74,7 +74,7 @@ def snapshot(reason, tail):
 os.makedirs(LOG, exist_ok=True); out = open(f'{LOG}/current.txt', 'ab', buffering=0)
 kfd = os.open('/dev/kmsg', os.O_RDONLY | os.O_NONBLOCK); os.lseek(kfd, 0, os.SEEK_END)
 out.write(f'### blackbox start {time.strftime("%F %T")} kernel {os.uname().release} driver {"lab" if rp("lab_gov","")!="" else "stable" if rp("gf114_gov","")!="" else "stock"} v3\n'.encode())
-tail, busy, last_snap = [], 0, 0.0
+tail, busy, last_snap = [], 0, -float(REARM_SEC)   # -REARM: иначе первые 10 мин после загрузки снимок не делается (ошибка 23.10)
 while True:
     ev, trig = [], ''
     while True:
