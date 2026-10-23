@@ -1,0 +1,57 @@
+                                                    ### Promise created here: ###
+Oct 23 19:53:14.155136 host kernel: audit: type=1400 audit(1792774394.153:272): apparmor="AUDIT" operation="exec" class="file" info="conflicting profile attachments" profile="claude-desktop" name="/opt/yandex/browser/yandex_browser" pid=7778 comm="ThreadPoolSingl" requested_mask="x" fsuid=1026 ouid=0
+Oct 23 19:53:14.161131 host kernel: audit: type=1400 audit(1792774394.158:273): apparmor="AUDIT" operation="exec" class="file" info="conflicting profile attachments" profile="claude-desktop" name="/opt/yandex/browser/yandex_browser" pid=7779 comm="ThreadPoolSingl" requested_mask="x" fsuid=1026 ouid=0
+Oct 23 19:53:16.203143 host sudo[7805]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 19:53:16.203279 host sudo[7805]: alex : TTY=/dev/pts/0 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c echo 0f > \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 19:53:16.207136 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=0 mem=0 core=1 volt_first=1
+Oct 23 19:53:16.207128 host sudo[7805]: pam_unix(sudo:session): session closed for user root
+Oct 23 19:53:16.207763 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie SKIPPED (lab_pcie=0)
+Oct 23 19:53:16.208165 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 1063638 uV raised to floor 1075000 uV
+Oct 23 19:53:16.208615 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 23 19:53:16.209083 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+Oct 23 19:53:16.209568 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+Oct 23 19:53:16.210008 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 1063638 uV raised to floor 1075000 uV
+Oct 23 19:53:16.210438 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 23 19:53:16.210873 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:53:16.211320 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:53:16.211731 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 1907000 got 1909285 ssel 00000004 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:53:16.212153 host kernel: nouveau 0000:01:00.0: clk: LAB calc_pll idx 07: опора nouveau 1620000 kHz, с делителем опоры 405000 kHz (lab_gpc_seq&8)
+Oct 23 19:53:16.212590 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 1645000 got 1645312 ssel 00000080 coef 00014110 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:53:16.213025 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 1645000 got 1645000 ssel 00000100 coef 00000000 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:53:16.213490 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 19:53:16.213849 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 23 19:53:16.214225 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 19:53:16.214641 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 23 19:53:16.215197 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 23 19:53:16.215609 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 23 19:53:16.216125 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq&2: 0x1371d0 81200202 -> 81200206
+Oct 23 19:53:16.216694 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 00012809
+Oct 23 19:53:16.217224 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 00 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 19:53:16.217755 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 01 PLL locked ctrl 00030001 coef 00012107
+Oct 23 19:53:16.218081 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 01 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 19:53:16.218481 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 02 PLL locked ctrl 00030001 coef 00012107
+Oct 23 19:53:16.218819 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 02 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 19:53:16.219179 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 07 PLL locked ctrl 00030001 coef 00014110
+Oct 23 19:53:16.219522 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 07 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 19:53:16.219963 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 23 19:53:16.220554 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 23 19:53:16.220989 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 23 19:53:16.221385 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 02 select PLL, 0x137100=00000003
+Oct 23 19:53:16.221751 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 07 select PLL, 0x137100=00000007
+Oct 23 19:53:16.222073 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 08 select PLL, 0x137100=00000087
+Oct 23 19:53:16.222459 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 23 19:53:16.222843 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 1063638 uV raised to floor 1075000 uV
+Oct 23 19:53:16.223193 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 23 19:53:16.223624 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+Oct 23 19:53:16.224018 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+Oct 23 19:53:21.422161 host sudo[7847]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 19:53:21.422335 host sudo[7847]: alex : TTY=/dev/pts/0 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 19:53:21.426635 host sudo[7847]: pam_unix(sudo:session): session closed for user root
+Oct 23 19:53:21.429386 host systemd[2005]: Starting ubuntu-insights-upload.service - "Upload collected and matured platform reports using Ubuntu Insights while respecting consent"...
+Oct 23 19:53:21.448127 host kernel: audit: type=1400 audit(1792774401.445:274): apparmor="AUDIT" operation="userns_create" class="namespace" info="Userns create - transitioning profile" profile="unconfined" pid=7856 comm="(ubuntu-insigh)" requested="userns_create" target="unprivileged_userns" execpath="/usr/lib/systemd/systemd-executor"
+Oct 23 19:53:21.448229 host kernel: audit: type=1400 audit(1792774401.446:275): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=7856 comm="(ubuntu-insigh)" capability=21  capname="sys_admin"
+Oct 23 19:53:21.463216 host systemd[2005]: Finished ubuntu-insights-upload.service - "Upload collected and matured platform reports using Ubuntu Insights while respecting consent".
+Oct 23 19:53:22.220176 host kernel: nouveau 0000:01:00.0: bus: MMIO write of 00000002 FAULT at 13b154 [ PRIVRING ]
+Oct 23 19:55:04.135184 host kernel: sysrq: Emergency Sync
+Oct 23 19:55:04.143164 host kernel: Emergency Sync complete
+Oct 23 19:55:05.567234 host kernel: sysrq: Emergency Remount R/O
