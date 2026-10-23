@@ -17,6 +17,9 @@ set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; KIT="$(dirname "$HERE")"; PRM=/sys/module/nouveau/parameters
 N="${1:-60}"; [[ "$N" =~ ^[0-9]+$ ]] || { echo "Число подъёмов"; exit 1; }
 LOAD="${LOAD:-browser}"; HOLD="${HOLD:-6}"
+# 24.10: LOW/HIGH — пара уровней (по умолчанию 07 и 0f). LOW=03 HIGH=07 — переход 03↔07 (зависания 24.10 01:32 и 01:38).
+LOW="${LOW:-07}"; HIGH="${HIGH:-0f}"
+memof() { case "$1" in 03) echo 135;; 07) echo 324;; 0f) echo 2004;; esac; }
 [ -e "$PRM/lab_gov" ] || { echo "Нужен лабораторный драйвер (нет $PRM/lab_gov)"; exit 1; }
 systemctl is-active -q gpu-blackbox || echo "⚠ чёрный ящик не запущен (lab/blackbox.sh install) — снимка регистров при зависании не будет"
 mkdir -p "$KIT/results"; LOG="$KIT/results/hangtest-$(date +%Y%m%d-%H%M%S).txt"
@@ -26,20 +29,20 @@ sudo -v || exit 1
 ac()     { sudo sh -c "grep '^AC' '$PSF'" | sed 's/^AC: //'; }
 pstate() { sudo sh -c "echo $1 > '$PSF'"; }
 gr()     { cat "$PRM/lab_perf_gr" 2>/dev/null || echo 0; }
-errs()   { journalctl -k -b 0 --no-pager --since "$T0" 2>/dev/null | grep -cE 'failed to idle|SCHED_ERROR|runl|fifo:.*INTR' || true; }
+errs()   { journalctl -k -b 0 --no-pager --since "$T0" 2>/dev/null | grep -cE 'failed to idle|SCHED_ERROR|runl|fifo:.*INTR|vmmgf100.c' || true; }
 bdur()   { journalctl -k -b 0 --no-pager --since "$T0" 2>/dev/null | grep -oE 'replay B 324->2004: выполнен за [0-9]+ мкс' | tail -n1 | grep -oE '[0-9]+ мкс'; }
 GOV0="$(cat "$PRM/lab_gov")"; LP=""; HUNG=0
 finish() {
     if [ "$HUNG" = 0 ]; then
         [ -n "$LP" ] && { kill "$LP" 2>/dev/null; wait "$LP" 2>/dev/null; }
-        pstate 07 2>/dev/null; sudo sh -c "echo $GOV0 > $PRM/lab_gov" 2>/dev/null
+        pstate $LOW 2>/dev/null; sudo sh -c "echo $GOV0 > $PRM/lab_gov" 2>/dev/null
         echo "$(date +%T) регулятор возвращён (lab_gov=$GOV0), режим: $(ac)" | tee -a "$LOG"
     fi
     sync
 }
 trap finish EXIT
 T0="$(date '+%Y-%m-%d %H:%M:%S')"
-{ echo "hangtest $T0: подъёмов $N, нагрузка $LOAD, удержание 0f ${HOLD}с, lab_gov был $GOV0, ядро $(uname -r)"
+{ echo "hangtest $T0: уровни $LOW↔$HIGH, подъёмов $N, нагрузка $LOAD, удержание 0f ${HOLD}с, lab_gov был $GOV0, ядро $(uname -r)"
   echo "параметры: $(for p in lab_mem_order lab_mem_op13 lab_mem_op34 lab_mem_op3a lab_mem_replay lab_pcie lab_gpc_seq; do printf '%s=%s ' $p "$(cat $PRM/$p)"; done)"
 } | tee "$LOG"; sync
 sudo sh -c "echo 0 > $PRM/lab_gov"
@@ -50,10 +53,10 @@ MEM0="$(cat $PRM/lab_mem)"; MEMHOLD="${MEMHOLD:-324}"
 if [ "$MEM0" = N ] || [ "$MEM0" = 0 ]; then
     case "$MEMHOLD" in 2004) LV=0f;; 324) LV=07;; *) echo "MEMHOLD=2004|324"; exit 1;; esac
     case "$(ac)" in *"memory $MEMHOLD MHz"*) ;; *) sudo sh -c "echo 1 > $PRM/lab_mem"; pstate $LV; sleep 3; sudo sh -c "echo 0 > $PRM/lab_mem";; esac
-    pstate 07; sleep 3
+    pstate $LOW; sleep 3
     case "$(ac)" in *"memory $MEMHOLD MHz"*) ;; *) echo "СТОП: не удалось поставить память $MEMHOLD МГц: $(ac)" | tee -a "$LOG"; exit 1;; esac
 else
-    pstate 07; sleep 3
+    pstate $LOW; sleep 3
 fi
 echo "$(date +%T) старт: $(ac); lab_mem=$MEM0 lab_core=$(cat $PRM/lab_core) lab_volt_min_uv=$(cat $PRM/lab_volt_min_uv) lab_gr_pause=$(cat $PRM/lab_gr_pause 2>/dev/null) lab_gr_gate=$(cat $PRM/lab_gr_gate 2>/dev/null) lab_gr_wait=$(cat $PRM/lab_gr_wait 2>/dev/null) lab_xbar=$(cat $PRM/lab_xbar 2>/dev/null) lab_e9e0=$(cat $PRM/lab_e9e0 2>/dev/null) lab_pll_keep=$(cat $PRM/lab_pll_keep 2>/dev/null) lab_order=$(cat $PRM/lab_order 2>/dev/null) lab_order_us=$(cat $PRM/lab_order_us 2>/dev/null) lab_therm=$(cat $PRM/lab_therm 2>/dev/null) lab_therm_us=$(cat $PRM/lab_therm_us 2>/dev/null) lab_therm_us_gpc=$(cat $PRM/lab_therm_us_gpc 2>/dev/null) lab_therm_us_hub=$(cat $PRM/lab_therm_us_hub 2>/dev/null) lab_therm_probe=$(cat $PRM/lab_therm_probe 2>/dev/null) lab_therm_wait=$(cat $PRM/lab_therm_wait 2>/dev/null) lab_therm_wait_us=$(cat $PRM/lab_therm_wait_us 2>/dev/null) khz: gpc=$(cat $PRM/lab_gpc_khz) rop=$(cat $PRM/lab_rop_khz) hub07=$(cat $PRM/lab_hub07_khz) hub06=$(cat $PRM/lab_hub06_khz) hub01=$(cat $PRM/lab_hub01_khz)" | tee -a "$LOG"; sync
 case "$LOAD" in
@@ -82,7 +85,7 @@ DONE=0
 for c in $(seq 1 "$N"); do
     [ -n "$LP" ] && ! kill -0 "$LP" 2>/dev/null && { echo "$(date +%T) СТОП: нагрузка завершилась сама" | tee -a "$LOG"; break; }
     sleep "$(shuf -i 15-55 -n1 | awk '{print $1/10}')"       # случайная фаза 1.5–5.5 с, как у регулятора
-    G0="$(gr)"; pstate 0f; TS="$(date +%T.%N | cut -c1-12)"
+    G0="$(gr)"; pstate $HIGH; TS="$(date +%T.%N | cut -c1-12)"
     busy=0; hung=""
     for s in $(seq 1 "$HOLD"); do
         sleep 1; g="$(gr)"
@@ -101,7 +104,7 @@ for c in $(seq 1 "$N"); do
         SIG="$(tail -n 15 /var/log/gpu-blackbox/current.txt 2>/dev/null | grep -oE 'gr700=[0-9a-f]+ eng0=[0-9a-f]+' | sort -u | wc -l)"
         if [ "${E:-0}" -gt 0 ]; then hung="$hung; ядро подтвердило: $(journalctl -k -b 0 --no-pager --since "$T0" | grep -m1 -oE 'failed to idle[^$]*|SCHED_ERROR[^$]*' | cut -c1-80)"
         elif [ "$SIG" = 1 ]; then hung="$hung; подпись ящика подтвердила: eng0/gr700 застыли ($(tail -n1 /var/log/gpu-blackbox/current.txt | grep -oE 'gr700=[0-9a-f]+ eng0=[0-9a-f]+')) 15 с"
-        elif [ "$(gr)" -lt 999 ] 2>/dev/null; then echo "$(date +%T) ложная тревога: GR освободился, подпись не застыла — продолжаю" | tee -a "$LOG"; hung=""; pstate 07; sleep 2; DONE=$c; continue
+        elif [ "$(gr)" -lt 999 ] 2>/dev/null; then echo "$(date +%T) ложная тревога: GR освободился, подпись не застыла — продолжаю" | tee -a "$LOG"; hung=""; pstate $LOW; sleep 2; DONE=$c; continue
         else hung="$hung; ни ядро, ни подпись ящика за 90 с не подтвердили (GR 1000‰, но eng0/gr700 меняются) — НЕ ЗАСЧИТЫВАТЬ"; fi
     fi
     if [ -n "$hung" ]; then
@@ -112,8 +115,8 @@ for c in $(seq 1 "$N"); do
           echo "    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show"; } | tee -a "$LOG"; sync
         exit 2
     fi
-    pstate 07; sleep 2; DONE=$c
-    case "$(ac)" in *"memory 324 MHz"*) ;; *) echo "$(date +%T) СТОП: после спуска не 324 МГц: $(ac)" | tee -a "$LOG"; break;; esac
+    pstate $LOW; sleep 2; DONE=$c
+    case "$(ac)" in *"memory $(memof $LOW) MHz"*) ;; *) [ "$MEM0" = Y ] && { echo "$(date +%T) СТОП: после спуска не $(memof $LOW) МГц: $(ac)" | tee -a "$LOG"; break; };; esac
 done
 if [ "$DONE" -eq "$N" ]; then echo "=== $N подъёмов без зависания (нагрузка $LOAD). Лог: $LOG" | tee -a "$LOG"
 else echo "=== Тест прерван после $DONE из $N подъёмов (см. причину выше). Лог: $LOG" | tee -a "$LOG"; fi

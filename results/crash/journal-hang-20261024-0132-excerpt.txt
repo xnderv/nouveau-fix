@@ -1,0 +1,446 @@
+Oct 24 01:32:25.428179 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 24 01:32:25.429292 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+Oct 24 01:32:25.430107 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+Oct 24 01:32:25.430953 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 950000 uV (id 1)
+Oct 24 01:32:25.431661 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+Oct 24 01:32:25.432529 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+Oct 24 01:32:25.433321 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 950000 uV (cstate voltage id 1)
+Oct 24 01:32:25.434116 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 24 01:32:25.434925 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 24 01:32:25.435744 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 24 01:32:25.436559 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 24 01:32:25.437304 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 24 01:32:25.437974 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 24 01:32:25.438663 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 24 01:32:25.439411 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 24 01:32:25.440139 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 01:32:25.441096 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 01:32:25.441869 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 01:32:25.442733 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2807 нс (чтений 2, статус 0002000a), запас 0 мкс
+Oct 24 01:32:25.443668 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 01:32:25.444560 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2862 нс (чтений 2, статус 00020002), запас 0 мкс
+Oct 24 01:32:25.445493 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 01:32:25.446369 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 01:32:25.447195 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 01:32:25.448015 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 24 01:32:25.448857 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+Oct 24 01:32:25.449697 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 135 МГц, цель 324 МГц, шагов 1 (lab_mem_replay=15)
+Oct 24 01:32:25.450623 host kernel: nouveau 0000:01:00.0: fb: LAB replay A 135->324: в memx 62 записей, 9 ожиданий, 9 пауз, пропущено 8 операций, ~200 слов
+Oct 24 01:32:25.451510 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 01:32:25.452383 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 493
+Oct 24 01:32:25.453127 host kernel: nouveau 0000:01:00.0: fb: LAB replay A 135->324: выполнен за 12248 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18010000 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+Oct 24 01:32:25.454014 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 24 01:32:25.454871 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+Oct 24 01:32:25.455789 host kernel: nouveau 0000:01:00.0: pmu: LAB gov: -> 07 (загрузка >= 15 % два замера, загрузка 242‰), ret 0, режим теперь 07
+Oct 24 01:32:27.441062 host kernel: ------------[ cut here ]------------
+Oct 24 01:32:27.441195 host kernel: nouveau 0000:01:00.0: timeout
+Oct 24 01:32:27.441238 host kernel: WARNING: nvkm/subdev/mmu/vmmgf100.c:220 at gf100_vmm_invalidate+0x23a/0x260 [nouveau], CPU#5: gnome-shell/2510
+Oct 24 01:32:27.441289 host kernel: Modules linked in: rpcsec_gss_krb5 xt_cgroup auth_rpcgss xt_MASQUERADE nfsv4 nfs lockd grace netfs ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 rfcomm snd_seq_dummy snd_hrtimer tcp_diag inet_diag nft_chain_nat nf_nat xt_tcpudp xt_TPROXY nf_tproxy_ipv6 nf_tproxy_ipv4 xt_NFQUEUE xt_connmark xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 xt_mark nfnetlink_queue xt_addrtype nft_compat x_tables nf_tables nfnetlink qrtr cmac algif_hash algif_skcipher af_alg bnep sunrpc binfmt_misc intel_rapl_msr at24 intel_rapl_common x86_pkg_temp_thermal mei_hdcp mei_pxp intel_powerclamp coretemp kvm_intel kvm irqbypass rapl intel_cstate snd_hda_codec_alc882 snd_hda_codec_realtek_lib snd_hda_codec_generic snd_hda_codec_nvhdmi snd_hda_codec_hdmi i2c_i801 i2c_smbus i2c_mux uvcvideo snd_hda_intel videobuf2_vmalloc snd_hda_codec btusb uvc btmtk videobuf2_memops snd_usb_audio snd_hda_core lpc_ich videobuf2_v4l2 snd_intel_dspcfg btrtl r8169 snd_seq_midi snd_usbmidi_lib btbcm snd_intel_sdw_acpi videobuf2_common
+Oct 24 01:32:27.441399 host kernel:  snd_seq_midi_event btintel snd_ump snd_hwdep realtek videodev bluetooth snd_pcm snd_rawmidi mc snd_seq snd_seq_device snd_timer snd mei_me soundcore mei input_leds joydev mac_hid sch_fq_codel efi_pstore nouveau(OE) drm_ttm_helper ttm gpu_sched i2c_algo_bit drm_gpuvm drm_exec drm_display_helper mxm_wmi psmouse cec rc_core ghash_clmulni_intel serio_raw video ahci libahci wmi hid_logitech ff_memless hid_generic usbhid uas hid usb_storage ppdev lp parport ramoops reed_solomon msr dmi_sysfs autofs4 aesni_intel
+Oct 24 01:32:27.441452 host kernel: CPU: 5 UID: 1026 PID: 2510 Comm: gnome-shell Kdump: loaded Tainted: G           OE       7.0.0-38-generic #38-Ubuntu PREEMPT(lazy) 
+Oct 24 01:32:27.441493 host kernel: Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+Oct 24 01:32:27.441526 host kernel: Hardware name: Gigabyte Technology Co., Ltd. To be filled by O.E.M./Z68X-UD3P-B3, BIOS U1g 11/13/2017
+Oct 24 01:32:27.441553 host kernel: RIP: 0010:gf100_vmm_invalidate+0x240/0x260 [nouveau]
+Oct 24 01:32:27.441588 host kernel: Code: b2 9c e5 48 8b 45 b0 48 8b 40 10 48 8b 78 10 48 8b 5f 50 48 85 db 74 23 e8 fd b1 9c e5 48 8d 3d e6 b0 dd ff 48 89 da 48 89 c6 <67> 48 0f b9 3a e9 3b ff ff ff 0f 0b e9 8f fe ff ff 48 8b 1f eb d8
+Oct 24 01:32:27.441621 host kernel: RSP: 0018:ffffccd90c2b71e0 EFLAGS: 00010246
+Oct 24 01:32:27.441649 host kernel: RAX: ffffffffc09be501 RBX: ffff8905815b1490 RCX: 0000000000000000
+Oct 24 01:32:27.441679 host kernel: RDX: ffff8905815b1490 RSI: ffffffffc09be501 RDI: ffffffffc0875300
+Oct 24 01:32:27.441706 host kernel: RBP: ffffccd90c2b7238 R08: 0000000000000000 R09: 0000000000000000
+Oct 24 01:32:27.441735 host kernel: R10: 0000000000000000 R11: 0000000000000000 R12: ffff890584e35000
+Oct 24 01:32:27.441766 host kernel: R13: 0000000000000001 R14: ffff8905823e5440 R15: 0000000000003520
+Oct 24 01:32:27.441794 host kernel: FS:  00007cd44e701040(0000) GS:ffff8908e547b000(0000) knlGS:0000000000000000
+Oct 24 01:32:27.441823 host kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Oct 24 01:32:27.441854 host kernel: CR2: 00007ea2422df2a8 CR3: 000000010feb0001 CR4: 00000000001726f0
+Oct 24 01:32:27.441879 host kernel: Call Trace:
+Oct 24 01:32:27.441909 host kernel:  <TASK>
+Oct 24 01:32:27.441932 host kernel:  gf100_vmm_flush+0x1f/0x30 [nouveau]
+Oct 24 01:32:27.441964 host kernel:  nvkm_vmm_iter.isra.0+0x41f/0xbb0 [nouveau]
+Oct 24 01:32:27.441997 host kernel:  ? __map_range_leaf+0x48d/0x530
+Oct 24 01:32:27.442028 host kernel:  ? __pfx_gf100_vmm_pgt_dma+0x10/0x10 [nouveau]
+Oct 24 01:32:27.442064 host kernel:  ? __pfx_nvkm_vmm_ref_ptes+0x10/0x10 [nouveau]
+Oct 24 01:32:27.442149 host kernel:  ? __pfx_gf100_vmm_pgt_dma+0x10/0x10 [nouveau]
+Oct 24 01:32:27.443099 host kernel:  nvkm_vmm_ptes_get_map+0xe3/0x120 [nouveau]
+Oct 24 01:32:27.443133 host kernel:  ? __pfx_nvkm_vmm_ref_ptes+0x10/0x10 [nouveau]
+Oct 24 01:32:27.443160 host kernel:  ? __pfx_gf100_vmm_pgt_dma+0x10/0x10 [nouveau]
+Oct 24 01:32:27.443193 host kernel:  ? nvkm_vmm_map_valid+0xc5/0x1a0 [nouveau]
+Oct 24 01:32:27.443237 host kernel:  nvkm_vmm_map_locked+0x287/0x3e0 [nouveau]
+Oct 24 01:32:27.443283 host kernel:  ? __pfx_nvkm_umem_new+0x10/0x10 [nouveau]
+Oct 24 01:32:27.443312 host kernel:  nvkm_vmm_map+0x81/0x100 [nouveau]
+Oct 24 01:32:27.443347 host kernel:  nvkm_mem_map_dma+0x56/0x90 [nouveau]
+Oct 24 01:32:27.443382 host kernel:  nvkm_uvmm_mthd+0xd52/0xf30 [nouveau]
+Oct 24 01:32:27.443414 host kernel:  ? nvkm_uvmm_mthd+0x226/0xf30 [nouveau]
+Oct 24 01:32:27.443441 host kernel:  nvkm_object_mthd+0x1a/0x40 [nouveau]
+Oct 24 01:32:27.444127 host kernel:  ? __pfx_nvkm_uvmm_mthd+0x10/0x10 [nouveau]
+Oct 24 01:32:27.444164 host kernel:  ? nvkm_object_mthd+0x1a/0x40 [nouveau]
+Oct 24 01:32:27.444197 host kernel:  nvkm_ioctl_mthd+0x5d/0x90 [nouveau]
+Oct 24 01:32:27.444224 host kernel:  nvkm_ioctl+0xcf/0x1e0 [nouveau]
+Oct 24 01:32:27.444250 host kernel:  nvkm_client_ioctl+0xe/0x20 [nouveau]
+Oct 24 01:32:27.444284 host kernel:  nvif_object_mthd+0xfc/0x220 [nouveau]
+Oct 24 01:32:27.444311 host kernel:  nvif_vmm_map+0x7f/0x140 [nouveau]
+Oct 24 01:32:27.444340 host kernel:  nouveau_mem_map+0xa1/0xf0 [nouveau]
+Oct 24 01:32:27.444367 host kernel:  nouveau_vma_new+0x231/0x260 [nouveau]
+Oct 24 01:32:27.444395 host kernel:  nouveau_gem_object_open+0x1e2/0x210 [nouveau]
+Oct 24 01:32:27.444427 host kernel:  drm_gem_handle_create_tail+0xcc/0x180
+Oct 24 01:32:27.444452 host kernel:  drm_gem_handle_create+0x39/0x50
+Oct 24 01:32:27.445090 host kernel:  nouveau_gem_ioctl_new+0xd7/0x180 [nouveau]
+Oct 24 01:32:27.445125 host kernel:  ? __pfx_nouveau_gem_ioctl_new+0x10/0x10 [nouveau]
+Oct 24 01:32:27.445157 host kernel:  drm_ioctl_kernel+0xb5/0x110
+Oct 24 01:32:27.445185 host kernel:  drm_ioctl+0x309/0x5e0
+Oct 24 01:32:27.445228 host kernel:  ? __pfx_nouveau_gem_ioctl_new+0x10/0x10 [nouveau]
+Oct 24 01:32:27.445258 host kernel:  nouveau_drm_ioctl+0x5e/0xd0 [nouveau]
+Oct 24 01:32:27.445291 host kernel:  __x64_sys_ioctl+0xa3/0x100
+Oct 24 01:32:27.445327 host kernel:  x64_sys_call+0x103b/0x2390
+Oct 24 01:32:27.445354 host kernel:  do_syscall_64+0x105/0x5a0
+Oct 24 01:32:27.445380 host kernel:  ? __pfx_nouveau_gem_ioctl_pushbuf+0x10/0x10 [nouveau]
+Oct 24 01:32:27.445406 host kernel:  ? drm_ioctl_kernel+0xb5/0x110
+Oct 24 01:32:27.445438 host kernel:  ? __check_object_size+0x51/0x100
+Oct 24 01:32:27.445464 host kernel:  ? _copy_to_user+0x31/0x60
+Oct 24 01:32:27.445492 host kernel:  ? drm_ioctl+0x348/0x5e0
+Oct 24 01:32:27.445519 host kernel:  ? __pfx_nouveau_gem_ioctl_pushbuf+0x10/0x10 [nouveau]
+Oct 24 01:32:27.445543 host kernel:  ? __pfx_read_tsc+0x10/0x10
+Oct 24 01:32:27.445569 host kernel:  ? ktime_get_mono_fast_ns+0x36/0xe0
+Oct 24 01:32:27.445597 host kernel:  ? nouveau_drm_ioctl+0x91/0xd0 [nouveau]
+Oct 24 01:32:27.445615 host kernel:  ? __x64_sys_ioctl+0xbd/0x100
+Oct 24 01:32:27.445641 host kernel:  ? arch_exit_to_user_mode_prepare.isra.0+0xd/0xe0
+Oct 24 01:32:27.445672 host kernel:  ? do_syscall_64+0x140/0x5a0
+Oct 24 01:32:27.445698 host kernel:  ? __task_pid_nr_ns+0x6c/0x120
+Oct 24 01:32:27.445722 host kernel:  ? arch_exit_to_user_mode_prepare.isra.0+0xd/0xe0
+Oct 24 01:32:27.445746 host kernel:  ? do_syscall_64+0x140/0x5a0
+Oct 24 01:32:27.445767 host kernel:  ? do_syscall_64+0x140/0x5a0
+Oct 24 01:32:27.445794 host kernel:  ? do_syscall_64+0x140/0x5a0
+Oct 24 01:32:27.445820 host kernel:  ? arch_exit_to_user_mode_prepare.isra.0+0xd/0xe0
+Oct 24 01:32:27.445842 host kernel:  ? do_syscall_64+0x140/0x5a0
+Oct 24 01:32:27.445868 host kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Oct 24 01:32:27.445899 host kernel: RIP: 0033:0x7cd453532a7d
+Oct 24 01:32:27.445922 host kernel: Code: 04 25 28 00 00 00 48 89 45 c8 31 c0 48 8d 45 10 c7 45 b0 10 00 00 00 48 89 45 b8 48 8d 45 d0 48 89 45 c0 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 1a 48 8b 45 c8 64 48 2b 04 25 28 00 00 00
+Oct 24 01:32:27.445954 host kernel: RSP: 002b:00007fffcee68160 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+Oct 24 01:32:27.445982 host kernel: RAX: ffffffffffffffda RBX: 0000629a5a99a080 RCX: 00007cd453532a7d
+Oct 24 01:32:27.446007 host kernel: RDX: 00007fffcee68220 RSI: 00000000c0306480 RDI: 000000000000000e
+Oct 24 01:32:27.446032 host kernel: RBP: 00007fffcee681b0 R08: 0000000000000017 R09: 0000629a5df94e20
+Oct 24 01:32:27.446071 host kernel: R10: 0000629a5f2d62d0 R11: 0000000000000246 R12: 00007fffcee68220
+Oct 24 01:32:27.446093 host kernel: R13: 00000000c0306480 R14: 000000000000000e R15: 0000629a5ab06050
+Oct 24 01:32:27.446119 host kernel:  </TASK>
+Oct 24 01:32:27.446149 host kernel: ---[ end trace 0000000000000000 ]---
+Oct 24 01:32:29.446123 host kernel: ------------[ cut here ]------------
+Oct 24 01:32:29.446209 host kernel: nouveau 0000:01:00.0: timeout
+Oct 24 01:32:29.446248 host kernel: WARNING: nvkm/subdev/mmu/vmmgf100.c:220 at gf100_vmm_invalidate+0x23a/0x260 [nouveau], CPU#5: kworker/5:0/50
+Oct 24 01:32:29.446290 host kernel: Modules linked in: rpcsec_gss_krb5 xt_cgroup auth_rpcgss xt_MASQUERADE nfsv4 nfs lockd grace netfs ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 rfcomm snd_seq_dummy snd_hrtimer tcp_diag inet_diag nft_chain_nat nf_nat xt_tcpudp xt_TPROXY nf_tproxy_ipv6 nf_tproxy_ipv4 xt_NFQUEUE xt_connmark xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 xt_mark nfnetlink_queue xt_addrtype nft_compat x_tables nf_tables nfnetlink qrtr cmac algif_hash algif_skcipher af_alg bnep sunrpc binfmt_misc intel_rapl_msr at24 intel_rapl_common x86_pkg_temp_thermal mei_hdcp mei_pxp intel_powerclamp coretemp kvm_intel kvm irqbypass rapl intel_cstate snd_hda_codec_alc882 snd_hda_codec_realtek_lib snd_hda_codec_generic snd_hda_codec_nvhdmi snd_hda_codec_hdmi i2c_i801 i2c_smbus i2c_mux uvcvideo snd_hda_intel videobuf2_vmalloc snd_hda_codec btusb uvc btmtk videobuf2_memops snd_usb_audio snd_hda_core lpc_ich videobuf2_v4l2 snd_intel_dspcfg btrtl r8169 snd_seq_midi snd_usbmidi_lib btbcm snd_intel_sdw_acpi videobuf2_common
+Oct 24 01:32:29.446356 host kernel:  snd_seq_midi_event btintel snd_ump snd_hwdep realtek videodev bluetooth snd_pcm snd_rawmidi mc snd_seq snd_seq_device snd_timer snd mei_me soundcore mei input_leds joydev mac_hid sch_fq_codel efi_pstore nouveau(OE) drm_ttm_helper ttm gpu_sched i2c_algo_bit drm_gpuvm drm_exec drm_display_helper mxm_wmi psmouse cec rc_core ghash_clmulni_intel serio_raw video ahci libahci wmi hid_logitech ff_memless hid_generic usbhid uas hid usb_storage ppdev lp parport ramoops reed_solomon msr dmi_sysfs autofs4 aesni_intel
+Oct 24 01:32:29.446412 host kernel: CPU: 5 UID: 0 PID: 50 Comm: kworker/5:0 Kdump: loaded Tainted: G        W  OE       7.0.0-38-generic #38-Ubuntu PREEMPT(lazy) 
+Oct 24 01:32:29.446440 host kernel: Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+Oct 24 01:32:29.446472 host kernel: Hardware name: Gigabyte Technology Co., Ltd. To be filled by O.E.M./Z68X-UD3P-B3, BIOS U1g 11/13/2017
+Oct 24 01:32:29.446504 host kernel: Workqueue: events nouveau_cli_work [nouveau]
+Oct 24 01:32:29.446531 host kernel: RIP: 0010:gf100_vmm_invalidate+0x240/0x260 [nouveau]
+Oct 24 01:32:29.446557 host kernel: Code: b2 9c e5 48 8b 45 b0 48 8b 40 10 48 8b 78 10 48 8b 5f 50 48 85 db 74 23 e8 fd b1 9c e5 48 8d 3d e6 b0 dd ff 48 89 da 48 89 c6 <67> 48 0f b9 3a e9 3b ff ff ff 0f 0b e9 8f fe ff ff 48 8b 1f eb d8
+Oct 24 01:32:29.446588 host kernel: RSP: 0018:ffffccd9001f3898 EFLAGS: 00010246
+Oct 24 01:32:29.446618 host kernel: RAX: ffffffffc09be501 RBX: ffff8905815b1490 RCX: 0000000000000000
+Oct 24 01:32:29.446643 host kernel: RDX: ffff8905815b1490 RSI: ffffffffc09be501 RDI: ffffffffc0875300
+Oct 24 01:32:29.446669 host kernel: RBP: ffffccd9001f38f0 R08: 0000000000000000 R09: 0000000000000000
+Oct 24 01:32:29.446697 host kernel: R10: 0000000000000000 R11: 0000000000000000 R12: ffff890584e35000
+Oct 24 01:32:29.446722 host kernel: R13: 0000000000000001 R14: ffff8905823e5440 R15: 0000000000000291
+Oct 24 01:32:29.446749 host kernel: FS:  0000000000000000(0000) GS:ffff8908e547b000(0000) knlGS:0000000000000000
+Oct 24 01:32:29.446775 host kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Oct 24 01:32:29.446803 host kernel: CR2: 00007ea2422df2a8 CR3: 000000010feb0001 CR4: 00000000001726f0
+Oct 24 01:32:29.446828 host kernel: Call Trace:
+Oct 24 01:32:29.446851 host kernel:  <TASK>
+Oct 24 01:32:29.446875 host kernel:  ? refcount_dec_and_mutex_lock+0x4e/0xd0
+Oct 24 01:32:29.446904 host kernel:  gf100_vmm_flush+0x1f/0x30 [nouveau]
+Oct 24 01:32:29.446933 host kernel:  nvkm_vmm_iter.isra.0+0x41f/0xbb0 [nouveau]
+Oct 24 01:32:29.446953 host kernel:  ? __pfx_gf100_vmm_pgt_unmap+0x10/0x10 [nouveau]
+Oct 24 01:32:29.446978 host kernel:  ? __pfx_nvkm_vmm_unref_ptes+0x10/0x10 [nouveau]
+Oct 24 01:32:29.447006 host kernel:  ? raw_spin_rq_unlock+0x14/0x50
+Oct 24 01:32:29.447036 host kernel:  nvkm_vmm_ptes_unmap_put+0xd1/0x110 [nouveau]
+Oct 24 01:32:29.447075 host kernel:  ? __pfx_nvkm_vmm_unref_ptes+0x10/0x10 [nouveau]
+Oct 24 01:32:29.447101 host kernel:  ? __pfx_gf100_vmm_pgt_unmap+0x10/0x10 [nouveau]
+Oct 24 01:32:29.447122 host kernel:  nvkm_vmm_put_locked+0x224/0x2a0 [nouveau]
+Oct 24 01:32:29.447150 host kernel:  nvkm_uvmm_mthd+0xeb0/0xf30 [nouveau]
+Oct 24 01:32:29.447178 host kernel:  nvkm_object_mthd+0x1a/0x40 [nouveau]
+Oct 24 01:32:29.447216 host kernel:  ? __pfx_nvkm_uvmm_mthd+0x10/0x10 [nouveau]
+Oct 24 01:32:29.447259 host kernel:  ? nvkm_object_mthd+0x1a/0x40 [nouveau]
+Oct 24 01:32:29.448052 host kernel:  nvkm_ioctl_mthd+0x5d/0x90 [nouveau]
+Oct 24 01:32:29.448101 host kernel:  nvkm_ioctl+0xcf/0x1e0 [nouveau]
+Oct 24 01:32:29.448140 host kernel:  nvkm_client_ioctl+0xe/0x20 [nouveau]
+Oct 24 01:32:29.448165 host kernel:  nvif_object_mthd+0xfc/0x220 [nouveau]
+Oct 24 01:32:29.448183 host kernel:  nvif_vmm_put+0x69/0x90 [nouveau]
+Oct 24 01:32:29.448211 host kernel:  nouveau_vma_del+0x88/0xf0 [nouveau]
+Oct 24 01:32:29.448230 host kernel:  nouveau_gem_object_delete_work+0x37/0x60 [nouveau]
+Oct 24 01:32:29.448244 host kernel:  nouveau_cli_work+0x11c/0x180 [nouveau]
+Oct 24 01:32:29.448256 host kernel:  process_one_work+0x1ac/0x3d0
+Oct 24 01:32:29.448272 host kernel:  worker_thread+0x1b8/0x360
+Oct 24 01:32:29.448286 host kernel:  ? __pfx_worker_thread+0x10/0x10
+Oct 24 01:32:29.448300 host kernel:  kthread+0xf7/0x130
+Oct 24 01:32:29.448318 host kernel:  ? __pfx_kthread+0x10/0x10
+Oct 24 01:32:29.448332 host kernel:  ret_from_fork+0x195/0x2a0
+Oct 24 01:32:29.448351 host kernel:  ? __pfx_kthread+0x10/0x10
+Oct 24 01:32:29.448371 host kernel:  ? __pfx_kthread+0x10/0x10
+Oct 24 01:32:29.448382 host kernel:  ret_from_fork_asm+0x1a/0x30
+Oct 24 01:32:29.448398 host kernel:  </TASK>
+Oct 24 01:32:29.448415 host kernel: ---[ end trace 0000000000000000 ]---
+Oct 24 01:32:30.550083 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 24 01:32:30.550803 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+Oct 24 01:32:30.551271 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+Oct 24 01:32:30.551594 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 24 01:32:30.551895 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+Oct 24 01:32:30.552251 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+Oct 24 01:32:30.552572 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 24 01:32:30.552869 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 01:32:30.553191 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 01:32:30.553466 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 1907000 got 1909285 ssel 00000004 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 01:32:30.553741 host kernel: nouveau 0000:01:00.0: clk: LAB calc_pll idx 07: опора nouveau 1620000 kHz, с делителем опоры 405000 kHz (lab_gpc_seq&8)
+Oct 24 01:32:30.554013 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 1645000 got 1645312 ssel 00000080 coef 00014110 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 01:32:30.554356 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 1645000 got 1645000 ssel 00000100 coef 00000000 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 01:32:30.554653 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 24 01:32:30.554923 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 24 01:32:30.555222 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 24 01:32:30.555489 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 01:32:30.555746 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 01:32:30.556009 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 01:32:30.556288 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2254 нс (чтений 3, статус 0002000a), запас 0 мкс
+Oct 24 01:32:30.556558 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 01:32:30.556824 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2227 нс (чтений 3, статус 00020002), запас 0 мкс
+Oct 24 01:32:30.557110 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 01:32:30.557376 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 00012809
+Oct 24 01:32:30.557636 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 00 бит 0x10 не ставлю, ctrl 00030001
+Oct 24 01:32:30.557905 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 01 PLL locked ctrl 00030001 coef 00012107
+Oct 24 01:32:30.558222 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 01 бит 0x10 не ставлю, ctrl 00030001
+Oct 24 01:32:30.558538 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 02 PLL locked ctrl 00030001 coef 00012107
+Oct 24 01:32:30.558826 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 02 бит 0x10 не ставлю, ctrl 00030001
+Oct 24 01:32:30.559106 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 07 PLL locked ctrl 00030001 coef 00014110
+Oct 24 01:32:30.559418 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 07 бит 0x10 не ставлю, ctrl 00030001
+Oct 24 01:32:30.559735 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 01:32:30.560018 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 24 01:32:30.560360 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 01:32:30.560645 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2225 нс (чтений 3, статус 0002000a), запас 0 мкс
+Oct 24 01:32:30.561029 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 24 01:32:30.561420 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 02 select PLL, 0x137100=00000003
+Oct 24 01:32:30.561763 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 07 select PLL, 0x137100=00000007
+Oct 24 01:32:30.562088 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 01:32:30.562408 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2221 нс (чтений 3, статус 00020002), запас 0 мкс
+Oct 24 01:32:30.562710 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 08 select PLL, 0x137100=00000087
+Oct 24 01:32:30.562989 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 01:32:30.563300 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 24 01:32:30.563586 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+Oct 24 01:32:30.563866 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 324 МГц, цель 2004 МГц, шагов 1 (lab_mem_replay=15)
+Oct 24 01:32:30.564150 host kernel: nouveau 0000:01:00.0: fb: LAB replay B 324->2004: в memx 81 записей, 7 ожиданий, 12 пауз, пропущено 10 операций, ~240 слов
+Oct 24 01:32:30.564441 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 01:32:30.564729 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 16
+Oct 24 01:32:30.565019 host kernel: nouveau 0000:01:00.0: fb: LAB replay B 324->2004: выполнен за 11963 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=89200816 0x1373f0=00000002 0x132000=18030101 0x10f290=0c3c362a 0x10f300=00000a4d 0x611200=00000031
+Oct 24 01:32:30.565306 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей после скрипта: 8
+Oct 24 01:32:30.565588 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 24 01:32:30.565864 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+Oct 24 01:32:30.566170 host kernel: nouveau 0000:01:00.0: pmu: LAB gov: -> 0f (загрузка >= 50 % два замера, загрузка 1000‰), ret 0, режим теперь 0f
+Oct 24 01:32:31.449129 host kernel: ------------[ cut here ]------------
+Oct 24 01:32:31.449220 host kernel: nouveau 0000:01:00.0: timeout
+Oct 24 01:32:31.449251 host kernel: WARNING: nvkm/subdev/mmu/vmmgf100.c:220 at gf100_vmm_invalidate+0x23a/0x260 [nouveau], CPU#3: gnome-shell/2510
+Oct 24 01:32:31.449289 host kernel: Modules linked in: rpcsec_gss_krb5 xt_cgroup auth_rpcgss xt_MASQUERADE nfsv4 nfs lockd grace netfs ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 rfcomm snd_seq_dummy snd_hrtimer tcp_diag inet_diag nft_chain_nat nf_nat xt_tcpudp xt_TPROXY nf_tproxy_ipv6 nf_tproxy_ipv4 xt_NFQUEUE xt_connmark xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 xt_mark nfnetlink_queue xt_addrtype nft_compat x_tables nf_tables nfnetlink qrtr cmac algif_hash algif_skcipher af_alg bnep sunrpc binfmt_misc intel_rapl_msr at24 intel_rapl_common x86_pkg_temp_thermal mei_hdcp mei_pxp intel_powerclamp coretemp kvm_intel kvm irqbypass rapl intel_cstate snd_hda_codec_alc882 snd_hda_codec_realtek_lib snd_hda_codec_generic snd_hda_codec_nvhdmi snd_hda_codec_hdmi i2c_i801 i2c_smbus i2c_mux uvcvideo snd_hda_intel videobuf2_vmalloc snd_hda_codec btusb uvc btmtk videobuf2_memops snd_usb_audio snd_hda_core lpc_ich videobuf2_v4l2 snd_intel_dspcfg btrtl r8169 snd_seq_midi snd_usbmidi_lib btbcm snd_intel_sdw_acpi videobuf2_common
+Oct 24 01:32:31.449341 host kernel:  snd_seq_midi_event btintel snd_ump snd_hwdep realtek videodev bluetooth snd_pcm snd_rawmidi mc snd_seq snd_seq_device snd_timer snd mei_me soundcore mei input_leds joydev mac_hid sch_fq_codel efi_pstore nouveau(OE) drm_ttm_helper ttm gpu_sched i2c_algo_bit drm_gpuvm drm_exec drm_display_helper mxm_wmi psmouse cec rc_core ghash_clmulni_intel serio_raw video ahci libahci wmi hid_logitech ff_memless hid_generic usbhid uas hid usb_storage ppdev lp parport ramoops reed_solomon msr dmi_sysfs autofs4 aesni_intel
+Oct 24 01:32:31.449381 host kernel: CPU: 3 UID: 1026 PID: 2510 Comm: gnome-shell Kdump: loaded Tainted: G        W  OE       7.0.0-38-generic #38-Ubuntu PREEMPT(lazy) 
+Oct 24 01:32:31.449429 host kernel: Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+Oct 24 01:32:31.449447 host kernel: Hardware name: Gigabyte Technology Co., Ltd. To be filled by O.E.M./Z68X-UD3P-B3, BIOS U1g 11/13/2017
+Oct 24 01:32:31.449460 host kernel: RIP: 0010:gf100_vmm_invalidate+0x240/0x260 [nouveau]
+Oct 24 01:32:31.449476 host kernel: Code: b2 9c e5 48 8b 45 b0 48 8b 40 10 48 8b 78 10 48 8b 5f 50 48 85 db 74 23 e8 fd b1 9c e5 48 8d 3d e6 b0 dd ff 48 89 da 48 89 c6 <67> 48 0f b9 3a e9 3b ff ff ff 0f 0b e9 8f fe ff ff 48 8b 1f eb d8
+Oct 24 01:32:31.449492 host kernel: RSP: 0018:ffffccd90c2b73d0 EFLAGS: 00010246
+Oct 24 01:32:31.449508 host kernel: RAX: ffffffffc09be501 RBX: ffff8905815b1490 RCX: 0000000000000000
+Oct 24 01:32:31.449520 host kernel: RDX: ffff8905815b1490 RSI: ffffffffc09be501 RDI: ffffffffc0875300
+Oct 24 01:32:31.449536 host kernel: RBP: ffffccd90c2b7428 R08: 0000000000000000 R09: 0000000000000000
+Oct 24 01:32:31.449553 host kernel: R10: 0000000000000000 R11: 0000000000000000 R12: ffff890584e35000
+Oct 24 01:32:31.449567 host kernel: R13: 0000000000000001 R14: ffff8905823e5440 R15: 0000000000004be7
+Oct 24 01:32:31.449581 host kernel: FS:  00007cd44e701040(0000) GS:ffff8908e537b000(0000) knlGS:0000000000000000
+Oct 24 01:32:31.449597 host kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Oct 24 01:32:31.449611 host kernel: CR2: 0000280400edc000 CR3: 000000010feb0003 CR4: 00000000001726f0
+Oct 24 01:32:31.449625 host kernel: Call Trace:
+Oct 24 01:32:31.449637 host kernel:  <TASK>
+Oct 24 01:32:31.449650 host kernel:  gf100_vmm_flush+0x1f/0x30 [nouveau]
+Oct 24 01:32:31.449662 host kernel:  nvkm_vmm_iter.isra.0+0x41f/0xbb0 [nouveau]
+Oct 24 01:32:31.449676 host kernel:  ? __cgroup_account_cputime+0x2f/0x60
+Oct 24 01:32:31.449691 host kernel:  ? __pfx_gf100_vmm_pgt_dma+0x10/0x10 [nouveau]
+Oct 24 01:32:31.449705 host kernel:  ? __pfx_nvkm_vmm_ref_ptes+0x10/0x10 [nouveau]
+Oct 24 01:32:31.449720 host kernel:  ? update_curr+0x87/0x120
+Oct 24 01:32:31.449732 host kernel:  ? update_cfs_rq_load_avg+0x1e/0x260
+Oct 24 01:32:31.449747 host kernel:  ? __pfx_gf100_vmm_pgt_dma+0x10/0x10 [nouveau]
+Oct 24 01:32:31.449763 host kernel:  nvkm_vmm_ptes_get_map+0xe3/0x120 [nouveau]
+Oct 24 01:32:31.449778 host kernel:  ? __pfx_nvkm_vmm_ref_ptes+0x10/0x10 [nouveau]
+Oct 24 01:32:31.449792 host kernel:  ? __pfx_gf100_vmm_pgt_dma+0x10/0x10 [nouveau]
+Oct 24 01:32:31.449806 host kernel:  ? nvkm_vmm_map_valid+0xc5/0x1a0 [nouveau]
+Oct 24 01:32:31.449821 host kernel:  nvkm_vmm_map_locked+0x287/0x3e0 [nouveau]
+Oct 24 01:32:31.449833 host kernel:  ? finish_task_switch.isra.0+0x95/0x2f0
+Oct 24 01:32:31.449845 host kernel:  nvkm_vmm_map+0x81/0x100 [nouveau]
+Oct 24 01:32:31.449861 host kernel:  nvkm_mem_map_dma+0x56/0x90 [nouveau]
+Oct 24 01:32:31.449878 host kernel:  nvkm_uvmm_mthd+0xd52/0xf30 [nouveau]
+Oct 24 01:32:31.450093 host kernel:  ? nvkm_uvmm_mthd+0x226/0xf30 [nouveau]
+Oct 24 01:32:31.450123 host kernel:  nvkm_object_mthd+0x1a/0x40 [nouveau]
+Oct 24 01:32:31.451113 host kernel:  ? __pfx_nvkm_uvmm_mthd+0x10/0x10 [nouveau]
+Oct 24 01:32:31.451157 host kernel:  ? nvkm_object_mthd+0x1a/0x40 [nouveau]
+Oct 24 01:32:31.451193 host kernel:  nvkm_ioctl_mthd+0x5d/0x90 [nouveau]
+Oct 24 01:32:31.451223 host kernel:  nvkm_ioctl+0xcf/0x1e0 [nouveau]
+Oct 24 01:32:31.451258 host kernel:  nvkm_client_ioctl+0xe/0x20 [nouveau]
+Oct 24 01:32:31.451274 host kernel:  nvif_object_mthd+0xfc/0x220 [nouveau]
+Oct 24 01:32:31.451290 host kernel:  nvif_vmm_map+0x7f/0x140 [nouveau]
+Oct 24 01:32:31.451301 host kernel:  nouveau_mem_map+0xa1/0xf0 [nouveau]
+Oct 24 01:32:31.451317 host kernel:  nouveau_vma_new+0x231/0x260 [nouveau]
+Oct 24 01:32:31.451333 host kernel:  nouveau_gem_object_open+0x1e2/0x210 [nouveau]
+Oct 24 01:32:31.451347 host kernel:  drm_gem_handle_create_tail+0xcc/0x180
+Oct 24 01:32:31.451359 host kernel:  drm_gem_handle_create+0x39/0x50
+Oct 24 01:32:31.451375 host kernel:  nouveau_gem_ioctl_new+0xd7/0x180 [nouveau]
+Oct 24 01:32:31.451389 host kernel:  ? __pfx_nouveau_gem_ioctl_new+0x10/0x10 [nouveau]
+Oct 24 01:32:31.451404 host kernel:  drm_ioctl_kernel+0xb5/0x110
+Oct 24 01:32:31.451422 host kernel:  drm_ioctl+0x309/0x5e0
+Oct 24 01:32:31.451438 host kernel:  ? __pfx_nouveau_gem_ioctl_new+0x10/0x10 [nouveau]
+Oct 24 01:32:31.451450 host kernel:  nouveau_drm_ioctl+0x5e/0xd0 [nouveau]
+Oct 24 01:32:31.451463 host kernel:  __x64_sys_ioctl+0xa3/0x100
+Oct 24 01:32:31.451477 host kernel:  x64_sys_call+0x103b/0x2390
+Oct 24 01:32:31.451491 host kernel:  do_syscall_64+0x105/0x5a0
+Oct 24 01:32:31.451508 host kernel:  ? __sys_recvmsg+0xe2/0x100
+Oct 24 01:32:31.451522 host kernel:  ? arch_exit_to_user_mode_prepare.isra.0+0xd/0xe0
+Oct 24 01:32:31.451568 host kernel:  ? do_syscall_64+0x140/0x5a0
+Oct 24 01:32:31.451601 host kernel:  ? do_syscall_64+0x140/0x5a0
+Oct 24 01:32:31.451667 host kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Oct 24 01:32:31.451684 host kernel: RIP: 0033:0x7cd453532a7d
+Oct 24 01:32:31.451698 host kernel: Code: 04 25 28 00 00 00 48 89 45 c8 31 c0 48 8d 45 10 c7 45 b0 10 00 00 00 48 89 45 b8 48 8d 45 d0 48 89 45 c0 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 1a 48 8b 45 c8 64 48 2b 04 25 28 00 00 00
+Oct 24 01:32:31.451723 host kernel: RSP: 002b:00007fffcee676c0 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+Oct 24 01:32:31.451735 host kernel: RAX: ffffffffffffffda RBX: 0000629a5a99a080 RCX: 00007cd453532a7d
+Oct 24 01:32:31.451747 host kernel: RDX: 00007fffcee67780 RSI: 00000000c0306480 RDI: 000000000000000e
+Oct 24 01:32:31.451765 host kernel: RBP: 00007fffcee67710 R08: 0000000000000017 R09: 0000629a5bbe5cd0
+Oct 24 01:32:31.451785 host kernel: R10: 0000000000000000 R11: 0000000000000246 R12: 00007fffcee67780
+Oct 24 01:32:31.451802 host kernel: R13: 00000000c0306480 R14: 000000000000000e R15: 0000629a5ab06050
+Oct 24 01:32:31.451817 host kernel:  </TASK>
+Oct 24 01:32:31.451834 host kernel: ---[ end trace 0000000000000000 ]---
+Oct 24 01:32:31.953348 host kernel: nouveau 0000:01:00.0: bus: MMIO write of 00000002 FAULT at 13b154 [ PRIVRING ]
+Oct 24 01:32:31.955864 host kernel: nouveau 0000:01:00.0: bus: MMIO read of 00000000 FAULT at 502090 [ TIMEOUT ]
+Oct 24 01:32:31.956283 host kernel: nouveau 0000:01:00.0: bus: MMIO read of 00000000 FAULT at 13b054 [ TIMEOUT ]
+Oct 24 01:32:31.956643 host kernel: nouveau 0000:01:00.0: bus: MMIO read of 00000000 FAULT at 13e014 [ TIMEOUT ]
+Oct 24 01:32:33.452213 host kernel: ------------[ cut here ]------------
+Oct 24 01:32:33.452343 host kernel: nouveau 0000:01:00.0: timeout
+Oct 24 01:32:33.452385 host kernel: WARNING: nvkm/subdev/mmu/vmmgf100.c:220 at gf100_vmm_invalidate+0x23a/0x260 [nouveau], CPU#3: kworker/3:1/104
+Oct 24 01:32:33.452424 host kernel: Modules linked in: rpcsec_gss_krb5 xt_cgroup auth_rpcgss xt_MASQUERADE nfsv4 nfs lockd grace netfs ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 rfcomm snd_seq_dummy snd_hrtimer tcp_diag inet_diag nft_chain_nat nf_nat xt_tcpudp xt_TPROXY nf_tproxy_ipv6 nf_tproxy_ipv4 xt_NFQUEUE xt_connmark xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 xt_mark nfnetlink_queue xt_addrtype nft_compat x_tables nf_tables nfnetlink qrtr cmac algif_hash algif_skcipher af_alg bnep sunrpc binfmt_misc intel_rapl_msr at24 intel_rapl_common x86_pkg_temp_thermal mei_hdcp mei_pxp intel_powerclamp coretemp kvm_intel kvm irqbypass rapl intel_cstate snd_hda_codec_alc882 snd_hda_codec_realtek_lib snd_hda_codec_generic snd_hda_codec_nvhdmi snd_hda_codec_hdmi i2c_i801 i2c_smbus i2c_mux uvcvideo snd_hda_intel videobuf2_vmalloc snd_hda_codec btusb uvc btmtk videobuf2_memops snd_usb_audio snd_hda_core lpc_ich videobuf2_v4l2 snd_intel_dspcfg btrtl r8169 snd_seq_midi snd_usbmidi_lib btbcm snd_intel_sdw_acpi videobuf2_common
+Oct 24 01:32:33.452461 host kernel:  snd_seq_midi_event btintel snd_ump snd_hwdep realtek videodev bluetooth snd_pcm snd_rawmidi mc snd_seq snd_seq_device snd_timer snd mei_me soundcore mei input_leds joydev mac_hid sch_fq_codel efi_pstore nouveau(OE) drm_ttm_helper ttm gpu_sched i2c_algo_bit drm_gpuvm drm_exec drm_display_helper mxm_wmi psmouse cec rc_core ghash_clmulni_intel serio_raw video ahci libahci wmi hid_logitech ff_memless hid_generic usbhid uas hid usb_storage ppdev lp parport ramoops reed_solomon msr dmi_sysfs autofs4 aesni_intel
+Oct 24 01:32:33.452485 host kernel: CPU: 3 UID: 0 PID: 104 Comm: kworker/3:1 Kdump: loaded Tainted: G        W  OE       7.0.0-38-generic #38-Ubuntu PREEMPT(lazy) 
+Oct 24 01:32:33.452501 host kernel: Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+Oct 24 01:32:33.452513 host kernel: Hardware name: Gigabyte Technology Co., Ltd. To be filled by O.E.M./Z68X-UD3P-B3, BIOS U1g 11/13/2017
+Oct 24 01:32:33.452528 host kernel: Workqueue: events nouveau_cli_work [nouveau]
+Oct 24 01:32:33.452544 host kernel: RIP: 0010:gf100_vmm_invalidate+0x240/0x260 [nouveau]
+Oct 24 01:32:33.452563 host kernel: Code: b2 9c e5 48 8b 45 b0 48 8b 40 10 48 8b 78 10 48 8b 5f 50 48 85 db 74 23 e8 fd b1 9c e5 48 8d 3d e6 b0 dd ff 48 89 da 48 89 c6 <67> 48 0f b9 3a e9 3b ff ff ff 0f 0b e9 8f fe ff ff 48 8b 1f eb d8
+Oct 24 01:32:33.452575 host kernel: RSP: 0018:ffffccd9009bf898 EFLAGS: 00010246
+Oct 24 01:32:33.452593 host kernel: RAX: ffffffffc09be501 RBX: ffff8905815b1490 RCX: 0000000000000000
+Oct 24 01:32:33.452608 host kernel: RDX: ffff8905815b1490 RSI: ffffffffc09be501 RDI: ffffffffc0875300
+Oct 24 01:32:33.452622 host kernel: RBP: ffffccd9009bf8f0 R08: 0000000000000000 R09: 0000000000000000
+Oct 24 01:32:33.452636 host kernel: R10: 0000000000000000 R11: 0000000000000000 R12: ffff890584e35000
+Oct 24 01:32:33.452652 host kernel: R13: 0000000000000001 R14: ffff8905823e5440 R15: 0000000000002525
+Oct 24 01:32:33.452667 host kernel: FS:  0000000000000000(0000) GS:ffff8908e537b000(0000) knlGS:0000000000000000
+Oct 24 01:32:33.452681 host kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Oct 24 01:32:33.452695 host kernel: CR2: 00007cd44de09010 CR3: 000000010feb0003 CR4: 00000000001726f0
+Oct 24 01:32:33.452713 host kernel: Call Trace:
+Oct 24 01:32:33.452729 host kernel:  <TASK>
+Oct 24 01:32:33.452743 host kernel:  ? refcount_dec_and_mutex_lock+0x4e/0xd0
+Oct 24 01:32:33.452759 host kernel:  gf100_vmm_flush+0x1f/0x30 [nouveau]
+Oct 24 01:32:33.452775 host kernel:  nvkm_vmm_iter.isra.0+0x41f/0xbb0 [nouveau]
+Oct 24 01:32:33.452791 host kernel:  ? _prb_read_valid+0xa8/0x140
+Oct 24 01:32:33.453085 host kernel:  ? __pfx_gf100_vmm_pgt_unmap+0x10/0x10 [nouveau]
+Oct 24 01:32:33.453150 host kernel:  ? __pfx_nvkm_vmm_unref_ptes+0x10/0x10 [nouveau]
+Oct 24 01:32:33.453176 host kernel:  nvkm_vmm_ptes_unmap_put+0xd1/0x110 [nouveau]
+Oct 24 01:32:33.453213 host kernel:  ? __pfx_nvkm_vmm_unref_ptes+0x10/0x10 [nouveau]
+Oct 24 01:32:33.454078 host kernel:  ? __pfx_gf100_vmm_pgt_unmap+0x10/0x10 [nouveau]
+Oct 24 01:32:33.454130 host kernel:  ? desc_read_finalized_seq+0x39/0xa0
+Oct 24 01:32:33.454169 host kernel:  nvkm_vmm_put_locked+0x224/0x2a0 [nouveau]
+Oct 24 01:32:33.454198 host kernel:  nvkm_uvmm_mthd+0xeb0/0xf30 [nouveau]
+Oct 24 01:32:33.454227 host kernel:  ? prb_read_valid+0x1c/0x30
+Oct 24 01:32:33.454257 host kernel:  ? console_unlock+0xb3/0x130
+Oct 24 01:32:33.454272 host kernel:  nvkm_object_mthd+0x1a/0x40 [nouveau]
+Oct 24 01:32:33.454289 host kernel:  ? __pfx_nvkm_uvmm_mthd+0x10/0x10 [nouveau]
+Oct 24 01:32:33.454306 host kernel:  ? nvkm_object_mthd+0x1a/0x40 [nouveau]
+Oct 24 01:32:33.454322 host kernel:  nvkm_ioctl_mthd+0x5d/0x90 [nouveau]
+Oct 24 01:32:33.454338 host kernel:  nvkm_ioctl+0xcf/0x1e0 [nouveau]
+Oct 24 01:32:33.454352 host kernel:  nvkm_client_ioctl+0xe/0x20 [nouveau]
+Oct 24 01:32:33.454368 host kernel:  nvif_object_mthd+0xfc/0x220 [nouveau]
+Oct 24 01:32:33.454382 host kernel:  nvif_vmm_put+0x69/0x90 [nouveau]
+Oct 24 01:32:33.454397 host kernel:  nouveau_vma_del+0x88/0xf0 [nouveau]
+Oct 24 01:32:33.455105 host kernel:  nouveau_gem_object_delete_work+0x37/0x60 [nouveau]
+Oct 24 01:32:33.455223 host kernel:  nouveau_cli_work+0x11c/0x180 [nouveau]
+Oct 24 01:32:33.455249 host kernel:  process_one_work+0x1ac/0x3d0
+Oct 24 01:32:33.455279 host kernel:  worker_thread+0x1b8/0x360
+Oct 24 01:32:33.455310 host kernel:  ? _raw_spin_lock_irqsave+0xe/0x20
+Oct 24 01:32:33.455332 host kernel:  ? __pfx_worker_thread+0x10/0x10
+Oct 24 01:32:33.455348 host kernel:  kthread+0xf7/0x130
+Oct 24 01:32:33.455364 host kernel:  ? __pfx_kthread+0x10/0x10
+Oct 24 01:32:33.455378 host kernel:  ret_from_fork+0x195/0x2a0
+Oct 24 01:32:33.455393 host kernel:  ? __pfx_kthread+0x10/0x10
+Oct 24 01:32:33.455410 host kernel:  ? __pfx_kthread+0x10/0x10
+Oct 24 01:32:33.455424 host kernel:  ret_from_fork_asm+0x1a/0x30
+Oct 24 01:32:33.455439 host kernel:  </TASK>
+Oct 24 01:32:33.455451 host kernel: ---[ end trace 0000000000000000 ]---
+Oct 24 01:32:35.455118 host kernel: ------------[ cut here ]------------
+Oct 24 01:32:35.455201 host kernel: nouveau 0000:01:00.0: timeout
+Oct 24 01:32:35.455269 host kernel: WARNING: nvkm/subdev/mmu/vmmgf100.c:220 at gf100_vmm_invalidate+0x23a/0x260 [nouveau], CPU#7: gnome-shell/2510
+Oct 24 01:32:35.455306 host kernel: Modules linked in: rpcsec_gss_krb5 xt_cgroup auth_rpcgss xt_MASQUERADE nfsv4 nfs lockd grace netfs ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 rfcomm snd_seq_dummy snd_hrtimer tcp_diag inet_diag nft_chain_nat nf_nat xt_tcpudp xt_TPROXY nf_tproxy_ipv6 nf_tproxy_ipv4 xt_NFQUEUE xt_connmark xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 xt_mark nfnetlink_queue xt_addrtype nft_compat x_tables nf_tables nfnetlink qrtr cmac algif_hash algif_skcipher af_alg bnep sunrpc binfmt_misc intel_rapl_msr at24 intel_rapl_common x86_pkg_temp_thermal mei_hdcp mei_pxp intel_powerclamp coretemp kvm_intel kvm irqbypass rapl intel_cstate snd_hda_codec_alc882 snd_hda_codec_realtek_lib snd_hda_codec_generic snd_hda_codec_nvhdmi snd_hda_codec_hdmi i2c_i801 i2c_smbus i2c_mux uvcvideo snd_hda_intel videobuf2_vmalloc snd_hda_codec btusb uvc btmtk videobuf2_memops snd_usb_audio snd_hda_core lpc_ich videobuf2_v4l2 snd_intel_dspcfg btrtl r8169 snd_seq_midi snd_usbmidi_lib btbcm snd_intel_sdw_acpi videobuf2_common
+Oct 24 01:32:35.455371 host kernel:  snd_seq_midi_event btintel snd_ump snd_hwdep realtek videodev bluetooth snd_pcm snd_rawmidi mc snd_seq snd_seq_device snd_timer snd mei_me soundcore mei input_leds joydev mac_hid sch_fq_codel efi_pstore nouveau(OE) drm_ttm_helper ttm gpu_sched i2c_algo_bit drm_gpuvm drm_exec drm_display_helper mxm_wmi psmouse cec rc_core ghash_clmulni_intel serio_raw video ahci libahci wmi hid_logitech ff_memless hid_generic usbhid uas hid usb_storage ppdev lp parport ramoops reed_solomon msr dmi_sysfs autofs4 aesni_intel
+Oct 24 01:32:35.455402 host kernel: CPU: 7 UID: 1026 PID: 2510 Comm: gnome-shell Kdump: loaded Tainted: G        W  OE       7.0.0-38-generic #38-Ubuntu PREEMPT(lazy) 
+Oct 24 01:32:35.455420 host kernel: Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+Oct 24 01:32:35.455433 host kernel: Hardware name: Gigabyte Technology Co., Ltd. To be filled by O.E.M./Z68X-UD3P-B3, BIOS U1g 11/13/2017
+Oct 24 01:32:35.455447 host kernel: RIP: 0010:gf100_vmm_invalidate+0x240/0x260 [nouveau]
+Oct 24 01:32:35.455461 host kernel: Code: b2 9c e5 48 8b 45 b0 48 8b 40 10 48 8b 78 10 48 8b 5f 50 48 85 db 74 23 e8 fd b1 9c e5 48 8d 3d e6 b0 dd ff 48 89 da 48 89 c6 <67> 48 0f b9 3a e9 3b ff ff ff 0f 0b e9 8f fe ff ff 48 8b 1f eb d8
+Oct 24 01:32:35.455476 host kernel: RSP: 0018:ffffccd90c2b74c0 EFLAGS: 00010246
+Oct 24 01:32:35.455488 host kernel: RAX: ffffffffc09be501 RBX: ffff8905815b1490 RCX: 0000000000000000
+Oct 24 01:32:35.455505 host kernel: RDX: ffff8905815b1490 RSI: ffffffffc09be501 RDI: ffffffffc0875300
+Oct 24 01:32:35.455519 host kernel: RBP: ffffccd90c2b7518 R08: 0000000000000000 R09: 0000000000000000
+Oct 24 01:32:35.455541 host kernel: R10: 0000000000000000 R11: 0000000000000000 R12: ffff890584e35000
+Oct 24 01:32:35.455552 host kernel: R13: 0000000000000001 R14: ffff8905823e5440 R15: 0000000000000291
+Oct 24 01:32:35.455564 host kernel: FS:  00007cd44e701040(0000) GS:ffff8908e557b000(0000) knlGS:0000000000000000
+Oct 24 01:32:35.455580 host kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Oct 24 01:32:35.455595 host kernel: CR2: 0000034da6e1b010 CR3: 000000010feb0004 CR4: 00000000001726f0
+Oct 24 01:32:35.455613 host kernel: Call Trace:
+Oct 24 01:32:35.455630 host kernel:  <TASK>
+Oct 24 01:32:35.455645 host kernel:  gf100_vmm_flush+0x1f/0x30 [nouveau]
+Oct 24 01:32:35.455658 host kernel:  nvkm_vmm_iter.isra.0+0x41f/0xbb0 [nouveau]
+Oct 24 01:32:35.455672 host kernel:  ? sugov_update_single_freq+0xe2/0x250
+Oct 24 01:32:35.455686 host kernel:  ? __pfx_gf100_vmm_pgt_dma+0x10/0x10 [nouveau]
+Oct 24 01:32:35.455700 host kernel:  ? __pfx_nvkm_vmm_ref_ptes+0x10/0x10 [nouveau]
+Oct 24 01:32:35.455716 host kernel:  ? __sched_balance_update_blocked_averages+0x608/0x690
+Oct 24 01:32:35.455730 host kernel:  ? __pfx_gf100_vmm_pgt_dma+0x10/0x10 [nouveau]
+Oct 24 01:32:35.455745 host kernel:  nvkm_vmm_ptes_get_map+0xe3/0x120 [nouveau]
+Oct 24 01:32:35.455764 host kernel:  ? __pfx_nvkm_vmm_ref_ptes+0x10/0x10 [nouveau]
+Oct 24 01:32:35.456162 host kernel:  ? __pfx_gf100_vmm_pgt_dma+0x10/0x10 [nouveau]
+Oct 24 01:32:35.456219 host kernel:  ? nvkm_vmm_map_valid+0xc5/0x1a0 [nouveau]
+Oct 24 01:32:35.456244 host kernel:  nvkm_vmm_map_locked+0x287/0x3e0 [nouveau]
+Oct 24 01:32:35.456268 host kernel:  ? finish_task_switch.isra.0+0x95/0x2f0
+Oct 24 01:32:35.456284 host kernel:  nvkm_vmm_map+0x81/0x100 [nouveau]
+Oct 24 01:32:35.456310 host kernel:  nvkm_mem_map_dma+0x56/0x90 [nouveau]
+Oct 24 01:32:35.457103 host kernel:  nvkm_uvmm_mthd+0xd52/0xf30 [nouveau]
+Oct 24 01:32:35.457161 host kernel:  ? nvkm_uvmm_mthd+0x226/0xf30 [nouveau]
+Oct 24 01:32:35.457185 host kernel:  nvkm_object_mthd+0x1a/0x40 [nouveau]
+Oct 24 01:32:35.457201 host kernel:  ? __pfx_nvkm_uvmm_mthd+0x10/0x10 [nouveau]
+Oct 24 01:32:35.457219 host kernel:  ? nvkm_object_mthd+0x1a/0x40 [nouveau]
+Oct 24 01:32:35.457244 host kernel:  nvkm_ioctl_mthd+0x5d/0x90 [nouveau]
+Oct 24 01:32:35.457262 host kernel:  nvkm_ioctl+0xcf/0x1e0 [nouveau]
+Oct 24 01:32:35.457288 host kernel:  nvkm_client_ioctl+0xe/0x20 [nouveau]
+Oct 24 01:32:35.457321 host kernel:  nvif_object_mthd+0xfc/0x220 [nouveau]
+Oct 24 01:32:35.457357 host kernel:  nvif_vmm_map+0x7f/0x140 [nouveau]
+Oct 24 01:32:35.457378 host kernel:  nouveau_mem_map+0xa1/0xf0 [nouveau]
+Oct 24 01:32:35.457397 host kernel:  nouveau_vma_new+0x231/0x260 [nouveau]
+Oct 24 01:32:35.458106 host kernel:  nouveau_gem_object_open+0x1e2/0x210 [nouveau]
+Oct 24 01:32:35.458232 host kernel:  drm_gem_handle_create_tail+0xcc/0x180
+Oct 24 01:32:35.458290 host kernel:  drm_gem_handle_create+0x39/0x50
+Oct 24 01:32:35.458355 host kernel:  nouveau_gem_ioctl_new+0xd7/0x180 [nouveau]
+Oct 24 01:32:35.458420 host kernel:  ? __pfx_nouveau_gem_ioctl_new+0x10/0x10 [nouveau]
+Oct 24 01:32:35.458475 host kernel:  drm_ioctl_kernel+0xb5/0x110
+Oct 24 01:32:35.458515 host kernel:  drm_ioctl+0x309/0x5e0
+Oct 24 01:32:35.458575 host kernel:  ? __pfx_nouveau_gem_ioctl_new+0x10/0x10 [nouveau]
+Oct 24 01:32:35.458612 host kernel:  nouveau_drm_ioctl+0x5e/0xd0 [nouveau]
+Oct 24 01:32:35.458645 host kernel:  __x64_sys_ioctl+0xa3/0x100
+Oct 24 01:32:35.458673 host kernel:  x64_sys_call+0x103b/0x2390
+Oct 24 01:32:35.458699 host kernel:  do_syscall_64+0x105/0x5a0
+Oct 24 01:32:35.458735 host kernel:  ? __task_pid_nr_ns+0x6c/0x120
+Oct 24 01:32:35.458774 host kernel:  ? arch_exit_to_user_mode_prepare.isra.0+0xd/0xe0
+Oct 24 01:32:35.458803 host kernel:  ? do_syscall_64+0x140/0x5a0
+Oct 24 01:32:35.458835 host kernel:  ? do_syscall_64+0x140/0x5a0
+Oct 24 01:32:35.458867 host kernel:  ? exc_page_fault+0x94/0x1e0
+Oct 24 01:32:35.458918 host kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Oct 24 01:32:35.458952 host kernel: RIP: 0033:0x7cd453532a7d
+Oct 24 01:32:35.458989 host kernel: Code: 04 25 28 00 00 00 48 89 45 c8 31 c0 48 8d 45 10 c7 45 b0 10 00 00 00 48 89 45 b8 48 8d 45 d0 48 89 45 c0 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 1a 48 8b 45 c8 64 48 2b 04 25 28 00 00 00
+Oct 24 01:32:35.459025 host kernel: RSP: 002b:00007fffcee68160 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+Oct 24 01:32:35.459092 host kernel: RAX: ffffffffffffffda RBX: 0000629a5a99a080 RCX: 00007cd453532a7d
+Oct 24 01:32:35.459134 host kernel: RDX: 00007fffcee68220 RSI: 00000000c0306480 RDI: 000000000000000e
+Oct 24 01:32:35.459186 host kernel: RBP: 00007fffcee681b0 R08: 0000000000000017 R09: 0000629a5d550a20
+Oct 24 01:32:35.459234 host kernel: R10: 0000629a5f2d62d0 R11: 0000000000000246 R12: 00007fffcee68220
+Oct 24 01:32:35.459269 host kernel: R13: 00000000c0306480 R14: 000000000000000e R15: 0000629a5ab06050
+Oct 24 01:32:35.459303 host kernel:  </TASK>
+Oct 24 01:32:35.459346 host kernel: ---[ end trace 0000000000000000 ]---
