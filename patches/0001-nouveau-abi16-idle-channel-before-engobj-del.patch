@@ -1,6 +1,6 @@
 --- a/nouveau_abi16.c
 +++ b/nouveau_abi16.c
-@@ -89,6 +89,7 @@
+@@ -89,6 +89,7 @@ struct nouveau_abi16_obj {
  		ENGOBJ,
  	} type;
  	u64 object;
@@ -8,7 +8,7 @@
  
  	struct nvif_object engobj;
  
-@@ -173,6 +174,13 @@
+@@ -173,6 +174,13 @@ nouveau_abi16_chan_fini(struct nouveau_abi16 *abi16,
  			struct nouveau_abi16_chan *chan)
  {
  	struct nouveau_abi16_ntfy *ntfy, *temp;
@@ -22,7 +22,7 @@
  
  	/* Cancel all jobs from the entity's queue. */
  	if (chan->sched)
-@@ -749,8 +757,19 @@
+@@ -784,8 +792,24 @@ nouveau_abi16_ioctl_del(struct nouveau_abi16 *abi16, struct nvif_ioctl_v0 *ioctl
  
  	obj = nouveau_abi16_obj_find(abi16, ioctl->object);
  	if (obj) {
@@ -32,10 +32,15 @@
 +			 * engine object, as the legacy GPUOBJ_FREE path does.  The
 +			 * channel may still have work queued that needs the engine
 +			 * context which is about to be unbound.
++			 *
++			 * Legacy PUSHBUF submissions are serialized with this ioctl
++			 * by cli->mutex.  With VM_BIND, EXEC jobs are pushed to the
++			 * channel asynchronously by the scheduler, so wait for every
++			 * submitted job to finish before touching the channel.
 +			 */
 +			if (obj->chan && obj->chan->chan) {
-+				pr_info("nouveau-engobj-idle: idling chid %d before deleting oclass %04x\n",
-+					obj->chan->chan->chid, obj->engobj.oclass);
++				if (obj->chan->sched)
++					nouveau_sched_wait_idle(obj->chan->sched);
 +				nouveau_channel_idle(obj->chan->chan);
 +			}
  			nvif_object_dtor(&obj->engobj);
@@ -43,7 +48,7 @@
  		nouveau_abi16_obj_del(obj);
  	}
  
-@@ -791,6 +810,7 @@
+@@ -826,6 +850,7 @@ nouveau_abi16_ioctl_new(struct nouveau_abi16 *abi16, struct nvif_ioctl_v0 *ioctl
  	obj = nouveau_abi16_obj_new(abi16, ENGOBJ, args->object);
  	if (IS_ERR(obj))
  		return PTR_ERR(obj);
@@ -51,3 +56,36 @@
  
  	ret = nvif_object_ctor(&chan->chan->user, "abi16EngObj", args->handle, args->oclass,
  			       NULL, 0, &obj->engobj);
+--- a/nouveau_sched.c
++++ b/nouveau_sched.c
+@@ -493,13 +493,20 @@ nouveau_sched_job_list_empty(struct nouveau_sched *sched)
+ 	return empty;
+ }
+ 
++/* Wait until every job submitted to the scheduler has finished. */
++void
++nouveau_sched_wait_idle(struct nouveau_sched *sched)
++{
++	wait_event(sched->job.wq, nouveau_sched_job_list_empty(sched));
++}
++
+ static void
+ nouveau_sched_fini(struct nouveau_sched *sched)
+ {
+ 	struct drm_gpu_scheduler *drm_sched = &sched->base;
+ 	struct drm_sched_entity *entity = &sched->entity;
+ 
+-	wait_event(sched->job.wq, nouveau_sched_job_list_empty(sched));
++	nouveau_sched_wait_idle(sched);
+ 
+ 	drm_sched_entity_fini(entity);
+ 	drm_sched_fini(drm_sched);
+--- a/nouveau_sched.h
++++ b/nouveau_sched.h
+@@ -115,5 +115,6 @@ struct nouveau_sched {
+ int nouveau_sched_create(struct nouveau_sched **psched, struct nouveau_drm *drm,
+ 			 struct workqueue_struct *wq, u32 credit_limit);
+ void nouveau_sched_destroy(struct nouveau_sched **psched);
++void nouveau_sched_wait_idle(struct nouveau_sched *sched);
+ 
+ #endif
