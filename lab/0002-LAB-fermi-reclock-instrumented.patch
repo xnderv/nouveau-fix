@@ -239,7 +239,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +309,53 @@
+@@ -270,6 +309,61 @@
  	return ret;
  }
  
@@ -260,6 +260,14 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +module_param(lab_hub01_khz, uint, 0644);
 +MODULE_PARM_DESC(lab_gpc_khz, "LAB: override gpc (core) target kHz, max 1800000");
 +MODULE_PARM_DESC(lab_rop_khz, "LAB: override rop target kHz, max 1907000");
++/* LAB 23.10: пауза GR вокруг переключения тактовых узлов ядра. Шесть воспроизведений 23.10: GR встаёт сразу после
++ * подъёма 07→0f под нагрузкой; память, PCIe, напряжение не нужны. Гипотеза: узлы ядра можно переключать только при
++ * простаивающем GR. Делаем как nouveau в gf100_gr_reset и NVIDIA перед PLL (запись 20.10): 0x400500[0]=0 (GR не забирает
++ * команды) → ждать 0x40060c[0]==0 и 0x002640[28]==0 (условие gf100_gr_wait_idle / gf100_engn_status) → узлы → 0x400500[0]=1.
++ * Значение = предел ожидания простоя в мс (0 — выключено). При таймауте переключаем всё равно и пишем в журнал. */
++static uint lab_gr_pause;
++module_param(lab_gr_pause, uint, 0644);
++MODULE_PARM_DESC(lab_gr_pause, "LAB: stop GR command fetch (0x400500) and wait idle around core clock switch: 0 off, N = wait up to N ms");
 +
 +/* LAB: если не 0 — PLL ядра получает ровно эти коэффициенты (P<<16 | N<<8 | M), ядро на PLL.
 + * Проверяются пределы из BIOS: M 4-16, N 8-95, P 1-63, опора/M 25-100 МГц, VCO 1000-2000 МГц. */
@@ -293,7 +301,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +368,41 @@
+@@ -282,6 +376,41 @@
  	if (!freq)
  		return 0;
  
@@ -335,7 +343,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +412,9 @@
+@@ -291,7 +420,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -346,7 +354,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +441,8 @@
+@@ -318,6 +449,8 @@
  		info->freq = clk1;
  	}
  
@@ -355,7 +363,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -362,6 +487,43 @@
+@@ -362,6 +495,43 @@
  	);
  }
  
@@ -399,7 +407,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static void
  gf100_clk_prog_2(struct gf100_clk *clk, int idx)
  {
-@@ -372,16 +534,33 @@
+@@ -372,16 +542,33 @@
  		nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000000);
  		nvkm_mask(device, addr + 0x00, 0x00000001, 0x00000000);
  		if (info->coef) {
@@ -436,7 +444,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +574,27 @@
+@@ -395,12 +582,27 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -466,15 +474,45 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -428,6 +622,7 @@
+@@ -428,10 +630,37 @@
  	int i, j;
- 
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 gr500 = 0, st = 0;
++	s64 waited = 0;
++	bool paused = false;
++
++	if (lab_gr_pause) {
++		gr500 = nvkm_rd32(device, 0x400500);
++		nvkm_mask(device, 0x400500, 0x00000001, 0x00000000);
++		paused = true;
++		waited = nvkm_msec(device, lab_gr_pause,
++			nvkm_rd32(device, 0x400700);
++			st = nvkm_rd32(device, 0x002640);
++			if (!(nvkm_rd32(device, 0x40060c) & 0x00000001) && !(st & 0x10000000))
++				break;
++		);
++		nvkm_info(&clk->base.subdev, "LAB gr pause: 0x400500 %08x -> %08x, %s %lld мкс (0x400700=%08x 0x40060c=%08x 0x002640=%08x)\n",
++			  gr500, nvkm_rd32(device, 0x400500), waited < 0 ? "ТАЙМАУТ" : "простой через",
++			  waited < 0 ? (s64)lab_gr_pause * 1000 : waited / 1000,
++			  nvkm_rd32(device, 0x400700), nvkm_rd32(device, 0x40060c), nvkm_rd32(device, 0x002640));
++	}
++
  	for (i = 0; i < ARRAY_SIZE(stage); i++) {
 +		nvkm_info(&clk->base.subdev, "LAB prog stage %d\n", i);
  		for (j = 0; j < ARRAY_SIZE(clk->eng); j++) {
  			if (!clk->eng[j].freq)
  				continue;
-@@ -477,5 +672,5 @@
+ 			stage[i].exec(clk, j);
+ 		}
+ 	}
+ 
++	if (paused) {
++		nvkm_mask(device, 0x400500, 0x00000001, gr500 & 0x00000001);
++		nvkm_info(&clk->base.subdev, "LAB gr pause: 0x400500 возвращён %08x\n", nvkm_rd32(device, 0x400500));
++	}
++
+ 	return 0;
+@@ -477,5 +706,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
