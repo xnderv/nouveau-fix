@@ -163,8 +163,8 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  static void
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-24 00:32:37.366407721 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 00:32:37.368247735 +0300
+--- base/nvkm/subdev/clk/gf100.c	2026-10-24 01:17:19.246799941 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 01:17:19.249628883 +0300
 @@ -23,11 +23,17 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -423,7 +423,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -351,15 +539,204 @@
+@@ -351,15 +539,206 @@
  	}
  }
  
@@ -437,7 +437,8 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 + * замедляется делителем FSRM (DIV2 = 10 для GPC, 2 для hubk06), а автоматика термопорогов отключается, чтобы не мешать.
 + * nouveau PTHERM при смене частот не трогает. lab_therm: 1 — как NVIDIA (значения выхода NVIDIA), 2 — после переключения
 + * вернуть наши исходные значения; lab_therm_us — пауза после входа в замедление, мкс (у NVIDIA ~24). */
-+static uint lab_therm;
++/* 24.10: включено по умолчанию — тесты 13, 15, 16, 17: 240 подъёмов под нагрузкой без зависания (без скобки 7 из 7 висло). */
++static uint lab_therm = 1;
 +module_param(lab_therm, uint, 0644);
 +MODULE_PARM_DESC(lab_therm, "LAB: PTHERM FSRM slowdown bracket around GPC/hubk06 mux switch as NVIDIA: 0 off, 1 NVIDIA exit values, 2 restore ours");
 +static uint lab_therm_us = 24;
@@ -463,7 +464,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 + * / 0x00020002 (hubk06): бит 17 FSRM_3_ACTIVE и CUR_DIV (биты 0-5) = записанный код. lab_therm_wait=1: вместо фиксированной
 + * выдержки ждать этот признак ((статус & 0x2003f) == 0x20000 | код), затем сразу переключать. Предел 100 мкс — только защита;
 + * lab_therm_wait_us — дополнительный запас ПОСЛЕ признака (0 = нет). lab_therm_us при lab_therm_wait=1 не используется. */
-+static uint lab_therm_wait;
++static uint lab_therm_wait = 1;	/* 24.10: по умолчанию — по признаку (тесты 16, 17) */
 +module_param(lab_therm_wait, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_wait, "LAB: wait for FSRM_STATUS engaged flag (bit17 + CUR_DIV == code) instead of a fixed delay (0 off, 1 on)");
 +static uint lab_therm_wait_us;
@@ -556,8 +557,9 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	nvkm_wr32(device, 0x020180 + sv->i * 4, lab_therm >= 2 ? sv->f3 : 0);
 +	nvkm_wr32(device, 0x0201a0 + sv->i * 4, lab_therm >= 2 ? sv->f4 : 0x00004040);
 +	nvkm_wr32(device, 0x020004, sv->ctrl1);
-+	nvkm_info(&clk->base.subdev, "LAB therm idx %02x (FSRM %d): выдержка %u мкс; до FSRM2 %08x FSRM3 %08x FSRM4 %08x CTRL1 %08x; после %08x %08x %08x %08x; статус %08x\n",
-+		  idx, sv->i, sv->us, sv->f2, sv->f3, sv->f4, sv->ctrl1,
++	nvkm_info(&clk->base.subdev, "LAB therm idx %02x (FSRM %d): %s%u мкс; до FSRM2 %08x FSRM3 %08x FSRM4 %08x CTRL1 %08x; после %08x %08x %08x %08x; статус %08x\n",
++		  idx, sv->i, sv->w ? "по признаку, запас " : "выдержка ", sv->w ? lab_therm_wait_us : sv->us,
++		  sv->f2, sv->f3, sv->f4, sv->ctrl1,
 +		  nvkm_rd32(device, 0x020160 + sv->i * 4), nvkm_rd32(device, 0x020180 + sv->i * 4),
 +		  nvkm_rd32(device, 0x0201a0 + sv->i * 4), nvkm_rd32(device, 0x020004), nvkm_rd32(device, 0x0201e0 + sv->i * 4));
 +	if (sv->w)
@@ -628,7 +630,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static void
-@@ -369,19 +746,52 @@
+@@ -369,19 +748,52 @@
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
  	if (idx <= 7) {
@@ -684,7 +686,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +805,31 @@
+@@ -395,12 +807,31 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -718,7 +720,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -426,15 +855,124 @@
+@@ -426,15 +857,124 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -845,7 +847,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +1015,5 @@
+@@ -477,5 +1017,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  

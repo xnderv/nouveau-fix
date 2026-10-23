@@ -12,7 +12,11 @@ verified step by step on the lab driver (2026-10-19..22):
   fetch to stop before blocking VRAM access (as gt215 nouveau does).
 - clk/gf100.c: never set bit 4 of the PLL control after lock (the NVIDIA driver does
   not; with it the 900 MHz core PLL hangs the GPU); hubk06 PLL reference through the
-  source divider; reclocking enabled for the known board.
+  source divider; reclocking enabled for the known board; PTHERM clock slowdown (FSRM)
+  engaged around every GPC and hubk06 clock source switch and released after it, waiting
+  for FSRM_STATUS to report it active (as the NVIDIA driver does, which waits ~5/8 us by
+  timer). Without it a 07->0f switch under load wedges PGRAPH (GPC/ROP busy, no traps):
+  7 of 7 test runs hung within 16 upshifts; with it 4 of 4 runs, 240 upshifts, clean.
 - clk/base.c: NVIDIA order: going up, voltage and core clocks first, memory last;
   going down, memory first (clk->core_first).
 - pmu/fuc/perf.fuc: PERF process accounts GPU load with the PMU busy counters set up
@@ -191,8 +195,8 @@ diff -ruN a/nvkm/subdev/clk/base.c b/nvkm/subdev/clk/base.c
  }
  
 diff -ruN a/nvkm/subdev/clk/gf100.c b/nvkm/subdev/clk/gf100.c
---- a/nvkm/subdev/clk/gf100.c	2026-10-22 14:02:34.821548719 +0300
-+++ b/nvkm/subdev/clk/gf100.c	2026-10-22 14:04:33.240099161 +0300
+--- a/nvkm/subdev/clk/gf100.c	2026-10-24 01:18:21.195784425 +0300
++++ b/nvkm/subdev/clk/gf100.c	2026-10-24 01:18:21.198868851 +0300
 @@ -25,6 +25,8 @@
  #include "priv.h"
  #include "pll.h"
@@ -259,7 +263,86 @@ diff -ruN a/nvkm/subdev/clk/gf100.c b/nvkm/subdev/clk/gf100.c
  	if (!limits.refclk)
  		return 0;
  
-@@ -377,11 +408,17 @@
+@@ -351,15 +382,78 @@
+ 	}
+ }
+ 
++/* PTHERM clock slowdown (FSRM) around a source switch of the GPC (idx 0) and
++ * hubk06 (idx 7) clocks, as the NVIDIA driver does on GF114: engage the
++ * slowdown of that domain with the threshold-driven slowdowns masked, wait
++ * until FSRM_STATUS reports it active, switch the mux, then restore.
++ * Switching a busy GPC between the divider and the PLL without it can wedge
++ * PGRAPH (GPC/ROP busy forever, no traps); observed on 1458:3515 under load.
++ */
++struct gf114_fsrm {
++	bool on;
++	int i;
++	u32 ctrl1, fsrm2, fsrm3, fsrm4;
++};
++
++static void
++gf114_fsrm_enter(struct gf100_clk *clk, int idx, struct gf114_fsrm *f)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 code;
++
++	f->on = false;
++	if (!gf114_quirks(clk) || (idx != 0 && idx != 7))
++		return;
++
++	f->i = (idx == 0) ? 0 : 1;
++	code = (idx == 0) ? 0x0a : 0x02;
++	f->ctrl1 = nvkm_rd32(device, 0x020004);
++	f->fsrm2 = nvkm_rd32(device, 0x020160 + f->i * 4);
++	f->fsrm3 = nvkm_rd32(device, 0x020180 + f->i * 4);
++	f->fsrm4 = nvkm_rd32(device, 0x0201a0 + f->i * 4);
++
++	nvkm_wr32(device, 0x020160 + f->i * 4, (idx == 0) ? 0x000a008a : 0x00020082);
++	nvkm_wr32(device, 0x020180 + f->i * 4, code);
++	nvkm_wr32(device, 0x0201a0 + f->i * 4, 0x00004040);
++	nvkm_wr32(device, 0x020004, f->ctrl1 & ~0x00000068);
++	f->on = true;
++
++	if (nvkm_usec(device, 100,
++		NVKM_DELAY
++		if ((nvkm_rd32(device, 0x0201e0 + f->i * 4) & 0x0002003f) == (0x00020000 | code))
++			break;
++	) < 0)
++		nvkm_warn(&clk->base.subdev, "FSRM %d slowdown not engaged (%08x)\n",
++			  f->i, nvkm_rd32(device, 0x0201e0 + f->i * 4));
++}
++
++static void
++gf114_fsrm_leave(struct gf100_clk *clk, struct gf114_fsrm *f)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++
++	if (!f->on)
++		return;
++	nvkm_wr32(device, 0x020160 + f->i * 4, f->fsrm2);
++	nvkm_wr32(device, 0x020180 + f->i * 4, f->fsrm3);
++	nvkm_wr32(device, 0x0201a0 + f->i * 4, f->fsrm4);
++	nvkm_wr32(device, 0x020004, f->ctrl1);
++	f->on = false;
++}
++
+ static void
+ gf100_clk_prog_1(struct gf100_clk *clk, int idx)
+ {
+ 	struct nvkm_device *device = clk->base.subdev.device;
++	struct gf114_fsrm fsrm;
++
++	gf114_fsrm_enter(clk, idx, &fsrm);
+ 	nvkm_mask(device, 0x137100, (1 << idx), 0x00000000);
+ 	nvkm_msec(device, 2000,
+ 		if (!(nvkm_rd32(device, 0x137100) & (1 << idx)))
+ 			break;
+ 	);
++	gf114_fsrm_leave(clk, &fsrm);
+ }
+ 
+ static void
+@@ -377,11 +471,17 @@
  
  			/* Test PLL lock */
  			nvkm_mask(device, addr + 0x00, 0x00000010, 0x00000000);
@@ -280,7 +363,24 @@ diff -ruN a/nvkm/subdev/clk/gf100.c b/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -472,10 +509,13 @@
+@@ -395,12 +495,16 @@
+ 	struct gf100_clk_info *info = &clk->eng[idx];
+ 	struct nvkm_device *device = clk->base.subdev.device;
+ 	if (info->ssel) {
++		struct gf114_fsrm fsrm;
++
++		gf114_fsrm_enter(clk, idx, &fsrm);
+ 		nvkm_mask(device, 0x137100, (1 << idx), info->ssel);
+ 		nvkm_msec(device, 2000,
+ 			u32 tmp = nvkm_rd32(device, 0x137100) & (1 << idx);
+ 			if (tmp == info->ssel)
+ 				break;
+ 		);
++		gf114_fsrm_leave(clk, &fsrm);
+ 	}
+ }
+ 
+@@ -472,10 +576,13 @@
  	      struct nvkm_clk **pclk)
  {
  	struct gf100_clk *clk;
