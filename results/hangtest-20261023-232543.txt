@@ -1,0 +1,15 @@
+hangtest 2026-10-23 23:25:51: подъёмов 60, нагрузка browser, удержание 0f 6с, lab_gov был 2, ядро 7.0.0-38-generic
+параметры: lab_mem_order=Y lab_mem_op13=1 lab_mem_op34=1 lab_mem_op3a=0 lab_mem_replay=15 lab_pcie=0 lab_gpc_seq=13 
+23:25:55 старт: core 405 MHz memory 324 MHz; lab_mem=N lab_core=Y lab_volt_min_uv=1075000 lab_gr_pause=0 lab_gr_gate=0 lab_gr_wait=0 lab_xbar=0 lab_e9e0=0 lab_pll_keep=0 lab_order=1 lab_order_us=0 khz: gpc=0 rop=0 hub07=0 hub06=0 hub01=0
+23:25:55 нагрузка: /usr/bin/yandex-browser (pid 5760, профиль /home/alex/.cache/nouveau-hangtest-profile), страница hangload.html; прогрев 10 с
+23:26:05 загрузка GR перед циклами: 944‰
+23:26:16 подъём 1/60 в 23:26:09.992: gr до 870‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 943‰
+23:26:29 подъём 2/60 в 23:26:23.301: gr до 908‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 892‰
+23:26:43 подъём 3/60 в 23:26:37.089: gr до 859‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 993‰
+23:26:54 подъём 4/60 в 23:26:48.370: gr до 989‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 996‰
+23:27:04 подъём 5/60 в 23:26:59.199: gr до 950‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 1000‰ — ЗАВИСАНИЕ: gr=1000‰ 4с подряд, ошибок журнала 0
+23:27:04 подозрение на зависание (gr=1000‰ 4с подряд, ошибок журнала 0) — жду подтверждения ядра до 90 с, не перезагружайте
+=== ЗАВИСАНИЕ ВОСПРОИЗВЕДЕНО на подъёме 5 (нагрузка browser): gr=1000‰ 4с подряд, ошибок журнала 0; подпись ящика подтвердила: eng0/gr700 застыли (gr700=03000801 eng0=80141001) 15 с
+    Нагрузка оставлена, lab_gov=0.
+    Снимок регистров: /var/log/gpu-blackbox/hang-*.txt (чёрный ящик). Журнал: journalctl -k -b 0 --since '2026-10-23 23:25:51'
+    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show
