@@ -163,8 +163,8 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  static void
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-23 23:36:13.389601361 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-23 23:36:13.391792440 +0300
+--- base/nvkm/subdev/clk/gf100.c	2026-10-24 00:17:20.238453891 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 00:17:20.241934982 +0300
 @@ -23,11 +23,17 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -423,7 +423,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -351,15 +539,119 @@
+@@ -351,15 +539,167 @@
  	}
  }
  
@@ -443,8 +443,26 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +static uint lab_therm_us = 24;
 +module_param(lab_therm_us, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_us, "LAB: delay after engaging the FSRM slowdown before the mux switch, us");
++/* LAB 24.10: выдержка NVIDIA измерена по таймеру PTIMER в обеих записях (цикл чтения 0x009400 сразу после записи FSRM):
++ * hubk06 — от 3,52 до 5,09 мкс, GPC — от 7,17 до 8,51 мкс (точнее нельзя: под mmiotrace каждое чтение ~1,7 мкс).
++ * 24 мкс в тесте 13 — это время в записи между записью FSRM и записью 0x137100, почти целиком накладные mmiotrace.
++ * lab_therm_us_gpc / lab_therm_us_hub — отдельные выдержки (0 = брать lab_therm_us). */
++static uint lab_therm_us_gpc;
++module_param(lab_therm_us_gpc, uint, 0644);
++MODULE_PARM_DESC(lab_therm_us_gpc, "LAB: FSRM wait for GPC (idx 0), us; 0 = lab_therm_us");
++static uint lab_therm_us_hub;
++module_param(lab_therm_us_hub, uint, 0644);
++MODULE_PARM_DESC(lab_therm_us_hub, "LAB: FSRM wait for hubk06 (idx 7), us; 0 = lab_therm_us");
++/* lab_therm_probe=1: во время выдержки (длительность не меняется) читать FSRM_STATUS 0x0201e0+i*4 и записывать моменты
++ * изменения (до 8) — есть ли аппаратный признак «замедление вступило», и через сколько. Только чтения. */
++static uint lab_therm_probe;
++module_param(lab_therm_probe, uint, 0644);
++MODULE_PARM_DESC(lab_therm_probe, "LAB: sample FSRM_STATUS during the FSRM wait and log its transitions (0 off, 1 on)");
 +
-+struct lab_therm_save { bool on; int i; u32 ctrl1, f2, f3, f4; };
++struct lab_therm_save {
++	bool on; int i; u32 ctrl1, f2, f3, f4;
++	uint us; int np; u32 st0; u32 pv[8]; u32 pt[8]; u32 nrd;
++};
 +
 +static void
 +lab_therm_enter(struct gf100_clk *clk, int idx, struct lab_therm_save *sv)
@@ -467,8 +485,29 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	nvkm_wr32(device, 0x0201a0 + sv->i * 4, 0x00004040);
 +	nvkm_wr32(device, 0x020004, sv->ctrl1 & ~0x00000068);
 +	sv->on = true;
-+	if (lab_therm_us)
-+		udelay(lab_therm_us);
++	sv->us = (idx == 0 && lab_therm_us_gpc) ? lab_therm_us_gpc :
++		 (idx == 7 && lab_therm_us_hub) ? lab_therm_us_hub : lab_therm_us;
++	sv->np = 0;
++	sv->nrd = 0;
++	if (lab_therm_probe) {
++		u64 t0 = ktime_get_ns(), lim = (u64)sv->us * 1000ULL, dt;
++		u32 last, v;
++
++		sv->st0 = last = nvkm_rd32(device, 0x0201e0 + sv->i * 4);
++		do {
++			v = nvkm_rd32(device, 0x0201e0 + sv->i * 4);
++			sv->nrd++;
++			dt = ktime_get_ns() - t0;
++			if (v != last && sv->np < 8) {
++				sv->pv[sv->np] = v;
++				sv->pt[sv->np] = (u32)dt;
++				sv->np++;
++				last = v;
++			}
++		} while (dt < lim);
++	} else if (sv->us) {
++		udelay(sv->us);
++	}
 +}
 +
 +static void
@@ -483,10 +522,19 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	nvkm_wr32(device, 0x020180 + sv->i * 4, lab_therm >= 2 ? sv->f3 : 0);
 +	nvkm_wr32(device, 0x0201a0 + sv->i * 4, lab_therm >= 2 ? sv->f4 : 0x00004040);
 +	nvkm_wr32(device, 0x020004, sv->ctrl1);
-+	nvkm_info(&clk->base.subdev, "LAB therm idx %02x (FSRM %d): до FSRM2 %08x FSRM3 %08x FSRM4 %08x CTRL1 %08x; после %08x %08x %08x %08x; статус %08x\n",
-+		  idx, sv->i, sv->f2, sv->f3, sv->f4, sv->ctrl1,
++	nvkm_info(&clk->base.subdev, "LAB therm idx %02x (FSRM %d): выдержка %u мкс; до FSRM2 %08x FSRM3 %08x FSRM4 %08x CTRL1 %08x; после %08x %08x %08x %08x; статус %08x\n",
++		  idx, sv->i, sv->us, sv->f2, sv->f3, sv->f4, sv->ctrl1,
 +		  nvkm_rd32(device, 0x020160 + sv->i * 4), nvkm_rd32(device, 0x020180 + sv->i * 4),
 +		  nvkm_rd32(device, 0x0201a0 + sv->i * 4), nvkm_rd32(device, 0x020004), nvkm_rd32(device, 0x0201e0 + sv->i * 4));
++	if (lab_therm_probe) {
++		char buf[200];
++		int k, o = 0;
++
++		for (k = 0; k < sv->np && o < (int)sizeof(buf) - 24; k++)
++			o += scnprintf(buf + o, sizeof(buf) - o, " %u нс:%08x", sv->pt[k], sv->pv[k]);
++		nvkm_info(&clk->base.subdev, "LAB therm probe idx %02x: статус сразу после записи %08x, чтений %u, изменений %d:%s\n",
++			  idx, sv->st0, sv->nrd, sv->np, sv->np ? buf : " нет");
++	}
 +	sv->on = false;
 +}
 +
@@ -543,7 +591,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static void
-@@ -369,19 +661,52 @@
+@@ -369,19 +709,52 @@
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
  	if (idx <= 7) {
@@ -599,7 +647,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +720,31 @@
+@@ -395,12 +768,31 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -633,7 +681,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -426,15 +770,124 @@
+@@ -426,15 +818,124 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -760,7 +808,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +930,5 @@
+@@ -477,5 +978,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
