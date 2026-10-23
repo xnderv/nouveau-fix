@@ -1,0 +1,90 @@
+                                                    ### Promise created here: ###
+                                                    ### Promise created here: ###
+                                                    ### Promise created here: ###
+                                                    ### Promise created here: ###
+                                                    ### Promise created here: ###
+Oct 23 21:24:01.305417 host sudo[25273]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 21:24:01.305565 host sudo[25273]: alex : TTY=/dev/pts/1 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 21:24:01.309706 host sudo[25273]: pam_unix(sudo:session): session closed for user root
+Oct 23 21:24:01.381407 host sudo[25290]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 21:24:01.381628 host sudo[25290]: alex : TTY=/dev/pts/1 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c echo 07 > \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 21:24:01.383904 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=0 mem=0 core=1 volt_first=1
+Oct 23 21:24:01.384462 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie SKIPPED (lab_pcie=0)
+Oct 23 21:24:01.384429 host sudo[25290]: pam_unix(sudo:session): session closed for user root
+Oct 23 21:24:01.384861 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 950000 uV raised to floor 1075000 uV
+Oct 23 21:24:01.385643 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 1)
+Oct 23 21:24:01.386167 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+Oct 23 21:24:01.386619 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+Oct 23 21:24:01.387056 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 950000 uV raised to floor 1075000 uV
+Oct 23 21:24:01.387476 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 1)
+Oct 23 21:24:01.387880 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 23 21:24:01.388259 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 23 21:24:01.388587 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 23 21:24:01.388937 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 23 21:24:01.389333 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 23 21:24:01.389623 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 23 21:24:01.389935 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 23 21:24:01.390262 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 23 21:24:01.390618 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 23 21:24:01.390965 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 23 21:24:01.391274 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 23 21:24:01.391581 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 23 21:24:01.391864 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 23 21:24:01.392158 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 950000 uV raised to floor 1075000 uV
+Oct 23 21:24:01.392568 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 23 21:24:01.393340 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+Oct 23 21:24:03.409374 host sudo[25307]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 21:24:03.409527 host sudo[25307]: alex : TTY=/dev/pts/1 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 21:24:03.413582 host sudo[25307]: pam_unix(sudo:session): session closed for user root
+Oct 23 21:24:04.471917 host kernel: audit: type=1400 audit(1792779844.470:301): apparmor="AUDIT" operation="exec" class="file" info="conflicting profile attachments" profile="claude-desktop" name="/opt/yandex/browser/yandex_browser" pid=25317 comm="ThreadPoolSingl" requested_mask="x" fsuid=1026 ouid=0
+Oct 23 21:24:04.477912 host kernel: audit: type=1400 audit(1792779844.476:302): apparmor="AUDIT" operation="exec" class="file" info="conflicting profile attachments" profile="claude-desktop" name="/opt/yandex/browser/yandex_browser" pid=25318 comm="ThreadPoolSingl" requested_mask="x" fsuid=1026 ouid=0
+Oct 23 21:24:05.750823 host sudo[25344]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 21:24:05.751062 host sudo[25344]: alex : TTY=/dev/pts/1 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c echo 0f > \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 21:24:05.753904 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=0 mem=0 core=1 volt_first=1
+Oct 23 21:24:05.754434 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie SKIPPED (lab_pcie=0)
+Oct 23 21:24:05.754372 host sudo[25344]: pam_unix(sudo:session): session closed for user root
+Oct 23 21:24:05.754846 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 1063638 uV raised to floor 1075000 uV
+Oct 23 21:24:05.755205 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 23 21:24:05.755595 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+Oct 23 21:24:05.756063 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+Oct 23 21:24:05.756484 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 1063638 uV raised to floor 1075000 uV
+Oct 23 21:24:05.756947 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 23 21:24:05.757389 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 21:24:05.757831 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 21:24:05.758307 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 1907000 got 1909285 ssel 00000004 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 21:24:05.758728 host kernel: nouveau 0000:01:00.0: clk: LAB calc_pll idx 07: опора nouveau 1620000 kHz, с делителем опоры 405000 kHz (lab_gpc_seq&8)
+Oct 23 21:24:05.759162 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 1645000 got 1645312 ssel 00000080 coef 00014110 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 21:24:05.759561 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 1645000 got 1645000 ssel 00000100 coef 00000000 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 21:24:05.759987 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 21:24:05.760456 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 23 21:24:05.760841 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 21:24:05.761275 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 23 21:24:05.761604 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 23 21:24:05.761901 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 23 21:24:05.762239 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 00012809
+Oct 23 21:24:05.762627 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 00 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 21:24:05.762975 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 01 PLL locked ctrl 00030001 coef 00012107
+Oct 23 21:24:05.763345 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 01 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 21:24:05.763672 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 02 PLL locked ctrl 00030001 coef 00012107
+Oct 23 21:24:05.763971 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 02 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 21:24:05.764368 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 07 PLL locked ctrl 00030001 coef 00014110
+Oct 23 21:24:05.764793 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 07 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 21:24:05.765233 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 23 21:24:05.765588 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 23 21:24:05.765958 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 23 21:24:05.766309 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 02 select PLL, 0x137100=00000003
+Oct 23 21:24:05.767539 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 07 select PLL, 0x137100=00000007
+Oct 23 21:24:05.767964 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 08 select PLL, 0x137100=00000087
+Oct 23 21:24:05.768403 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 23 21:24:05.768847 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 1063638 uV raised to floor 1075000 uV
+Oct 23 21:24:05.769197 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 23 21:24:05.769493 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+Oct 23 21:24:05.769792 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+Oct 23 21:24:10.964136 host sudo[25389]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 21:24:10.964307 host sudo[25389]: alex : TTY=/dev/pts/1 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 21:24:10.969597 host sudo[25389]: pam_unix(sudo:session): session closed for user root
+Oct 23 21:24:12.179933 host kernel: nouveau 0000:01:00.0: bus: MMIO write of 00000002 FAULT at 13b154 [ PRIVRING ]
+Oct 23 21:24:30.904069 host com.anthropic.Claude.desktop[3954]: [3954:1023/212430.903988:ERROR:electron/shell/browser/notifications/linux/libnotify_notification.cc:64] notify_notification_show: domain=271 code=24 message="GDBus.Error:org.gtk.GDBus.UnmappedGError.Quark._g_2dio_2derror_2dquark.Code24: Timeout was reached"
+Oct 23 21:26:07.436252 host kernel: sysrq: Emergency Sync
+Oct 23 21:26:07.464920 host kernel: Emergency Sync complete
+Oct 23 21:26:08.260235 host kernel: sysrq: Emergency Remount R/O
