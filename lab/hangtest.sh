@@ -49,8 +49,11 @@ case "$LOAD" in
   browser)
     B="$(command -v yandex-browser || command -v chromium || command -v google-chrome || true)"
     [ -n "$B" ] || { echo "Браузер не найден"; exit 1; }
-    "$B" --new-window --app="file://$HERE/hangload.html" >/dev/null 2>&1 & LP=$!
-    echo "$(date +%T) нагрузка: $B (pid $LP), страница hangload.html; прогрев 10 с" | tee -a "$LOG"; sleep 10 ;;
+    # отдельный профиль: иначе уже открытый браузер получает страницу, а новый процесс сразу завершается
+    PROF="$HOME/.cache/nouveau-hangtest-profile"; mkdir -p "$PROF"
+    "$B" --user-data-dir="$PROF" --no-first-run --no-default-browser-check --disable-sync --new-window \
+         --app="file://$HERE/hangload.html" >/dev/null 2>&1 & LP=$!
+    echo "$(date +%T) нагрузка: $B (pid $LP, профиль $PROF), страница hangload.html; прогрев 10 с" | tee -a "$LOG"; sleep 10 ;;
   glmark2)
     G="$(command -v glmark2-wayland || command -v glmark2 || true)"; [ -n "$G" ] || { echo "glmark2 не установлен"; exit 1; }
     "$G" --run-forever -s 1600x900 -b shading:shading=phong -b bump:bump-render=high-poly -b refract >/dev/null 2>&1 & LP=$!
@@ -59,6 +62,7 @@ case "$LOAD" in
   *) echo "LOAD=browser|glmark2|none"; exit 1 ;;
 esac
 echo "$(date +%T) загрузка GR перед циклами: $(gr)‰ (ожидается > 500 при нагрузке)" | tee -a "$LOG"; sync
+DONE=0
 for c in $(seq 1 "$N"); do
     [ -n "$LP" ] && ! kill -0 "$LP" 2>/dev/null && { echo "$(date +%T) СТОП: нагрузка завершилась сама" | tee -a "$LOG"; break; }
     sleep "$(shuf -i 15-55 -n1 | awk '{print $1/10}')"       # случайная фаза 1.5–5.5 с, как у регулятора
@@ -79,7 +83,8 @@ for c in $(seq 1 "$N"); do
           echo "    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show"; } | tee -a "$LOG"; sync
         exit 2
     fi
-    pstate 07; sleep 2
+    pstate 07; sleep 2; DONE=$c
     case "$(ac)" in *"memory 324 MHz"*) ;; *) echo "$(date +%T) СТОП: после спуска не 324 МГц: $(ac)" | tee -a "$LOG"; break;; esac
 done
-echo "=== $N подъёмов без зависания (нагрузка $LOAD). Лог: $LOG" | tee -a "$LOG"
+if [ "$DONE" -eq "$N" ]; then echo "=== $N подъёмов без зависания (нагрузка $LOAD). Лог: $LOG" | tee -a "$LOG"
+else echo "=== Тест прерван после $DONE из $N подъёмов (см. причину выше). Лог: $LOG" | tee -a "$LOG"; fi
