@@ -239,7 +239,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +309,61 @@
+@@ -270,6 +309,67 @@
  	return ret;
  }
  
@@ -268,6 +268,12 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +static uint lab_gr_pause;
 +module_param(lab_gr_pause, uint, 0644);
 +MODULE_PARM_DESC(lab_gr_pause, "LAB: stop GR command fetch (0x400500) and wait idle around core clock switch: 0 off, N = wait up to N ms");
++/* LAB 23.10, тесты 6–8: с открытым входом GR зависает (6 из 6), с закрытым — 120/120 чисто, причём ожидание простоя не
++ * нужно (в 73 из 120 пауз GR был занят в момент переключения). lab_gr_gate — чистый вариант без ожидания:
++ * закрыть вход (0x400500[0]=0) → переключить узлы → открыть. Независим от lab_gr_pause. */
++static bool lab_gr_gate;
++module_param(lab_gr_gate, bool, 0644);
++MODULE_PARM_DESC(lab_gr_gate, "LAB: close GR command input (0x400500[0]) around the core clock switch, no waiting");
 +
 +/* LAB: если не 0 — PLL ядра получает ровно эти коэффициенты (P<<16 | N<<8 | M), ядро на PLL.
 + * Проверяются пределы из BIOS: M 4-16, N 8-95, P 1-63, опора/M 25-100 МГц, VCO 1000-2000 МГц. */
@@ -301,7 +307,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +376,41 @@
+@@ -282,6 +382,41 @@
  	if (!freq)
  		return 0;
  
@@ -343,7 +349,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +420,9 @@
+@@ -291,7 +426,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -354,7 +360,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +449,8 @@
+@@ -318,6 +455,8 @@
  		info->freq = clk1;
  	}
  
@@ -363,7 +369,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -362,6 +495,43 @@
+@@ -362,6 +501,43 @@
  	);
  }
  
@@ -407,7 +413,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static void
  gf100_clk_prog_2(struct gf100_clk *clk, int idx)
  {
-@@ -372,16 +542,33 @@
+@@ -372,16 +548,33 @@
  		nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000000);
  		nvkm_mask(device, addr + 0x00, 0x00000001, 0x00000000);
  		if (info->coef) {
@@ -444,7 +450,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +582,27 @@
+@@ -395,12 +588,27 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -474,14 +480,20 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -428,11 +630,44 @@
+@@ -428,11 +636,50 @@
  	int i, j;
 +	struct nvkm_device *device = clk->base.subdev.device;
 +	u32 gr500 = 0, st = 0;
 +	s64 waited = 0;
 +	bool paused = false;
 +
-+	if (lab_gr_pause) {
++	if (lab_gr_gate && !lab_gr_pause) {
++		gr500 = nvkm_rd32(device, 0x400500);
++		nvkm_mask(device, 0x400500, 0x00000001, 0x00000000);
++		paused = true;
++		nvkm_info(&clk->base.subdev, "LAB gr gate: 0x400500 %08x -> %08x, без ожидания\n",
++			  gr500, nvkm_rd32(device, 0x400500));
++	} else if (lab_gr_pause) {
 +		gr500 = nvkm_rd32(device, 0x400500);
 +		nvkm_mask(device, 0x400500, 0x00000001, 0x00000000);
 +		paused = true;
@@ -519,7 +531,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	}
 +
  	return 0;
-@@ -477,5 +712,5 @@
+@@ -477,5 +724,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
