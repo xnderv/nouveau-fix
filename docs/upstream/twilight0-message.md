@@ -27,7 +27,7 @@ flush via 0x13d7f4) and the 500 ms VBLANK timeout in Falcon are the two best lea
 
 **What I can share:** the full NVIDIA 390 trace from this board (~17 MB xz), the decoded scripts
 A–E for GDDR5, register snapshots of NVIDIA vs nouveau in each level, and all experiment logs.
-Repository: <URL after publication>. I'd be glad to compare the two traces side by side — what is
+Repository: https://github.com/avderevyanko/nouveau-fix. I'd be glad to compare the two traces side by side — what is
 common between DDR3 and GDDR5 is what could eventually become a generic Fermi sequence in nouveau,
 rather than two board-specific replays.
 
