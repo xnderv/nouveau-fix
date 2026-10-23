@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Нагрузка для hangtest</title>
+<style>
+  html,body{margin:0;background:#101418;color:#ddd;font:15px/1.4 sans-serif;overflow:hidden}
+  #gl{position:fixed;left:0;top:0;width:60vw;height:100vh}
+  #c2{position:fixed;left:60vw;top:0;width:40vw;height:50vh}
+  #txt{position:fixed;left:60vw;top:50vh;width:40vw;height:50vh;overflow:hidden;padding:8px;box-sizing:border-box;
+       background:#1b2026;user-select:text}
+  #txt p{margin:0 0 6px 0}
+  #hud{position:fixed;left:8px;top:8px;background:rgba(0,0,0,.6);padding:4px 8px;font:13px monospace;z-index:9}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .box{position:fixed;width:120px;height:120px;border-radius:12px;animation:spin 1.3s linear infinite;
+       box-shadow:0 0 40px #0ff;background:linear-gradient(45deg,#f0f,#0ff,#ff0);opacity:.85;z-index:5}
+</style></head>
+<body>
+<div id="hud">hangtest load: запуск…</div>
+<canvas id="gl"></canvas>
+<canvas id="c2"></canvas>
+<div id="txt"></div>
+<script>
+// Нагрузка «как у браузера в момент зависания 23.10»: WebGL с загрузкой текстур каждый кадр (DMA из системной
+// памяти), 2D-канвас, CSS-анимации (композитор) и непрерывное выделение текста (перерисовка выделения).
+const hud = document.getElementById('hud');
+// --- текст и его выделение
+const txt = document.getElementById('txt');
+let s = '';
+for (let i = 0; i < 40; i++) s += '<p>' + ('Абзац ' + i + ': съешь же ещё этих мягких французских булок, да выпей чаю. ').repeat(3) + '</p>';
+txt.innerHTML = s;
+const paras = txt.querySelectorAll('p');
+let selI = 0;
+setInterval(() => {
+  const a = paras[selI % paras.length], b = paras[(selI + 7) % paras.length];
+  try { window.getSelection().setBaseAndExtent(a.firstChild, 0, b.firstChild, b.firstChild.length); } catch (e) {}
+  selI++;
+}, 40);
+// --- вращающиеся блоки (композитор)
+for (let i = 0; i < 8; i++) { const d = document.createElement('div'); d.className = 'box';
+  d.style.left = (10 + i * 7) + 'vw'; d.style.top = (10 + (i % 4) * 20) + 'vh'; d.style.animationDuration = (0.7 + i * 0.15) + 's'; document.body.appendChild(d); }
+// --- 2D канвас
+const c2 = document.getElementById('c2'); c2.width = 1024; c2.height = 512; const g2 = c2.getContext('2d');
+// --- WebGL
+const cv = document.getElementById('gl'); cv.width = 1536; cv.height = 1440;
+const gl = cv.getContext('webgl', { antialias: true, preserveDrawingBuffer: false });
+let frames = 0, t0 = performance.now(), glok = !!gl;
+if (gl) {
+  const vs = `attribute vec2 p; attribute vec2 t; varying vec2 v; uniform float a; void main(){ float c=cos(a),s=sin(a); vec2 q=vec2(p.x*c-p.y*s,p.x*s+p.y*c); gl_Position=vec4(q,0.,1.); v=t; }`;
+  const fs = `precision mediump float; varying vec2 v; uniform sampler2D s; uniform float a; void main(){ vec4 c=texture2D(s,v+vec2(sin(a+v.y*9.)*.02,0.)); gl_FragColor=vec4(c.rgb*(.6+.4*sin(a*3.+v.x*20.)),1.); }`;
+  const sh = (t, src) => { const o = gl.createShader(t); gl.shaderSource(o, src); gl.compileShader(o); return o; };
+  const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pr); gl.useProgram(pr);
+  const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,0,0, 1,-1,1,0, -1,1,0,1, 1,1,1,1]), gl.STATIC_DRAW);
+  const lp = gl.getAttribLocation(pr, 'p'), lt = gl.getAttribLocation(pr, 't');
+  gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp, 2, gl.FLOAT, false, 16, 0);
+  gl.enableVertexAttribArray(lt); gl.vertexAttribPointer(lt, 2, gl.FLOAT, false, 16, 8);
+  const ua = gl.getUniformLocation(pr, 'a');
+  const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  const src = document.createElement('canvas'); src.width = 1024; src.height = 1024; const gs = src.getContext('2d');
+  gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+  function frame(now) {
+    const a = now / 1000;
+    // текстура 1024x1024 перерисовывается и заливается в GPU каждый кадр (4 МБ/кадр по шине)
+    gs.fillStyle = `hsl(${(a * 60) % 360},70%,40%)`; gs.fillRect(0, 0, 1024, 1024);
+    gs.fillStyle = '#fff'; gs.font = '48px sans-serif';
+    for (let i = 0; i < 12; i++) gs.fillText('nouveau GF114 ' + (frames + i), 20 + (i * 37) % 300, 60 + i * 80);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+    gl.viewport(0, 0, cv.width, cv.height); gl.clearColor(0.05, 0.06, 0.08, 1); gl.clear(gl.COLOR_BUFFER_BIT);
+    for (let i = 0; i < 24; i++) { gl.uniform1f(ua, a * (0.3 + i * 0.07) + i); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); }
+    // 2D канвас: градиенты и картинки
+    for (let i = 0; i < 20; i++) { const gr = g2.createRadialGradient(512 + Math.sin(a + i) * 400, 256 + Math.cos(a * 1.3 + i) * 200, 10, 512, 256, 500);
+      gr.addColorStop(0, `hsla(${(i * 37 + a * 90) % 360},90%,60%,.6)`); gr.addColorStop(1, 'rgba(0,0,0,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 1024, 512); }
+    g2.drawImage(src, 0, 0, 1024, 1024, (a * 100) % 300, 0, 400, 400);
+    frames++;
+    if (now - t0 > 1000) { hud.textContent = `hangtest load: ${frames} fps, WebGL ${glok ? 'да' : 'нет'}, выделение ${selI}`; frames = 0; t0 = now; }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+} else { hud.textContent = 'hangtest load: WebGL недоступен — только 2D/композитор'; }
+</script>
+</body></html>

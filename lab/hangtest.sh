@@ -1,0 +1,85 @@
+#!/bin/bash
+# ТЕСТ ВОСПРОИЗВЕДЕНИЯ зависания 23.10 (два случая: сразу после подъёма 07 -> 0f под нагрузкой браузера
+# графический блок GR встаёт «занят» на 100 % и не отпускает; ядро и шина живы, экран замирает).
+# Идея: не ждать случайности, а повторять ровно этот переход под похожей нагрузкой, пока не повторится.
+#   bash ~/Home/nouveau-fix/lab/hangtest.sh [N]        — N подъёмов 07 -> 0f -> 07 под нагрузкой (по умолчанию 60)
+#   LOAD=none bash .../hangtest.sh [N]                 — то же без нагрузки (контроль: должно не зависать)
+#   LOAD=glmark2 bash .../hangtest.sh [N]              — нагрузка glmark2 вместо браузера (если установлен)
+#   HOLD=СЕК                                           — сколько держать 0f после подъёма (по умолчанию 6)
+# Нагрузка по умолчанию: Яндекс.Браузер с локальной страницей lab/hangload.html (WebGL с загрузкой текстур
+# каждый кадр, 2D-канвас, CSS-анимации, непрерывное выделение текста — как в момент зависаний).
+# Регулятор драйвера на время теста выключается (lab_gov=0), переключения делаются вручную через debugfs,
+# в конце lab_gov возвращается. Признак зависания: lab_perf_gr >= 999‰ четыре секунды подряд или строки
+# «failed to idle channel» / SCHED_ERROR / runl / timeout в журнале ядра. При зависании тест останавливается,
+# нагрузка НЕ убивается (чёрному ящику нужно состояние «как есть» для снимка hang-*.txt), экран, скорее
+# всего, уже замер: Alt+PrtSc, затем S, U, B. Лог теста пишется с sync после каждой строки.
+set -uo pipefail
+HERE="$(cd "$(dirname "$0")" && pwd)"; KIT="$(dirname "$HERE")"; PRM=/sys/module/nouveau/parameters
+N="${1:-60}"; [[ "$N" =~ ^[0-9]+$ ]] || { echo "Число подъёмов"; exit 1; }
+LOAD="${LOAD:-browser}"; HOLD="${HOLD:-6}"
+[ -e "$PRM/lab_gov" ] || { echo "Нужен лабораторный драйвер (нет $PRM/lab_gov)"; exit 1; }
+systemctl is-active -q gpu-blackbox || echo "⚠ чёрный ящик не запущен (lab/blackbox.sh install) — снимка регистров при зависании не будет"
+mkdir -p "$KIT/results"; LOG="$KIT/results/hangtest-$(date +%Y%m%d-%H%M%S).txt"
+PSF="$(ls /sys/kernel/debug/dri/*/pstate 2>/dev/null | head -n1)"
+sudo -v || exit 1
+[ -n "$PSF" ] || PSF="$(sudo sh -c 'ls /sys/kernel/debug/dri/*/pstate' | head -n1)"
+ac()     { sudo sh -c "grep '^AC' '$PSF'" | sed 's/^AC: //'; }
+pstate() { sudo sh -c "echo $1 > '$PSF'"; }
+gr()     { cat "$PRM/lab_perf_gr" 2>/dev/null || echo 0; }
+errs()   { journalctl -k -b 0 --no-pager --since "$T0" 2>/dev/null | grep -cE 'failed to idle|SCHED_ERROR|runl|nouveau.*timeout|fifo:.*INTR' || true; }
+bdur()   { journalctl -k -b 0 --no-pager --since "$T0" 2>/dev/null | grep -oE 'replay B 324->2004: выполнен за [0-9]+ мкс' | tail -n1 | grep -oE '[0-9]+ мкс'; }
+GOV0="$(cat "$PRM/lab_gov")"; LP=""; HUNG=0
+finish() {
+    if [ "$HUNG" = 0 ]; then
+        [ -n "$LP" ] && { kill "$LP" 2>/dev/null; wait "$LP" 2>/dev/null; }
+        pstate 07 2>/dev/null; sudo sh -c "echo $GOV0 > $PRM/lab_gov" 2>/dev/null
+        echo "$(date +%T) регулятор возвращён (lab_gov=$GOV0), режим: $(ac)" | tee -a "$LOG"
+    fi
+    sync
+}
+trap finish EXIT
+T0="$(date '+%Y-%m-%d %H:%M:%S')"
+{ echo "hangtest $T0: подъёмов $N, нагрузка $LOAD, удержание 0f ${HOLD}с, lab_gov был $GOV0, ядро $(uname -r)"
+  echo "параметры: $(for p in lab_mem_order lab_mem_op13 lab_mem_op34 lab_mem_replay lab_pcie lab_gpc_seq; do printf '%s=%s ' $p "$(cat $PRM/$p)"; done)"
+} | tee "$LOG"; sync
+sudo sh -c "echo 0 > $PRM/lab_gov"
+pstate 07; sleep 3
+echo "$(date +%T) старт: $(ac)" | tee -a "$LOG"; sync
+case "$LOAD" in
+  browser)
+    B="$(command -v yandex-browser || command -v chromium || command -v google-chrome || true)"
+    [ -n "$B" ] || { echo "Браузер не найден"; exit 1; }
+    "$B" --new-window --app="file://$HERE/hangload.html" >/dev/null 2>&1 & LP=$!
+    echo "$(date +%T) нагрузка: $B (pid $LP), страница hangload.html; прогрев 10 с" | tee -a "$LOG"; sleep 10 ;;
+  glmark2)
+    G="$(command -v glmark2-wayland || command -v glmark2 || true)"; [ -n "$G" ] || { echo "glmark2 не установлен"; exit 1; }
+    "$G" --run-forever -s 1600x900 -b shading:shading=phong -b bump:bump-render=high-poly -b refract >/dev/null 2>&1 & LP=$!
+    echo "$(date +%T) нагрузка: glmark2 (pid $LP); прогрев 5 с" | tee -a "$LOG"; sleep 5 ;;
+  none) echo "$(date +%T) без нагрузки (контроль)" | tee -a "$LOG" ;;
+  *) echo "LOAD=browser|glmark2|none"; exit 1 ;;
+esac
+echo "$(date +%T) загрузка GR перед циклами: $(gr)‰ (ожидается > 500 при нагрузке)" | tee -a "$LOG"; sync
+for c in $(seq 1 "$N"); do
+    [ -n "$LP" ] && ! kill -0 "$LP" 2>/dev/null && { echo "$(date +%T) СТОП: нагрузка завершилась сама" | tee -a "$LOG"; break; }
+    sleep "$(shuf -i 15-55 -n1 | awk '{print $1/10}')"       # случайная фаза 1.5–5.5 с, как у регулятора
+    G0="$(gr)"; pstate 0f; TS="$(date +%T.%N | cut -c1-12)"
+    busy=0; hung=""
+    for s in $(seq 1 "$HOLD"); do
+        sleep 1; g="$(gr)"
+        [ "$g" -ge 999 ] 2>/dev/null && busy=$((busy + 1)) || busy=0
+        E="$(errs)"
+        if [ "$busy" -ge 4 ] || [ "${E:-0}" -gt 0 ]; then hung="gr=$g‰ ${busy}с подряд, ошибок журнала $E"; break; fi
+    done
+    AC="$(ac)"
+    echo "$(date +%T) подъём $c/$N в $TS: gr до $G0‰, скрипт B $(bdur), после: $AC, gr $(gr)‰${hung:+ — ЗАВИСАНИЕ: $hung}" | tee -a "$LOG"; sync
+    if [ -n "$hung" ]; then
+        HUNG=1
+        { echo "=== ЗАВИСАНИЕ ВОСПРОИЗВЕДЕНО на подъёме $c (нагрузка $LOAD). Нагрузка оставлена, lab_gov=0."
+          echo "    Снимок регистров: /var/log/gpu-blackbox/hang-*.txt (чёрный ящик). Журнал: journalctl -k -b 0 --since '$T0'"
+          echo "    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show"; } | tee -a "$LOG"; sync
+        exit 2
+    fi
+    pstate 07; sleep 2
+    case "$(ac)" in *"memory 324 MHz"*) ;; *) echo "$(date +%T) СТОП: после спуска не 324 МГц: $(ac)" | tee -a "$LOG"; break;; esac
+done
+echo "=== $N подъёмов без зависания (нагрузка $LOAD). Лог: $LOG" | tee -a "$LOG"
