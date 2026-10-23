@@ -163,9 +163,9 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  static void
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-22 15:46:27.112391106 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-22 15:46:27.282717127 +0300
-@@ -23,6 +23,8 @@
+--- base/nvkm/subdev/clk/gf100.c	2026-10-23 21:53:25.886303606 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-23 21:53:25.888721222 +0300
+@@ -23,11 +23,16 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
  #include "priv.h"
@@ -174,7 +174,15 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  #include "pll.h"
  
  #include <subdev/bios.h>
-@@ -45,6 +47,15 @@
+ #include <subdev/bios/pll.h>
+ #include <subdev/timer.h>
++#include <core/device.h>
++#include <engine/fifo.h>
++#include <engine/fifo/runl.h>
+ 
+ struct gf100_clk_info {
+ 	u32 freq;
+@@ -45,6 +50,15 @@
  
  static u32 read_div(struct gf100_clk *, int, u32, u32);
  
@@ -190,7 +198,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static u32
  read_vco(struct gf100_clk *clk, u32 dsrc)
  {
-@@ -55,6 +66,25 @@
+@@ -55,6 +69,25 @@
  	return nvkm_clk_read(&clk->base, nv_clk_src_sppll1);
  }
  
@@ -216,7 +224,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static u32
  read_pll(struct gf100_clk *clk, u32 pll)
  {
-@@ -86,6 +116,8 @@
+@@ -86,6 +119,8 @@
  	case 0x137040:
  	case 0x1370e0:
  		sclk = read_div(clk, (pll & 0xff) / 0x20, 0x137120, 0x137140);
@@ -225,7 +233,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		break;
  	default:
  		return 0;
-@@ -259,6 +291,13 @@
+@@ -259,6 +294,13 @@
  		return 0;
  
  	limits.refclk = read_div(clk, idx, 0x137120, 0x137140);
@@ -239,7 +247,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +309,67 @@
+@@ -270,6 +312,74 @@
  	return ret;
  }
  
@@ -267,13 +275,20 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 + * Значение = предел ожидания простоя в мс (0 — выключено). При таймауте переключаем всё равно и пишем в журнал. */
 +static uint lab_gr_pause;
 +module_param(lab_gr_pause, uint, 0644);
-+MODULE_PARM_DESC(lab_gr_pause, "LAB: stop GR command fetch (0x400500) and wait idle around core clock switch: 0 off, N = wait up to N ms");
-+/* LAB 23.10, тесты 6–8: с открытым входом GR зависает (6 из 6), с закрытым — 120/120 чисто, причём ожидание простоя не
-+ * нужно (в 73 из 120 пауз GR был занят в момент переключения). lab_gr_gate — чистый вариант без ожидания:
-+ * закрыть вход (0x400500[0]=0) → переключить узлы → открыть. Независим от lab_gr_pause. */
-+static bool lab_gr_gate;
-+module_param(lab_gr_gate, bool, 0644);
-+MODULE_PARM_DESC(lab_gr_gate, "LAB: close GR command input (0x400500[0]) around the core clock switch, no waiting");
++MODULE_PARM_DESC(lab_gr_pause, "LAB: time limit (ms) for lab_gr_wait, or fixed delay for lab_gr_wait=3; alone (gate=wait=0) = old behaviour: close input + wait GR idle");
++/* LAB 23.10, тесты 6–9. Два независимых действия вокруг переключения узлов ядра, чтобы проверять их по одному:
++ *  lab_gr_gate: 0 — ничего; 1 — закрыть вход GR (0x400500[0]=0, как gf100_gr_reset); 2 — запретить планирование
++ *               каналов на движки (0x002630, nvkm_runl_block) — новых переключений контекста не будет.
++ *  lab_gr_wait: 0 — ничего; 1 — ждать «GR не занят» (0x40060c[0]==0 и 0x002640[28]==0, тесты 6–7);
++ *               2 — ждать «переключение контекста не идёт» (nvkm_fifo_ctxsw_in_progress, условие nouveau);
++ *               3 — фиксированная пауза lab_gr_pause мс без всяких условий.
++ * Итоги: вход открыт — зависает (6/6); закрыт без ожидания — зависло (тест 9); закрыт + ожидание 1 — чисто 120/120. */
++static uint lab_gr_gate;
++module_param(lab_gr_gate, uint, 0644);
++MODULE_PARM_DESC(lab_gr_gate, "LAB: around core clock switch: 0 none, 1 close GR input (0x400500[0]), 2 block runlist scheduling (0x002630)");
++static uint lab_gr_wait;
++module_param(lab_gr_wait, uint, 0644);
++MODULE_PARM_DESC(lab_gr_wait, "LAB: before core clock switch: 0 none, 1 poll GR idle, 2 poll ctxsw not in progress, 3 fixed delay (lab_gr_pause ms)");
 +
 +/* LAB: если не 0 — PLL ядра получает ровно эти коэффициенты (P<<16 | N<<8 | M), ядро на PLL.
 + * Проверяются пределы из BIOS: M 4-16, N 8-95, P 1-63, опора/M 25-100 МГц, VCO 1000-2000 МГц. */
@@ -307,7 +322,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +382,41 @@
+@@ -282,6 +392,41 @@
  	if (!freq)
  		return 0;
  
@@ -349,7 +364,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +426,9 @@
+@@ -291,7 +436,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -360,7 +375,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +455,8 @@
+@@ -318,6 +465,8 @@
  		info->freq = clk1;
  	}
  
@@ -369,7 +384,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -362,6 +501,43 @@
+@@ -362,6 +511,43 @@
  	);
  }
  
@@ -413,7 +428,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static void
  gf100_clk_prog_2(struct gf100_clk *clk, int idx)
  {
-@@ -372,16 +548,33 @@
+@@ -372,16 +558,33 @@
  		nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000000);
  		nvkm_mask(device, addr + 0x00, 0x00000001, 0x00000000);
  		if (info->coef) {
@@ -450,7 +465,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +588,27 @@
+@@ -395,12 +598,27 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -480,58 +495,84 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -428,11 +636,50 @@
+@@ -426,8 +644,59 @@
+ 		{ gf100_clk_prog_4 }, /* final divider */
+ 	};
  	int i, j;
 +	struct nvkm_device *device = clk->base.subdev.device;
++	struct nvkm_engine *gr = nvkm_device_engine(device, NVKM_ENGINE_GR, 0);
++	struct nvkm_runl *runl;
++	uint gate = lab_gr_gate, wait = lab_gr_wait, lim_ms = lab_gr_pause ? lab_gr_pause : 1;
 +	u32 gr500 = 0, st = 0;
 +	s64 waited = 0;
-+	bool paused = false;
++	bool blocked = false;
 +
-+	if (lab_gr_gate && !lab_gr_pause) {
-+		gr500 = nvkm_rd32(device, 0x400500);
-+		nvkm_mask(device, 0x400500, 0x00000001, 0x00000000);
-+		paused = true;
-+		nvkm_info(&clk->base.subdev, "LAB gr gate: 0x400500 %08x -> %08x, без ожидания\n",
-+			  gr500, nvkm_rd32(device, 0x400500));
-+	} else if (lab_gr_pause) {
-+		gr500 = nvkm_rd32(device, 0x400500);
-+		nvkm_mask(device, 0x400500, 0x00000001, 0x00000000);
-+		paused = true;
-+		/* свой цикл, а не nvkm_msec: тот при истечении печатает dev_WARN «timeout» со стеком */
-+		{
-+			u64 t0 = ktime_get_ns(), lim = (u64)lab_gr_pause * 1000000ULL;
-+			waited = -1;
-+			do {
-+				nvkm_rd32(device, 0x400700);
-+				st = nvkm_rd32(device, 0x002640);
-+				if (!(nvkm_rd32(device, 0x40060c) & 0x00000001) && !(st & 0x10000000)) {
-+					waited = ktime_get_ns() - t0;
-+					break;
-+				}
-+			} while (ktime_get_ns() - t0 < lim);
-+		}
-+		nvkm_info(&clk->base.subdev, "LAB gr pause: 0x400500 %08x -> %08x, %s %lld мкс (0x400700=%08x 0x40060c=%08x 0x002640=%08x)\n",
-+			  gr500, nvkm_rd32(device, 0x400500), waited < 0 ? "ТАЙМАУТ" : "простой через",
-+			  waited < 0 ? (s64)lab_gr_pause * 1000 : waited / 1000,
-+			  nvkm_rd32(device, 0x400700), nvkm_rd32(device, 0x40060c), nvkm_rd32(device, 0x002640));
++	if (!gate && !wait && lab_gr_pause) {	/* старое поведение lab_gr_pause=N (тесты 6, 7) */
++		gate = 1;
++		wait = 1;
 +	}
++
++	if (gate == 1) {
++		gr500 = nvkm_rd32(device, 0x400500);
++		nvkm_mask(device, 0x400500, 0x00000001, 0x00000000);
++	} else if (gate == 2 && device->fifo) {
++		nvkm_runl_foreach(runl, device->fifo)
++			nvkm_runl_block(runl);
++		blocked = true;
++	}
++
++	if (wait) {
++		u64 t0 = ktime_get_ns(), lim = (u64)lim_ms * 1000000ULL;
++
++		waited = -1;
++		do {
++			bool done = false;
++
++			nvkm_rd32(device, 0x400700);
++			st = nvkm_rd32(device, 0x002640);
++			switch (wait) {
++			case 1: done = !(nvkm_rd32(device, 0x40060c) & 0x00000001) && !(st & 0x10000000); break;
++			case 2: done = gr && !nvkm_fifo_ctxsw_in_progress(gr); break;
++			case 3: done = ktime_get_ns() - t0 >= lim; break;
++			default: done = true; break;
++			}
++			if (done) {
++				waited = ktime_get_ns() - t0;
++				break;
++			}
++		} while (ktime_get_ns() - t0 < lim);
++	}
++
++	if (gate || wait)
++		nvkm_info(&clk->base.subdev, "LAB gr: вход %s, ожидание %s: %s %lld мкс (0x400700=%08x 0x40060c=%08x 0x002640=%08x)\n",
++			  gate == 1 ? "закрыт (0x400500)" : gate == 2 ? "планирование заблокировано (0x002630)" : "открыт",
++			  wait == 1 ? "простоя GR" : wait == 2 ? "конца переключения контекста" : wait == 3 ? "фиксированное" : "нет",
++			  waited < 0 ? "ТАЙМАУТ" : "готово через", waited < 0 ? (s64)lim_ms * 1000 : waited / 1000,
++			  nvkm_rd32(device, 0x400700), nvkm_rd32(device, 0x40060c), nvkm_rd32(device, 0x002640));
  
  	for (i = 0; i < ARRAY_SIZE(stage); i++) {
 +		nvkm_info(&clk->base.subdev, "LAB prog stage %d\n", i);
  		for (j = 0; j < ARRAY_SIZE(clk->eng); j++) {
  			if (!clk->eng[j].freq)
  				continue;
- 			stage[i].exec(clk, j);
+@@ -435,6 +704,16 @@
  		}
  	}
  
-+	if (paused) {
++	if (gate == 1)
 +		nvkm_mask(device, 0x400500, 0x00000001, gr500 & 0x00000001);
-+		nvkm_info(&clk->base.subdev, "LAB gr pause: 0x400500 возвращён %08x\n", nvkm_rd32(device, 0x400500));
++	if (blocked) {
++		nvkm_runl_foreach(runl, device->fifo)
++			nvkm_runl_allow(runl);
 +	}
++	if (gate)
++		nvkm_info(&clk->base.subdev, "LAB gr: открыто обратно (0x400500=%08x 0x002630=%08x)\n",
++			  nvkm_rd32(device, 0x400500), nvkm_rd32(device, 0x002630));
 +
  	return 0;
-@@ -477,5 +724,5 @@
+ }
+ 
+@@ -477,5 +756,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
