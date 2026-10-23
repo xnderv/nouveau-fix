@@ -55,7 +55,7 @@ if [ "$MEM0" = N ] || [ "$MEM0" = 0 ]; then
 else
     pstate 07; sleep 3
 fi
-echo "$(date +%T) старт: $(ac); lab_mem=$MEM0 lab_core=$(cat $PRM/lab_core) lab_volt_min_uv=$(cat $PRM/lab_volt_min_uv)" | tee -a "$LOG"; sync
+echo "$(date +%T) старт: $(ac); lab_mem=$MEM0 lab_core=$(cat $PRM/lab_core) lab_volt_min_uv=$(cat $PRM/lab_volt_min_uv) khz: gpc=$(cat $PRM/lab_gpc_khz) rop=$(cat $PRM/lab_rop_khz) hub07=$(cat $PRM/lab_hub07_khz) hub06=$(cat $PRM/lab_hub06_khz) hub01=$(cat $PRM/lab_hub01_khz)" | tee -a "$LOG"; sync
 case "$LOAD" in
   browser)
     B="$(command -v yandex-browser || command -v chromium || command -v google-chrome || true)"
