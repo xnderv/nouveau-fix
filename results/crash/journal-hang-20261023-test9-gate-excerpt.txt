@@ -1,0 +1,178 @@
+                                                    ### Promise created here: ###
+Oct 23 21:40:00.089843 host systemd[1]: Starting sysstat-collect.service - system activity accounting tool...
+Oct 23 21:40:00.098889 host sudo[7142]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 21:40:00.099091 host sudo[7142]: alex : TTY=/dev/pts/0 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 21:40:00.105058 host sudo[7142]: pam_unix(sudo:session): session closed for user root
+Oct 23 21:40:00.139579 host systemd[1]: sysstat-collect.service: Deactivated successfully.
+Oct 23 21:40:00.139835 host systemd[1]: Finished sysstat-collect.service - system activity accounting tool.
+Oct 23 21:40:05.637765 host sudo[7179]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 21:40:05.637914 host sudo[7179]: alex : TTY=/dev/pts/0 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c echo 0f > \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 21:40:05.641117 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=0 mem=0 core=1 volt_first=1
+Oct 23 21:40:05.642253 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie SKIPPED (lab_pcie=0)
+Oct 23 21:40:05.642180 host sudo[7179]: pam_unix(sudo:session): session closed for user root
+Oct 23 21:40:05.642796 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 1063638 uV raised to floor 1075000 uV
+Oct 23 21:40:05.643257 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 23 21:40:05.643610 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+Oct 23 21:40:05.644065 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+Oct 23 21:40:05.644489 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 1063638 uV raised to floor 1075000 uV
+Oct 23 21:40:05.644919 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 23 21:40:05.645341 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 21:40:05.645681 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 21:40:05.646021 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 1907000 got 1909285 ssel 00000004 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 21:40:05.646305 host kernel: nouveau 0000:01:00.0: clk: LAB calc_pll idx 07: опора nouveau 1620000 kHz, с делителем опоры 405000 kHz (lab_gpc_seq&8)
+Oct 23 21:40:05.646690 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 1645000 got 1645312 ssel 00000080 coef 00014110 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 21:40:05.647008 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 1645000 got 1645000 ssel 00000100 coef 00000000 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 21:40:05.647350 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 21:40:05.647680 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 23 21:40:05.647963 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 21:40:05.648272 host kernel: nouveau 0000:01:00.0: clk: LAB gr gate: 0x400500 00010001 -> 00010000, без ожидания
+Oct 23 21:40:05.648563 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 23 21:40:05.648864 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 23 21:40:05.649151 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 23 21:40:05.649420 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 00012809
+Oct 23 21:40:05.649695 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 00 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 21:40:05.650030 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 01 PLL locked ctrl 00030001 coef 00012107
+Oct 23 21:40:05.650342 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 01 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 21:40:05.650742 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 02 PLL locked ctrl 00030001 coef 00012107
+Oct 23 21:40:05.651078 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 02 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 21:40:05.651355 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 07 PLL locked ctrl 00030001 coef 00014110
+Oct 23 21:40:05.651625 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 07 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 21:40:05.651912 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 23 21:40:05.652199 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 23 21:40:05.652461 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 23 21:40:05.652747 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 02 select PLL, 0x137100=00000003
+Oct 23 21:40:05.653037 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 07 select PLL, 0x137100=00000007
+Oct 23 21:40:05.653374 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 08 select PLL, 0x137100=00000087
+Oct 23 21:40:05.653647 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 23 21:40:05.653916 host kernel: nouveau 0000:01:00.0: clk: LAB gr pause: 0x400500 возвращён 00010001
+Oct 23 21:40:05.654269 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 1063638 uV raised to floor 1075000 uV
+Oct 23 21:40:05.654651 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 23 21:40:05.655026 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+Oct 23 21:40:05.655448 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+Oct 23 21:40:10.016274 host upmpdcli[1933]: :2:../src/mpdcli.cxx:336::MPDCli::getQueueSongs: mpd_list_queue_meta:finish failed: Connection closed by the server
+Oct 23 21:40:10.016836 host upmpdcli[1933]: :3:../src/mpdcli.cxx:148::MPDCli::startEventLoop: already started
+Oct 23 21:40:10.016836 host upmpdcli[1933]: :2:../src/ohplaylist.cxx:206::OHPlaylist::makeIdArray: getQueueData failed.metacache size 39
+Oct 23 21:40:10.866153 host sudo[7226]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 21:40:10.866294 host sudo[7226]: alex : TTY=/dev/pts/0 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 21:40:10.870469 host sudo[7226]: pam_unix(sudo:session): session closed for user root
+Oct 23 21:40:11.580002 host kernel: nouveau 0000:01:00.0: bus: MMIO write of 00000002 FAULT at 13b154 [ PRIVRING ]
+Oct 23 21:40:13.198485 host mpd[1715]: exception: Not playing
+Oct 23 21:40:13.199304 host upmpdcli[1933]: :2:../src/mpdcli.cxx:336::mpd_run_next(m_conn) failed: Not playing
+Oct 23 21:40:13.199304 host upmpdcli[1933]: :2:../src/mpdcli.cxx:339::mpd_run_next(m_conn) server error: 55
+Oct 23 21:40:13.199304 host upmpdcli[1933]: :2:../libupnpp/device/devdevice.cxx:468::UpnpDevice: Action failed:  code -911
+Oct 23 21:40:14.904534 host mpd[1715]: exception: Not playing
+Oct 23 21:40:14.905315 host upmpdcli[1933]: :2:../src/mpdcli.cxx:336::mpd_run_next(m_conn) failed: Not playing
+Oct 23 21:40:14.905315 host upmpdcli[1933]: :2:../src/mpdcli.cxx:339::mpd_run_next(m_conn) server error: 55
+Oct 23 21:40:14.905315 host upmpdcli[1933]: :2:../libupnpp/device/devdevice.cxx:468::UpnpDevice: Action failed:  code -911
+Oct 23 21:40:27.872940 host whoopsie[1935]: [21:40:27] Sent; server replied with: No error
+Oct 23 21:40:27.872940 host whoopsie[1935]: [21:40:27] Response code: 504
+Oct 23 21:40:27.875582 host whoopsie[1935]: [21:40:27] Server replied with:
+Oct 23 21:40:27.875582 host whoopsie[1935]: [21:40:27] <html><body><h1>504 Gateway Time-out</h1>
+Oct 23 21:40:27.875582 host whoopsie[1935]: The server didn't respond in time.
+Oct 23 21:40:27.875582 host whoopsie[1935]: </body></html>
+Oct 23 21:40:27.875582 host whoopsie[1935]: [21:40:27] Found .crash corresponding to .upload (/var/crash/_usr_lib_claude-desktop_claude-desktop.1026.crash)
+Oct 23 21:40:27.876134 host whoopsie[1935]: [21:40:27] Parsing /var/crash/_usr_lib_claude-desktop_claude-desktop.1026.crash.
+Oct 23 21:40:27.954428 host whoopsie[1935]: [21:40:27] Uploading /var/crash/_usr_lib_claude-desktop_claude-desktop.1026.crash.
+Oct 23 21:40:34.514271 host at-spi2-registryd[2765]: Disabling unresponsive app with pid 2524
+Oct 23 21:40:54.516271 host at-spi2-registryd[2765]: Re-enabling app with pid 2524
+Oct 23 21:41:42.425238 host systemd[1]: Starting update-notifier-download.service - Download data for packages that failed at package install time...
+Oct 23 21:41:42.614743 host systemd[1]: update-notifier-download.service: Deactivated successfully.
+Oct 23 21:41:42.615258 host systemd[1]: Finished update-notifier-download.service - Download data for packages that failed at package install time.
+Oct 23 21:41:43.476118 host dbus-daemon[1307]: [system] Activating via systemd: service name='org.freedesktop.timedate1' unit='dbus-org.freedesktop.timedate1.service' requested by ':1.30' (uid=0 pid=1335 comm="/usr/lib/snapd/snapd" label="unconfined")
+Oct 23 21:41:43.485069 host systemd[1]: Starting systemd-timedated.service - Time & Date Service...
+Oct 23 21:41:43.570105 host systemd[1]: Started systemd-timedated.service - Time & Date Service.
+Oct 23 21:41:43.570749 host dbus-daemon[1307]: [system] Successfully activated service 'org.freedesktop.timedate1'
+Oct 23 21:42:13.603488 host systemd[1]: systemd-timedated.service: Deactivated successfully.
+Oct 23 21:42:19.382312 host systemd[2044]: launchpadlib-cache-clean.service - Clean up old files in the Launchpadlib cache skipped, unmet condition check ConditionPathExists=/home/user/.launchpadlib/api.launchpad.net/cache
+Oct 23 21:42:19.383084 host systemd[2044]: ubuntu-insights-collect.service: unit configures an IP firewall, but not running as root.
+Oct 23 21:42:19.383092 host systemd[2044]: ubuntu-insights-collect.service: (This warning is only shown for the first unit using IP firewalling.)
+Oct 23 21:42:19.385950 host systemd[2044]: Starting ubuntu-insights-collect.service - "Collect platform report using Ubuntu Insights while respecting consent"...
+Oct 23 21:42:19.406012 host kernel: audit: type=1400 audit(1792780939.403:271): apparmor="AUDIT" operation="userns_create" class="namespace" info="Userns create - transitioning profile" profile="unconfined" pid=7607 comm="(ubuntu-insigh)" requested="userns_create" target="unprivileged_userns" execpath="/usr/lib/systemd/systemd-executor"
+Oct 23 21:42:19.407004 host kernel: audit: type=1400 audit(1792780939.404:272): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=7607 comm="(ubuntu-insigh)" capability=21  capname="sys_admin"
+Oct 23 21:42:19.457997 host kernel: audit: type=1400 audit(1792780939.455:273): apparmor="DENIED" operation="getattr" class="file" info="Failed name lookup - disconnected path" error=-13 profile="unprivileged_userns" name="" pid=7615 comm="systemd-detect-" requested_mask="r" denied_mask="r" fsuid=1026 ouid=0
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]: {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:   "insightsVersion": "0.9.3ubuntu",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:   "collectionTime": 1792780939,
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:   "systemInfo": {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:     "hardware": {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       "product": {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "family": "To be filled by O.E.M.",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "name": "To be filled by O.E.M.",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "vendor": "Gigabyte Technology Co., Ltd."
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       },
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       "cpu": {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "name": "Intel(R) Xeon(R) CPU E3-1270 V2 @ 3.50GHz",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "vendor": "GenuineIntel",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "architecture": "x86_64",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "cpus": 8,
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "sockets": 1,
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "coresPerSocket": 4,
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "threadsPerCore": 2
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       },
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       "gpus": [
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           "device": "0x1200",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           "vendor": "0x10de",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           "driver": "nouveau"
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         }
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       ],
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       "memory": {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "size": 15416
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       },
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       "disks": [
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           "size": 476979,
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           "type": "disk",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           "children": [
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:             {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:               "size": 476979,
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:               "type": "part"
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:             }
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           ]
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         },
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           "size": 953856,
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           "type": "disk",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           "children": [
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:             {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:               "size": 953856,
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:               "type": "part"
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:             }
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           ]
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         }
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       ],
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       "screens": [
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           "physicalResolution": "2560x1440",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           "size": "610mm x 340mm",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:           "refreshRate": "59.95"
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         }
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       ]
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:     },
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:     "software": {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       "os": {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "family": "linux",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "distribution": "Ubuntu",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "version": "26.04"
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       },
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       "timezone": "MSK",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       "language": "en_US",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       "bios": {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "vendor": "American Megatrends Inc.",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "version": "U1g"
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       }
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:     },
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:     "platform": {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       "desktop": {
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "desktopEnvironment": "ubuntu:GNOME",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "sessionName": "ubuntu",
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:         "sessionType": "wayland"
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:       }
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:     }
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]:   }
+Oct 23 21:42:20.109912 host ubuntu-insights[7607]: }
+Oct 23 21:42:20.112396 host ubuntu-insights[7607]: 2026/10/23 21:42:20 ERROR failed to collect insights: insights write failed: report already exists for this period
+Oct 23 21:42:20.112212 host systemd[2044]: Finished ubuntu-insights-collect.service - "Collect platform report using Ubuntu Insights while respecting consent".
+Oct 23 21:42:24.026060 host kernel: sysrq: Emergency Sync
+Oct 23 21:42:24.276036 host kernel: Emergency Sync complete
+Oct 23 21:42:25.546076 host kernel: sysrq: Emergency Remount R/O
