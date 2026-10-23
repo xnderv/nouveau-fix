@@ -163,8 +163,8 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  static void
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-24 01:47:59.083927759 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 01:47:59.086733054 +0300
+--- base/nvkm/subdev/clk/gf100.c	2026-10-24 02:11:44.800993360 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 02:11:44.803820269 +0300
 @@ -23,11 +23,18 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -424,7 +424,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -351,15 +540,221 @@
+@@ -351,15 +540,227 @@
  	}
  }
  
@@ -476,12 +476,18 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 + * lab_therm_real=1 — скобка только если бит 0x137100 этого домена реально меняется (как у NVIDIA);
 + * lab_clk_mmu_lock=1 — на время стадий смены частот держать mmu->mutex (им же сериализуется сброс TLB): сброс TLB и
 + * переключение тактов не идут одновременно, как в драйвере NVIDIA (одна блокировка GPU на всё). */
-+static uint lab_therm_real = 1;
++static uint lab_therm_real;	/* 24.10: по умолчанию 0 — у NVIDIA тоже есть пустые скобки (lab/trace-brackets.py) */
 +module_param(lab_therm_real, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_real, "LAB: bracket only when the domain mux bit really changes (0 = every stage-1/3 call, 1 = real changes only)");
 +static uint lab_clk_mmu_lock = 1;
 +module_param(lab_clk_mmu_lock, uint, 0644);
 +MODULE_PARM_DESC(lab_clk_mmu_lock, "LAB: hold mmu->mutex (serialises TLB invalidates) across the clock programming stages (0 off, 1 on)");
++/* LAB 24.10, запись NVIDIA (try1 104,511 и 50,0563): пост-делители GPC (0x137250) и hubk06 (0x13726c) NVIDIA меняет только
++ * под скобкой PTHERM. У nouveau стадия 4 пишет их на ходу: на 03->07 hubk06 270 -> 810 МГц (0x0a -> 0x02), на 07->0f
++ * 0x02 -> 0. lab_therm_div: 0 — без скобки (как раньше), 1 — скобка, если поле 0x3f3f реально меняется, 2 — всегда. */
++static uint lab_therm_div = 1;
++module_param(lab_therm_div, uint, 0644);
++MODULE_PARM_DESC(lab_therm_div, "LAB: PTHERM bracket around GPC/hubk06 post-divider writes (stage 4): 0 off, 1 when it changes, 2 always");
 +
 +struct lab_therm_save {
 +	bool on; int i; u32 ctrl1, f2, f3, f4;
@@ -646,7 +652,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static void
-@@ -369,19 +764,52 @@
+@@ -369,19 +770,52 @@
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
  	if (idx <= 7) {
@@ -702,7 +708,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +823,35 @@
+@@ -395,12 +829,35 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -740,7 +746,25 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -426,15 +877,138 @@
+@@ -409,7 +866,17 @@
+ {
+ 	struct gf100_clk_info *info = &clk->eng[idx];
+ 	struct nvkm_device *device = clk->base.subdev.device;
++	struct lab_therm_save th = { .on = false };
++	u32 cur = nvkm_rd32(device, 0x137250 + (idx * 0x04));
++	bool chg = (cur & 0x00003f3f) != (info->mdiv & 0x00003f3f);
++
++	if (lab_therm_div && (idx == 0 || idx == 7) && (chg || lab_therm_div >= 2)) {
++		nvkm_info(&clk->base.subdev, "LAB prog_4 idx %02x: пост-делитель %08x -> %04x под скобкой\n",
++			  idx, cur, info->mdiv & 0x00003f3f);
++		lab_therm_enter(clk, idx, &th);
++	}
+ 	nvkm_mask(device, 0x137250 + (idx * 0x04), 0x00003f3f, info->mdiv);
++	lab_therm_leave(clk, idx, &th);
+ }
+ 
+ static int
+@@ -426,15 +893,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -881,7 +905,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +1051,5 @@
+@@ -477,5 +1067,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
