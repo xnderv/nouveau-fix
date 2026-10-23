@@ -43,10 +43,10 @@ T0="$(date '+%Y-%m-%d %H:%M:%S')"
   echo "параметры: $(for p in lab_mem_order lab_mem_op13 lab_mem_op34 lab_mem_op3a lab_mem_replay lab_pcie lab_gpc_seq; do printf '%s=%s ' $p "$(cat $PRM/$p)"; done)"
 } | tee "$LOG"; sync
 sudo sh -c "echo 0 > $PRM/lab_gov"
-# Память при lab_mem=0 стоит на одном значении весь тест. MEMHOLD=2004 (по умолчанию) — поднять память на 2004 с
-# включённым lab_mem, затем выключить lab_mem: дальше ходит только ядро, память как в реальной работе на 0f.
+# Память при lab_mem=0 стоит на одном значении весь тест. По умолчанию MEMHOLD=324 (база теста 1). MEMHOLD=2004 — поднять память на 2004 с
+# включённым lab_mem, затем выключить lab_mem: дальше ходит только ядро, память как в реальной работе на 0f (опция на потом).
 # MEMHOLD=324 — держать 324. При 135 МГц GR голодает и показывает 1000‰ без зависания — так не тестируем.
-MEM0="$(cat $PRM/lab_mem)"; MEMHOLD="${MEMHOLD:-2004}"
+MEM0="$(cat $PRM/lab_mem)"; MEMHOLD="${MEMHOLD:-324}"
 if [ "$MEM0" = N ] || [ "$MEM0" = 0 ]; then
     case "$MEMHOLD" in 2004) LV=0f;; 324) LV=07;; *) echo "MEMHOLD=2004|324"; exit 1;; esac
     case "$(ac)" in *"memory $MEMHOLD MHz"*) ;; *) sudo sh -c "echo 1 > $PRM/lab_mem"; pstate $LV; sleep 3; sudo sh -c "echo 0 > $PRM/lab_mem";; esac
