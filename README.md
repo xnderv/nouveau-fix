@@ -35,6 +35,14 @@ is taken in the driver once a second; a thermal brake lowers the level at 90 / 9
 new kernel. `lab/` holds the instrumented driver (`lab/0002-*.patch`, `patches/0004`, `0005`) with runtime
 switches for every step, and the scripts of all experiments; `trace/` is the mmiotrace tooling.
 
+**Status (23 Oct 2026):** daily driver on the author's machine since 20 Oct. One open problem: a rare hard
+hang (3 in 3 days, `nvkm_intr read 0xffffffff from PMC_BOOT_0` → MCE, machine needs Reset) that does not
+reproduce on demand — ~100 level switches under bus/CPU load and with screenshots passed clean. PCIe link
+switching, memory replay under load and the governor were each ruled out individually (`docs/HANDOFF-2026-10-22.md`).
+Until it is found, treat this as **beta**: `lab/blackbox.sh install` records the card state once a second to
+disk and `lab/trap.sh on` makes a hard lockup panic into ramoops, so the next hang leaves a trace — please
+attach it to a "Hang report" issue.
+
 Known differences from the NVIDIA driver and open questions are listed in `docs/2026-10-22/review-driver.md`.
 Reports from other GTX 560 / 560 Ti boards are welcome (open an issue with `dmesg | grep -i nouveau` and
 `stable.sh status` output).
