@@ -163,9 +163,9 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  static void
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-23 22:52:20.928580557 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-23 22:52:20.930585141 +0300
-@@ -23,11 +23,16 @@
+--- base/nvkm/subdev/clk/gf100.c	2026-10-23 23:17:23.409348007 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-23 23:17:23.412332602 +0300
+@@ -23,11 +23,17 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
  #include "priv.h"
@@ -179,10 +179,11 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +#include <core/device.h>
 +#include <engine/fifo.h>
 +#include <engine/fifo/runl.h>
++#include <linux/delay.h>
  
  struct gf100_clk_info {
  	u32 freq;
-@@ -45,6 +50,15 @@
+@@ -45,6 +51,15 @@
  
  static u32 read_div(struct gf100_clk *, int, u32, u32);
  
@@ -198,7 +199,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static u32
  read_vco(struct gf100_clk *clk, u32 dsrc)
  {
-@@ -55,6 +69,25 @@
+@@ -55,6 +70,25 @@
  	return nvkm_clk_read(&clk->base, nv_clk_src_sppll1);
  }
  
@@ -224,7 +225,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static u32
  read_pll(struct gf100_clk *clk, u32 pll)
  {
-@@ -86,6 +119,8 @@
+@@ -86,6 +120,8 @@
  	case 0x137040:
  	case 0x1370e0:
  		sclk = read_div(clk, (pll & 0xff) / 0x20, 0x137120, 0x137140);
@@ -233,7 +234,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		break;
  	default:
  		return 0;
-@@ -259,6 +294,13 @@
+@@ -259,6 +295,13 @@
  		return 0;
  
  	limits.refclk = read_div(clk, idx, 0x137120, 0x137140);
@@ -247,7 +248,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +312,99 @@
+@@ -270,6 +313,112 @@
  	return ret;
  }
  
@@ -314,6 +315,19 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +static uint lab_pll_keep;
 +module_param(lab_pll_keep, uint, 0644);
 +MODULE_PARM_DESC(lab_pll_keep, "LAB: keep core PLLs running as NVIDIA: skip reprogramming a locked PLL with the same coef, never disable on downshift (0 off, 1 on)");
++/* LAB 23.10, запись NVIDIA (try1/try2, одинаково): порядок переключения мультиплексоров 0x137100 при подъёме —
++ * hubk06 (бит 7), hubk01 (бит 8), затем GPC (бит 0), ROP (бит 1), …27 мс…, hubk07 (бит 2); при спуске — hubk07 (2),
++ * ROP (1), GPC (0), hubk01 (8), hubk06 (7). Правило: хабы всегда не медленнее GPC/ROP во время перехода.
++ * nouveau (и мы) переключает по возрастанию idx: GPC, ROP, hubk07, hubk06, hubk01 — при подъёме GPC/ROP на полной частоте
++ * несколько мкс гонят трафик в хабы, которые ещё на 405/810 МГц. Гипотеза: переполнение очередей кросс-бара → потерянная
++ * транзакция → GPC/ROP ждут вечно (очередь команд GR при этом пуста — снимок теста 10). lab_order: 1 — порядок NVIDIA
++ * для стадий 1 (снятие PLL) и 3 (выбор PLL); lab_order_us — пауза между переключениями доменов, мкс (у NVIDIA ~80–900). */
++static uint lab_order;
++module_param(lab_order, uint, 0644);
++MODULE_PARM_DESC(lab_order, "LAB: domain switch order as NVIDIA (hubs before GPC/ROP going up, reverse going down): 0 off, 1 on");
++static uint lab_order_us;
++module_param(lab_order_us, uint, 0644);
++MODULE_PARM_DESC(lab_order_us, "LAB: delay between consecutive domain mux switches, microseconds (0 = none)");
 +
 +/* LAB: если не 0 — PLL ядра получает ровно эти коэффициенты (P<<16 | N<<8 | M), ядро на PLL.
 + * Проверяются пределы из BIOS: M 4-16, N 8-95, P 1-63, опора/M 25-100 МГц, VCO 1000-2000 МГц. */
@@ -347,7 +361,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +417,41 @@
+@@ -282,6 +431,41 @@
  	if (!freq)
  		return 0;
  
@@ -389,7 +403,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +461,9 @@
+@@ -291,7 +475,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -400,7 +414,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +490,8 @@
+@@ -318,6 +504,8 @@
  		info->freq = clk1;
  	}
  
@@ -409,7 +423,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -362,6 +536,43 @@
+@@ -362,6 +550,43 @@
  	);
  }
  
@@ -453,7 +467,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static void
  gf100_clk_prog_2(struct gf100_clk *clk, int idx)
  {
-@@ -369,19 +580,52 @@
+@@ -369,19 +594,52 @@
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
  	if (idx <= 7) {
@@ -509,7 +523,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +639,27 @@
+@@ -395,12 +653,27 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -539,7 +553,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -426,8 +685,75 @@
+@@ -426,15 +699,124 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -611,11 +625,23 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	}
  
  	for (i = 0; i < ARRAY_SIZE(stage); i++) {
-+		nvkm_info(&clk->base.subdev, "LAB prog stage %d\n", i);
++		static const int up_order[16]   = { 7, 8, 0, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15 };
++		static const int down_order[16] = { 2, 1, 0, 8, 7, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15 };
++		bool up = clk->eng[0].ssel != 0;	/* цель GPC — PLL: подъём */
++		bool mux_stage = (i == 1 || i == 3);
++
++		nvkm_info(&clk->base.subdev, "LAB prog stage %d%s\n", i,
++			  (lab_order && mux_stage) ? (up ? " (порядок NVIDIA, подъём: 7 8 0 1 2)" : " (порядок NVIDIA, спуск: 2 1 0 8 7)") : "");
  		for (j = 0; j < ARRAY_SIZE(clk->eng); j++) {
- 			if (!clk->eng[j].freq)
+-			if (!clk->eng[j].freq)
++			int e = (lab_order && mux_stage) ? (up ? up_order[j] : down_order[j]) : j;
++
++			if (!clk->eng[e].freq)
  				continue;
-@@ -435,6 +761,38 @@
+-			stage[i].exec(clk, j);
++			stage[i].exec(clk, e);
++			if (lab_order_us && mux_stage)
++				udelay(lab_order_us);
  		}
  	}
  
@@ -654,7 +680,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +835,5 @@
+@@ -477,5 +859,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
