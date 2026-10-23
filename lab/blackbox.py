@@ -37,16 +37,16 @@ bar = mmap.mmap(fd, 16 << 20, mmap.MAP_SHARED, mmap.PROT_READ)
 rd = lambda a: struct.unpack_from('<I', bar, a)[0]
 
 # Регистры снимка: GR (gr/gf100.c: intr, trap, wait_idle, ctxctl), FIFO (fifo/gf100.c: intr, engine status,
-# runlist), по GPC (0x502090 — ловушка GPC, GF114 = 4 GPC), память (regsnap.py — из записи NVIDIA 20.10).
+# runlist), по GPC (0x502090 — ловушка GPC, GF114 = 2 GPC), память (regsnap.py — из записи NVIDIA 20.10).
 SNAP = [
     ('PMC',  [0x000200, 0x000100, 0x000140]),
     ('GR',   [0x400100, 0x400108, 0x400110, 0x400118, 0x400500, 0x40060c, 0x400700, 0x400704, 0x400708,
               0x404000, 0x404200, 0x404490, 0x404494, 0x40449c, 0x404600, 0x405840, 0x40601c, 0x407020,
               0x408030, 0x409800, 0x409804, 0x409808, 0x40980c, 0x409810, 0x409814, 0x409b00, 0x409c18, 0x409c20]),
-    ('GPC',  [0x502090 + g * 0x8000 for g in range(4)]),
+    ('GPC',  [0x502090 + g * 0x8000 for g in range(2)]),   # GF114: 2 GPC (0x512090 — ошибка PRIVRING 23.10)
     ('FIFO', [0x002100, 0x002140, 0x002254, 0x00252c, 0x00254c, 0x00256c, 0x00258c, 0x00259c, 0x0025a0,
               0x0025a4, 0x002628, 0x002630, 0x002a00]
-             + [0x0025a8 + e * 4 for e in range(8)] + [0x002640 + e * 4 for e in range(8)]
+             + [0x0025a8 + e * 4 for e in range(6)] + [0x002640 + e * 4 for e in range(6)]   # движки 6,7 нет (TIMEOUT 23.10)
              + [0x002800 + u * 0x10 + r for u in range(3) for r in (0, 4, 8, 0xc)]),
     ('MEM',  [0x100760, 0x100764, 0x100768, 0x10f050, 0x10f090, 0x10f200, 0x10f210, 0x10f290, 0x10f294,
               0x10f298, 0x10f29c, 0x10f2a0, 0x10f300, 0x10f310, 0x10f314, 0x10f330, 0x10f338, 0x10f340,

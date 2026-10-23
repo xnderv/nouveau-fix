@@ -499,7 +499,7 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  #include <core/option.h>
  #include <subdev/bios.h>
  #include <subdev/bios/pll.h>
-@@ -123,6 +133,744 @@
+@@ -123,6 +133,761 @@
  	}
  }
  
@@ -963,6 +963,14 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
 +static uint lab_mem_op34;
 +module_param(lab_mem_op34, uint, 0644);
 +MODULE_PARM_DESC(lab_mem_op34, "LAB: NVIDIA op 0x34 0x0a: 0 skip, 1 wait 0x611200&3==0 after display pause (gt215-style)");
++/* LAB 23.10: операция NVIDIA 0x3a N — в скриптах всегда сразу после записи 0x13d8f4 <= 0 (сброс буфера записи
++ * разделов памяти, по twilight0: _nv031754rm, 0x13d7f4 + (раздел << 6)) и ПЕРЕД записями вне 0x10fxxx (делители,
++ * PLL). До 23.10 пропускалась. Три зависания 23.10 (GR встаёт на 100 % сразу после подъёма памяти под нагрузкой,
++ * без ловушек и ошибок) — кандидат: PLL переключается, пока записи в PHY ещё стоят в буферах разделов.
++ * 0 — пропускать; 1 — одно чтение 0x13d8f4 (барьер для отложенных записей); 2 — ждать 0x13d8f4 == 0 (до 1 мс). */
++static uint lab_mem_op3a;
++module_param(lab_mem_op3a, uint, 0644);
++MODULE_PARM_DESC(lab_mem_op3a, "LAB: NVIDIA op 0x3a (partition write-buffer flush wait): 0 skip, 1 read-back 0x13d8f4, 2 wait 0x13d8f4==0");
 +static int lab_plan[6], lab_plan_n, lab_plan_i;
 +static bool lab_armed;
 +static u32 lab_rp611;
@@ -1088,8 +1096,17 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
 +			}
 +			nskip++;
 +			break;
-+		case 0x39:
 +		case 0x3a:
++			if (lab_mem_op3a) {
++				if (build)
++					nvkm_memx_wait(memx, 0x13d8f4, lab_mem_op3a >= 2 ? 0xffffffff : 0x00000000, 0x00000000, 1000000);
++				lab_est_cmd(&e, 4, 4);
++				nwait++;
++				break;
++			}
++			nskip++;
++			break;
++		case 0x39:
 +			nskip++;
 +			break;
 +		default:
@@ -1225,8 +1242,8 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
 +	ret = ram_exec(&ram->fuc, true);
 +	us = ktime_us_delta(ktime_get(), t0);
 +	lab_armed = false;
-+	nvkm_info(subdev, "LAB replay %s: выполнен за %lld мкс (op13×%u op34=%u), ret %d; 0x137310=%08x 0x1373f0=%08x 0x132000=%08x 0x10f290=%08x 0x10f300=%08x 0x611200=%08x\n",
-+		  st->name, us, lab_mem_op13, lab_mem_op34, ret, nvkm_rd32(device, 0x137310), nvkm_rd32(device, 0x1373f0),
++	nvkm_info(subdev, "LAB replay %s: выполнен за %lld мкс (op13×%u op34=%u op3a=%u), ret %d; 0x137310=%08x 0x1373f0=%08x 0x132000=%08x 0x10f290=%08x 0x10f300=%08x 0x611200=%08x\n",
++		  st->name, us, lab_mem_op13, lab_mem_op34, lab_mem_op3a, ret, nvkm_rd32(device, 0x137310), nvkm_rd32(device, 0x1373f0),
 +		  nvkm_rd32(device, 0x132000), nvkm_rd32(device, 0x10f290),
 +		  nvkm_rd32(device, 0x10f300), nvkm_rd32(device, 0x611200));
 +	lab_host_writes(subdev, "после скрипта", st->post, st->npost);
@@ -1244,7 +1261,7 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  int
  gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  {
-@@ -142,6 +890,16 @@
+@@ -142,6 +907,16 @@
  	int from, mode;
  	int N1, M1, P;
  	int ret;
@@ -1261,7 +1278,7 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  
  	/* lookup memory config data relevant to the target frequency */
  	rammap.data = nvbios_rammapEm(bios, freq / 1000, &ver, &rammap.size,
-@@ -268,7 +1026,10 @@
+@@ -268,7 +1043,10 @@
  	ram_wr32(fuc, 0x100b0c, 0x00080012);
  // 0x00030014 // 0x00000000 // 0x02b5f070
  // 0x00030014 // 0x00010000 // 0x02b5f070
@@ -1273,7 +1290,7 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  // 0x00020034 // 0x0000000a
  // 0x00030020 // 0x00000001 // 0x00000000
  
-@@ -322,7 +1083,7 @@
+@@ -322,7 +1100,7 @@
  		ram_wr32(fuc, 0x10f344, 0x00600009);
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700008);
@@ -1282,7 +1299,7 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  		ram_wr32(fuc, 0x10f830, 0x00300017);
  		gf100_ram_train(fuc, 0x80021001);
  		gf100_ram_train(fuc, 0x80081001);
-@@ -333,7 +1094,8 @@
+@@ -333,7 +1111,8 @@
  // 0x00030020 // 0x00000000 // 0x00000000
  // 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -1292,7 +1309,7 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  	} else {
  		ram_wr32(fuc, 0x10f800, 0x00001800);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
-@@ -376,7 +1138,7 @@
+@@ -376,7 +1155,7 @@
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700000);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
@@ -1301,7 +1318,7 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  
  		gf100_ram_train(fuc, 0x800e1008);
  
-@@ -386,7 +1148,8 @@
+@@ -386,7 +1165,8 @@
  	// 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -1311,7 +1328,7 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  		ram_nsec(fuc, 100000);
  		ram_wr32(fuc, 0x10f9b0, 0x05313f41);
  		ram_wr32(fuc, 0x10f9b4, 0x00002f50);
-@@ -408,6 +1171,8 @@
+@@ -408,6 +1188,8 @@
  {
  	struct gf100_ram *ram = gf100_ram(base);
  	struct nvkm_device *device = ram->base.fb->subdev.device;
@@ -1320,7 +1337,7 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  	ram_exec(&ram->fuc, nvkm_boolopt(device->cfgopt, "NvMemExec", true));
  	return 0;
  }
-@@ -416,6 +1181,10 @@
+@@ -416,6 +1198,10 @@
  gf100_ram_tidy(struct nvkm_ram *base)
  {
  	struct gf100_ram *ram = gf100_ram(base);

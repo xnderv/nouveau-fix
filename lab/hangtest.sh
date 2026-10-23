@@ -40,7 +40,7 @@ finish() {
 trap finish EXIT
 T0="$(date '+%Y-%m-%d %H:%M:%S')"
 { echo "hangtest $T0: подъёмов $N, нагрузка $LOAD, удержание 0f ${HOLD}с, lab_gov был $GOV0, ядро $(uname -r)"
-  echo "параметры: $(for p in lab_mem_order lab_mem_op13 lab_mem_op34 lab_mem_replay lab_pcie lab_gpc_seq; do printf '%s=%s ' $p "$(cat $PRM/$p)"; done)"
+  echo "параметры: $(for p in lab_mem_order lab_mem_op13 lab_mem_op34 lab_mem_op3a lab_mem_replay lab_pcie lab_gpc_seq; do printf '%s=%s ' $p "$(cat $PRM/$p)"; done)"
 } | tee "$LOG"; sync
 sudo sh -c "echo 0 > $PRM/lab_gov"
 pstate 07; sleep 3

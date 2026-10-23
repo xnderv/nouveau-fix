@@ -1,0 +1,186 @@
+Oct 23 18:50:41.596164 host sudo[11104]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 18:50:41.596312 host sudo[11104]: alex : TTY=/dev/pts/3 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c ls /sys/kernel/debug/dri/*/pstate
+Oct 23 18:50:41.603862 host sudo[11104]: pam_unix(sudo:session): session closed for user root
+Oct 23 18:50:41.691508 host sudo[11124]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 18:50:41.691710 host sudo[11124]: alex : TTY=/dev/pts/3 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c echo 0 > /sys/module/nouveau/parameters/lab_gov
+Oct 23 18:50:41.694667 host sudo[11124]: pam_unix(sudo:session): session closed for user root
+Oct 23 18:50:41.709273 host sudo[11128]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 18:50:41.709531 host sudo[11128]: alex : TTY=/dev/pts/3 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c echo 07 > \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 18:50:41.712393 host sudo[11128]: pam_unix(sudo:session): session closed for user root
+Oct 23 18:50:44.741629 host sudo[11144]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 18:50:44.741761 host sudo[11144]: alex : TTY=/dev/pts/3 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 18:50:44.745585 host sudo[11144]: pam_unix(sudo:session): session closed for user root
+Oct 23 18:50:44.787942 host kernel: audit: type=1400 audit(1792770644.785:292): apparmor="AUDIT" operation="exec" class="file" info="conflicting profile attachments" profile="claude-desktop" name="/opt/yandex/browser/yandex_browser" pid=11154 comm="yandex-browser" requested_mask="x" fsuid=1026 ouid=0
+Oct 23 18:50:44.886047 host kernel: nouveau-engobj-idle: idling chid 7 before deleting oclass 9097
+Oct 23 18:50:44.887034 host kernel: nouveau-engobj-idle: idling chid 7 before deleting oclass 902d
+Oct 23 18:50:44.888040 host kernel: nouveau-engobj-idle: idling chid 7 before deleting oclass 9039
+Oct 23 18:50:44.889043 host kernel: nouveau-engobj-idle: idling chid 7 before deleting oclass 90c0
+Oct 23 18:50:44.890041 host kernel: nouveau-engobj-idle: idling chid 7 before deleting oclass fffffff9
+Oct 23 18:50:44.904029 host kernel: audit: type=1400 audit(1792770644.902:293): apparmor="AUDIT" operation="exec" class="file" info="conflicting profile attachments" profile="claude-desktop" name="/opt/yandex/browser/yandex_browser" pid=11176 comm="yandex_browser" requested_mask="x" fsuid=1026 ouid=0
+Oct 23 18:50:44.906029 host kernel: audit: type=1400 audit(1792770644.903:294): apparmor="AUDIT" operation="exec" class="file" info="conflicting profile attachments" profile="claude-desktop" name="/opt/yandex/browser/yandex_browser" pid=11177 comm="yandex_browser" requested_mask="x" fsuid=1026 ouid=0
+Oct 23 18:50:45.155111 host kernel: audit: type=1400 audit(1792770645.153:295): apparmor="AUDIT" operation="exec" class="file" info="conflicting profile attachments" profile="claude-desktop" name="/opt/yandex/browser/yandex_browser" pid=11211 comm="ThreadPoolSingl" requested_mask="x" fsuid=1026 ouid=0
+Oct 23 18:50:45.485275 host systemd[2011]: Started app-org.chromium.Chromium-11154.scope.
+Oct 23 18:50:45.537968 host gnome-shell[2419]: Client provided invalid window geometry for xdg_surface#48 (chrome-__home_alex_Home_nouveau-fix_lab_hangload.html-Default - W9 ()). Working around.
+Oct 23 18:50:45.817979 host gnome-shell[2419]: Buggy client (chrome-__home_alex_Home_nouveau-fix_lab_hangload.html-Default) committed initial non-empty content without acknowledging configuration, working around.
+Oct 23 18:50:47.560041 host kernel: audit: type=1400 audit(1792770647.558:296): apparmor="AUDIT" operation="exec" class="file" info="conflicting profile attachments" profile="claude-desktop" name="/opt/yandex/browser/yandex_browser" pid=11290 comm="yandex-browser" requested_mask="x" fsuid=1026 ouid=0
+Oct 23 18:50:48.513055 host gnome-shell[2419]: While initalizing proxy for org.freedesktop.StatusNotifierItem-11154-1: Gio.DBusError: GDBus.Error:org.freedesktop.DBus.Error.Failed: error occurred in Get
+Oct 23 18:50:48.518792 host gnome-shell[2419]: TypeError: can't access property "g_name_owner", this._proxy is undefined
+Oct 23 18:50:56.973356 host sudo[11617]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 18:50:56.973548 host sudo[11617]: alex : TTY=/dev/pts/3 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c echo 0f > \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 18:50:56.977030 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 23 18:50:56.978572 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+Oct 23 18:50:56.978944 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+Oct 23 18:50:56.979300 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 23 18:50:56.979626 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+Oct 23 18:50:56.979942 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+Oct 23 18:50:56.980280 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 23 18:50:56.980599 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:50:56.980915 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:50:56.981253 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 1907000 got 1909285 ssel 00000004 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:50:56.981534 host kernel: nouveau 0000:01:00.0: clk: LAB calc_pll idx 07: опора nouveau 1620000 kHz, с делителем опоры 405000 kHz (lab_gpc_seq&8)
+Oct 23 18:50:56.981811 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 1645000 got 1645312 ssel 00000080 coef 00014110 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:50:56.982179 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 1645000 got 1645000 ssel 00000100 coef 00000000 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:50:56.982551 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 18:50:56.982875 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 23 18:50:56.983197 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 18:50:56.983560 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 23 18:50:56.983856 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 23 18:50:56.984153 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 23 18:50:56.984473 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 00012809
+Oct 23 18:50:56.984796 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 00 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 18:50:56.985094 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 01 PLL locked ctrl 00030001 coef 00012107
+Oct 23 18:50:56.985372 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 01 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 18:50:56.985637 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 02 PLL locked ctrl 00030001 coef 00012107
+Oct 23 18:50:56.985918 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 02 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 18:50:56.986302 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 07 PLL locked ctrl 00030001 coef 00014110
+Oct 23 18:50:56.986708 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 07 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 18:50:56.987162 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 23 18:50:56.986810 host sudo[11617]: pam_unix(sudo:session): session closed for user root
+Oct 23 18:50:56.987628 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 23 18:50:56.987956 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 23 18:50:56.988403 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 02 select PLL, 0x137100=00000003
+Oct 23 18:50:56.988813 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 07 select PLL, 0x137100=00000007
+Oct 23 18:50:56.989240 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 08 select PLL, 0x137100=00000087
+Oct 23 18:50:56.989678 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 23 18:50:56.990113 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 23 18:50:56.990575 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+Oct 23 18:50:56.991132 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 324 МГц, цель 2004 МГц, шагов 1 (lab_mem_replay=15)
+Oct 23 18:50:56.991924 host kernel: nouveau 0000:01:00.0: fb: LAB replay B 324->2004: в memx 81 записей, 7 ожиданий, 12 пауз, пропущено 10 операций, ~240 слов
+Oct 23 18:50:56.992580 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 23 18:50:56.993052 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 16
+Oct 23 18:50:56.994096 host kernel: nouveau 0000:01:00.0: fb: LAB replay B 324->2004: выполнен за 9248 мкс (op13×1 op34=1), ret 0; 0x137310=89200816 0x1373f0=00000002 0x132000=18030101 0x10f290=0c3c362a 0x10f300=00000a4d 0x611200=00000030
+Oct 23 18:50:56.994641 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей после скрипта: 8
+Oct 23 18:50:56.995140 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 23 18:50:56.995649 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+Oct 23 18:51:02.811432 host yandex-browser.desktop[4450]: [4824:4829:1023/185102.811332:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:51:03.053437 host yandex-browser.desktop[4450]: [4824:4829:1023/185103.053385:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:51:03.266602 host sudo[11694]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 18:51:03.266747 host sudo[11694]: alex : TTY=/dev/pts/3 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 18:51:03.270594 host sudo[11694]: pam_unix(sudo:session): session closed for user root
+Oct 23 18:51:03.338420 host sudo[11712]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 18:51:03.338585 host sudo[11712]: alex : TTY=/dev/pts/3 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c echo 07 > \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 18:51:03.342019 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 23 18:51:03.342612 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+Oct 23 18:51:03.342975 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+Oct 23 18:51:03.343354 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 1)
+Oct 23 18:51:03.343806 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+Oct 23 18:51:03.344270 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 2004 МГц, цель 324 МГц, шагов 2 (lab_mem_replay=15)
+Oct 23 18:51:03.344700 host kernel: nouveau 0000:01:00.0: fb: LAB replay C 2004->324: в memx 76 записей, 9 ожиданий, 10 пауз, пропущено 13 операций, ~231 слов
+Oct 23 18:51:03.345209 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 23 18:51:03.345745 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 7
+Oct 23 18:51:03.359022 host kernel: nouveau 0000:01:00.0: fb: LAB replay C 2004->324: выполнен за 16669 мкс (op13×1 op34=1), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18030001 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+Oct 23 18:51:03.359605 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 1
+Oct 23 18:51:03.360266 host kernel: nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): в memx 37 записей, 9 ожиданий, 8 пауз, пропущено 6 операций, ~145 слов
+Oct 23 18:51:03.360969 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 23 18:51:03.361469 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 20
+Oct 23 18:51:03.375021 host kernel: nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): выполнен за 16509 мкс (op13×1 op34=1), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18010000 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+Oct 23 18:51:03.375601 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей после скрипта: 16
+Oct 23 18:51:03.376086 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 23 18:51:03.375674 host sudo[11712]: pam_unix(sudo:session): session closed for user root
+Oct 23 18:51:03.376734 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+Oct 23 18:51:03.377092 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 1)
+Oct 23 18:51:03.378013 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 23 18:51:03.378441 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 23 18:51:03.378909 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 23 18:51:03.379462 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 23 18:51:03.379908 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 23 18:51:03.380333 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 23 18:51:03.380713 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 23 18:51:03.381142 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 23 18:51:03.381597 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 23 18:51:03.382071 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 23 18:51:03.382538 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 23 18:51:03.382890 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 23 18:51:03.383229 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 23 18:51:03.383562 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 23 18:51:03.383830 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+Oct 23 18:51:03.766923 host yandex-browser.desktop[4450]: [4824:4829:1023/185103.766872:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:51:05.403948 host sudo[11723]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 18:51:05.404152 host sudo[11723]: alex : TTY=/dev/pts/3 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 18:51:05.408873 host sudo[11723]: pam_unix(sudo:session): session closed for user root
+Oct 23 18:51:07.477548 host kernel: audit: type=1400 audit(1792770667.475:297): apparmor="AUDIT" operation="exec" class="file" info="conflicting profile attachments" profile="claude-desktop" name="/opt/yandex/browser/yandex_browser" pid=11757 comm="ThreadPoolSingl" requested_mask="x" fsuid=1026 ouid=0
+Oct 23 18:51:07.482109 host kernel: audit: type=1400 audit(1792770667.480:298): apparmor="AUDIT" operation="exec" class="file" info="conflicting profile attachments" profile="claude-desktop" name="/opt/yandex/browser/yandex_browser" pid=11758 comm="ThreadPoolSingl" requested_mask="x" fsuid=1026 ouid=0
+Oct 23 18:51:08.545603 host sudo[11783]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 18:51:08.545818 host sudo[11783]: alex : TTY=/dev/pts/3 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c echo 0f > \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 18:51:08.551032 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 23 18:51:08.553517 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+Oct 23 18:51:08.553828 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+Oct 23 18:51:08.554179 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 23 18:51:08.554493 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+Oct 23 18:51:08.554778 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+Oct 23 18:51:08.555076 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 23 18:51:08.555359 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:51:08.555647 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:51:08.555922 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 1907000 got 1909285 ssel 00000004 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:51:08.556214 host kernel: nouveau 0000:01:00.0: clk: LAB calc_pll idx 07: опора nouveau 1620000 kHz, с делителем опоры 405000 kHz (lab_gpc_seq&8)
+Oct 23 18:51:08.556502 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 1645000 got 1645312 ssel 00000080 coef 00014110 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:51:08.556805 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 1645000 got 1645000 ssel 00000100 coef 00000000 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:51:08.557173 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 18:51:08.557491 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 23 18:51:08.557773 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 18:51:08.558064 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 23 18:51:08.558345 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 23 18:51:08.558622 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 23 18:51:08.558895 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 00012809
+Oct 23 18:51:08.559194 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 00 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 18:51:08.559519 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 01 PLL locked ctrl 00030001 coef 00012107
+Oct 23 18:51:08.559827 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 01 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 18:51:08.560169 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 02 PLL locked ctrl 00030001 coef 00012107
+Oct 23 18:51:08.560457 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 02 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 18:51:08.560739 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 07 PLL locked ctrl 00030001 coef 00014110
+Oct 23 18:51:08.561039 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 07 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 18:51:08.561403 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 23 18:51:08.561825 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 23 18:51:08.562309 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 23 18:51:08.562600 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 02 select PLL, 0x137100=00000003
+Oct 23 18:51:08.562958 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 07 select PLL, 0x137100=00000007
+Oct 23 18:51:08.563441 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 08 select PLL, 0x137100=00000087
+Oct 23 18:51:08.563868 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 23 18:51:08.563751 host sudo[11783]: pam_unix(sudo:session): session closed for user root
+Oct 23 18:51:08.564369 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 23 18:51:08.564691 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+Oct 23 18:51:08.565021 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 324 МГц, цель 2004 МГц, шагов 1 (lab_mem_replay=15)
+Oct 23 18:51:08.565471 host kernel: nouveau 0000:01:00.0: fb: LAB replay B 324->2004: в memx 81 записей, 7 ожиданий, 12 пауз, пропущено 10 операций, ~240 слов
+Oct 23 18:51:08.565831 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 23 18:51:08.566406 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 16
+Oct 23 18:51:08.566817 host kernel: nouveau 0000:01:00.0: fb: LAB replay B 324->2004: выполнен за 12277 мкс (op13×1 op34=1), ret 0; 0x137310=89200816 0x1373f0=00000002 0x132000=18030101 0x10f290=0c3c362a 0x10f300=00000a4d 0x611200=00000030
+Oct 23 18:51:08.567221 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей после скрипта: 8
+Oct 23 18:51:08.568225 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 23 18:51:08.568723 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+Oct 23 18:51:08.848831 host yandex-browser.desktop[4450]: [4824:4829:1023/185108.848679:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:51:09.076351 host yandex-browser.desktop[4450]: [4824:4829:1023/185109.076198:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:51:10.122072 host yandex-browser.desktop[4450]: [4824:4829:1023/185110.121917:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:51:13.754812 host sudo[11834]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 18:51:13.754964 host sudo[11834]: alex : TTY=/dev/pts/3 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 18:51:13.758836 host sudo[11834]: pam_unix(sudo:session): session closed for user root
+Oct 23 18:51:14.365800 host kernel: nouveau 0000:01:00.0: bus: MMIO write of 00000002 FAULT at 13b154 [ PRIVRING ]
+Oct 23 18:51:14.366868 host kernel: nouveau 0000:01:00.0: bus: MMIO read of 00000000 FAULT at 512090 [ PRIVRING ]
+Oct 23 18:51:14.367745 host kernel: nouveau 0000:01:00.0: bus: MMIO read of 00000000 FAULT at 002658 [ TIMEOUT ]
+Oct 23 18:51:14.368499 host kernel: nouveau 0000:01:00.0: bus: MMIO read of 00000000 FAULT at 00265c [ TIMEOUT ]
+Oct 23 18:51:22.526499 host at-spi2-registryd[2625]: Disabling unresponsive app with pid 2419
+Oct 23 18:51:28.413674 host yandex-browser.desktop[4450]: [4824:4829:1023/185128.413516:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:51:32.741930 host yandex-browser.desktop[4450]: [4824:4829:1023/185132.741779:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:51:42.512500 host at-spi2-registryd[2625]: Re-enabling app with pid 2419
+Oct 23 18:51:43.978732 host kernel: sysrq: Emergency Sync
+Oct 23 18:51:44.004036 host kernel: Emergency Sync complete
+Oct 23 18:51:44.786720 host kernel: sysrq: Emergency Remount R/O
