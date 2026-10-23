@@ -1,0 +1,148 @@
+                                                    ### Promise created here: ###
+Oct 23 19:42:58.562956 host sudo[7743]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 19:42:58.563145 host sudo[7743]: alex : TTY=/dev/pts/4 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c echo 0f > \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 19:42:58.566047 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=0 mem=0 core=1 volt_first=1
+Oct 23 19:42:58.566588 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie SKIPPED (lab_pcie=0)
+Oct 23 19:42:58.566905 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 1063638 uV raised to floor 1075000 uV
+Oct 23 19:42:58.566628 host sudo[7743]: pam_unix(sudo:session): session closed for user root
+Oct 23 19:42:58.567311 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 23 19:42:58.567656 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+Oct 23 19:42:58.568064 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+Oct 23 19:42:58.568737 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 1063638 uV raised to floor 1075000 uV
+Oct 23 19:42:58.569556 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 23 19:42:58.569972 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:42:58.570512 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:42:58.570981 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 1907000 got 1909285 ssel 00000004 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:42:58.571457 host kernel: nouveau 0000:01:00.0: clk: LAB calc_pll idx 07: опора nouveau 1620000 kHz, с делителем опоры 405000 kHz (lab_gpc_seq&8)
+Oct 23 19:42:58.571927 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 1645000 got 1645312 ssel 00000080 coef 00014110 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:42:58.572273 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 1645000 got 1645000 ssel 00000100 coef 00000000 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:42:58.572552 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 19:42:58.572828 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 23 19:42:58.573114 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 19:42:58.573420 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 23 19:42:58.573695 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 23 19:42:58.574009 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 23 19:42:58.574398 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 00012809
+Oct 23 19:42:58.574714 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 00 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 19:42:58.575046 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 01 PLL locked ctrl 00030001 coef 00012107
+Oct 23 19:42:58.575325 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 01 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 19:42:58.575603 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 02 PLL locked ctrl 00030001 coef 00012107
+Oct 23 19:42:58.575877 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 02 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 19:42:58.576200 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 07 PLL locked ctrl 00030001 coef 00014110
+Oct 23 19:42:58.576475 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 07 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 19:42:58.576731 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 23 19:42:58.577005 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 23 19:42:58.577309 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 23 19:42:58.577623 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 02 select PLL, 0x137100=00000003
+Oct 23 19:42:58.577979 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 07 select PLL, 0x137100=00000007
+Oct 23 19:42:58.578311 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 08 select PLL, 0x137100=00000087
+Oct 23 19:42:58.578678 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 23 19:42:58.579052 host kernel: nouveau 0000:01:00.0: volt: LAB volt: table 1063638 uV raised to floor 1075000 uV
+Oct 23 19:42:58.579329 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 23 19:42:58.579608 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+Oct 23 19:42:58.579879 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+Oct 23 19:43:02.730318 host sudo[7778]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 19:43:02.730447 host sudo[7778]: alex : TTY=/dev/pts/4 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 19:43:02.735749 host sudo[7778]: pam_unix(sudo:session): session closed for user root
+Oct 23 19:43:04.234089 host kernel: nouveau 0000:01:00.0: bus: MMIO write of 00000002 FAULT at 13b154 [ PRIVRING ]
+Oct 23 19:43:37.322235 host systemd[1]: Starting update-notifier-download.service - Download data for packages that failed at package install time...
+Oct 23 19:43:37.478747 host systemd[1]: update-notifier-download.service: Deactivated successfully.
+Oct 23 19:43:37.479313 host systemd[1]: Finished update-notifier-download.service - Download data for packages that failed at package install time.
+Oct 23 19:43:41.835809 host dbus-daemon[1286]: [system] Activating via systemd: service name='org.freedesktop.timedate1' unit='dbus-org.freedesktop.timedate1.service' requested by ':1.26' (uid=0 pid=1305 comm="/usr/lib/snapd/snapd" label="unconfined")
+Oct 23 19:43:41.844884 host systemd[1]: Starting systemd-timedated.service - Time & Date Service...
+Oct 23 19:43:41.927645 host systemd[1]: Started systemd-timedated.service - Time & Date Service.
+Oct 23 19:43:41.928334 host dbus-daemon[1286]: [system] Successfully activated service 'org.freedesktop.timedate1'
+Oct 23 19:43:57.318918 host systemd[1989]: launchpadlib-cache-clean.service - Clean up old files in the Launchpadlib cache skipped, unmet condition check ConditionPathExists=/home/user/.launchpadlib/api.launchpad.net/cache
+Oct 23 19:43:57.319665 host systemd[1989]: ubuntu-insights-collect.service: unit configures an IP firewall, but not running as root.
+Oct 23 19:43:57.319674 host systemd[1989]: ubuntu-insights-collect.service: (This warning is only shown for the first unit using IP firewalling.)
+Oct 23 19:43:57.322444 host systemd[1989]: Starting ubuntu-insights-collect.service - "Collect platform report using Ubuntu Insights while respecting consent"...
+Oct 23 19:43:57.344044 host kernel: audit: type=1400 audit(1792773837.342:271): apparmor="AUDIT" operation="userns_create" class="namespace" info="Userns create - transitioning profile" profile="unconfined" pid=8033 comm="(ubuntu-insigh)" requested="userns_create" target="unprivileged_userns" execpath="/usr/lib/systemd/systemd-executor"
+Oct 23 19:43:57.345048 host kernel: audit: type=1400 audit(1792773837.343:272): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=8033 comm="(ubuntu-insigh)" capability=21  capname="sys_admin"
+Oct 23 19:43:57.399059 host kernel: audit: type=1400 audit(1792773837.397:273): apparmor="DENIED" operation="getattr" class="file" info="Failed name lookup - disconnected path" error=-13 profile="unprivileged_userns" name="" pid=8041 comm="systemd-detect-" requested_mask="r" denied_mask="r" fsuid=1026 ouid=0
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]: {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:   "insightsVersion": "0.9.3ubuntu",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:   "collectionTime": 1792773837,
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:   "systemInfo": {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:     "hardware": {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       "product": {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "family": "To be filled by O.E.M.",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "name": "To be filled by O.E.M.",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "vendor": "Gigabyte Technology Co., Ltd."
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       },
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       "cpu": {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "name": "Intel(R) Xeon(R) CPU E3-1270 V2 @ 3.50GHz",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "vendor": "GenuineIntel",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "architecture": "x86_64",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "cpus": 8,
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "sockets": 1,
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "coresPerSocket": 4,
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "threadsPerCore": 2
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       },
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       "gpus": [
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           "device": "0x1200",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           "vendor": "0x10de",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           "driver": "nouveau"
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         }
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       ],
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       "memory": {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "size": 15416
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       },
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       "disks": [
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           "size": 476979,
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           "type": "disk",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           "children": [
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:             {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:               "size": 476979,
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:               "type": "part"
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:             }
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           ]
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         },
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           "size": 953856,
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           "type": "disk",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           "children": [
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:             {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:               "size": 953856,
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:               "type": "part"
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:             }
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           ]
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         }
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       ],
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       "screens": [
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           "physicalResolution": "2560x1440",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           "size": "610mm x 340mm",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:           "refreshRate": "59.95"
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         }
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       ]
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:     },
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:     "software": {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       "os": {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "family": "linux",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "distribution": "Ubuntu",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "version": "26.04"
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       },
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       "timezone": "MSK",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       "language": "en_US",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       "bios": {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "vendor": "American Megatrends Inc.",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "version": "U1g"
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       }
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:     },
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:     "platform": {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       "desktop": {
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "desktopEnvironment": "ubuntu:GNOME",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "sessionName": "ubuntu",
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:         "sessionType": "wayland"
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:       }
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:     }
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]:   }
+Oct 23 19:43:57.987998 host ubuntu-insights[8033]: }
+Oct 23 19:43:57.991311 host ubuntu-insights[8033]: 2026/10/23 19:43:57 ERROR failed to collect insights: insights write failed: report already exists for this period
+Oct 23 19:43:57.990300 host systemd[1989]: Finished ubuntu-insights-collect.service - "Collect platform report using Ubuntu Insights while respecting consent".
+Oct 23 19:44:11.961761 host systemd[1]: systemd-timedated.service: Deactivated successfully.
+Oct 23 19:45:04.567780 host kernel: sysrq: Emergency Sync
+Oct 23 19:45:04.600100 host kernel: Emergency Sync complete
+Oct 23 19:45:05.231777 host kernel: sysrq: Emergency Remount R/O

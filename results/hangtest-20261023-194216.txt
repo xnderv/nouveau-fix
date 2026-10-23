@@ -1,0 +1,12 @@
+hangtest 2026-10-23 19:42:19: подъёмов 60, нагрузка browser, удержание 0f 6с, lab_gov был 2, ядро 7.0.0-38-generic
+параметры: lab_mem_order=Y lab_mem_op13=1 lab_mem_op34=1 lab_mem_op3a=0 lab_mem_replay=15 lab_pcie=0 lab_gpc_seq=13 
+19:42:22 старт: core 405 MHz memory 324 MHz; lab_mem=N lab_core=Y lab_volt_min_uv=1075000
+19:42:22 нагрузка: /usr/bin/yandex-browser (pid 6987, профиль /home/alex/.cache/nouveau-hangtest-profile), страница hangload.html; прогрев 10 с
+19:42:32 загрузка GR перед циклами: 986‰
+19:42:41 подъём 1/60 в 19:42:35.573: gr до 876‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 870‰
+19:42:52 подъём 2/60 в 19:42:46.393: gr до 930‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 904‰
+19:43:02 подъём 3/60 в 19:42:58.572: gr до 867‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 1000‰ — ЗАВИСАНИЕ: gr=1000‰ 4с подряд, ошибок журнала 0
+19:43:02 подозрение на зависание (gr=1000‰ 4с подряд, ошибок журнала 0) — жду подтверждения ядра до 90 с, не перезагружайте
+=== ЗАВИСАНИЕ ВОСПРОИЗВЕДЕНО на подъёме 3 (нагрузка browser). Нагрузка оставлена, lab_gov=0.
+    Снимок регистров: /var/log/gpu-blackbox/hang-*.txt (чёрный ящик). Журнал: journalctl -k -b 0 --since '2026-10-23 19:42:19'
+    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show

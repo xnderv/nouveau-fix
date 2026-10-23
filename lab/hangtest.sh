@@ -96,13 +96,18 @@ for c in $(seq 1 "$N"); do
         # подтверждение от ядра: «failed to idle channel» приходит через ~35-45 с после зависания; ждём до 90 с
         echo "$(date +%T) подозрение на зависание ($hung) — жду подтверждения ядра до 90 с, не перезагружайте" | tee -a "$LOG"; sync
         for s in $(seq 1 18); do sleep 5; E="$(errs)"; [ "${E:-0}" -gt 0 ] && break; done
+        # объективная подпись из чёрного ящика: при зависании канал в GR (eng0=0x002640) и 0x400700 застывают на одном
+        # значении, при здоровой нагрузке они меняются каждую секунду. 15 одинаковых строк подряд = зависание.
+        SIG="$(tail -n 15 /var/log/gpu-blackbox/current.txt 2>/dev/null | grep -oE 'gr700=[0-9a-f]+ eng0=[0-9a-f]+' | sort -u | wc -l)"
         if [ "${E:-0}" -gt 0 ]; then hung="$hung; ядро подтвердило: $(journalctl -k -b 0 --no-pager --since "$T0" | grep -m1 -oE 'failed to idle[^$]*|SCHED_ERROR[^$]*' | cut -c1-80)"
-        elif [ "$(gr)" -lt 999 ] 2>/dev/null; then echo "$(date +%T) ложная тревога: GR освободился, ядро ошибок не дало — продолжаю" | tee -a "$LOG"; hung=""; pstate 07; sleep 2; DONE=$c; continue
-        else hung="$hung; ядро за 90 с НЕ подтвердило (GR всё ещё 1000‰) — считать зависанием только если экран замер"; fi
+        elif [ "$SIG" = 1 ]; then hung="$hung; подпись ящика подтвердила: eng0/gr700 застыли ($(tail -n1 /var/log/gpu-blackbox/current.txt | grep -oE 'gr700=[0-9a-f]+ eng0=[0-9a-f]+')) 15 с"
+        elif [ "$(gr)" -lt 999 ] 2>/dev/null; then echo "$(date +%T) ложная тревога: GR освободился, подпись не застыла — продолжаю" | tee -a "$LOG"; hung=""; pstate 07; sleep 2; DONE=$c; continue
+        else hung="$hung; ни ядро, ни подпись ящика за 90 с не подтвердили (GR 1000‰, но eng0/gr700 меняются) — НЕ ЗАСЧИТЫВАТЬ"; fi
     fi
     if [ -n "$hung" ]; then
         HUNG=1
-        { echo "=== ЗАВИСАНИЕ ВОСПРОИЗВЕДЕНО на подъёме $c (нагрузка $LOAD). Нагрузка оставлена, lab_gov=0."
+        { echo "=== ЗАВИСАНИЕ ВОСПРОИЗВЕДЕНО на подъёме $c (нагрузка $LOAD): $hung"
+          echo "    Нагрузка оставлена, lab_gov=0."
           echo "    Снимок регистров: /var/log/gpu-blackbox/hang-*.txt (чёрный ящик). Журнал: journalctl -k -b 0 --since '$T0'"
           echo "    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show"; } | tee -a "$LOG"; sync
         exit 2
