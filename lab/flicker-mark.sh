@@ -1,7 +1,7 @@
 #!/bin/bash
-# Отметка «МИГНУЛО»: время с миллисекундами в ~/nouveau-fix/results/flicker-marks.txt (+ короткий звук-щелчок, если есть).
+# Отметка «МИГНУЛО»: время с миллисекундами в ~/Home/nouveau-fix/results/flicker-marks.txt (+ короткий звук-щелчок, если есть).
 # Вешается на сочетание клавиш:  flicker-mark.sh key-on   /  убрать:  flicker-mark.sh key-off
-F="$HOME/nouveau-fix/results/flicker-marks.txt"
+F="$HOME/Home/nouveau-fix/results/flicker-marks.txt"
 KEY='<Control><Alt>m'
 BASE=org.gnome.settings-daemon.plugins.media-keys
 PATHK=/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/flicker-mark/
@@ -20,7 +20,7 @@ print('Список сочетаний:', lst)
 PY
     S="$BASE.custom-keybinding:$PATHK"
     gsettings set "$S" name 'Отметка: мигнуло'
-    gsettings set "$S" command "$HOME/nouveau-fix/lab/flicker-mark.sh"
+    gsettings set "$S" command "$HOME/Home/nouveau-fix/lab/flicker-mark.sh"
     gsettings set "$S" binding "$KEY"
     echo "Готово: Ctrl+Alt+M пишет отметку в $F" ;;
 key-off)

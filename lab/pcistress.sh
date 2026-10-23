@@ -5,7 +5,7 @@
 #                               по шине. ВО ВРЕМЯ ОПЫТА ДЕЛАЙ СНИМКИ ЭКРАНА (PrtSc, несколько раз) — именно это роняло.
 #   CPU=1 bash pcistress.sh ...  — дополнительно занять ВСЕ ядра процессора (как при сборке драйвера): оба падения
 #                                  22.10 были во время сборки; проверяем, не рвёт ли нагрузка на процессор тайминги шагов
-# Чёрный ящик (gpu-blackbox) должен работать: при зависании после Reset — bash ~/nouveau-fix/lab/blackbox.sh show.
+# Чёрный ящик (gpu-blackbox) должен работать: при зависании после Reset — bash ~/Home/nouveau-fix/lab/blackbox.sh show.
 # Регулятор на время опыта выключается и в конце включается; lab_pcie в конце ВОЗВРАЩАЕТСЯ к значению до опыта.
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; KIT="$(dirname "$HERE")"; mkdir -p "$KIT/results"
@@ -13,7 +13,7 @@ P=/sys/module/nouveau/parameters
 [ -e "$P/lab_pcie" ] || { echo "--- СТОП: нет lab_pcie (нужен лабораторный драйвер)"; exit 1; }
 V="${1:-}"; [[ "$V" =~ ^[0123]$ ]] || { sed -n '2,7p' "$0"; exit 1; }
 N="${2:-10}"
-systemctl is-active -q gpu-blackbox || echo "⚠ чёрный ящик не запущен (bash ~/nouveau-fix/lab/blackbox.sh install) — при зависании следов не будет"
+systemctl is-active -q gpu-blackbox || echo "⚠ чёрный ящик не запущен (bash ~/Home/nouveau-fix/lab/blackbox.sh install) — при зависании следов не будет"
 G="$(command -v glmark2-wayland || command -v glmark2 || true)"; [ -n "$G" ] || { echo "--- СТОП: нет glmark2"; exit 1; }
 sudo -v || exit 1
 PS="$(sudo sh -c 'ls /sys/kernel/debug/dri/*/pstate' | head -n1)"

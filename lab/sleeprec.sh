@@ -15,7 +15,7 @@ case "${1:-}" in
 install)
     sudo tee "$BIN" >/dev/null <<'EOF'
 #!/bin/bash
-# самописец сна (ставится ~/nouveau-fix/lab/sleeprec.sh install)
+# самописец сна (ставится ~/Home/nouveau-fix/lab/sleeprec.sh install)
 DIR=/var/log/sleeprec; mkdir -p "$DIR"
 ls -1t "$DIR"/*.txt 2>/dev/null | tail -n +20 | xargs -r rm -f
 W="$DIR/$(date +%Y%m%d-%H%M%S).txt"
@@ -50,7 +50,7 @@ EOF
     sudo chmod 0755 "$BIN"
     sudo tee "$UNIT" >/dev/null <<EOF
 [Unit]
-Description=Самописец сна: что делают крючки сна (диагностика, ~/nouveau-fix/lab/sleeprec.sh)
+Description=Самописец сна: что делают крючки сна (диагностика, ~/Home/nouveau-fix/lab/sleeprec.sh)
 Before=sleep.target
 StopWhenUnneeded=yes
 

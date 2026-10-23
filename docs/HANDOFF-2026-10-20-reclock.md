@@ -1,7 +1,7 @@
 # Handoff: смена частот GTX 560 Ti (GF114, Gigabyte 1458:3515) в nouveau — состояние на 2026-10-20 00:25
 
 ## Где мы
-- Зависания от гонки (Chromium + Dash) **решены**: `patches/0001`, стабильный драйвер в `~/nouveau-build/stable-7.0.0-38-generic-nouveau.ko`,
+- Зависания от гонки (Chromium + Dash) **решены**: `patches/0001`, стабильный драйвер в `~/Home/nouveau-build/stable-7.0.0-38-generic-nouveau.ko`,
   пересборка после обновления ядра — `rebuild.sh`. Ежедневная работа: стабильный драйвер (`lab/lab.sh restore` + перезагрузка).
 - Частоты: исследуем лабораторным драйвером (`lab/`, патч `0002`), опыты со страховкой `lab.sh exp X <режим>`.
 - Журнал загрузки: `nouveau.debug=clk=trace,fb=trace,volt=trace,pmu=debug` (тихий; выключить — README).
@@ -51,4 +51,4 @@ PCIe → память → вентилятор → напряжение ↑ → 
 3. Подготовить письмо разработчикам nouveau: исправление гонки (0001) + данные по reclock и fence UAF.
 
 
-Заметка: `results/` создаётся от root (скрипт try) — обычные команды не могут туда писать (`sudo chown -R $USER: ~/nouveau-fix/results`).
+Заметка: `results/` создаётся от root (скрипт try) — обычные команды не могут туда писать (`sudo chown -R $USER: ~/Home/nouveau-fix/results`).

@@ -53,7 +53,7 @@ def notify(mode, tries=60):
             if st.st_uid < 1000:
                 continue
             pw = pwd.getpwuid(st.st_uid)
-            n = os.path.join(pw.pw_dir, 'nouveau-fix/daily/notify-newkernel.sh')
+            n = os.path.join(pw.pw_dir, 'Home/nouveau-fix/daily/notify-newkernel.sh')
             if not os.access(n, os.X_OK):
                 continue
             r = subprocess.run(['sudo', '-u', pw.pw_name, 'env', f'DBUS_SESSION_BUS_ADDRESS=unix:path={b}',
@@ -69,7 +69,7 @@ def main():
     prm = '/sys/module/nouveau/parameters'
     if not os.path.exists(prm + '/lab_mem_replay'):
         m = (f'Загружен не наш драйвер nouveau (ядро {os.uname().release}): частоты не управляются, карта на стартовых. '
-             'Если это новое ядро: ~/nouveau-fix/newkernel.sh и перезагрузка.')
+             'Если это новое ядро: ~/Home/nouveau-fix/newkernel.sh и перезагрузка.')
         log('Нет лабораторного драйвера с lab_mem_replay — ничего не трогаю. ' + m)
         notify('notloaded')
         return 1

@@ -26,7 +26,7 @@ run)
     echo "--- Окружение верное"
     echo "Компьютер уснёт. Подожди ~15 с и разбуди КОРОТКИМ нажатием кнопки питания."
     echo "Если экран не включится за минуту: нажми Caps Lock — мигает ли лампочка? Потом выключи (держать 5 с),"
-    echo "включи и запусти: bash ~/nouveau-fix/lab/sleep0.sh after"
+    echo "включи и запусти: bash ~/Home/nouveau-fix/lab/sleep0.sh after"
     read -r -p "Начинаем? Enter — да, Ctrl+C — отмена " _
     say "Сон без наших частот $(date '+%F %T'), отпечаток $(md5sum "$0" | cut -c1-8), ядро $(uname -r)"
     say "до сна: $(sudo sh -c 'grep "^AC" /sys/kernel/debug/dri/*/pstate | head -n 1')"

@@ -1,7 +1,7 @@
 #!/bin/bash
 # ДОДЕЛКА установки u2204-trace после остановки на шаге 5 (update-initramfs не найден).
 # Ничего не стирает. Работает только с разделом с меткой u2204-trace на диске с серийным <DISK_SERIAL>.
-# Запуск: sudo ~/nouveau-fix/trace/build-finish.sh
+# Запуск: sudo ~/Home/nouveau-fix/trace/build-finish.sh
 set -euo pipefail
 SERIAL="<DISK_SERIAL>"; MNT=/mnt/u2204-trace; USER_NAME=alex
 HERE="$(cd "$(dirname "$0")" && pwd)"

@@ -1,9 +1,9 @@
 #!/bin/bash
 # Установка / удаление службы автоматических режимов карты .
-#   ~/nouveau-fix/daily/autoclock.sh install   — поставить и запустить службу + напоминание о новом ядре (пароль)
-#   ~/nouveau-fix/daily/autoclock.sh remove    — остановить и удалить; карта остаётся в текущем режиме до перезагрузки
-#   ~/nouveau-fix/daily/autoclock.sh status    — состояние и последние переключения
-#   ~/nouveau-fix/daily/autoclock.sh watch     — смотреть переключения вживую (Ctrl+C — выход)
+#   ~/Home/nouveau-fix/daily/autoclock.sh install   — поставить и запустить службу + напоминание о новом ядре (пароль)
+#   ~/Home/nouveau-fix/daily/autoclock.sh remove    — остановить и удалить; карта остаётся в текущем режиме до перезагрузки
+#   ~/Home/nouveau-fix/daily/autoclock.sh status    — состояние и последние переключения
+#   ~/Home/nouveau-fix/daily/autoclock.sh watch     — смотреть переключения вживую (Ctrl+C — выход)
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 case "${1:-}" in

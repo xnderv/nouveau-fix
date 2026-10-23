@@ -28,7 +28,7 @@ shadow)
     T0="$(date '+%F %T')"
     echo "Тень регулятора $T0, отпечаток $(md5sum "$0" | cut -c1-8), ядро $(uname -r), $MIN мин" | tee "$LOG"
     if [ "$DBG" = 1 ]; then
-        grep -q 'gpu-autoclock.debug' /usr/local/sbin/gpu-autoclock.py || { echo "--- СТОП: установленная служба не умеет посекундную запись — сначала: bash ~/nouveau-fix/daily/autoclock.sh install"; exit 1; }
+        grep -q 'gpu-autoclock.debug' /usr/local/sbin/gpu-autoclock.py || { echo "--- СТОП: установленная служба не умеет посекундную запись — сначала: bash ~/Home/nouveau-fix/daily/autoclock.sh install"; exit 1; }
         sudo touch /run/gpu-autoclock.debug; echo "  посекундная запись включена (драйвер и служба)" | tee -a "$LOG"
     fi
     sudo sh -c "echo 20300000 > $P/lab_perf_ticks; echo 1000 > $P/lab_perf_ms; echo $DBG > $P/lab_perf_log; echo 1 > $P/lab_gov"

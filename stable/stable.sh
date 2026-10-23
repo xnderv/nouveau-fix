@@ -49,7 +49,7 @@ install)
     [ -e "$KIT/daily/kernel-remind.sh" ] && sudo install -m 0755 "$KIT/daily/kernel-remind.sh" /etc/kernel/postinst.d/zz-nouveau-fix-remind
     sudo depmod -a "$KVER"; sudo update-initramfs -u -k "$KVER"
     echo "=== Для ядра $KVER выбран драйвер: $(modinfo -k "$KVER" -n nouveau)"
-    modinfo -k "$KVER" -p nouveau 2>/dev/null | grep -q gf114_gov && echo "=== Это стабильный драйвер GF114 ✅ Перезагрузись, затем: bash ~/nouveau-fix/stable/stable.sh status" \
+    modinfo -k "$KVER" -p nouveau 2>/dev/null | grep -q gf114_gov && echo "=== Это стабильный драйвер GF114 ✅ Перезагрузись, затем: bash ~/Home/nouveau-fix/stable/stable.sh status" \
         || echo "!!! Выбран не наш драйвер — пришли вывод"
     ;;
 build)

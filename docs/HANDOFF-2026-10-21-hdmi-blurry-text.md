@@ -53,5 +53,5 @@
 - Установлены пакеты: `ttf-mscorefonts-installer`, `fonts-liberation`, `fonts-noto`, `libdrm-tests`, `edid-decode`.
 - В Яндекс Браузере включено аппаратное ускорение (`browser://gpu`: всё Hardware accelerated, работает).
 - Пустая папка `~/.config/fontconfig` (без файлов, ни на что не влияет). Настройки GNOME — исходные (`rgba`, `slight`).
-- Файлы с данными: `~/nouveau-fix/display-info.txt` (state, modetest, EDID, dmesg),
-  `~/nouveau-fix/color-info.txt` (colord, GAMMA_LUT), `~/nouveau-fix/dither.txt`.
+- Файлы с данными: `~/Home/nouveau-fix/display-info.txt` (state, modetest, EDID, dmesg),
+  `~/Home/nouveau-fix/color-info.txt` (colord, GAMMA_LUT), `~/Home/nouveau-fix/dither.txt`.

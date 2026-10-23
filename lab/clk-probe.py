@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # ТОЛЬКО ЧТЕНИЕ регистров тактирования карты (блок 0x137000): для ядра, ROP, hubk07, hubk06, hubk01
 # показывает источник (делитель/PLL), коэффициенты PLL, опорный делитель PLL и итоговые делители.
-# Ничего не записывает. Запуск: sudo python3 ~/nouveau-fix/lab/clk-probe.py [метка]
+# Ничего не записывает. Запуск: sudo python3 ~/Home/nouveau-fix/lab/clk-probe.py [метка]
 import mmap, os, struct, sys, glob
 
 dev = None

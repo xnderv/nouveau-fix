@@ -2,7 +2,7 @@
 # Ставит на ОТДЕЛЬНЫЙ диск минимальную Ubuntu 22.04 (ядро 5.15) с драйвером NVIDIA 390 и X11 —
 # только для записи mmiotrace драйвера NVIDIA. Основная система и её загрузчик НЕ трогаются.
 # Диск выбирается строго по серийному номеру. ВСЁ СОДЕРЖИМОЕ ЭТОГО ДИСКА БУДЕТ СТЁРТО.
-# Запуск: sudo ~/nouveau-fix/trace/build-trace-disk.sh
+# Запуск: sudo ~/Home/nouveau-fix/trace/build-trace-disk.sh
 set -euo pipefail
 
 SERIAL="<DISK_SERIAL>"          # Seagate ST120FN0, 111.8G (sdb на 20.10.2026)

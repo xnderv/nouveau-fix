@@ -47,7 +47,7 @@ start)
     bad="$(journalctl -u gpu-autoclock.service -b 0 --no-pager | grep -c 'не та\|СТОП' || true)"
     echo "  переключений за опыт: $((S1 - S0)), сбоев службы: $bad, ошибок драйвера: $((E1 - E0))"
     [ "$((E1 - E0))" = 0 ] && [ "$bad" = 0 ] && [ "$((S1 - S0))" -gt 0 ] && echo "=== Шаг 1б: замеры в прошивке не мешают смене частот ✅ (замеры оставлены включёнными до перезагрузки)" \
-      || echo "=== Шаг 1б: есть отличия — пришли вывод (выключить замеры: bash ~/nouveau-fix/lab/perftest.sh stop)"
+      || echo "=== Шаг 1б: есть отличия — пришли вывод (выключить замеры: bash ~/Home/nouveau-fix/lab/perftest.sh stop)"
     exit 0 ;;
 stop)
     sudo sh -c "echo 0 > $P/lab_perf_ms; echo 0 > $P/lab_perf_ticks"; sleep 2
@@ -56,7 +56,7 @@ stop)
 compare) ;;
 *) sed -n '2,10p' "$0"; exit 1 ;;
 esac
-[ "$(cat $P/lab_perf_ticks)" -gt 0 ] || { echo "--- СТОП: замеры в прошивке не включены — сначала шаг 1б: bash ~/nouveau-fix/lab/perftest.sh start"; exit 1; }
+[ "$(cat $P/lab_perf_ticks)" -gt 0 ] || { echo "--- СТОП: замеры в прошивке не включены — сначала шаг 1б: bash ~/Home/nouveau-fix/lab/perftest.sh start"; exit 1; }
 G="$(command -v glmark2-wayland || command -v glmark2 || true)"
 [ -n "$G" ] || { echo "--- СТОП: нет glmark2"; exit 1; }
 sudo -v || exit 1

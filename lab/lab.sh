@@ -4,7 +4,7 @@
 #                      разрешение смены частот + подробные сообщения "LAB ..." в журнале).
 #                      Стабильный драйвер сохраняется в резервную копию.
 #   lab.sh pstate 07 — переключить карту в режим 07 (или 0f, 03). Действует до перезагрузки.
-#                      Результат пишется в ~/nouveau-fix/results/ и сразу сбрасывается на диск.
+#                      Результат пишется в ~/Home/nouveau-fix/results/ и сразу сбрасывается на диск.
 #   lab.sh try 07 0f — ОПЫТ СО СТРАХОВКОЙ: по очереди переключает режимы и после каждого ждёт
 #                      15 с, пока ты нажмёшь Enter («вижу экран»). Нет нажатия → возвращает 03;
 #                      снова нет → сам сохраняет журнал и перезагружает компьютер.
@@ -49,8 +49,8 @@ KIT="$(dirname "$HERE")"
 KVER="${KVER:-$(uname -r)}"   # KVER=версия перед командой — собрать под другое (новое) ядро
 KBUILD="/lib/modules/$KVER/build"
 SLOT="/lib/modules/$KVER/updates/nouveau-fix/nouveau.ko"
-BACKUP="$HOME/nouveau-build/stable-$KVER-nouveau.ko"
-WORK="$HOME/nouveau-build/lab-$KVER"
+BACKUP="$HOME/Home/nouveau-build/stable-$KVER-nouveau.ko"
+WORK="$HOME/Home/nouveau-build/lab-$KVER"
 
 preflight() {  # $1 = ожидаемая маска, $2..$6 = ожидаемые частоты gpc rop hub07 hub06 hub01 (кГц)
     local P=/sys/module/nouveau/parameters ok=1 a
@@ -106,7 +106,7 @@ install)
     fi
     grep -q "vermagic: *$KVER " <(modinfo "$WORK/nouveau/nouveau.ko") || { echo "Собранный модуль не совпадает с ядром $KVER. Ничего не установлено."; exit 3; }
     if [ ! -e "$BACKUP" ]; then
-        [ -e "$SLOT" ] || { echo "Нет стабильного драйвера в $SLOT. Сначала запусти ~/nouveau-fix/rebuild.sh"; exit 1; }
+        [ -e "$SLOT" ] || { echo "Нет стабильного драйвера в $SLOT. Сначала запусти ~/Home/nouveau-fix/rebuild.sh"; exit 1; }
         cp "$SLOT" "$BACKUP"
         echo "=== Стабильный драйвер сохранён: $BACKUP"
     fi
@@ -114,11 +114,11 @@ install)
     case "$ans" in y|Y|д|Д) ;; *) echo "Не ставлю."; exit 0 ;; esac
     # 22.10: если для этого ядра стоит СТАБИЛЬНЫЙ драйвер через DKMS — снять его, чтобы в updates/ был один nouveau.ko
     if command -v dkms >/dev/null && dkms status nouveau-gf114/1.0 -k "$KVER" 2>/dev/null | grep -q installed; then
-        sudo dkms uninstall nouveau-gf114/1.0 -k "$KVER" && echo "=== Стабильный драйвер (DKMS) для $KVER отключён; вернуть: ~/nouveau-fix/stable/stable.sh install"
+        sudo dkms uninstall nouveau-gf114/1.0 -k "$KVER" && echo "=== Стабильный драйвер (DKMS) для $KVER отключён; вернуть: ~/Home/nouveau-fix/stable/stable.sh install"
     fi
     sudo install -m 644 "$WORK/nouveau/nouveau.ko" "$SLOT"
     sudo depmod -a "$KVER"; sudo update-initramfs -u -k "$KVER"
-    echo "=== Готово. Перезагрузись. Вернуть стабильный: ~/nouveau-fix/stable/stable.sh install (или lab.sh restore — только исправление гонки)"
+    echo "=== Готово. Перезагрузись. Вернуть стабильный: ~/Home/nouveau-fix/stable/stable.sh install (или lab.sh restore — только исправление гонки)"
     ;;
 pstate)
     P="${2:-}"; [[ "$P" =~ ^(03|07|0f)$ ]] || { echo "Укажи режим: 03, 07 или 0f"; exit 1; }
@@ -160,7 +160,7 @@ flags|exp)
     echo "=== Опыт $E ($T): $D"
     for f in lab_pcie lab_mem lab_core lab_volt_first lab_eng_mask lab_volt_min_uv; do echo "    $f = $(cat "$PRM/$f")"; done
     case "$E" in
-        E|F) echo "=== Карта останется в режиме $T. Дальше нагрузка: ~/nouveau-fix/lab/lab.sh load"
+        E|F) echo "=== Карта останется в режиме $T. Дальше нагрузка: ~/Home/nouveau-fix/lab/lab.sh load"
              exec "$0" try "$T" ;;
         *)   exec "$0" try "$T" 03 ;;
     esac
@@ -437,7 +437,7 @@ hold)
     echo "=== Держим 0f: ядро ${A[0]}, ROP ${A[1]}, hub ${A[2]}/${A[3]}/${A[4]} МГц (0 = не трогаем)"
     preflight "$MASK" $((A[0]*1000)) $((A[1]*1000)) $((A[2]*1000)) $((A[3]*1000)) $((A[4]*1000))
     "$0" pstate 0f
-    echo "=== Карта держится в этом режиме. Вернуть рабочий 07: ~/nouveau-fix/lab/lab.sh home"
+    echo "=== Карта держится в этом режиме. Вернуть рабочий 07: ~/Home/nouveau-fix/lab/lab.sh home"
     ;;
 mem07)
     # ПАМЯТЬ, первый шаг: 135 -> 324 МГц повтором скрипта NVIDIA (шаг A из записи) при переходе 03 -> 07.
@@ -726,13 +726,13 @@ pllcmp)
     echo "=== Сравнение завершено ✅"; grep '^  ядро' "$LOG"
     ;;
 restore)
-    [ -e "$BACKUP" ] || { echo "Нет резервной копии $BACKUP. Стабильный драйвер можно пересобрать: ~/nouveau-fix/rebuild.sh"; exit 1; }
+    [ -e "$BACKUP" ] || { echo "Нет резервной копии $BACKUP. Стабильный драйвер можно пересобрать: ~/Home/nouveau-fix/rebuild.sh"; exit 1; }
     if command -v dkms >/dev/null && dkms status nouveau-gf114/1.0 -k "$KVER" 2>/dev/null | grep -q installed; then
         sudo dkms uninstall nouveau-gf114/1.0 -k "$KVER"
     fi
     sudo install -m 644 "$BACKUP" "$SLOT"
     sudo depmod -a "$KVER"; sudo update-initramfs -u -k "$KVER"
-    echo "=== Стабильный драйвер возвращён. Перезагрузись и проверь: ~/nouveau-fix/check.sh"
+    echo "=== Стабильный драйвер возвращён. Перезагрузись и проверь: ~/Home/nouveau-fix/check.sh"
     ;;
 *)
     sed -n '2,42p' "$0"; exit 1 ;;

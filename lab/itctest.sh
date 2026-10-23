@@ -34,7 +34,7 @@ on|off)
     if sudo python3 "$HERE/hdmiregs.py" | grep -q "ITC): $([ $V = 1 ] && echo ДА || echo нет)"; then
         echo "=== Монитор получает ITC=$([ $V = 1 ] && echo 1 || echo 0) ✅ Теперь сравни текст."
     else
-        echo "=== Пакет ещё старый. Смени в настройках экрана частоту обновления туда и обратно (или выйди из сеанса и войди) и проверь: bash ~/nouveau-fix/lab/itctest.sh show"
+        echo "=== Пакет ещё старый. Смени в настройках экрана частоту обновления туда и обратно (или выйди из сеанса и войди) и проверь: bash ~/Home/nouveau-fix/lab/itctest.sh show"
     fi ;;
 show) echo "lab_hdmi_itc = $(cat $P)"; show ;;
 *) sed -n '2,8p' "$0"; exit 1 ;;

@@ -17,7 +17,7 @@ case "${1:-}" in
 on)
     grep -q '^CONFIG_PSTORE_RAM=' "/boot/config-$(uname -r)" || { echo "Ядро без ramoops — ловушка невозможна."; exit 1; }
     sudo tee "$CFG" >/dev/null <<EOF
-# nouveau lab: ловушка зависаний. Выключить: ~/nouveau-fix/lab/trap.sh off
+# nouveau lab: ловушка зависаний. Выключить: ~/Home/nouveau-fix/lab/trap.sh off
 GRUB_CMDLINE_LINUX_DEFAULT="\$GRUB_CMDLINE_LINUX_DEFAULT memmap=16M\\\\\\\$$ADDR ramoops.mem_address=$ADDR ramoops.mem_size=$SIZE ramoops.record_size=0x200000 ramoops.pmsg_size=0x400000 ramoops.console_size=0x200000 nmi_watchdog=panic,1 softlockup_panic=1 panic=10 crash_kexec_post_notifiers"
 EOF
     echo ramoops | sudo tee "$MOD" >/dev/null

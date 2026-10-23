@@ -4,7 +4,7 @@
 # Линии из таблицы GPIO этого VBIOS: VID_0 = 17, VID_1 = 2, VID_2 = 5, VID_3 = 6, VID_4 = 7, MEM_VOLTAGE = 23.
 # Таблица напряжений VBIOS: 1 212 500 мкВ − VID × 12 500. NVIDIA: 03/07 — VID 21 = 0,950 В; 0f — VID 11 = 1,075 В;
 # MEM_VOLTAGE после первого подъёма памяти — 1 и больше не снимается; PCIe: 0f — 5 GT/s (gen2), 03/07 — 2,5 GT/s (gen1).
-# Запуск: sudo python3 ~/nouveau-fix/lab/voltcheck.py
+# Запуск: sudo python3 ~/Home/nouveau-fix/lab/voltcheck.py
 import glob, mmap, os, struct, subprocess, sys
 dev = next((d for d in glob.glob('/sys/bus/pci/devices/*')
             if open(d + '/vendor').read().strip() == '0x10de' and open(d + '/class').read().startswith('0x03')), None)

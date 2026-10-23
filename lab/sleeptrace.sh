@@ -10,7 +10,7 @@
 #     все процессы в состоянии D (непрерываемое ожидание), состояние службы автопереключения;
 #   - каждая запись сразу сбрасывается на диск (переживает Reset).
 # Условия — как при сбое: служба автопереключения работает, засыпание обычным systemctl suspend, рабочий стол активен.
-# Запуск: bash ~/nouveau-fix/lab/sleeptrace.sh run      Посмотреть запись: ... sleeptrace.sh show
+# Запуск: bash ~/Home/nouveau-fix/lab/sleeptrace.sh run      Посмотреть запись: ... sleeptrace.sh show
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; KIT="$(dirname "$HERE")"; mkdir -p "$KIT/results"
 case "${1:-}" in
@@ -32,11 +32,11 @@ run)
     echo "--- Окружение верное"
     echo
     echo "ЧТО БУДЕТ: запустится наблюдатель, затем компьютер пойдёт в сон обычным способом (рабочий стол НЕ переключается)."
-    echo "  • Уснул — через 15 с разбуди коротким нажатием кнопки питания. Потом: bash ~/nouveau-fix/lab/sleeptrace.sh show"
+    echo "  • Уснул — через 15 с разбуди коротким нажатием кнопки питания. Потом: bash ~/Home/nouveau-fix/lab/sleeptrace.sh show"
     echo "  • Экран застыл и не гаснет — НЕ жми Reset сразу: подожди 2 минуты (systemd ждёт зависший крючок до 90 с"
     echo "    и потом может уснуть сам — тогда разбуди кнопкой). Если через 2 минуты всё ещё застыл:"
     echo "    зажми Alt+PrtSc и нажми S, подожди 5 с, потом Alt+PrtSc+B (перезагрузка). Не помогло — Reset."
-    echo "    После загрузки: bash ~/nouveau-fix/lab/sleeptrace.sh show"
+    echo "    После загрузки: bash ~/Home/nouveau-fix/lab/sleeptrace.sh show"
     read -r -p "Понятно, начинаем? Enter — да, Ctrl+C — отмена " _
     PID="$(systemctl show -p MainPID --value gpu-autoclock.service)"
     say "Запись сбоя сна v2 $(date '+%F %T'), отпечаток $(md5sum "$0" | cut -c1-8), ядро $(uname -r), служба pid $PID"

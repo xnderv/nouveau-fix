@@ -2,7 +2,7 @@
 Type=Application
 Name=Драйвер видеокарты: подготовить под новое ядро
 Comment=Собрать наш драйвер nouveau (GTX 560 Ti) под новое ядро Ubuntu перед перезагрузкой
-Exec=@HOME@/nouveau-fix/daily/open-newkernel.sh
+Exec=@HOME@/Home/nouveau-fix/daily/open-newkernel.sh
 Icon=video-display
 Terminal=false
 Categories=System;

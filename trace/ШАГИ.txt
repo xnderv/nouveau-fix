@@ -1,7 +1,7 @@
 ЗАПИСЬ ДРАЙВЕРА NVIDIA 390 — ПО ШАГАМ
 
 1. Установка (в основной системе):
-   sudo apt install -y debootstrap && chmod +x ~/nouveau-fix/trace/*.sh && sudo ~/nouveau-fix/trace/build-trace-disk.sh
+   sudo apt install -y debootstrap && chmod +x ~/Home/nouveau-fix/trace/*.sh && sudo ~/Home/nouveau-fix/trace/build-trace-disk.sh
    На вопрос напиши СТЕРЕТЬ. Ждать 20–30 минут до «Готово».
 
 2. Перезагрузка. На экране с логотипом платы — клавиша меню загрузки (ASUS F8, Gigabyte F12, MSI F11).
@@ -15,4 +15,4 @@
 4. Обратно: sudo reboot  (без меню загрузится обычная Ubuntu)
 
 5. Забрать запись (в основной системе):
-   sudo mkdir -p /mnt/u2204-trace && sudo mount -o ro LABEL=u2204-trace /mnt/u2204-trace && mkdir -p ~/nouveau-fix/results/trace-nvidia && cp -r /mnt/u2204-trace/home/user/trace/out-* ~/nouveau-fix/results/trace-nvidia/ && sudo umount /mnt/u2204-trace && ls -lhR ~/nouveau-fix/results/trace-nvidia
+   sudo mkdir -p /mnt/u2204-trace && sudo mount -o ro LABEL=u2204-trace /mnt/u2204-trace && mkdir -p ~/Home/nouveau-fix/results/trace-nvidia && cp -r /mnt/u2204-trace/home/user/trace/out-* ~/Home/nouveau-fix/results/trace-nvidia/ && sudo umount /mnt/u2204-trace && ls -lhR ~/Home/nouveau-fix/results/trace-nvidia

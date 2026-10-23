@@ -1,7 +1,7 @@
 #!/bin/bash
 # Пересобирает драйвер nouveau с нашим исправлением под указанное ядро и ставит его.
-# Запуск:  ~/nouveau-fix/rebuild.sh            — для самого нового установленного ядра
-#          ~/nouveau-fix/rebuild.sh 7.0.0-40-generic — для конкретного ядра
+# Запуск:  ~/Home/nouveau-fix/rebuild.sh            — для самого нового установленного ядра
+#          ~/Home/nouveau-fix/rebuild.sh 7.0.0-40-generic — для конкретного ядра
 # Сборка идёт без прав администратора; пароль спрашивается только на шаге установки,
 # и только после твоего «y».
 set -euo pipefail
@@ -10,7 +10,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 PATCH="$HERE/patches/0001-nouveau-abi16-idle-channel-before-engobj-del.patch"
 KVER="${1:-$(ls -1 /lib/modules | sort -V | tail -n 1)}"
 KBUILD="/lib/modules/$KVER/build"
-WORK="$HOME/nouveau-build/fix-$KVER"
+WORK="$HOME/Home/nouveau-build/fix-$KVER"
 LOG="$WORK/build.log"
 
 say() { printf '\n=== %s\n' "$*"; }
@@ -57,7 +57,7 @@ if git apply --check -p1 "$PATCH" 2>/dev/null; then
     echo "Исправление наложено."
 elif git apply -R --check -p1 "$PATCH" 2>/dev/null; then
     echo "Похоже, исправление УЖЕ ЕСТЬ в этой версии Linux — пересобирать не нужно."
-    echo "Стандартный драйвер Ubuntu для $KVER уже содержит его. Проверь после перезагрузки: ~/nouveau-fix/check.sh"
+    echo "Стандартный драйвер Ubuntu для $KVER уже содержит его. Проверь после перезагрузки: ~/Home/nouveau-fix/check.sh"
     exit 0
 else
     echo "Исправление НЕ накладывается: код драйвера в Linux $UPV изменился."
@@ -90,4 +90,4 @@ sudo update-initramfs -u -k "$KVER"
 
 say "Готово. Для ядра $KVER выбран драйвер:"
 modinfo -k "$KVER" -n nouveau
-echo "Перезагрузись, затем запусти: ~/nouveau-fix/check.sh"
+echo "Перезагрузись, затем запусти: ~/Home/nouveau-fix/check.sh"

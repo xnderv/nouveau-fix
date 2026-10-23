@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # ТОЛЬКО ЧТЕНИЕ регистров видеокарты: что видит микроконтроллер PMU (часы, входы/выходы),
 # в каком он состоянии, и чем сейчас тактируется память. Ничего не записывает.
-# Запуск: sudo python3 ~/nouveau-fix/lab/pmu-probe.py
+# Запуск: sudo python3 ~/Home/nouveau-fix/lab/pmu-probe.py
 import mmap, os, struct, sys, time, glob
 
 dev = None

@@ -8,7 +8,7 @@
 #   фаза 1 — 07 <-> 03 (подозреваемый) N раз;  фаза 2 — 07 <-> 0f N раз (сравнение);
 #   в конце — 07, исходные значения регистров отслеживания, служба снова запускается.
 # Перед каждым переходом флаг сбрасывается, после — ждём 0,3 с (~18 кадров) и читаем.
-# Запуск: sudo python3 ~/nouveau-fix/lab/flicker.py [N=5] [пауза_с=3]
+# Запуск: sudo python3 ~/Home/nouveau-fix/lab/flicker.py [N=5] [пауза_с=3]
 import glob, mmap, os, struct, subprocess, sys, time
 
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 5
@@ -22,8 +22,8 @@ MEM = {'03': 135, '07': 324, '0f': 2004}
 UF = [0x616308, 0x616b08]
 VERT = [0x616340, 0x616b40]
 
-os.makedirs(os.path.expanduser('~alex/nouveau-fix/results'), exist_ok=True)
-LOGF = os.path.expanduser('~alex/nouveau-fix/results/flicker-' + time.strftime('%Y%m%d-%H%M%S') + '.txt')
+os.makedirs(os.path.expanduser('~alex/Home/nouveau-fix/results'), exist_ok=True)
+LOGF = os.path.expanduser('~alex/Home/nouveau-fix/results/flicker-' + time.strftime('%Y%m%d-%H%M%S') + '.txt')
 logf = open(LOGF, 'w')
 def ts(): t = time.time(); return time.strftime('%H:%M:%S', time.localtime(t)) + f'.{int(t * 1000) % 1000:03d}'
 def say(m):
@@ -124,7 +124,7 @@ def step(frm, to, k, tot):
 res = {}
 TRANS = []   # (unix-время перехода, название)
 T_START = time.time()
-MARKS = os.path.expanduser('~alex/nouveau-fix/results/flicker-marks.txt')
+MARKS = os.path.expanduser('~alex/Home/nouveau-fix/results/flicker-marks.txt')
 try:
     ok, _, a = setp('07')
     say(f'Старт в 07: {a}')

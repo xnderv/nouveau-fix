@@ -13,7 +13,7 @@ install)
     sudo install -m 0755 "$HERE/blackbox.py" "$BIN"
     sudo tee "$UNIT" >/dev/null <<EOU
 [Unit]
-Description=GPU black box: card state once a second into ramoops pmsg (~/nouveau-fix/lab/blackbox.sh)
+Description=GPU black box: card state once a second into ramoops pmsg (~/Home/nouveau-fix/lab/blackbox.sh)
 After=multi-user.target
 
 [Service]
@@ -30,7 +30,7 @@ EOU
     sudo sysctl -q -p /etc/sysctl.d/90-gpu-blackbox.conf
     sudo systemctl daemon-reload && sudo systemctl enable --now gpu-blackbox.service
     sleep 2; systemctl --no-pager status gpu-blackbox.service | sed -n 1,3p
-    echo "=== Чёрный ящик пишет в /var/log/gpu-blackbox/current.txt. После зависания и Reset: bash ~/nouveau-fix/lab/blackbox.sh show"
+    echo "=== Чёрный ящик пишет в /var/log/gpu-blackbox/current.txt. После зависания и Reset: bash ~/Home/nouveau-fix/lab/blackbox.sh show"
     ;;
 show)
     echo "=== ящик (диск), последние ${2:-60} строк:"; sudo tail -n "${2:-60}" /var/log/gpu-blackbox/current.txt 2>/dev/null | cut -c1-230

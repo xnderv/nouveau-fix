@@ -2,7 +2,7 @@
 # ТОЛЬКО ЧТЕНИЕ: загрузка графического ядра по флагу «занят» (регистр 0x40060c, бит 0 —
 # тот же, по которому nouveau ждёт простоя ядра). Опрос 200 раз в секунду, раз в секунду печатает % занятости.
 # Читаются только 0x400700 (nouveau читает его перед 0x40060c) и 0x40060c — оба существуют.
-# Запуск: sudo python3 ~/nouveau-fix/lab/gpuload.py [секунд]
+# Запуск: sudo python3 ~/Home/nouveau-fix/lab/gpuload.py [секунд]
 import mmap, os, struct, sys, glob, time
 
 dev = None

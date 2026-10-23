@@ -3,7 +3,7 @@
 # Читает регистры выходов SOR: включён ли режим HDMI, включён ли пакет AVI InfoFrame и его содержимое
 # (формат цвета, диапазон, «ИТ-содержимое», тип содержимого). Сначала читается список существующих выходов
 # (0x610184), чтобы не трогать несуществующие адреса. Ничего не записывает.
-# Запуск: sudo python3 ~/nouveau-fix/lab/hdmiregs.py
+# Запуск: sudo python3 ~/Home/nouveau-fix/lab/hdmiregs.py
 import glob, mmap, os, struct, sys
 
 dev = next((d for d in glob.glob('/sys/bus/pci/devices/*')

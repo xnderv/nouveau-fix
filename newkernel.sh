@@ -1,9 +1,9 @@
 #!/bin/bash
 # НОВОЕ ЯДРО: убедиться, что под него собран наш драйвер — ДО перезагрузки.
-#   ~/nouveau-fix/newkernel.sh                  — самое новое установленное ядро
-#   ~/nouveau-fix/newkernel.sh 7.0.0-40-generic — конкретное ядро
+#   ~/Home/nouveau-fix/newkernel.sh                  — самое новое установленное ядро
+#   ~/Home/nouveau-fix/newkernel.sh 7.0.0-40-generic — конкретное ядро
 # Стабильный драйвер (DKMS) обычно собирается сам при установке ядра; этот скрипт проверяет и при необходимости
-# досабирает. Для лабораторного драйвера — отдельно: KVER=<ядро> ~/nouveau-fix/lab/lab.sh install
+# досабирает. Для лабораторного драйвера — отдельно: KVER=<ядро> ~/Home/nouveau-fix/lab/lab.sh install
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 KVER="${1:-$(ls -1 /lib/modules | sort -V | tail -n 1)}"
@@ -18,9 +18,9 @@ if command -v dkms >/dev/null && dkms status nouveau-gf114/1.0 2>/dev/null | gre
         "$HERE/stable/stable.sh" build "$KVER"
     fi
 else
-    echo "=== Стабильный драйвер через DKMS не установлен. Поставить: bash ~/nouveau-fix/stable/stable.sh install"
-    echo "    (старый путь — стабильный-0001 + лабораторный: ~/nouveau-fix/rebuild.sh и lab/lab.sh install)"
+    echo "=== Стабильный драйвер через DKMS не установлен. Поставить: bash ~/Home/nouveau-fix/stable/stable.sh install"
+    echo "    (старый путь — стабильный-0001 + лабораторный: ~/Home/nouveau-fix/rebuild.sh и lab/lab.sh install)"
     exit 1
 fi
 sudo rm -f "/var/lib/nouveau-fix/pending-$KVER" 2>/dev/null || true
-echo "Перезагрузись. После неё: bash ~/nouveau-fix/stable/stable.sh status"
+echo "Перезагрузись. После неё: bash ~/Home/nouveau-fix/stable/stable.sh status"

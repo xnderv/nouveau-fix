@@ -16,7 +16,7 @@
 ## 2. Текущее состояние машины
 
 - Установлен **наш модуль**: `/lib/modules/7.0.0-38-generic/updates/nouveau-engobj-idle/nouveau.ko`
-  (исходники Linux 7.0.14 + патч `nouveau-abi16-idle-before-engobj-del.patch`, в `~/nouveau-build/nouveau-engobj-idle/`).
+  (исходники Linux 7.0.14 + патч `nouveau-abi16-idle-before-engobj-del.patch`, в `~/Home/nouveau-build/nouveau-engobj-idle/`).
   При срабатывании пишет в журнал `nouveau-engobj-idle: idling chid N before deleting oclass XXXX`.
 - Параметры загрузки: `quiet splash nouveau.hdmimhz=297` + **временно** `nouveau.debug=fifo=trace,gr=trace`
   (очень подробный журнал, ~9 тыс. строк/мин — выключить, см. ниже). Копия до трассировки: `/etc/default/grub.before-trace`.
