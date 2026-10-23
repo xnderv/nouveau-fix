@@ -239,7 +239,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +309,51 @@
+@@ -270,6 +309,53 @@
  	return ret;
  }
  
@@ -283,7 +283,9 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	case 0x08: want = lab_hub01_khz; cap = 1645000; break;
 +	default: return freq;
 +	}
-+	if (!want)
++	/* LAB 23.10: переопределение только для целей выше 500 МГц (уровень 0f); 07/03 (405/50) не трогаем,
++	 * иначе при опыте «подъём до 1000 МГц» уровень 07 тоже стал бы 1000 и переключать было бы нечего. */
++	if (!want || freq <= 500000)
 +		return freq;
 +	return min(want, cap);
 +}
@@ -291,7 +293,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +366,41 @@
+@@ -282,6 +368,41 @@
  	if (!freq)
  		return 0;
  
@@ -333,7 +335,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +410,9 @@
+@@ -291,7 +412,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -344,7 +346,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +439,8 @@
+@@ -318,6 +441,8 @@
  		info->freq = clk1;
  	}
  
@@ -353,7 +355,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -362,6 +485,43 @@
+@@ -362,6 +487,43 @@
  	);
  }
  
@@ -397,7 +399,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static void
  gf100_clk_prog_2(struct gf100_clk *clk, int idx)
  {
-@@ -372,16 +532,33 @@
+@@ -372,16 +534,33 @@
  		nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000000);
  		nvkm_mask(device, addr + 0x00, 0x00000001, 0x00000000);
  		if (info->coef) {
@@ -434,7 +436,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +572,27 @@
+@@ -395,12 +574,27 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -464,7 +466,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -428,6 +620,7 @@
+@@ -428,6 +622,7 @@
  	int i, j;
  
  	for (i = 0; i < ARRAY_SIZE(stage); i++) {
@@ -472,7 +474,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		for (j = 0; j < ARRAY_SIZE(clk->eng); j++) {
  			if (!clk->eng[j].freq)
  				continue;
-@@ -477,5 +670,5 @@
+@@ -477,5 +672,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
