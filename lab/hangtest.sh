@@ -43,12 +43,19 @@ T0="$(date '+%Y-%m-%d %H:%M:%S')"
   echo "параметры: $(for p in lab_mem_order lab_mem_op13 lab_mem_op34 lab_mem_op3a lab_mem_replay lab_pcie lab_gpc_seq; do printf '%s=%s ' $p "$(cat $PRM/$p)"; done)"
 } | tee "$LOG"; sync
 sudo sh -c "echo 0 > $PRM/lab_gov"
-# память должна быть 324 МГц (уровень 07) даже при lab_mem=0: иначе при 135 МГц GR голодает и показывает 1000‰ без зависания
-MEM0="$(cat $PRM/lab_mem)"
-case "$(ac)" in *"memory 324 MHz"*) ;; *) sudo sh -c "echo 1 > $PRM/lab_mem"; pstate 07; sleep 3; sudo sh -c "echo $MEM0 > $PRM/lab_mem";; esac
-pstate 07; sleep 3
-case "$(ac)" in *"memory 324 MHz"*) ;; *) echo "СТОП: не удалось поставить память 324 МГц: $(ac)" | tee -a "$LOG"; exit 1;; esac
-echo "$(date +%T) старт: $(ac)" | tee -a "$LOG"; sync
+# Память при lab_mem=0 стоит на одном значении весь тест. MEMHOLD=2004 (по умолчанию) — поднять память на 2004 с
+# включённым lab_mem, затем выключить lab_mem: дальше ходит только ядро, память как в реальной работе на 0f.
+# MEMHOLD=324 — держать 324. При 135 МГц GR голодает и показывает 1000‰ без зависания — так не тестируем.
+MEM0="$(cat $PRM/lab_mem)"; MEMHOLD="${MEMHOLD:-2004}"
+if [ "$MEM0" = N ] || [ "$MEM0" = 0 ]; then
+    case "$MEMHOLD" in 2004) LV=0f;; 324) LV=07;; *) echo "MEMHOLD=2004|324"; exit 1;; esac
+    case "$(ac)" in *"memory $MEMHOLD MHz"*) ;; *) sudo sh -c "echo 1 > $PRM/lab_mem"; pstate $LV; sleep 3; sudo sh -c "echo 0 > $PRM/lab_mem";; esac
+    pstate 07; sleep 3
+    case "$(ac)" in *"memory $MEMHOLD MHz"*) ;; *) echo "СТОП: не удалось поставить память $MEMHOLD МГц: $(ac)" | tee -a "$LOG"; exit 1;; esac
+else
+    pstate 07; sleep 3
+fi
+echo "$(date +%T) старт: $(ac); lab_mem=$MEM0 lab_core=$(cat $PRM/lab_core) lab_volt_min_uv=$(cat $PRM/lab_volt_min_uv)" | tee -a "$LOG"; sync
 case "$LOAD" in
   browser)
     B="$(command -v yandex-browser || command -v chromium || command -v google-chrome || true)"
