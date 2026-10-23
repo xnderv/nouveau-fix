@@ -48,6 +48,8 @@ SNAP = [
               0x0025a4, 0x002628, 0x002630, 0x002a00]
              + [0x0025a8 + e * 4 for e in range(6)] + [0x002640 + e * 4 for e in range(6)]   # движки 6,7 нет (TIMEOUT 23.10)
              + [0x002800 + u * 0x10 + r for u in range(3) for r in (0, 4, 8, 0xc)]),
+    ('XBAR', [0x13b054, 0x13b0d4, 0x13c054, 0x13c0d4, 0x13c154, 0x13c1d4, 0x13c844, 0x13e014, 0x13e054, 0x13ec14,
+              0x00e9e0, 0x001548, 0x137360, 0x1371d0, 0x1371d4, 0x1371d8, 0x409614, 0x409c00, 0x400504]),   # PXBAR + делители, которые NVIDIA пишет вокруг смены частот (запись 20.10)
     ('MEM',  [0x100760, 0x100764, 0x100768, 0x10f050, 0x10f090, 0x10f200, 0x10f210, 0x10f290, 0x10f294,
               0x10f298, 0x10f29c, 0x10f2a0, 0x10f300, 0x10f310, 0x10f314, 0x10f330, 0x10f338, 0x10f340,
               0x10f344, 0x10f348, 0x10f400, 0x10f410, 0x10f420, 0x10f430, 0x10f444, 0x10f468, 0x10f604,
@@ -91,7 +93,7 @@ while True:
     t = rp('lab_gov_temp', rp('gf114_temp'))
     line = (f'{time.strftime("%T")} | {ac()} | gr {gr}‰ vid {vid}‰ | {temp()}C/{t} | '
             f'611200={rd(0x611200):08x} 137100={rd(0x137100):08x} 1373f0={rd(0x1373f0):08x} pmuq={rd(0x10a4a0):x}/{rd(0x10a4b0):x} | '
-            f'gr700={rd(0x400700):08x} eng0={rd(0x002640):08x} fifo={rd(0x002100):08x}'
+            f'gr700={rd(0x400700):08x} eng0={rd(0x002640):08x} fifo={rd(0x002100):08x} xbar={rd(0x13c054):x}/{rd(0x13c844):x}/{rd(0x13ec14):x} e9e0={rd(0x00e9e0):08x} 1548={rd(0x001548):08x}'
             + (' | ' + ' ;; '.join(ev) if ev else '') + '\n')
     out.write(line.encode()); os.fsync(out.fileno())
     tail = (tail + [line])[-15:]
