@@ -474,7 +474,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -428,10 +630,37 @@
+@@ -428,11 +630,37 @@
  	int i, j;
 +	struct nvkm_device *device = clk->base.subdev.device;
 +	u32 gr500 = 0, st = 0;
@@ -496,7 +496,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +			  waited < 0 ? (s64)lab_gr_pause * 1000 : waited / 1000,
 +			  nvkm_rd32(device, 0x400700), nvkm_rd32(device, 0x40060c), nvkm_rd32(device, 0x002640));
 +	}
-+
+ 
  	for (i = 0; i < ARRAY_SIZE(stage); i++) {
 +		nvkm_info(&clk->base.subdev, "LAB prog stage %d\n", i);
  		for (j = 0; j < ARRAY_SIZE(clk->eng); j++) {
@@ -512,7 +512,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	}
 +
  	return 0;
-@@ -477,5 +706,5 @@
+@@ -477,5 +705,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
