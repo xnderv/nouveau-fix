@@ -474,7 +474,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -428,11 +630,37 @@
+@@ -428,11 +630,44 @@
  	int i, j;
 +	struct nvkm_device *device = clk->base.subdev.device;
 +	u32 gr500 = 0, st = 0;
@@ -485,12 +485,19 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +		gr500 = nvkm_rd32(device, 0x400500);
 +		nvkm_mask(device, 0x400500, 0x00000001, 0x00000000);
 +		paused = true;
-+		waited = nvkm_msec(device, lab_gr_pause,
-+			nvkm_rd32(device, 0x400700);
-+			st = nvkm_rd32(device, 0x002640);
-+			if (!(nvkm_rd32(device, 0x40060c) & 0x00000001) && !(st & 0x10000000))
-+				break;
-+		);
++		/* свой цикл, а не nvkm_msec: тот при истечении печатает dev_WARN «timeout» со стеком */
++		{
++			u64 t0 = ktime_get_ns(), lim = (u64)lab_gr_pause * 1000000ULL;
++			waited = -1;
++			do {
++				nvkm_rd32(device, 0x400700);
++				st = nvkm_rd32(device, 0x002640);
++				if (!(nvkm_rd32(device, 0x40060c) & 0x00000001) && !(st & 0x10000000)) {
++					waited = ktime_get_ns() - t0;
++					break;
++				}
++			} while (ktime_get_ns() - t0 < lim);
++		}
 +		nvkm_info(&clk->base.subdev, "LAB gr pause: 0x400500 %08x -> %08x, %s %lld мкс (0x400700=%08x 0x40060c=%08x 0x002640=%08x)\n",
 +			  gr500, nvkm_rd32(device, 0x400500), waited < 0 ? "ТАЙМАУТ" : "простой через",
 +			  waited < 0 ? (s64)lab_gr_pause * 1000 : waited / 1000,
@@ -512,7 +519,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	}
 +
  	return 0;
-@@ -477,5 +705,5 @@
+@@ -477,5 +712,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  

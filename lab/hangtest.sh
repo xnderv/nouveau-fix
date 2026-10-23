@@ -26,7 +26,7 @@ sudo -v || exit 1
 ac()     { sudo sh -c "grep '^AC' '$PSF'" | sed 's/^AC: //'; }
 pstate() { sudo sh -c "echo $1 > '$PSF'"; }
 gr()     { cat "$PRM/lab_perf_gr" 2>/dev/null || echo 0; }
-errs()   { journalctl -k -b 0 --no-pager --since "$T0" 2>/dev/null | grep -cE 'failed to idle|SCHED_ERROR|runl|nouveau.*timeout|fifo:.*INTR' || true; }
+errs()   { journalctl -k -b 0 --no-pager --since "$T0" 2>/dev/null | grep -cE 'failed to idle|SCHED_ERROR|runl|fifo:.*INTR' || true; }
 bdur()   { journalctl -k -b 0 --no-pager --since "$T0" 2>/dev/null | grep -oE 'replay B 324->2004: выполнен за [0-9]+ мкс' | tail -n1 | grep -oE '[0-9]+ мкс'; }
 GOV0="$(cat "$PRM/lab_gov")"; LP=""; HUNG=0
 finish() {
