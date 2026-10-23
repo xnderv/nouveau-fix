@@ -14,6 +14,12 @@
    или вставить файл целиком в письмо текстом (без HTML) из почтового клиента.
 4. В теле письма ничего менять не нужно; если попросят — отчёт о воспроизведении лежит в `results/crash/` и `docs/`.
 
+**Отправлено 23.10.2026 17:42 (MSK)** через `git send-email` (smtp.yandex.ru), ответ сервера 250.
+Message-ID: `<20261023144219.46478-1-xnderv@yandex.com>`.
+Кому: Lyude Paul, Danilo Krummrich; копии: Karol Herbst, nouveau@, dri-devel@, linux-kernel@.
+Архив: https://lore.kernel.org/dri-devel/20261023144219.46478-1-xnderv@yandex.com/
+Дальше: следить за ответами в этой ветке (придут на xnderv@yandex.com); при замечаниях — v2 тем же способом с `--in-reply-to=<Message-ID>`.
+
 ## 0003 — HDMI без SCDC
 Не отправлять: исправлено upstream коммитом `1717fcc5be57` (2026-09-17). Наш вариант остаётся для ядер 7.0.x.
 
