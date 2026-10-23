@@ -1,0 +1,1427 @@
+### blackbox start 2026-10-23 19:13:12 kernel 7.0.0-38-generic driver lab v3
+19:13:12 | core 405 MHz memory 324 MHz | gr 33‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:13 | core 405 MHz memory 324 MHz | gr 35‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:14 | core 405 MHz memory 324 MHz | gr 18‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:15 | core 405 MHz memory 324 MHz | gr 22‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:16 | core 405 MHz memory 324 MHz | gr 184‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90011001 fifo=00000000
+19:13:17 | core 405 MHz memory 324 MHz | gr 184‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:18 | core 405 MHz memory 324 MHz | gr 243‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:19 | core 405 MHz memory 324 MHz | gr 235‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:20 | core 405 MHz memory 324 MHz | gr 22‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:21 | core 405 MHz memory 324 MHz | gr 14‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:22 | core 405 MHz memory 324 MHz | gr 30‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:23 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:24 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:25 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:27 | core 405 MHz memory 324 MHz | gr 43‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:28 | core 405 MHz memory 324 MHz | gr 33‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:29 | core 405 MHz memory 324 MHz | gr 9‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:30 | core 405 MHz memory 324 MHz | gr 65‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:31 | core 405 MHz memory 324 MHz | gr 45‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:32 | core 405 MHz memory 324 MHz | gr 34‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:33 | core 405 MHz memory 324 MHz | gr 42‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:34 | core 405 MHz memory 324 MHz | gr 22‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:35 | core 405 MHz memory 324 MHz | gr 48‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:36 | core 405 MHz memory 324 MHz | gr 69‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:37 | core 405 MHz memory 324 MHz | gr 153‰ vid 0‰ | 43C/44 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:38 | core 405 MHz memory 324 MHz | gr 3‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:39 | core 405 MHz memory 324 MHz | gr 4‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:40 | core 405 MHz memory 324 MHz | gr 5‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:41 | core 405 MHz memory 324 MHz | gr 37‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:42 | core 405 MHz memory 324 MHz | gr 20‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:43 | core 405 MHz memory 324 MHz | gr 25‰ vid 0‰ | 43C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:44 | core 405 MHz memory 324 MHz | gr 36‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:45 | core 405 MHz memory 324 MHz | gr 65‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:46 | core 405 MHz memory 324 MHz | gr 46‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:47 | core 405 MHz memory 324 MHz | gr 32‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=03004001 eng0=90011001 fifo=00000000
+19:13:48 | core 405 MHz memory 324 MHz | gr 132‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:49 | core 405 MHz memory 324 MHz | gr 22‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=03000001 eng0=80141001 fifo=00000000
+19:13:50 | core 405 MHz memory 324 MHz | gr 820‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90111006 fifo=80000000
+19:13:51 | core 405 MHz memory 324 MHz | gr 805‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:52 | core 405 MHz memory 324 MHz | gr 199‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:53 | core 405 MHz memory 324 MHz | gr 171‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=03004001 eng0=90011001 fifo=00000000
+19:13:54 | core 405 MHz memory 324 MHz | gr 288‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:55 | core 405 MHz memory 324 MHz | gr 40‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:56 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:57 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=00000000
+19:13:58 | core 405 MHz memory 324 MHz | gr 10‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:13:59 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:00 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:14:01 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:02 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:03 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:04 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:05 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:06 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:07 | core 405 MHz memory 324 MHz | gr 9‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:14:08 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 45C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:09 | core 405 MHz memory 324 MHz | gr 8‰ vid 0‰ | 45C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:10 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 45C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:11 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 45C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:12 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:13 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 45C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:14 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:14:15 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:16 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:17 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:18 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:19 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:20 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:14:21 | core 405 MHz memory 324 MHz | gr 9‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:22 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:23 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:24 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 45C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:25 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:26 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 45C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:27 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 45C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:14:28 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:29 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:30 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:31 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:32 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:33 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:34 | core 405 MHz memory 324 MHz | gr 5‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:14:35 | core 405 MHz memory 324 MHz | gr 5‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:36 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:37 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:38 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:39 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:40 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:41 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:14:42 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:43 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:44 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:45 | core 900 MHz memory 324 MHz | gr 13‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:46 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:47 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:14:48 | core 405 MHz memory 324 MHz | gr 10‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:49 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:50 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:51 | core 405 MHz memory 324 MHz | gr 18‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:52 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:53 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:54 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 46C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:55 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:14:56 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:57 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:14:58 | core 900 MHz memory 324 MHz | gr 18‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=00000000
+19:14:59 | core 900 MHz memory 324 MHz | gr 31‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=00000000
+19:15:00 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:01 | core 405 MHz memory 324 MHz | gr 14‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:15:02 | core 405 MHz memory 324 MHz | gr 21‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=00000000
+19:15:03 | core 405 MHz memory 324 MHz | gr 141‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:04 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:05 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:06 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/43 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:07 | core 900 MHz memory 324 MHz | gr 116‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:15:08 | core 900 MHz memory 324 MHz | gr 139‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:09 | core 900 MHz memory 324 MHz | gr 187‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:10 | core 900 MHz memory 324 MHz | gr 4‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:11 | core 900 MHz memory 324 MHz | gr 189‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:12 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000030 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:13 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:15:14 | core 405 MHz memory 324 MHz | gr 75‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:15 | core 405 MHz memory 324 MHz | gr 105‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:16 | core 405 MHz memory 324 MHz | gr 73‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:17 | core 405 MHz memory 324 MHz | gr 73‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:18 | core 405 MHz memory 324 MHz | gr 4‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:19 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:20 | core 900 MHz memory 324 MHz | gr 98‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:15:21 | core 900 MHz memory 324 MHz | gr 168‰ vid 0‰ | 51C/43 | 611200=00000030 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:22 | core 900 MHz memory 324 MHz | gr 195‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:23 | core 900 MHz memory 324 MHz | gr 82‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:24 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:25 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:26 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:15:27 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:28 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:29 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:30 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:31 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:32 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:33 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:15:34 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:35 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:36 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:37 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:38 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:39 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:15:40 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:41 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:42 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:43 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:44 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:15:45 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:46 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:47 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:48 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:49 | core 900 MHz memory 324 MHz | gr 72‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=03004001 eng0=90011001 fifo=00000000
+19:15:50 | core 900 MHz memory 324 MHz | gr 199‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=00000000
+19:15:51 | core 405 MHz memory 324 MHz | gr 221‰ vid 0‰ | 49C/43 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:15:52 | core 405 MHz memory 324 MHz | gr 4‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:53 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:55 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:56 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:15:57 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:58 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:15:59 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:00 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=00000000
+19:16:01 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=00000000
+19:16:02 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=00000000
+19:16:03 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:16:04 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:05 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:06 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:07 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:16:08 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:09 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:10 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:11 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:12 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:13 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:16:14 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:15 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:16 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:17 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:18 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:19 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:20 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:21 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:16:22 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:23 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:24 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:25 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:26 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:27 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:16:28 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:29 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:30 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:31 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:32 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:16:33 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:34 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:35 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:36 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:37 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:38 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:16:39 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:40 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:41 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:42 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:43 | core 405 MHz memory 324 MHz | gr 374‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:44 | core 405 MHz memory 324 MHz | gr 3‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:45 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:16:46 | core 900 MHz memory 324 MHz | gr 27‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:47 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:48 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:49 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:50 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:51 | core 405 MHz memory 324 MHz | gr 6‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:16:52 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=00000000
+19:16:53 | core 405 MHz memory 324 MHz | gr 3‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=00000000
+19:16:54 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=00000000
+19:16:55 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=00000000
+19:16:56 | core 405 MHz memory 324 MHz | gr 23‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=00000000
+19:16:57 | core 900 MHz memory 324 MHz | gr 3‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:16:58 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:16:59 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:00 | core 900 MHz memory 324 MHz | gr 2‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:01 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:02 | core 900 MHz memory 324 MHz | gr 2‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:03 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:04 | core 405 MHz memory 324 MHz | gr 7‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:17:05 | core 405 MHz memory 324 MHz | gr 3‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:06 | core 405 MHz memory 324 MHz | gr 23‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:07 | core 405 MHz memory 324 MHz | gr 3‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:08 | core 405 MHz memory 324 MHz | gr 3‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:09 | core 405 MHz memory 324 MHz | gr 3‰ vid 0‰ | 47C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:10 | core 900 MHz memory 324 MHz | gr 2‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:17:11 | core 900 MHz memory 324 MHz | gr 2‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:12 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:13 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:14 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:15 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:16 | core 405 MHz memory 324 MHz | gr 28‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:17:17 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:18 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:19 | core 405 MHz memory 324 MHz | gr 3‰ vid 0‰ | 48C/43 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:20 | core 405 MHz memory 324 MHz | gr 3‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:21 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:22 | core 405 MHz memory 324 MHz | gr 4‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:23 | core 900 MHz memory 324 MHz | gr 3‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:17:24 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:25 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:26 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:27 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:28 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:29 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:17:30 | core 405 MHz memory 324 MHz | gr 7‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:31 | core 405 MHz memory 324 MHz | gr 23‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:32 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:33 | core 900 MHz memory 324 MHz | gr 3‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:17:34 | core 900 MHz memory 324 MHz | gr 3‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:35 | core 900 MHz memory 324 MHz | gr 2‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:36 | core 900 MHz memory 324 MHz | gr 2‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:37 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:38 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:39 | core 405 MHz memory 324 MHz | gr 15‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:17:40 | core 405 MHz memory 324 MHz | gr 47‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:41 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=80141001 fifo=80000000
+19:17:42 | core 405 MHz memory 324 MHz | gr 616‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000081 eng0=80141001 fifo=80000000
+19:17:43 | core 405 MHz memory 324 MHz | gr 978‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:44 | core 900 MHz memory 324 MHz | gr 85‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:17:45 | core 900 MHz memory 324 MHz | gr 50‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=03000801 eng0=90011001 fifo=00000000
+19:17:46 | core 900 MHz memory 324 MHz | gr 38‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:47 | core 900 MHz memory 324 MHz | gr 65‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:48 | core 900 MHz memory 324 MHz | gr 58‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:49 | core 900 MHz memory 324 MHz | gr 57‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:50 | core 405 MHz memory 324 MHz | gr 22‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=03004001 eng0=90011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:17:51 | core 405 MHz memory 324 MHz | gr 50‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:52 | core 405 MHz memory 324 MHz | gr 24‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:53 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:54 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:55 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=00000000
+19:17:56 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:57 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:17:58 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:17:59 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:00 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:01 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:02 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:03 | core 900 MHz memory 324 MHz | gr 1‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:04 | core 405 MHz memory 324 MHz | gr 11‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:18:05 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:06 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:07 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:08 | core 900 MHz memory 324 MHz | gr 34‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:18:09 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:10 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:11 | core 900 MHz memory 324 MHz | gr 24‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:12 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:13 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:14 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:15 | core 405 MHz memory 324 MHz | gr 4‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:18:16 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:17 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:18 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:19 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:20 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:22 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:23 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:18:24 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:25 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:26 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:27 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=03004001 eng0=90011001 fifo=00000000
+19:18:28 | core 900 MHz memory 324 MHz | gr 105‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:29 | core 405 MHz memory 324 MHz | gr 75‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:18:30 | core 405 MHz memory 324 MHz | gr 74‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:31 | core 405 MHz memory 324 MHz | gr 3‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:32 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:33 | core 900 MHz memory 324 MHz | gr 8‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:18:34 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:35 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:36 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:37 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:38 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:39 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:18:40 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:41 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:42 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:43 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:18:44 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:45 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:46 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:47 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:48 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:49 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:50 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:18:51 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:52 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:53 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:54 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:18:55 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:56 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:57 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:58 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:18:59 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:00 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 50C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:19:01 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:02 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:03 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:04 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:05 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:06 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:19:07 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:08 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:09 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:10 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:11 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:12 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:19:13 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:14 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:15 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:16 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:17 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:18 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:19:19 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:20 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:21 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:22 | core 900 MHz memory 324 MHz | gr 0‰ vid 0‰ | 52C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:23 | core 900 MHz memory 324 MHz | gr 2‰ vid 0‰ | 53C/43 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:24 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 51C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:19:25 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:26 | core 405 MHz memory 324 MHz | gr 18‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: pmu: LAB gov: \xd0\xb2\xd0\xba\xd0\xbb\xd1\x8e\xd1\x87\xd1\x91\xd0\xbd (\xd0\xbf\xd0\xb5\xd1\x80\x
+19:19:27 | core 405 MHz memory 324 MHz | gr 3‰ vid 0‰ | 49C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:28 | core 405 MHz memory 324 MHz | gr 6‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:29 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:30 | core 405 MHz memory 324 MHz | gr 12‰ vid 0‰ | 48C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:31 | core 405 MHz memory 324 MHz | gr 22‰ vid 0‰ | 48C/48 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=00000000
+19:19:32 | core 405 MHz memory 324 MHz | gr 40‰ vid 0‰ | 48C/48 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=00000000
+19:19:33 | core 405 MHz memory 324 MHz | gr 11‰ vid 0‰ | 48C/48 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=00000000
+19:19:34 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 48C/48 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:35 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 48C/48 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=00000000
+19:19:36 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 48C/48 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:37 | core 405 MHz memory 324 MHz | gr 11‰ vid 0‰ | 47C/48 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:38 | core 405 MHz memory 324 MHz | gr 33‰ vid 0‰ | 48C/48 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:39 | core 405 MHz memory 324 MHz | gr 5‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:40 | core 405 MHz memory 324 MHz | gr 27‰ vid 0‰ | 48C/48 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=03004001 eng0=90011001 fifo=00000000
+19:19:41 | core 405 MHz memory 324 MHz | gr 80‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90011001 fifo=00000000
+19:19:42 | core 405 MHz memory 324 MHz | gr 53‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=00000000
+19:19:43 | core 405 MHz memory 324 MHz | gr 36‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=03004001 eng0=90011001 fifo=00000000
+19:19:44 | core 405 MHz memory 324 MHz | gr 39‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=00000000
+19:19:45 | core 405 MHz memory 324 MHz | gr 35‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=00000000
+19:19:46 | core 405 MHz memory 324 MHz | gr 53‰ vid 0‰ | 47C/47 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:47 | core 405 MHz memory 324 MHz | gr 57‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=00000000
+19:19:48 | core 405 MHz memory 324 MHz | gr 34‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=00000000
+19:19:49 | core 405 MHz memory 324 MHz | gr 45‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=00000000
+19:19:50 | core 405 MHz memory 324 MHz | gr 33‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:51 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:52 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=90011001 fifo=00000000
+19:19:53 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:54 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:55 | core 405 MHz memory 324 MHz | gr 31‰ vid 0‰ | 46C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:56 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:57 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:58 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 47C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:19:59 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/47 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:00 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:01 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:02 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:03 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:04 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:05 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:06 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:07 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:08 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:09 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:10 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:11 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:12 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:13 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:14 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:15 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:16 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:17 | core 50 MHz memory 324 MHz | gr 0‰ vid 0‰ | 46C/46 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: pmu: LAB gov: -> 03 (\xd0\xb7\xd0\xb0\xd0\xb3\xd1\x80\xd1\x83\xd0\xb7\xd0\xba\xd0\xb0 < 5 % 30 \xd
+19:20:18 | core 50 MHz memory 324 MHz | gr 0‰ vid 0‰ | 45C/46 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:19 | core 50 MHz memory 324 MHz | gr 0‰ vid 0‰ | 45C/46 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:20 | core 50 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/46 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:21 | core 50 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/46 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:22 | core 50 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/46 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:23 | core 50 MHz memory 324 MHz | gr 93‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:24 | core 50 MHz memory 324 MHz | gr 25‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:25 | core 50 MHz memory 324 MHz | gr 8‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:26 | core 50 MHz memory 324 MHz | gr 10‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:27 | core 50 MHz memory 324 MHz | gr 8‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=b/b | gr700=01004001 eng0=90011001 fifo=00000000
+19:20:28 | core 50 MHz memory 324 MHz | gr 9‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:29 | core 50 MHz memory 324 MHz | gr 8‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:30 | core 50 MHz memory 324 MHz | gr 9‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:31 | core 50 MHz memory 324 MHz | gr 7‰ vid 0‰ | 43C/44 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:32 | core 50 MHz memory 324 MHz | gr 8‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:33 | core 50 MHz memory 324 MHz | gr 9‰ vid 0‰ | 43C/43 | 611200=00000030 137100=00000001 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:34 | core 50 MHz memory 324 MHz | gr 10‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:35 | core 50 MHz memory 324 MHz | gr 9‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:36 | core 50 MHz memory 324 MHz | gr 9‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:37 | core 50 MHz memory 324 MHz | gr 83‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:38 | core 50 MHz memory 324 MHz | gr 11‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:39 | core 50 MHz memory 324 MHz | gr 3‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:40 | core 50 MHz memory 324 MHz | gr 3‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:41 | core 50 MHz memory 324 MHz | gr 3‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:42 | core 50 MHz memory 324 MHz | gr 219‰ vid 0‰ | 43C/43 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:43 | core 405 MHz memory 324 MHz | gr 773‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: pmu: LAB gov: -> 07 (\xd0\xb7\xd0\xb0\xd0\xb3\xd1\x80\xd1\x83\xd0\xb7\xd0\xba\xd0\xb0 >= 15 % \xd0
+19:20:44 | core 405 MHz memory 324 MHz | gr 132‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:45 | core 405 MHz memory 324 MHz | gr 5‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:46 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:48 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 44C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:49 | core 405 MHz memory 324 MHz | gr 22‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:50 | core 405 MHz memory 324 MHz | gr 37‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:51 | core 405 MHz memory 324 MHz | gr 53‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:52 | core 405 MHz memory 324 MHz | gr 56‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:53 | core 405 MHz memory 324 MHz | gr 51‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:54 | core 405 MHz memory 324 MHz | gr 52‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=00000000
+19:20:55 | core 405 MHz memory 324 MHz | gr 10‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:56 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:57 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:58 | core 405 MHz memory 324 MHz | gr 31‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:20:59 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:00 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:01 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:02 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:03 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:04 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:05 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:06 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:07 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:08 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:09 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:10 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:11 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:12 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=00000000
+19:21:13 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:14 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:15 | core 405 MHz memory 324 MHz | gr 29‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=00000000
+19:21:16 | core 405 MHz memory 324 MHz | gr 27‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:17 | core 405 MHz memory 324 MHz | gr 54‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=00000000
+19:21:18 | core 405 MHz memory 324 MHz | gr 55‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:19 | core 405 MHz memory 324 MHz | gr 55‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:21:20 | core 405 MHz memory 324 MHz | gr 53‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=00000000
+19:21:21 | core 405 MHz memory 324 MHz | gr 107‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=00000000
+19:21:22 | core 405 MHz memory 324 MHz | gr 153‰ vid 0‰ | 44C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=00000000
+19:21:23 | core 405 MHz memory 324 MHz | gr 207‰ vid 0‰ | 45C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=03000801 eng0=90011006 fifo=80000000
+19:21:24 | core 405 MHz memory 324 MHz | gr 685‰ vid 0‰ | 45C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=03000001 eng0=90011006 fifo=80000000
+19:21:25 | core 405 MHz memory 324 MHz | gr 886‰ vid 0‰ | 45C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=03000801 eng0=90011006 fifo=80000000
+19:21:26 | core 405 MHz memory 324 MHz | gr 853‰ vid 0‰ | 45C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=03000801 eng0=90111001 fifo=80000000
+19:21:27 | core 405 MHz memory 324 MHz | gr 838‰ vid 0‰ | 45C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=01000801 eng0=90111006 fifo=00000000
+19:21:28 | core 405 MHz memory 324 MHz | gr 894‰ vid 0‰ | 45C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=90111006 fifo=00000000
+19:21:29 | core 405 MHz memory 324 MHz | gr 990‰ vid 0‰ | 45C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90111006 fifo=00000000
+19:21:30 | core 405 MHz memory 324 MHz | gr 987‰ vid 0‰ | 45C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=03024001 eng0=90011006 fifo=00000000
+19:21:31 | core 405 MHz memory 324 MHz | gr 989‰ vid 0‰ | 45C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=03000001 eng0=90111006 fifo=00000000
+19:21:32 | core 405 MHz memory 324 MHz | gr 987‰ vid 0‰ | 45C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=90111006 fifo=00000000
+19:21:33 | core 405 MHz memory 324 MHz | gr 987‰ vid 0‰ | 45C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=03000801 eng0=90011006 fifo=80000000
+19:21:34 | core 900 MHz memory 324 MHz | gr 876‰ vid 0‰ | 48C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=03004001 eng0=80141001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:21:35 | core 900 MHz memory 324 MHz | gr 885‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=03000801 eng0=90111006 fifo=00000000
+19:21:36 | core 900 MHz memory 324 MHz | gr 993‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=03000001 eng0=80141001 fifo=00000000
+19:21:37 | core 900 MHz memory 324 MHz | gr 988‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90111006 fifo=00000000
+19:21:38 | core 900 MHz memory 324 MHz | gr 988‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=03000001 eng0=80141001 fifo=00000000
+19:21:39 | core 900 MHz memory 324 MHz | gr 979‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=03000801 eng0=90011006 fifo=80000000
+19:21:40 | core 405 MHz memory 324 MHz | gr 867‰ vid 0‰ | 48C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=03000801 eng0=90011006 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:21:41 | core 405 MHz memory 324 MHz | gr 863‰ vid 0‰ | 47C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=03004001 eng0=90011006 fifo=80000000
+19:21:42 | core 405 MHz memory 324 MHz | gr 852‰ vid 0‰ | 47C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011006 fifo=80000000
+19:21:43 | core 405 MHz memory 324 MHz | gr 850‰ vid 0‰ | 46C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=03000801 eng0=90111006 fifo=80000000
+19:21:44 | core 405 MHz memory 324 MHz | gr 825‰ vid 0‰ | 46C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=90011006 fifo=80000000
+19:21:45 | core 405 MHz memory 324 MHz | gr 860‰ vid 0‰ | 46C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90111001 fifo=00000000
+19:21:46 | core 405 MHz memory 324 MHz | gr 862‰ vid 0‰ | 46C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=03004001 eng0=90011006 fifo=80000000
+19:21:47 | core 900 MHz memory 324 MHz | gr 856‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=0000004b eng0=90011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:21:48 | core 900 MHz memory 324 MHz | gr 870‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=01000901 eng0=90111006 fifo=80000000
+19:21:49 | core 900 MHz memory 324 MHz | gr 871‰ vid 0‰ | 51C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=03004001 eng0=90011006 fifo=80000000
+19:21:50 | core 900 MHz memory 324 MHz | gr 853‰ vid 0‰ | 51C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=01000801 eng0=90011006 fifo=00000000
+19:21:51 | core 900 MHz memory 324 MHz | gr 877‰ vid 0‰ | 51C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=03000001 eng0=90011006 fifo=80000000
+19:21:52 | core 900 MHz memory 324 MHz | gr 874‰ vid 0‰ | 51C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90011006 fifo=80000000
+19:21:53 | core 405 MHz memory 324 MHz | gr 877‰ vid 0‰ | 48C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90011006 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:21:54 | core 405 MHz memory 324 MHz | gr 854‰ vid 0‰ | 47C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=90011006 fifo=80000000
+19:21:55 | core 405 MHz memory 324 MHz | gr 852‰ vid 0‰ | 47C/44 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=03000801 eng0=90011006 fifo=80000000
+19:21:56 | core 405 MHz memory 324 MHz | gr 848‰ vid 0‰ | 47C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=03000001 eng0=90111006 fifo=80000000
+19:21:57 | core 405 MHz memory 324 MHz | gr 836‰ vid 0‰ | 47C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=03000801 eng0=90011006 fifo=80000000
+19:21:58 | core 405 MHz memory 324 MHz | gr 848‰ vid 0‰ | 47C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000081 eng0=80141006 fifo=00000000
+19:21:59 | core 900 MHz memory 324 MHz | gr 853‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=03000001 eng0=90011006 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:22:00 | core 900 MHz memory 324 MHz | gr 849‰ vid 0‰ | 51C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=03004001 eng0=90111006 fifo=00000000
+19:22:01 | core 900 MHz memory 324 MHz | gr 990‰ vid 0‰ | 52C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90011006 fifo=80000000
+19:22:02 | core 900 MHz memory 324 MHz | gr 992‰ vid 0‰ | 52C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=90011006 fifo=80000000
+19:22:03 | core 900 MHz memory 324 MHz | gr 925‰ vid 0‰ | 52C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=02000021 eng0=90111006 fifo=00000000
+19:22:04 | core 900 MHz memory 324 MHz | gr 978‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=90111006 fifo=00000000
+19:22:05 | core 405 MHz memory 324 MHz | gr 993‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=03000801 eng0=90111006 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:22:06 | core 405 MHz memory 324 MHz | gr 989‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=03004001 eng0=90111006 fifo=00000000
+19:22:07 | core 405 MHz memory 324 MHz | gr 818‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=02000001 eng0=90111006 fifo=00000000
+19:22:08 | core 405 MHz memory 324 MHz | gr 953‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90111006 fifo=80000000
+19:22:09 | core 405 MHz memory 324 MHz | gr 987‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03024001 eng0=90111006 fifo=00000000
+19:22:10 | core 405 MHz memory 324 MHz | gr 989‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=01000901 eng0=90011006 fifo=80000000
+19:22:11 | core 405 MHz memory 324 MHz | gr 939‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=03000801 eng0=90111006 fifo=80000000
+19:22:12 | core 900 MHz memory 324 MHz | gr 648‰ vid 0‰ | 52C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:22:13 | core 900 MHz memory 324 MHz | gr 12‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=00000000
+19:22:14 | core 900 MHz memory 324 MHz | gr 49‰ vid 0‰ | 53C/44 | 611200=00000030 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=00000000
+19:22:15 | core 900 MHz memory 324 MHz | gr 143‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=03004001 eng0=90011001 fifo=00000000
+19:22:16 | core 900 MHz memory 324 MHz | gr 148‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=00000000
+19:22:17 | core 900 MHz memory 324 MHz | gr 151‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=03004001 eng0=90011001 fifo=00000000
+19:22:18 | core 405 MHz memory 324 MHz | gr 151‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:22:19 | core 405 MHz memory 324 MHz | gr 142‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=00000000
+19:22:20 | core 405 MHz memory 324 MHz | gr 250‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000
+19:22:21 | core 405 MHz memory 324 MHz | gr 208‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000
+19:22:22 | core 405 MHz memory 324 MHz | gr 139‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=00000000
+19:22:23 | core 900 MHz memory 324 MHz | gr 234‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:22:24 | core 900 MHz memory 324 MHz | gr 172‰ vid 0‰ | 52C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000
+19:22:25 | core 900 MHz memory 324 MHz | gr 123‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000
+19:22:26 | core 900 MHz memory 324 MHz | gr 11‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000
+19:22:27 | core 900 MHz memory 324 MHz | gr 64‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=00000000
+19:22:28 | core 900 MHz memory 324 MHz | gr 120‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=00000000
+19:22:29 | core 900 MHz memory 324 MHz | gr 60‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000
+19:22:30 | core 405 MHz memory 324 MHz | gr 8‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:22:31 | core 405 MHz memory 324 MHz | gr 134‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000
+19:22:32 | core 405 MHz memory 324 MHz | gr 49‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000
+19:22:33 | core 900 MHz memory 324 MHz | gr 67‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=03004001 eng0=90011006 fifo=80000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:22:34 | core 900 MHz memory 324 MHz | gr 267‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90111001 fifo=00000000
+19:22:35 | core 900 MHz memory 324 MHz | gr 993‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=90011006 fifo=00000000
+19:22:36 | core 900 MHz memory 324 MHz | gr 990‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=90011006 fifo=00000000
+19:22:37 | core 900 MHz memory 324 MHz | gr 989‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=90011006 fifo=00000000
+19:22:38 | core 900 MHz memory 324 MHz | gr 905‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000
+19:22:39 | core 900 MHz memory 324 MHz | gr 6‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011006 fifo=80000000
+19:22:40 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:22:41 | core 405 MHz memory 324 MHz | gr 22‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90011006 fifo=80000000
+19:22:42 | core 405 MHz memory 324 MHz | gr 871‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03000001 eng0=80141001 fifo=00000000
+19:22:43 | core 405 MHz memory 324 MHz | gr 988‰ vid 0‰ | 50C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=90011006 fifo=00000000
+19:22:44 | core 405 MHz memory 324 MHz | gr 985‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=03000801 eng0=90011006 fifo=00000000
+19:22:45 | core 405 MHz memory 324 MHz | gr 988‰ vid 0‰ | 49C/44 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=03000801 eng0=90111006 fifo=00000000
+19:22:46 | core 900 MHz memory 324 MHz | gr 984‰ vid 0‰ | 52C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=03000801 eng0=80141001 fifo=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+19:22:47 | core 900 MHz memory 324 MHz | gr 999‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=03000801 eng0=80141001 fifo=00000000
+19:22:48 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=03000801 eng0=80141001 fifo=00000000
+19:22:49 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=80141001 fifo=00000000
+19:22:50 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141001 fifo=00000000
+19:22:51 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=80141001 fifo=00000000
+19:22:51 | СНИМОК /var/log/gpu-blackbox/hang-20261023-192251.txt
+19:22:52 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=80141001 fifo=00000000
+19:22:53 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=80141001 fifo=00000000
+19:22:54 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=03000801 eng0=80141001 fifo=00000000
+19:22:55 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=03000801 eng0=80141001 fifo=00000000
+19:22:56 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=d/d | gr700=03000801 eng0=80141001 fifo=00000000
+19:22:57 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 53C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=80141001 fifo=00000000
+19:22:58 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=80141001 fifo=00000000
+19:22:59 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=80141001 fifo=00000000
+19:23:00 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=1/1 | gr700=03000801 eng0=80141001 fifo=00000000
+19:23:01 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=2/2 | gr700=03000801 eng0=80141001 fifo=00000000
+19:23:02 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=3/3 | gr700=03000801 eng0=80141001 fifo=00000000
+19:23:03 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=4/4 | gr700=03000801 eng0=80141001 fifo=00000000
+19:23:04 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=5/5 | gr700=03000801 eng0=80141001 fifo=00000000
+19:23:05 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=80141001 fifo=00000000
+19:23:06 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141001 fifo=00000000
+19:23:07 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=80141001 fifo=00000000
+19:23:08 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=80141001 fifo=00000000
+19:23:09 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=80141001 fifo=00000000
+19:23:10 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=b/b | gr700=03000801 eng0=80141001 fifo=00000000
+19:23:11 | core 900 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 54C/44 | 611200=00000031 137100=00000187 1373f0=00000001 pmuq=c/c | gr700=03000801 eng0=80141001 fifo=00000000
+### blackbox start 2026-10-23 19:23:54 kernel 7.0.0-38-generic driver lab v3

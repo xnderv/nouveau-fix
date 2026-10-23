@@ -1,0 +1,15 @@
+hangtest 2026-10-23 19:21:18: подъёмов 60, нагрузка browser, удержание 0f 6с, lab_gov был 2, ядро 7.0.0-38-generic
+параметры: lab_mem_order=Y lab_mem_op13=1 lab_mem_op34=1 lab_mem_op3a=0 lab_mem_replay=15 lab_pcie=1 lab_gpc_seq=13 
+19:21:21 старт: core 405 MHz memory 324 MHz
+19:21:21 нагрузка: /usr/bin/yandex-browser (pid 10139, профиль /home/alex/.cache/nouveau-hangtest-profile), страница hangload.html; прогрев 10 с
+19:21:31 загрузка GR перед циклами: 989‰
+19:21:40 подъём 1/60 в 19:21:33.848: gr до 876‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 867‰
+19:21:52 подъём 2/60 в 19:21:46.519: gr до 862‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 874‰
+19:22:05 подъём 3/60 в 19:21:58.913: gr до 848‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 978‰
+19:22:17 подъём 4/60 в 19:22:11.712: gr до 939‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 151‰
+19:22:29 подъём 5/60 в 19:22:23.482: gr до 234‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 60‰
+19:22:39 подъём 6/60 в 19:22:33.592: gr до 67‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 6‰
+19:22:50 подъём 7/60 в 19:22:46.321: gr до 984‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 1000‰ — ЗАВИСАНИЕ: gr=1000‰ 4с подряд, ошибок журнала 0
+=== ЗАВИСАНИЕ ВОСПРОИЗВЕДЕНО на подъёме 7 (нагрузка browser). Нагрузка оставлена, lab_gov=0.
+    Снимок регистров: /var/log/gpu-blackbox/hang-*.txt (чёрный ящик). Журнал: journalctl -k -b 0 --since '2026-10-23 19:21:18'
+    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show

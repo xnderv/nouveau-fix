@@ -1,0 +1,53 @@
+                                                    ### Promise created here: ###
+                                                    ### Promise created here: ###
+Oct 23 19:22:41.969594 host sudo[11298]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 19:22:41.969768 host sudo[11298]: alex : TTY=/dev/pts/1 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 19:22:41.974098 host sudo[11298]: pam_unix(sudo:session): session closed for user root
+Oct 23 19:22:46.313251 host sudo[11319]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 19:22:46.313431 host sudo[11319]: alex : TTY=/dev/pts/1 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c echo 0f > \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 19:22:46.316087 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=0 core=1 volt_first=1
+Oct 23 19:22:46.316646 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+Oct 23 19:22:46.317021 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+Oct 23 19:22:46.316662 host sudo[11319]: pam_unix(sudo:session): session closed for user root
+Oct 23 19:22:46.317530 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 23 19:22:46.317950 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+Oct 23 19:22:46.318395 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+Oct 23 19:22:46.318820 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 23 19:22:46.319255 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:22:46.319652 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:22:46.319939 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 1907000 got 1909285 ssel 00000004 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:22:46.320264 host kernel: nouveau 0000:01:00.0: clk: LAB calc_pll idx 07: опора nouveau 1620000 kHz, с делителем опоры 405000 kHz (lab_gpc_seq&8)
+Oct 23 19:22:46.320570 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 1645000 got 1645312 ssel 00000080 coef 00014110 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:22:46.320860 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 1645000 got 1645000 ssel 00000100 coef 00000000 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 19:22:46.321183 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 19:22:46.321508 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 23 19:22:46.321782 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 19:22:46.322090 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 23 19:22:46.322461 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 23 19:22:46.322803 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 23 19:22:46.323119 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 00012809
+Oct 23 19:22:46.323512 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 00 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 19:22:46.323831 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 01 PLL locked ctrl 00030001 coef 00012107
+Oct 23 19:22:46.324235 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 01 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 19:22:46.324661 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 02 PLL locked ctrl 00030001 coef 00012107
+Oct 23 19:22:46.325064 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 02 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 19:22:46.325435 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 07 PLL locked ctrl 00030001 coef 00014110
+Oct 23 19:22:46.325729 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 07 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 19:22:46.326022 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 23 19:22:46.326390 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 23 19:22:46.326697 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 23 19:22:46.327005 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 02 select PLL, 0x137100=00000003
+Oct 23 19:22:46.327439 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 07 select PLL, 0x137100=00000007
+Oct 23 19:22:46.327758 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 08 select PLL, 0x137100=00000087
+Oct 23 19:22:46.328062 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 23 19:22:46.328343 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 23 19:22:46.328634 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory SKIPPED (lab_mem=0)
+Oct 23 19:22:46.328944 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+Oct 23 19:22:50.494516 host sudo[11364]: pam_unix(sudo:session): session opened for user root(uid=0) by alex(uid=1026)
+Oct 23 19:22:50.494645 host sudo[11364]: alex : TTY=/dev/pts/1 ; PWD=/home/user/Home ; USER=root ; COMMAND=/usr/bin/sh -c grep \'^AC\' \'/sys/kernel/debug/dri/0/pstate\'
+Oct 23 19:22:50.499541 host sudo[11364]: pam_unix(sudo:session): session closed for user root
+Oct 23 19:22:51.849064 host kernel: nouveau 0000:01:00.0: bus: MMIO write of 00000002 FAULT at 13b154 [ PRIVRING ]
+Oct 23 19:23:01.530130 host at-spi2-registryd[2757]: Disabling unresponsive app with pid 2481
+Oct 23 19:23:12.032902 host kernel: sysrq: Emergency Sync
+Oct 23 19:23:12.066066 host kernel: Emergency Sync complete
+Oct 23 19:23:12.728918 host kernel: sysrq: Emergency Remount R/O
