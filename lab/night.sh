@@ -4,11 +4,14 @@
 # Один раз пароль sudo (дальше его держит сам hangtest: sudo вызывается каждые несколько секунд).
 # Экран не гаснет и система не засыпает (gnome-session-inhibit). Тесты по очереди, по 60 подъёмов; каждый — база
 # (боевая конфигурация: память, PCIe, напряжение по таблице, скобка по признаку) + ровно свои отличия.
-# На первом зависании: копия журнала ядра и ящика в results/, sync, и (AUTOREBOOT=1, по умолчанию) перезагрузка
-# через SysRq (S, U, B) — как вручную. Дальнейшие тесты после перезагрузки не идут. Итог — results/night-*.txt.
+# На первом зависании: копия журнала ядра и ящика в results/, sync; дальнейшие тесты не идут. Итог — results/night-*.txt.
+# В конце (и при зависании) серия ЖДЁТ разрешения на выключение: файл ~/Home/nouveau-archive/night-poweroff.ok
+# (его создаёт ассистент после разбора), но не дольше WAITMIN (60) минут; sudo в это время продлевается.
+# Затем выключение: после чистой серии — systemctl poweroff, после зависания — SysRq S, U, O. POWEROFF=0 — не выключать.
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; KIT="$(dirname "$HERE")"; PRM=/sys/module/nouveau/parameters
-AUTOREBOOT="${AUTOREBOOT:-1}"
+POWEROFF="${POWEROFF:-1}"; WAITMIN="${WAITMIN:-60}"; FLAG="$HOME/Home/nouveau-archive/night-poweroff.ok"
+rm -f "$FLAG"
 if [ -z "${NIGHT_INHIBITED:-}" ]; then
     exec env NIGHT_INHIBITED=1 gnome-session-inhibit --inhibit idle --inhibit suspend --inhibit logout \
          --reason "nouveau night tests" bash "$0" "$@"
@@ -29,11 +32,23 @@ hung() {
     tail -n 400 /var/log/gpu-blackbox/current.txt > "$KIT/results/night-blackbox-$T.txt" 2>/dev/null
     cp /var/log/gpu-blackbox/hang-*.txt "$KIT/results/" 2>/dev/null
     sync
-    if [ "$AUTOREBOOT" = 1 ]; then
-        say "перезагрузка через SysRq через 10 с"; sleep 10
-        sudo sh -c 'echo s > /proc/sysrq-trigger; sleep 3; echo u > /proc/sysrq-trigger; sleep 2; echo b > /proc/sysrq-trigger'
+    finish_night hung
+}
+finish_night() {   # $1 = clean | hung
+    [ "$POWEROFF" = 1 ] || { say "POWEROFF=0 — машину не выключаю"; exit 0; }
+    say "СЕРИЯ ЗАВЕРШЕНА ($1). Жду разрешения на выключение ($FLAG), не дольше $WAITMIN мин"
+    local m=0
+    while [ ! -e "$FLAG" ] && [ $m -lt $((WAITMIN * 6)) ]; do
+        sleep 10; m=$((m + 1)); [ $((m % 30)) = 0 ] && sudo -n -v 2>/dev/null
+    done
+    [ -e "$FLAG" ] && say "разрешение получено" || say "разрешения нет $WAITMIN мин — выключаю"
+    sync
+    if [ "$1" = hung ]; then
+        sudo sh -c 'echo s > /proc/sysrq-trigger; sleep 3; echo u > /proc/sysrq-trigger; sleep 2; echo o > /proc/sysrq-trigger'
+    else
+        sudo systemctl poweroff || sudo sh -c 'echo s > /proc/sysrq-trigger; sleep 3; echo u > /proc/sysrq-trigger; sleep 2; echo o > /proc/sysrq-trigger'
     fi
-    exit 2
+    exit 0
 }
 run() {   # run ИМЯ НИЗ-ВЕРХ [параметр=значение ...]
     local name="$1" lv="$2"; shift 2
@@ -58,12 +73,13 @@ run() {   # run ИМЯ НИЗ-ВЕРХ [параметр=значение ...]
     wait "$pid"; rc=$?
     say "тест $name: код $rc, лог $(basename "$R")"; tail -n 3 "$R" >> "$LOG"; sync
     grep -q "ЗАВИСАНИЕ ВОСПРОИЗВЕДЕНО" "$R" && hung "$name"
-    grep -q "подъёмов без зависания" "$R" || { say "тест $name не дошёл до конца (код $rc) — серия остановлена"; exit 1; }
+    grep -q "подъёмов без зависания" "$R" || { say "тест $name не дошёл до конца (код $rc) — серия остановлена"; finish_night clean; }
 }
-say "ночная серия: драйвер $(modinfo -n nouveau), ядро $(uname -r), AUTOREBOOT=$AUTOREBOOT"
+say "ночная серия: драйвер $(modinfo -n nouveau), ядро $(uname -r), POWEROFF=$POWEROFF WAITMIN=$WAITMIN"
 run 19  03-07                                   # скобка вокруг пост-делителей (тест 18 + одно изменение)
 run 19b 07-0f                                   # та же конфигурация на проверенной паре 07↔0f
 run 21  03-07 lab_clk_mmu_lock=1                # + блокировка MMU (= значения по умолчанию)
 run 20  03-07 lab_therm=0 lab_therm_div=0       # контроль: без скобки вообще, как до 24.10
-setp lab_gov=2 lab_therm_div=1 lab_clk_mmu_lock=1
-say "=== серия закончена без зависаний; регулятор включён, параметры по умолчанию"
+setp lab_therm_div=1 lab_clk_mmu_lock=1
+say "=== серия закончена без зависаний; параметры по умолчанию, регулятор оставлен выключенным"
+finish_night clean
