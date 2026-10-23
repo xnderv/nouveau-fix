@@ -1,0 +1,22 @@
+hangtest 2026-10-24 01:56:49: уровни 03↔07, подъёмов 60, нагрузка browser, удержание 0f 6с, lab_gov был 0, ядро 7.0.0-38-generic
+параметры: lab_mem_order=Y lab_mem_op13=1 lab_mem_op34=1 lab_mem_op3a=0 lab_mem_replay=15 lab_pcie=1 lab_gpc_seq=13 
+01:56:52 старт: core 50 MHz memory 135 MHz; lab_mem=Y lab_core=Y lab_volt_min_uv=0 lab_gr_pause=0 lab_gr_gate=0 lab_gr_wait=0 lab_xbar=0 lab_e9e0=0 lab_pll_keep=0 lab_order=0 lab_order_us=0 lab_therm=1 lab_therm_us=24 lab_therm_us_gpc=0 lab_therm_us_hub=0 lab_therm_probe=0 lab_therm_wait=1 lab_therm_wait_us=0 lab_therm_real=0 lab_clk_mmu_lock=0 khz: gpc=0 rop=0 hub07=0 hub06=0 hub01=0
+01:56:53 нагрузка: /usr/bin/yandex-browser (pid 5786, профиль /home/alex/.cache/nouveau-hangtest-profile), страница hangload.html; прогрев 10 с
+01:57:03 загрузка GR перед циклами: 992‰
+01:57:14 подъём 1/60 в 01:57:07.986: gr до 998‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 855‰
+01:57:27 подъём 2/60 в 01:57:20.931: gr до 997‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 863‰
+01:57:37 подъём 3/60 в 01:57:31.239: gr до 997‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 874‰
+01:57:49 подъём 4/60 в 01:57:43.649: gr до 993‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 895‰
+01:58:01 подъём 5/60 в 01:57:55.177: gr до 998‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 894‰
+01:58:14 подъём 6/60 в 01:58:08.588: gr до 994‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 885‰
+01:58:27 подъём 7/60 в 01:58:21.333: gr до 993‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 869‰
+01:58:39 подъём 8/60 в 01:58:32.809: gr до 997‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 937‰
+01:58:51 подъём 9/60 в 01:58:45.471: gr до 992‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 928‰
+01:59:02 подъём 10/60 в 01:58:55.945: gr до 997‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 896‰
+01:59:13 подъём 11/60 в 01:59:06.988: gr до 990‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 895‰
+01:59:24 подъём 12/60 в 01:59:18.080: gr до 990‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 888‰
+01:59:36 подъём 13/60 в 01:59:30.580: gr до 992‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 992‰
+01:59:49 подъём 14/60 в 01:59:43.152: gr до 997‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 869‰
+02:00:02 подъём 15/60 в 01:59:56.264: gr до 997‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 877‰
+02:00:16 подъём 16/60 в 02:00:09.876: gr до 995‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 862‰
+02:00:26 подъём 17/60 в 02:00:20.001: gr до 997‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 874‰

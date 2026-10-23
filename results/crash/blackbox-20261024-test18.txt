@@ -1,0 +1,804 @@
+### blackbox start 2026-10-24 01:55:46 kernel 7.0.0-38-generic driver lab v3
+01:55:46 | core 50 MHz memory 135 MHz | gr 0‰ vid 0‰ | 40C/0 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:55:47 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 41C/0 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=03000801 eng0=90011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: pmu: LAB gov: \xd0\xb2\xd0\xba\xd0\xbb\xd1\x8e\xd1\x87\xd1\x91\xd0\xbd (\xd0\xbf\xd0\xb5\xd1\x80\x
+01:55:48 | core 405 MHz memory 324 MHz | gr 190‰ vid 0‰ | 42C/0 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:55:49 | core 405 MHz memory 324 MHz | gr 11‰ vid 0‰ | 42C/0 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:55:50 | core 405 MHz memory 324 MHz | gr 20‰ vid 0‰ | 42C/0 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011006 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:55:51 | core 405 MHz memory 324 MHz | gr 118‰ vid 0‰ | 42C/0 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:55:52 | core 405 MHz memory 324 MHz | gr 202‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:55:53 | core 405 MHz memory 324 MHz | gr 9‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:55:54 | core 405 MHz memory 324 MHz | gr 6‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:55:55 | core 405 MHz memory 324 MHz | gr 59‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:55:56 | core 405 MHz memory 324 MHz | gr 64‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:55:57 | core 405 MHz memory 324 MHz | gr 22‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:55:58 | core 405 MHz memory 324 MHz | gr 121‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:55:59 | core 405 MHz memory 324 MHz | gr 181‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:00 | core 405 MHz memory 324 MHz | gr 240‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:01 | core 405 MHz memory 324 MHz | gr 6‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:02 | core 405 MHz memory 324 MHz | gr 4‰ vid 0‰ | 42C/43 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:03 | core 405 MHz memory 324 MHz | gr 77‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:04 | core 405 MHz memory 324 MHz | gr 9‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:05 | core 405 MHz memory 324 MHz | gr 4‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:06 | core 405 MHz memory 324 MHz | gr 14‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:07 | core 405 MHz memory 324 MHz | gr 10‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:08 | core 405 MHz memory 324 MHz | gr 17‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:09 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:10 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:11 | core 405 MHz memory 324 MHz | gr 80‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:12 | core 405 MHz memory 324 MHz | gr 9‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:13 | core 405 MHz memory 324 MHz | gr 62‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:14 | core 405 MHz memory 324 MHz | gr 9‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90111001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:15 | core 405 MHz memory 324 MHz | gr 68‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:16 | core 405 MHz memory 324 MHz | gr 7‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011006 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:17 | core 405 MHz memory 324 MHz | gr 114‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:18 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:19 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:20 | core 405 MHz memory 324 MHz | gr 56‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:21 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:22 | core 405 MHz memory 324 MHz | gr 2‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:23 | core 405 MHz memory 324 MHz | gr 68‰ vid 0‰ | 43C/42 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:24 | core 405 MHz memory 324 MHz | gr 42‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:25 | core 405 MHz memory 324 MHz | gr 45‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:26 | core 405 MHz memory 324 MHz | gr 43‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:27 | core 405 MHz memory 324 MHz | gr 43‰ vid 0‰ | 43C/42 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:28 | core 405 MHz memory 324 MHz | gr 103‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:29 | core 405 MHz memory 324 MHz | gr 55‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:30 | core 405 MHz memory 324 MHz | gr 215‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:31 | core 405 MHz memory 324 MHz | gr 30‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:32 | core 405 MHz memory 324 MHz | gr 32‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:33 | core 405 MHz memory 324 MHz | gr 14‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:34 | core 405 MHz memory 324 MHz | gr 17‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:35 | core 405 MHz memory 324 MHz | gr 40‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:36 | core 405 MHz memory 324 MHz | gr 103‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:37 | core 405 MHz memory 324 MHz | gr 124‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=90011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:38 | core 405 MHz memory 324 MHz | gr 95‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:39 | core 405 MHz memory 324 MHz | gr 4‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:40 | core 405 MHz memory 324 MHz | gr 6‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:41 | core 405 MHz memory 324 MHz | gr 1‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:42 | core 405 MHz memory 324 MHz | gr 9‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:43 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:44 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:45 | core 405 MHz memory 324 MHz | gr 0‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:46 | core 405 MHz memory 324 MHz | gr 93‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:47 | core 405 MHz memory 324 MHz | gr 5‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:48 | core 405 MHz memory 324 MHz | gr 50‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:49 | core 405 MHz memory 324 MHz | gr 26‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:50 | core 50 MHz memory 135 MHz | gr 69‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:56:51 | core 50 MHz memory 135 MHz | gr 103‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:52 | core 50 MHz memory 135 MHz | gr 58‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=8/8 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:53 | core 50 MHz memory 135 MHz | gr 411‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=90011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:54 | core 50 MHz memory 135 MHz | gr 106‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=80141006 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:55 | core 50 MHz memory 135 MHz | gr 615‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=b/b | gr700=01000003 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:56 | core 50 MHz memory 135 MHz | gr 994‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=c/c | gr700=00000081 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:57 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 41C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=d/d | gr700=00000081 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:58 | core 50 MHz memory 135 MHz | gr 991‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:56:59 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:00 | core 50 MHz memory 135 MHz | gr 992‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:01 | core 50 MHz memory 135 MHz | gr 992‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=1/1 | gr700=03000801 eng0=90111007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:02 | core 50 MHz memory 135 MHz | gr 992‰ vid 0‰ | 41C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=2/2 | gr700=03000021 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:03 | core 50 MHz memory 135 MHz | gr 994‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=3/3 | gr700=03000801 eng0=90111007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:04 | core 50 MHz memory 135 MHz | gr 995‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=4/4 | gr700=03000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:05 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 41C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=5/5 | gr700=03000801 eng0=90111007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:06 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 41C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=00000081 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:08 | core 405 MHz memory 324 MHz | gr 998‰ vid 0‰ | 41C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:57:09 | core 405 MHz memory 324 MHz | gr 915‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:10 | core 405 MHz memory 324 MHz | gr 857‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000081 eng0=80141001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:11 | core 405 MHz memory 324 MHz | gr 960‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:12 | core 405 MHz memory 324 MHz | gr 846‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:13 | core 405 MHz memory 324 MHz | gr 854‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:14 | core 405 MHz memory 324 MHz | gr 855‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03000021 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:15 | core 50 MHz memory 135 MHz | gr 917‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=4/4 | gr700=01000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:57:16 | core 50 MHz memory 135 MHz | gr 998‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=5/5 | gr700=03000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:17 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:18 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:19 | core 50 MHz memory 135 MHz | gr 995‰ vid 0‰ | 41C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=8/8 | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:20 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 41C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=9/9 | gr700=03000001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:21 | core 405 MHz memory 324 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:57:22 | core 405 MHz memory 324 MHz | gr 874‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=03000801 eng0=90101001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:23 | core 405 MHz memory 324 MHz | gr 856‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:24 | core 405 MHz memory 324 MHz | gr 869‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03004001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:25 | core 405 MHz memory 324 MHz | gr 869‰ vid 0‰ | 43C/42 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:26 | core 405 MHz memory 324 MHz | gr 875‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:27 | core 405 MHz memory 324 MHz | gr 865‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:28 | core 50 MHz memory 135 MHz | gr 863‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:57:29 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=7/7 | gr700=03004001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:30 | core 50 MHz memory 135 MHz | gr 998‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=8/8 | gr700=03024001 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:31 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:32 | core 405 MHz memory 324 MHz | gr 998‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=03000801 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:57:33 | core 405 MHz memory 324 MHz | gr 921‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:34 | core 405 MHz memory 324 MHz | gr 978‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=03004001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:35 | core 405 MHz memory 324 MHz | gr 874‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:36 | core 405 MHz memory 324 MHz | gr 908‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:37 | core 405 MHz memory 324 MHz | gr 880‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:38 | core 50 MHz memory 135 MHz | gr 874‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:57:39 | core 50 MHz memory 135 MHz | gr 956‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:40 | core 50 MHz memory 135 MHz | gr 994‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:41 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:42 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000030 137100=00000001 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:43 | core 50 MHz memory 135 MHz | gr 992‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=b/b | gr700=03004001 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:44 | core 405 MHz memory 324 MHz | gr 993‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:57:45 | core 405 MHz memory 324 MHz | gr 939‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:46 | core 405 MHz memory 324 MHz | gr 899‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=03000001 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:47 | core 405 MHz memory 324 MHz | gr 899‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:48 | core 405 MHz memory 324 MHz | gr 885‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:49 | core 405 MHz memory 324 MHz | gr 902‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=03004001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:50 | core 50 MHz memory 135 MHz | gr 895‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:57:51 | core 50 MHz memory 135 MHz | gr 983‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=9/9 | gr700=03000001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:52 | core 50 MHz memory 135 MHz | gr 996‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:53 | core 50 MHz memory 135 MHz | gr 994‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=b/b | gr700=03000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:54 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=c/c | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:55 | core 405 MHz memory 324 MHz | gr 998‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03004001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:57:56 | core 405 MHz memory 324 MHz | gr 943‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000081 eng0=90111001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:57 | core 405 MHz memory 324 MHz | gr 920‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000081 eng0=80041007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:58 | core 405 MHz memory 324 MHz | gr 910‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:57:59 | core 405 MHz memory 324 MHz | gr 914‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:00 | core 405 MHz memory 324 MHz | gr 970‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:01 | core 405 MHz memory 324 MHz | gr 894‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=03000021 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:02 | core 50 MHz memory 135 MHz | gr 947‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:58:03 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=b/b | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:04 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=c/c | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:05 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=d/d | gr700=01000801 eng0=90111001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:06 | core 50 MHz memory 135 MHz | gr 998‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=e/e | gr700=03004001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:07 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:08 | core 50 MHz memory 135 MHz | gr 994‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=0/0 | gr700=02000001 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:09 | core 405 MHz memory 324 MHz | gr 896‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:58:10 | core 405 MHz memory 324 MHz | gr 880‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:11 | core 405 MHz memory 324 MHz | gr 854‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:12 | core 405 MHz memory 324 MHz | gr 866‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=03004001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:13 | core 405 MHz memory 324 MHz | gr 869‰ vid 0‰ | 44C/42 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:14 | core 405 MHz memory 324 MHz | gr 885‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=01000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:15 | core 50 MHz memory 135 MHz | gr 917‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=d/d | gr700=03000801 eng0=90111007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:58:16 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:17 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:18 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000030 137100=00000001 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:19 | core 50 MHz memory 135 MHz | gr 996‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=1/1 | gr700=02000001 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:20 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=2/2 | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:21 | core 405 MHz memory 324 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:58:22 | core 405 MHz memory 324 MHz | gr 867‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:23 | core 405 MHz memory 324 MHz | gr 873‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:24 | core 405 MHz memory 324 MHz | gr 869‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:25 | core 405 MHz memory 324 MHz | gr 869‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:26 | core 405 MHz memory 324 MHz | gr 864‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:27 | core 405 MHz memory 324 MHz | gr 874‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:28 | core 50 MHz memory 135 MHz | gr 869‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:58:29 | core 50 MHz memory 135 MHz | gr 984‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:30 | core 50 MHz memory 135 MHz | gr 995‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=1/1 | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:31 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=2/2 | gr700=00000081 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:32 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=3/3 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:33 | core 405 MHz memory 324 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:58:34 | core 405 MHz memory 324 MHz | gr 928‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:35 | core 405 MHz memory 324 MHz | gr 945‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=03000001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:36 | core 405 MHz memory 324 MHz | gr 949‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:37 | core 405 MHz memory 324 MHz | gr 967‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:38 | core 405 MHz memory 324 MHz | gr 924‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=03000801 eng0=80141007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:39 | core 50 MHz memory 135 MHz | gr 937‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:58:40 | core 50 MHz memory 135 MHz | gr 994‰ vid 0‰ | 43C/42 | 611200=00000030 137100=00000001 1373f0=00000001 pmuq=1/1 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:41 | core 50 MHz memory 135 MHz | gr 991‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=2/2 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:42 | core 50 MHz memory 135 MHz | gr 991‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=3/3 | gr700=03004001 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:43 | core 50 MHz memory 135 MHz | gr 991‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=4/4 | gr700=03000001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:44 | core 50 MHz memory 135 MHz | gr 992‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=5/5 | gr700=00000081 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:45 | core 405 MHz memory 324 MHz | gr 992‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=90101001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:58:46 | core 405 MHz memory 324 MHz | gr 956‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=03000001 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:47 | core 405 MHz memory 324 MHz | gr 882‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:48 | core 405 MHz memory 324 MHz | gr 907‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:49 | core 405 MHz memory 324 MHz | gr 934‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:50 | core 405 MHz memory 324 MHz | gr 941‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:51 | core 405 MHz memory 324 MHz | gr 928‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:52 | core 50 MHz memory 135 MHz | gr 972‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=3/3 | gr700=02000021 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:58:53 | core 50 MHz memory 135 MHz | gr 998‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=4/4 | gr700=03004001 eng0=80141001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:54 | core 50 MHz memory 135 MHz | gr 998‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=5/5 | gr700=03000001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:55 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=03000001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:56 | core 405 MHz memory 324 MHz | gr 996‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:58:57 | core 405 MHz memory 324 MHz | gr 994‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:58 | core 405 MHz memory 324 MHz | gr 983‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:58:59 | core 405 MHz memory 324 MHz | gr 895‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=03000001 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:00 | core 405 MHz memory 324 MHz | gr 880‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=03024001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:01 | core 405 MHz memory 324 MHz | gr 896‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90111001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:02 | core 50 MHz memory 135 MHz | gr 895‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=3/3 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:59:03 | core 50 MHz memory 135 MHz | gr 970‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=4/4 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:04 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=5/5 | gr700=03004001 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:05 | core 50 MHz memory 135 MHz | gr 991‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=03000001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:06 | core 50 MHz memory 135 MHz | gr 990‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:07 | core 405 MHz memory 324 MHz | gr 975‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=03000021 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:59:08 | core 405 MHz memory 324 MHz | gr 878‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=03024001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:09 | core 405 MHz memory 324 MHz | gr 917‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=03000801 eng0=90111001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:10 | core 405 MHz memory 324 MHz | gr 893‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=03000001 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:11 | core 405 MHz memory 324 MHz | gr 861‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:12 | core 405 MHz memory 324 MHz | gr 895‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90111001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:13 | core 50 MHz memory 135 MHz | gr 920‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=4/4 | gr700=00000081 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:59:14 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=5/5 | gr700=03000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:15 | core 50 MHz memory 135 MHz | gr 994‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=03000001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:16 | core 50 MHz memory 135 MHz | gr 990‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:17 | core 50 MHz memory 135 MHz | gr 990‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:18 | core 405 MHz memory 324 MHz | gr 930‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:59:19 | core 405 MHz memory 324 MHz | gr 892‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:20 | core 405 MHz memory 324 MHz | gr 882‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=03000801 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:21 | core 405 MHz memory 324 MHz | gr 892‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=03004001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:22 | core 405 MHz memory 324 MHz | gr 893‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:23 | core 405 MHz memory 324 MHz | gr 888‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=03004001 eng0=80141007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:24 | core 50 MHz memory 135 MHz | gr 940‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=5/5 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:59:25 | core 50 MHz memory 135 MHz | gr 992‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:26 | core 50 MHz memory 135 MHz | gr 992‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:27 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=7/7 | gr700=03000001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:28 | core 50 MHz memory 135 MHz | gr 990‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=8/8 | gr700=03000001 eng0=90111007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:29 | core 50 MHz memory 135 MHz | gr 991‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=9/9 | gr700=01000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:30 | core 405 MHz memory 324 MHz | gr 992‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:59:31 | core 405 MHz memory 324 MHz | gr 995‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=03004001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:33 | core 405 MHz memory 324 MHz | gr 982‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=03000001 eng0=80141001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:34 | core 405 MHz memory 324 MHz | gr 993‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03000001 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:35 | core 405 MHz memory 324 MHz | gr 924‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:36 | core 405 MHz memory 324 MHz | gr 901‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=03004001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:37 | core 50 MHz memory 135 MHz | gr 992‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:59:38 | core 50 MHz memory 135 MHz | gr 994‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:39 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:40 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=9/9 | gr700=01000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:41 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=a/a | gr700=01000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:42 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=b/b | gr700=03024001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:43 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=c/c | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:44 | core 405 MHz memory 324 MHz | gr 973‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=80141007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:59:45 | core 405 MHz memory 324 MHz | gr 871‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:46 | core 405 MHz memory 324 MHz | gr 869‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:47 | core 405 MHz memory 324 MHz | gr 882‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:48 | core 405 MHz memory 324 MHz | gr 886‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:49 | core 405 MHz memory 324 MHz | gr 869‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=03000801 eng0=80141001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:50 | core 50 MHz memory 135 MHz | gr 874‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:59:51 | core 50 MHz memory 135 MHz | gr 991‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:52 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=b/b | gr700=00000081 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:53 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=c/c | gr700=03000001 eng0=90111007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:54 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=d/d | gr700=03024001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:55 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:56 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:57 | core 405 MHz memory 324 MHz | gr 969‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=03000801 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+01:59:58 | core 405 MHz memory 324 MHz | gr 851‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+01:59:59 | core 405 MHz memory 324 MHz | gr 877‰ vid 0‰ | 44C/42 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=01000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:00 | core 405 MHz memory 324 MHz | gr 861‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=03000801 eng0=80111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:01 | core 405 MHz memory 324 MHz | gr 865‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=03004001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:02 | core 405 MHz memory 324 MHz | gr 877‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:03 | core 50 MHz memory 135 MHz | gr 887‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=c/c | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+02:00:04 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=d/d | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:05 | core 50 MHz memory 135 MHz | gr 996‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:06 | core 50 MHz memory 135 MHz | gr 995‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:07 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=90111007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:08 | core 50 MHz memory 135 MHz | gr 995‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=1/1 | gr700=03000001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:09 | core 50 MHz memory 135 MHz | gr 995‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=2/2 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:10 | core 405 MHz memory 324 MHz | gr 996‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+02:00:11 | core 405 MHz memory 324 MHz | gr 874‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:12 | core 405 MHz memory 324 MHz | gr 865‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:13 | core 405 MHz memory 324 MHz | gr 866‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:14 | core 405 MHz memory 324 MHz | gr 876‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:15 | core 405 MHz memory 324 MHz | gr 872‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=90011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:16 | core 50 MHz memory 135 MHz | gr 862‰ vid 0‰ | 45C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+02:00:17 | core 50 MHz memory 135 MHz | gr 980‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=90111007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:18 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=1/1 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:19 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=2/2 | gr700=03000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:20 | core 405 MHz memory 324 MHz | gr 993‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=03004001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+02:00:21 | core 405 MHz memory 324 MHz | gr 879‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:22 | core 405 MHz memory 324 MHz | gr 880‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:23 | core 405 MHz memory 324 MHz | gr 873‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=90111001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:24 | core 405 MHz memory 324 MHz | gr 866‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=03000021 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:25 | core 405 MHz memory 324 MHz | gr 853‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=03004001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:26 | core 405 MHz memory 324 MHz | gr 874‰ vid 0‰ | 44C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=01004001 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:27 | core 50 MHz memory 135 MHz | gr 986‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+02:00:28 | core 50 MHz memory 135 MHz | gr 986‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=0/0 | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:29 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=1/1 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:30 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=2/2 | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:31 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=3/3 | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:32 | core 50 MHz memory 135 MHz | gr 997‰ vid 0‰ | 43C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=4/4 | gr700=03000901 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:33 | core 50 MHz memory 135 MHz | gr 993‰ vid 0‰ | 42C/42 | 611200=00000031 137100=00000001 1373f0=00000001 pmuq=5/5 | gr700=01000801 eng0=90111007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:00:35 | core 0 MHz memory 0 MHz | gr 993‰ vid 0‰ | -1C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd0\xbf\xd0\xbe\xd0\xb4\xd1\x8a\xd1\x91\xd0\xbc \xe2\x80\x94 \xd0\xbf\xd0\xb0\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x8c \xd1\x81\xd0\xb5\xd0\xb9\xd1\x87\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\
+02:01:01 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: disp: ERROR 0 [NONE] 00 [] chid 0 mthd 0000 data ffffffff
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: disp: ERROR 7 [UNRESOLVABLE_HANDLE] ff [] chid 1 mthd 0ffc data ffffffff
+ SUBSYSTEM=pci
+ DEVICE=+p ;; nouveau 0000:01:00.0: disp: ERROR 7 [UNRESOLVABLE_HANDLE] ff [] chid 2 mthd 0ffc data ffffffff
+ SUBSYSTEM=pci
+ DEVICE=+p ;; nouveau 0000:01:00.0: disp: ERROR 0 [NONE] 00 [] chid 3 mthd 0048 data ffffffff
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: disp: ERROR 7 [UNRESOLVABLE_HANDLE] ff [] chid 4 mthd 0ffc data ffffffff
+ SUBSYSTEM=pci
+ DEVICE=+p ;; nouveau 0000:01:00.0: ce0: DISPATCH_ERROR 0000 [] ch -1 [0000000000 unknown] subc 0 mthd 1040 data 00000000
+ SUBSYSTEM=p ;; nouveau 0000:01:00.0: timeout ;; nouveau 0000:01:00.0: drm: base-0: timeout
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: timeout ;; nouveau 0000:01:00.0: timeout
+02:01:06 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: timeout
+02:01:07 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: timeout
+02:01:08 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:09 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: timeout ;; nouveau 0000:01:00.0: timeout
+02:01:18 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: timeout ;; nouveau 0000:01:00.0: timeout ;; nouveau 0000:01:00.0: timeout ;; nouveau 0000:01:00.0: timeout ;; nouveau 0000:01:00.0: timeout ;; nouveau 0000:01:00.0: timeout
+02:01:26 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: timeout ;; nouveau 0000:01:00.0: timeout ;; nouveau 0000:01:00.0: timeout ;; nouveau 0000:01:00.0: timeout ;; nouveau 0000:01:00.0: timeout
+02:01:27 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: timeout
+02:01:28 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:30 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: timeout
+02:01:31 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:32 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: timeout
+02:01:33 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:34 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: timeout
+02:01:35 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:36 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: timeout
+02:01:37 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:38 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:39 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:40 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 40C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:41 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:42 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:43 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:44 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:45 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:46 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:47 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:48 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:49 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:50 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:51 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:52 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:53 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:54 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:55 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:56 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:57 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:58 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:01:59 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:00 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:01 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:02 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:03 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:04 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: timeout
+02:02:05 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:06 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 | nouveau 0000:01:00.0: timeout
+02:02:07 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:08 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:09 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:10 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:11 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:12 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:13 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:14 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:15 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:16 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:17 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:18 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:19 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+02:02:20 | core 405 MHz memory 135 MHz | gr 993‰ vid 0‰ | 39C/42 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141007 fifo=00800000 xbar=2/2/0 e9e0=81200a0a 1548=00000000
+### blackbox start 2026-10-24 02:03:03 kernel 7.0.0-38-generic driver lab v3
