@@ -163,8 +163,8 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  static void
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-23 22:36:33.206309559 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-23 22:36:33.208618034 +0300
+--- base/nvkm/subdev/clk/gf100.c	2026-10-23 22:52:20.928580557 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-23 22:52:20.930585141 +0300
 @@ -23,11 +23,16 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -247,7 +247,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +312,89 @@
+@@ -270,6 +312,99 @@
  	return ret;
  }
  
@@ -304,6 +304,16 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +static uint lab_e9e0;
 +module_param(lab_e9e0, uint, 0644);
 +MODULE_PARM_DESC(lab_e9e0, "LAB: program 0x00e9e0 divider per level as NVIDIA (04/06/0a): 0 off, 1 on");
++/* LAB 23.10, запись NVIDIA: PLL ядра/ROP (0x1370e0, idx 7/8) NVIDIA НИКОГДА не перепрограммирует и не выключает — она
++ * заведена при загрузке (0x30005, coef 0x14110 = 1645 МГц) и работает постоянно; при подъёме только переключается
++ * мультиплексор 0x137100 (биты 7, 8). PLL hub06 (0x137000) при спуске тоже остаётся включённой, выключаются только
++ * hubk01 (0x137020) и copy (0x137040). nouveau же в prog_2 при КАЖДОМ подъёме гасит PLL, пишет coef, захватывает заново и
++ * переключается на неё, а при спуске выключает. Гипотеза: выход PLL сразу после захвата нечист (дрожание/выброс частоты);
++ * занятые GPC/ROP ловят сбой, простаивающие — нет (поэтому помогала пауза). lab_pll_keep: 1 — если PLL уже включена,
++ * захвачена и coef совпадает, ничего с ней не делать; при спуске (цель — делитель) PLL не выключать. */
++static uint lab_pll_keep;
++module_param(lab_pll_keep, uint, 0644);
++MODULE_PARM_DESC(lab_pll_keep, "LAB: keep core PLLs running as NVIDIA: skip reprogramming a locked PLL with the same coef, never disable on downshift (0 off, 1 on)");
 +
 +/* LAB: если не 0 — PLL ядра получает ровно эти коэффициенты (P<<16 | N<<8 | M), ядро на PLL.
 + * Проверяются пределы из BIOS: M 4-16, N 8-95, P 1-63, опора/M 25-100 МГц, VCO 1000-2000 МГц. */
@@ -337,7 +347,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +407,41 @@
+@@ -282,6 +417,41 @@
  	if (!freq)
  		return 0;
  
@@ -379,7 +389,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +451,9 @@
+@@ -291,7 +461,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -390,7 +400,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +480,8 @@
+@@ -318,6 +490,8 @@
  		info->freq = clk1;
  	}
  
@@ -399,7 +409,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -362,6 +526,43 @@
+@@ -362,6 +536,43 @@
  	);
  }
  
@@ -443,7 +453,26 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static void
  gf100_clk_prog_2(struct gf100_clk *clk, int idx)
  {
-@@ -372,16 +573,33 @@
+@@ -369,19 +580,52 @@
+ 	struct nvkm_device *device = clk->base.subdev.device;
+ 	const u32 addr = 0x137000 + (idx * 0x20);
+ 	if (idx <= 7) {
++		if (lab_pll_keep) {
++			u32 ctrl = nvkm_rd32(device, addr + 0x00), coef = nvkm_rd32(device, addr + 0x04);
++
++			if (!info->coef) {
++				nvkm_info(&clk->base.subdev, "LAB pll_keep: idx %02x цель — делитель, PLL не выключаю (ctrl %08x coef %08x)\n",
++					  idx, ctrl, coef);
++				return;
++			}
++			if ((ctrl & 0x00000001) && (ctrl & 0x00020000) && coef == info->coef) {
++				nvkm_info(&clk->base.subdev, "LAB pll_keep: idx %02x PLL уже захвачена с тем же coef %08x (ctrl %08x), не трогаю\n",
++					  idx, coef, ctrl);
++				return;
++			}
++			nvkm_info(&clk->base.subdev, "LAB pll_keep: idx %02x PLL надо программировать (ctrl %08x coef %08x -> %08x)\n",
++				  idx, ctrl, coef, info->coef);
++		}
  		nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000000);
  		nvkm_mask(device, addr + 0x00, 0x00000001, 0x00000000);
  		if (info->coef) {
@@ -480,7 +509,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +613,27 @@
+@@ -395,12 +639,27 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -510,7 +539,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -426,8 +659,75 @@
+@@ -426,8 +685,75 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -586,7 +615,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		for (j = 0; j < ARRAY_SIZE(clk->eng); j++) {
  			if (!clk->eng[j].freq)
  				continue;
-@@ -435,6 +735,38 @@
+@@ -435,6 +761,38 @@
  		}
  	}
  
@@ -625,7 +654,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +809,5 @@
+@@ -477,5 +835,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
