@@ -163,9 +163,9 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  static void
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-24 01:17:19.246799941 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 01:17:19.249628883 +0300
-@@ -23,11 +23,17 @@
+--- base/nvkm/subdev/clk/gf100.c	2026-10-24 01:47:59.083927759 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 01:47:59.086733054 +0300
+@@ -23,11 +23,18 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
  #include "priv.h"
@@ -179,11 +179,12 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +#include <core/device.h>
 +#include <engine/fifo.h>
 +#include <engine/fifo/runl.h>
++#include <subdev/mmu.h>
 +#include <linux/delay.h>
  
  struct gf100_clk_info {
  	u32 freq;
-@@ -45,6 +51,15 @@
+@@ -45,6 +52,15 @@
  
  static u32 read_div(struct gf100_clk *, int, u32, u32);
  
@@ -199,7 +200,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static u32
  read_vco(struct gf100_clk *clk, u32 dsrc)
  {
-@@ -55,6 +70,25 @@
+@@ -55,6 +71,25 @@
  	return nvkm_clk_read(&clk->base, nv_clk_src_sppll1);
  }
  
@@ -225,7 +226,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static u32
  read_pll(struct gf100_clk *clk, u32 pll)
  {
-@@ -86,6 +120,8 @@
+@@ -86,6 +121,8 @@
  	case 0x137040:
  	case 0x1370e0:
  		sclk = read_div(clk, (pll & 0xff) / 0x20, 0x137120, 0x137140);
@@ -234,7 +235,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		break;
  	default:
  		return 0;
-@@ -259,6 +295,13 @@
+@@ -259,6 +296,13 @@
  		return 0;
  
  	limits.refclk = read_div(clk, idx, 0x137120, 0x137140);
@@ -248,7 +249,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +313,112 @@
+@@ -270,6 +314,112 @@
  	return ret;
  }
  
@@ -361,7 +362,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +431,41 @@
+@@ -282,6 +432,41 @@
  	if (!freq)
  		return 0;
  
@@ -403,7 +404,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +475,9 @@
+@@ -291,7 +476,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -414,7 +415,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +504,8 @@
+@@ -318,6 +505,8 @@
  		info->freq = clk1;
  	}
  
@@ -423,7 +424,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -351,15 +539,206 @@
+@@ -351,15 +540,221 @@
  	}
  }
  
@@ -470,6 +471,17 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +static uint lab_therm_wait_us;
 +module_param(lab_therm_wait_us, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_wait_us, "LAB: extra margin after the FSRM engaged flag, us (0 = none)");
++/* LAB 24.10, зависания 01:32 и 01:38 на 03->07: сброс TLB (gf100_vmm_invalidate) запущен ровно во время скобки стадии 1,
++ * в т. ч. «пустой» скобки hubk06 (бит мультиплексора не меняется). Два отдельных изменения, проверять по одному:
++ * lab_therm_real=1 — скобка только если бит 0x137100 этого домена реально меняется (как у NVIDIA);
++ * lab_clk_mmu_lock=1 — на время стадий смены частот держать mmu->mutex (им же сериализуется сброс TLB): сброс TLB и
++ * переключение тактов не идут одновременно, как в драйвере NVIDIA (одна блокировка GPU на всё). */
++static uint lab_therm_real = 1;
++module_param(lab_therm_real, uint, 0644);
++MODULE_PARM_DESC(lab_therm_real, "LAB: bracket only when the domain mux bit really changes (0 = every stage-1/3 call, 1 = real changes only)");
++static uint lab_clk_mmu_lock = 1;
++module_param(lab_clk_mmu_lock, uint, 0644);
++MODULE_PARM_DESC(lab_clk_mmu_lock, "LAB: hold mmu->mutex (serialises TLB invalidates) across the clock programming stages (0 off, 1 on)");
 +
 +struct lab_therm_save {
 +	bool on; int i; u32 ctrl1, f2, f3, f4;
@@ -581,9 +593,13 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  gf100_clk_prog_1(struct gf100_clk *clk, int idx)
  {
  	struct nvkm_device *device = clk->base.subdev.device;
-+	struct lab_therm_save th;
++	struct lab_therm_save th = { .on = false };
++	bool chg = !!(nvkm_rd32(device, 0x137100) & (1 << idx));
 +
-+	lab_therm_enter(clk, idx, &th);
++	if (!lab_therm_real || chg)
++		lab_therm_enter(clk, idx, &th);
++	else if (lab_therm && (idx == 0 || idx == 7))
++		nvkm_info(&clk->base.subdev, "LAB therm idx %02x: стадия 1, бит не меняется — без скобки\n", idx);
  	nvkm_mask(device, 0x137100, (1 << idx), 0x00000000);
  	nvkm_msec(device, 2000,
  		if (!(nvkm_rd32(device, 0x137100) & (1 << idx)))
@@ -630,7 +646,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static void
-@@ -369,19 +748,52 @@
+@@ -369,19 +764,52 @@
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
  	if (idx <= 7) {
@@ -686,14 +702,18 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +807,31 @@
+@@ -395,12 +823,35 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
-+		struct lab_therm_save th;
++		struct lab_therm_save th = { .on = false };
++		bool chg = (nvkm_rd32(device, 0x137100) & (1 << idx)) != info->ssel;
 +
 +		nvkm_info(&clk->base.subdev, "LAB prog_3 idx %02x select PLL, 0x137100=%08x\n", idx, nvkm_rd32(device, 0x137100));
-+		lab_therm_enter(clk, idx, &th);
++		if (!lab_therm_real || chg)
++			lab_therm_enter(clk, idx, &th);
++		else if (lab_therm && (idx == 0 || idx == 7))
++			nvkm_info(&clk->base.subdev, "LAB therm idx %02x: стадия 3, бит не меняется — без скобки\n", idx);
  		nvkm_mask(device, 0x137100, (1 << idx), info->ssel);
 -		nvkm_msec(device, 2000,
 +		if (nvkm_msec(device, 2000,
@@ -720,7 +740,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -426,15 +857,124 @@
+@@ -426,15 +877,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -731,6 +751,16 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	u32 gr500 = 0, st = 0;
 +	s64 waited = 0;
 +	bool blocked = false;
++	struct nvkm_mmu *mmu = device->mmu;
++	bool mmu_locked = false;
++	u64 lk0 = 0;
++
++	if (lab_clk_mmu_lock && mmu) {
++		lk0 = ktime_get_ns();
++		mutex_lock(&mmu->mutex);
++		mmu_locked = true;
++		lk0 = ktime_get_ns() - lk0;
++	}
 +
 +	if (!gate && !wait && lab_gr_pause) {	/* старое поведение lab_gr_pause=N (тесты 6, 7) */
 +		gate = 1;
@@ -844,10 +874,14 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +		nvkm_info(&clk->base.subdev, "LAB gr: открыто обратно (0x400500=%08x 0x002630=%08x)\n",
 +			  nvkm_rd32(device, 0x400500), nvkm_rd32(device, 0x002630));
 +
++	if (mmu_locked) {
++		mutex_unlock(&mmu->mutex);
++		nvkm_info(&clk->base.subdev, "LAB clk: блокировка MMU на время стадий, ожидание захвата %llu мкс\n", lk0 / 1000);
++	}
  	return 0;
  }
  
-@@ -477,5 +1017,5 @@
+@@ -477,5 +1051,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
