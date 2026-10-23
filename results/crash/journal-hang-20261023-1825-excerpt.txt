@@ -1,0 +1,96 @@
+Oct 23 18:25:30.381955 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 23 18:25:30.382728 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+Oct 23 18:25:30.383152 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+Oct 23 18:25:30.383528 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 950000 uV (id 1)
+Oct 23 18:25:30.383839 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+Oct 23 18:25:30.384152 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+Oct 23 18:25:30.384498 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 950000 uV (cstate voltage id 1)
+Oct 23 18:25:30.384810 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 23 18:25:30.385174 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 23 18:25:30.385692 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 23 18:25:30.386112 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 23 18:25:30.386432 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 23 18:25:30.386799 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 23 18:25:30.387250 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 23 18:25:30.387592 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 23 18:25:30.387911 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 23 18:25:30.388338 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 23 18:25:30.388667 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 23 18:25:30.388991 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 23 18:25:30.389278 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 23 18:25:30.389642 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 23 18:25:30.389917 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+Oct 23 18:25:30.390280 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 135 МГц, цель 324 МГц, шагов 1 (lab_mem_replay=15)
+Oct 23 18:25:30.390559 host kernel: nouveau 0000:01:00.0: fb: LAB replay A 135->324: в memx 62 записей, 9 ожиданий, 9 пауз, пропущено 8 операций, ~200 слов
+Oct 23 18:25:30.390861 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 23 18:25:30.391162 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 493
+Oct 23 18:25:30.391484 host kernel: nouveau 0000:01:00.0: fb: LAB replay A 135->324: выполнен за 4365 мкс (op13×1 op34=1), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18010000 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+Oct 23 18:25:30.391787 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 23 18:25:30.392130 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+Oct 23 18:25:30.392452 host kernel: nouveau 0000:01:00.0: pmu: LAB gov: -> 07 (загрузка >= 15 % два замера, загрузка 187‰), ret 0, режим теперь 07
+Oct 23 18:25:33.040805 host yandex-browser.desktop[5523]: [5572:5577:1023/182533.040681:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:33.275949 host yandex-browser.desktop[5523]: [5572:5577:1023/182533.275845:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:37.634211 host yandex-browser.desktop[5523]: [5572:5577:1023/182537.634027:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:38.008338 host yandex-browser.desktop[5523]: [5572:5577:1023/182538.008194:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:38.253390 host yandex-browser.desktop[5523]: [5572:5577:1023/182538.253291:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:38.380337 host yandex-browser.desktop[5523]: [5572:5577:1023/182538.380282:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:38.495519 host yandex-browser.desktop[5523]: [5572:5577:1023/182538.495403:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:38.569142 host yandex-browser.desktop[5523]: [5572:5577:1023/182538.569061:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:38.581194 host yandex-browser.desktop[5523]: [5572:5577:1023/182538.581100:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:38.629842 host yandex-browser.desktop[5523]: [5572:5577:1023/182538.629739:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:38.635721 host yandex-browser.desktop[5523]: [5572:5577:1023/182538.635503:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:42.222432 host yandex-browser.desktop[5523]: [5572:5577:1023/182542.222265:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:43.693970 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 23 18:25:43.694851 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+Oct 23 18:25:43.695511 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+Oct 23 18:25:43.696197 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 23 18:25:43.696815 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+Oct 23 18:25:43.697522 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage
+Oct 23 18:25:43.697958 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 23 18:25:43.698448 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:25:43.698921 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:25:43.699532 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 1907000 got 1909285 ssel 00000004 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:25:43.700340 host kernel: nouveau 0000:01:00.0: clk: LAB calc_pll idx 07: опора nouveau 1620000 kHz, с делителем опоры 405000 kHz (lab_gpc_seq&8)
+Oct 23 18:25:43.701212 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 1645000 got 1645312 ssel 00000080 coef 00014110 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:25:43.701897 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 1645000 got 1645000 ssel 00000100 coef 00000000 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 23 18:25:43.702858 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 18:25:43.703752 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 23 18:25:43.704456 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 23 18:25:43.705131 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 23 18:25:43.705796 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 23 18:25:43.706499 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 23 18:25:43.707199 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 00 PLL locked ctrl 00030001 coef 00012809
+Oct 23 18:25:43.707846 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 00 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 18:25:43.708545 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 01 PLL locked ctrl 00030001 coef 00012107
+Oct 23 18:25:43.709228 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 01 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 18:25:43.709896 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 02 PLL locked ctrl 00030001 coef 00012107
+Oct 23 18:25:43.710587 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 02 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 18:25:43.711244 host kernel: nouveau 0000:01:00.0: clk: LAB prog_2 idx 07 PLL locked ctrl 00030001 coef 00014110
+Oct 23 18:25:43.711887 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_seq: idx 07 бит 0x10 не ставлю, ctrl 00030001
+Oct 23 18:25:43.712595 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 23 18:25:43.713448 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 23 18:25:43.714166 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 23 18:25:43.714487 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 02 select PLL, 0x137100=00000003
+Oct 23 18:25:43.714845 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 07 select PLL, 0x137100=00000007
+Oct 23 18:25:43.715405 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 08 select PLL, 0x137100=00000087
+Oct 23 18:25:43.715714 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 23 18:25:43.716239 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 23 18:25:43.716788 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+Oct 23 18:25:43.717426 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 324 МГц, цель 2004 МГц, шагов 1 (lab_mem_replay=15)
+Oct 23 18:25:43.718029 host kernel: nouveau 0000:01:00.0: fb: LAB replay B 324->2004: в memx 81 записей, 7 ожиданий, 12 пауз, пропущено 10 операций, ~240 слов
+Oct 23 18:25:43.718593 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 23 18:25:43.719201 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 16
+Oct 23 18:25:43.719763 host kernel: nouveau 0000:01:00.0: fb: LAB replay B 324->2004: выполнен за 3633 мкс (op13×1 op34=1), ret 0; 0x137310=89200816 0x1373f0=00000002 0x132000=18030101 0x10f290=0c3c362a 0x10f300=00000a4d 0x611200=00000030
+Oct 23 18:25:43.720344 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей после скрипта: 8
+Oct 23 18:25:43.720906 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 23 18:25:43.721500 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+Oct 23 18:25:43.722124 host kernel: nouveau 0000:01:00.0: pmu: LAB gov: -> 0f (загрузка >= 50 % два замера, загрузка 985‰), ret 0, режим теперь 0f
+Oct 23 18:25:47.670276 host yandex-browser.desktop[5523]: [5572:5577:1023/182547.670127:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:25:47.917381 host yandex-browser.desktop[5523]: [5572:5577:1023/182547.917254:ERROR:ssl_client_socket_impl.cc:1180] handshake failed; returned -1, SSL error code 1, net_error -215
+Oct 23 18:26:07.529570 host at-spi2-registryd[2616]: Disabling unresponsive app with pid 2427
+Oct 23 18:26:07.529665 host at-spi2-registryd[2616]: Disabling unresponsive app with pid 5516
+Oct 23 18:26:27.516584 host at-spi2-registryd[2616]: Re-enabling app with pid 2427
+Oct 23 18:26:28.488353 host kernel: sysrq: Emergency Sync
+Oct 23 18:26:28.496969 host kernel: Emergency Sync complete
+Oct 23 18:26:28.942281 host kernel: nouveau 0000:01:00.0: yandex_browser[5565]: failed to idle channel 6 [yandex_browser[5565]]
+Oct 23 18:26:31.440371 host kernel: sysrq: Emergency Remount R/O
