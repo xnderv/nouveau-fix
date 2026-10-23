@@ -163,8 +163,8 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  static void
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-23 23:17:23.409348007 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-23 23:17:23.412332602 +0300
+--- base/nvkm/subdev/clk/gf100.c	2026-10-23 23:36:13.389601361 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-23 23:36:13.391792440 +0300
 @@ -23,11 +23,17 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -423,10 +423,88 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -362,6 +550,43 @@
- 	);
+@@ -351,15 +539,119 @@
+ 	}
  }
  
++/* LAB 23.10, запись NVIDIA (try1 35.5529/35.5539/50.0560/50.0563, try2 аналогично): вокруг переключения мультиплексора
++ * 0x137100 для GPC (бит 0) и hubk06 (бит 7) — и только для них — драйвер NVIDIA за ~24 мкс до записи и через ~3 мкс после
++ * трогает PTHERM (0x020000, терморегулирование): «замедлитель» тактового домена FSRM (rnndb: FSRM_2[i] 0x020160+i*4,
++ * FSRM_3[i] 0x020180+i*4, FSRM_4[i] 0x0201a0+i*4; i = 0 для GPC, 1 для hubk06) и CTRL_1 (0x020004, биты 3/5/6 —
++ * включение термопорогов CRIT/2/5). До переключения: GPC FSRM_2[0]=0x000a008a, FSRM_3[0]=0xa; hubk06 FSRM_2[1]=0x20082,
++ * FSRM_3[1]=0x2; FSRM_4[i]=0x4040; CTRL_1 &= ~0x68 (термопороги выключены). После: FSRM_2[0]=0 / FSRM_2[1]=0x82,
++ * FSRM_3[i]=0, FSRM_4[i]=0x4040, CTRL_1 обратно (0x110068). То есть домен на время смены источника такта принудительно
++ * замедляется делителем FSRM (DIV2 = 10 для GPC, 2 для hubk06), а автоматика термопорогов отключается, чтобы не мешать.
++ * nouveau PTHERM при смене частот не трогает. lab_therm: 1 — как NVIDIA (значения выхода NVIDIA), 2 — после переключения
++ * вернуть наши исходные значения; lab_therm_us — пауза после входа в замедление, мкс (у NVIDIA ~24). */
++static uint lab_therm;
++module_param(lab_therm, uint, 0644);
++MODULE_PARM_DESC(lab_therm, "LAB: PTHERM FSRM slowdown bracket around GPC/hubk06 mux switch as NVIDIA: 0 off, 1 NVIDIA exit values, 2 restore ours");
++static uint lab_therm_us = 24;
++module_param(lab_therm_us, uint, 0644);
++MODULE_PARM_DESC(lab_therm_us, "LAB: delay after engaging the FSRM slowdown before the mux switch, us");
++
++struct lab_therm_save { bool on; int i; u32 ctrl1, f2, f3, f4; };
++
++static void
++lab_therm_enter(struct gf100_clk *clk, int idx, struct lab_therm_save *sv)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 e2, e3;
++
++	sv->on = false;
++	if (!lab_therm || (idx != 0 && idx != 7))
++		return;
++	sv->i = (idx == 0) ? 0 : 1;
++	e2 = (idx == 0) ? 0x000a008a : 0x00020082;
++	e3 = (idx == 0) ? 0x0000000a : 0x00000002;
++	sv->ctrl1 = nvkm_rd32(device, 0x020004);
++	sv->f2 = nvkm_rd32(device, 0x020160 + sv->i * 4);
++	sv->f3 = nvkm_rd32(device, 0x020180 + sv->i * 4);
++	sv->f4 = nvkm_rd32(device, 0x0201a0 + sv->i * 4);
++	nvkm_wr32(device, 0x020160 + sv->i * 4, e2);
++	nvkm_wr32(device, 0x020180 + sv->i * 4, e3);
++	nvkm_wr32(device, 0x0201a0 + sv->i * 4, 0x00004040);
++	nvkm_wr32(device, 0x020004, sv->ctrl1 & ~0x00000068);
++	sv->on = true;
++	if (lab_therm_us)
++		udelay(lab_therm_us);
++}
++
++static void
++lab_therm_leave(struct gf100_clk *clk, int idx, struct lab_therm_save *sv)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 x2 = (idx == 0) ? 0x00000000 : 0x00000082;
++
++	if (!sv->on)
++		return;
++	nvkm_wr32(device, 0x020160 + sv->i * 4, lab_therm >= 2 ? sv->f2 : x2);
++	nvkm_wr32(device, 0x020180 + sv->i * 4, lab_therm >= 2 ? sv->f3 : 0);
++	nvkm_wr32(device, 0x0201a0 + sv->i * 4, lab_therm >= 2 ? sv->f4 : 0x00004040);
++	nvkm_wr32(device, 0x020004, sv->ctrl1);
++	nvkm_info(&clk->base.subdev, "LAB therm idx %02x (FSRM %d): до FSRM2 %08x FSRM3 %08x FSRM4 %08x CTRL1 %08x; после %08x %08x %08x %08x; статус %08x\n",
++		  idx, sv->i, sv->f2, sv->f3, sv->f4, sv->ctrl1,
++		  nvkm_rd32(device, 0x020160 + sv->i * 4), nvkm_rd32(device, 0x020180 + sv->i * 4),
++		  nvkm_rd32(device, 0x0201a0 + sv->i * 4), nvkm_rd32(device, 0x020004), nvkm_rd32(device, 0x0201e0 + sv->i * 4));
++	sv->on = false;
++}
++
+ static void
+ gf100_clk_prog_1(struct gf100_clk *clk, int idx)
+ {
+ 	struct nvkm_device *device = clk->base.subdev.device;
++	struct lab_therm_save th;
++
++	lab_therm_enter(clk, idx, &th);
+ 	nvkm_mask(device, 0x137100, (1 << idx), 0x00000000);
+ 	nvkm_msec(device, 2000,
+ 		if (!(nvkm_rd32(device, 0x137100) & (1 << idx)))
+ 			break;
+ 	);
++	lab_therm_leave(clk, idx, &th);
++}
++
 +/* LAB: опыт с PLL ядра (idx 0). У ядра, в отличие от ROP/hub, BIOS оставляет два бита,
 + * о которых nouveau не знает: 0x137120 бит 0x1000 (источник опоры PLL) и 0x137008 бит 0x200000.
 + * lab_gpc_fix: бит0 — снять 0x1000 в 0x137120; бит1 — снять 0x200000 в 0x137008;
@@ -462,12 +540,10 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	}
 +	nvkm_info(subdev, "LAB gpc_fix=%u: 0x137120 %08x -> %08x, 0x137008 %08x -> %08x\n",
 +		  lab_gpc_fix, r120, nvkm_rd32(device, 0x137120), r008, nvkm_rd32(device, 0x137008));
-+}
-+
+ }
+ 
  static void
- gf100_clk_prog_2(struct gf100_clk *clk, int idx)
- {
-@@ -369,19 +594,52 @@
+@@ -369,19 +661,52 @@
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
  	if (idx <= 7) {
@@ -523,11 +599,14 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +653,27 @@
+@@ -395,12 +720,31 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
++		struct lab_therm_save th;
++
 +		nvkm_info(&clk->base.subdev, "LAB prog_3 idx %02x select PLL, 0x137100=%08x\n", idx, nvkm_rd32(device, 0x137100));
++		lab_therm_enter(clk, idx, &th);
  		nvkm_mask(device, 0x137100, (1 << idx), info->ssel);
 -		nvkm_msec(device, 2000,
 +		if (nvkm_msec(device, 2000,
@@ -539,7 +618,8 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +			nvkm_error(&clk->base.subdev, "LAB prog_3 idx %02x SWITCH TIMEOUT 0x137100=%08x pllctrl=%08x\n",
 +				   idx, nvkm_rd32(device, 0x137100),
 +				   idx <= 7 ? nvkm_rd32(device, 0x137000 + idx * 0x20) : 0);
-+		else if (idx == 0 && (lab_gpc_fix & 4)) {
++		lab_therm_leave(clk, idx, &th);
++		if (idx == 0 && (lab_gpc_fix & 4)) {
 +			u32 r = nvkm_rd32(device, 0x137120);
 +			if (!lab_gpc_saved) {
 +				lab_gpc_orig120 = r;
@@ -553,7 +633,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -426,15 +699,124 @@
+@@ -426,15 +770,124 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -680,7 +760,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +859,5 @@
+@@ -477,5 +930,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
