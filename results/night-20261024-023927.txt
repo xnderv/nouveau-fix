@@ -1,0 +1,3 @@
+02:39:27 ночная серия: драйвер /lib/modules/7.0.0-38-generic/updates/nouveau-fix/nouveau.ko, ядро 7.0.0-38-generic, POWEROFF=1 WAITMIN=60 DRY=0
+02:39:27 === тест 19: уровни 03-07; отличия от базы: нет
+02:39:29 тест 19: журнал hangtest-20261024-023928.txt
