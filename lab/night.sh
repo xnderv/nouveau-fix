@@ -1,5 +1,5 @@
 #!/bin/bash
-# НОЧНАЯ СЕРИЯ ТЕСТОВ (24.10). Запуск из терминала в графическом сеансе, окно браузера с нагрузкой будет на экране:
+# НОЧНАЯ СЕРИЯ ТЕСТОВ (24.10; вторая ночь: 19b, 20, 21 — тест 19 сделан в первую). Запуск из терминала в графическом сеансе, окно браузера с нагрузкой будет на экране:
 #   bash ~/Home/nouveau-fix/lab/night.sh
 # Один раз пароль sudo (дальше его держит сам hangtest: sudo вызывается каждые несколько секунд).
 # Экран не гаснет и система не засыпает (gnome-session-inhibit; проверяется перед стартом). Тесты по очереди, по 60
@@ -35,10 +35,13 @@ if [ "$DRY" != 1 ]; then
     [ "$INH" = "(true,)" ] || { echo "Запрет гашения экрана не работает ($INH) — экран погаснет, тесты будут без нагрузки. Не запускаю."; exit 1; }
     sudo -v || exit 1
     # подстраховка к запрету: гашение экрана GNOME «никогда» на время серии, ваше значение вернётся перед выключением
-    OLD_IDLE="$(gsettings get org.gnome.desktop.session idle-delay 2>/dev/null)"
+    # исходное значение — в файл: если машина встанет намертво, вернуть его некому (24.10 осталось 0); следующий запуск возьмёт из файла
+    IDLE_SAVE="$(dirname "$FLAG")/night-idle-delay.saved"
+    [ -s "$IDLE_SAVE" ] || gsettings get org.gnome.desktop.session idle-delay > "$IDLE_SAVE" 2>/dev/null
+    OLD_IDLE="$(cat "$IDLE_SAVE")"
     gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null
 fi
-restore_idle() { [ -n "${OLD_IDLE:-}" ] && gsettings set org.gnome.desktop.session idle-delay "${OLD_IDLE#uint32 }" 2>/dev/null; OLD_IDLE=""; }
+restore_idle() { [ -n "${OLD_IDLE:-}" ] && gsettings set org.gnome.desktop.session idle-delay "${OLD_IDLE#uint32 }" 2>/dev/null && rm -f "${IDLE_SAVE:-}"; OLD_IDLE=""; }
 trap restore_idle EXIT
 mkdir -p "$RES"; LOG="$RES/night-$(date +%Y%m%d-%H%M%S).txt"; MARK="$RES/.night-mark"
 say() { echo "$(date +%T) $*" | tee -a "$LOG"; sync; }
@@ -108,11 +111,14 @@ run() {   # run ИМЯ НИЗ-ВЕРХ [параметр=значение ...]
     grep -q "ЗАВИСАНИЕ ВОСПРОИЗВЕДЕНО" "$R" && hung "$name"
     grep -q "подъёмов без зависания" "$R" || { say "тест $name не дошёл до конца (код $rc) — серия остановлена"; finish_night clean; }
 }
+systemctl is-active -q gpu-blackbox && grep "### blackbox start" /var/log/gpu-blackbox/current.txt 2>/dev/null | tail -n1 | grep -q " v4" \
+    || say "⚠ чёрный ящик не v4 или не запущен — температуры процессора в ящике не будет"
 say "ночная серия: драйвер $(modinfo -n nouveau 2>/dev/null), ядро $(uname -r), POWEROFF=$POWEROFF WAITMIN=$WAITMIN DRY=$DRY"
-run 19  03-07                                   # скобка вокруг пост-делителей (тест 18 + одно изменение)
-run 19b 07-0f                                   # та же конфигурация на проверенной паре 07↔0f
-run 21  03-07 lab_clk_mmu_lock=1                # + блокировка MMU (= значения по умолчанию)
-run 20  03-07 lab_therm=0 lab_therm_div=0       # контроль: без скобки вообще, как до 24.10
+# Тест 19 (03↔07 с этой базой) прошёл в первую ночь: зависание на 32-м подъёме, машина встала целиком.
+# Порядок — от меньшего риска встать намертво к большему: зависание обрывает серию.
+run 19b 07-0f                                   # база на проверенной паре 07↔0f (240 подъёмов без lab_therm_div) — не сломал ли её lab_therm_div
+run 20  03-07 lab_therm=0                       # контроль: скобки нет совсем (lab_therm=0 выключает и стадию 4), как до 24.10
+run 21  03-07 lab_clk_mmu_lock=1                # база + блокировка MMU на время стадий частот
 setp lab_therm=1 lab_therm_div=1 lab_clk_mmu_lock=1
 say "=== серия закончена без зависаний; параметры по умолчанию, регулятор оставлен выключенным"
 finish_night clean

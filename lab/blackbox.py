@@ -5,7 +5,8 @@
 # недоступен; строки самого драйвера при этом пишет ядро в console-ramoops (уровень консоли 7). Только читает карту.
 # Строка: время | режим (pstate) | загрузка по прошивке PMU | температура | 0x611200 (вывод) 0x137100 (PLL select)
 #         0x1373f0 (память на PLL?) 0x10a4a0/0x10a4b0 (очередь команд PMU) | gr700 (0x400700, состояние GR)
-#         eng0 (0x002640, GR глазами FIFO) fifo (0x002100, прерывания FIFO) | что переключал регулятор (из dmesg)
+#         eng0 (0x002640, GR глазами FIFO) fifo (0x002100, прерывания FIFO) ... cpu (температура процессора, v4)
+#         | что переключал регулятор (из dmesg)
 # Версия 3 (23.10): снимок по зависанию. Два зависания 23.10 выглядели как gr=1000‰ подряд, ядро живо.
 # Если загрузка GR >= 999‰ держится HANG_SEC секунд подряд или в журнале ядра появилось
 # «failed to idle channel»/«SCHED_ERROR»/«runl», один раз пишется /var/log/gpu-blackbox/hang-ДАТА.txt:
@@ -29,6 +30,11 @@ def ac():
 hw = next((h for h in glob.glob('/sys/class/hwmon/hwmon*') if 'nouveau' in open(h + '/name').read()), None)
 def temp():
     try: return int(open(hw + '/temp1_input').read()) // 1000
+    except Exception: return -1
+# 24.10: температура процессора (coretemp, Package id 0) — после зависания 02:46 был вопрос о перегреве, а её никто не писал
+cpuhw = next((h for h in glob.glob('/sys/class/hwmon/hwmon*') if open(h + '/name').read().strip() == 'coretemp'), None)
+def cputemp():
+    try: return int(open(cpuhw + '/temp1_input').read()) // 1000
     except Exception: return -1
 dev = next((d for d in glob.glob('/sys/bus/pci/devices/*')
             if open(d + '/vendor').read().strip() == '0x10de' and open(d + '/class').read().startswith('0x03')), None)
@@ -75,7 +81,7 @@ def snapshot(reason, tail):
 
 os.makedirs(LOG, exist_ok=True); out = open(f'{LOG}/current.txt', 'ab', buffering=0)
 kfd = os.open('/dev/kmsg', os.O_RDONLY | os.O_NONBLOCK); os.lseek(kfd, 0, os.SEEK_END)
-out.write(f'### blackbox start {time.strftime("%F %T")} kernel {os.uname().release} driver {"lab" if rp("lab_gov","")!="" else "stable" if rp("gf114_gov","")!="" else "stock"} v3\n'.encode())
+out.write(f'### blackbox start {time.strftime("%F %T")} kernel {os.uname().release} driver {"lab" if rp("lab_gov","")!="" else "stable" if rp("gf114_gov","")!="" else "stock"} v4\n'.encode())
 tail, busy, last_snap = [], 0, -float(REARM_SEC)   # -REARM: иначе первые 10 мин после загрузки снимок не делается (ошибка 23.10)
 while True:
     ev, trig = [], ''
@@ -93,7 +99,7 @@ while True:
     t = rp('lab_gov_temp', rp('gf114_temp'))
     line = (f'{time.strftime("%T")} | {ac()} | gr {gr}‰ vid {vid}‰ | {temp()}C/{t} | '
             f'611200={rd(0x611200):08x} 137100={rd(0x137100):08x} 1373f0={rd(0x1373f0):08x} pmuq={rd(0x10a4a0):x}/{rd(0x10a4b0):x} | '
-            f'gr700={rd(0x400700):08x} eng0={rd(0x002640):08x} fifo={rd(0x002100):08x} xbar={rd(0x13c054):x}/{rd(0x13c844):x}/{rd(0x13ec14):x} e9e0={rd(0x00e9e0):08x} 1548={rd(0x001548):08x}'
+            f'gr700={rd(0x400700):08x} eng0={rd(0x002640):08x} fifo={rd(0x002100):08x} xbar={rd(0x13c054):x}/{rd(0x13c844):x}/{rd(0x13ec14):x} e9e0={rd(0x00e9e0):08x} 1548={rd(0x001548):08x} cpu={cputemp()}C'
             + (' | ' + ' ;; '.join(ev) if ev else '') + '\n')
     out.write(line.encode()); os.fsync(out.fileno())
     tail = (tail + [line])[-15:]
