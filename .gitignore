@@ -8,3 +8,5 @@ photo_bios/
 nouveau-archive/
 lab/__pycache__/
 results/.night-mark
+results/night-journal-*
+results/hang-*.txt
