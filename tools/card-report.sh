@@ -34,9 +34,11 @@ sudo -v || exit 1
 
 OUT="$(mktemp -d)"; trap 'rm -rf "$OUT"' EXIT
 
-# 2. образ VBIOS: через debugfs nouveau (как его видит драйвер), иначе — ПЗУ карты через sysfs
+# 2. образ VBIOS: через debugfs nouveau (рабочая копия, с которой работает драйвер), иначе — ПЗУ карты через sysfs.
+# /sys/kernel/debug доступен только root: список каталогов берём через sudo, а не шаблоном оболочки (24.10: шаблон без
+# прав не раскрывался, и скрипт молча брал сырое ПЗУ — в нём таблицы лежат иначе и разбор выходит пустым).
 got=""
-for n in /sys/kernel/debug/dri/*; do
+for n in $(sudo sh -c 'ls -d /sys/kernel/debug/dri/* 2>/dev/null'); do
     if sudo grep -qs "$BDF" "$n/name" && sudo test -e "$n/vbios.rom"; then
         sudo cat "$n/vbios.rom" > "$OUT/vbios.rom" && got="nouveau debugfs ($n)"
         sudo cat "$n/pstate" > "$OUT/pstate.txt" 2>/dev/null
@@ -53,6 +55,9 @@ if [ -z "$got" ] || [ "$(head -c 2 "$OUT/vbios.rom" 2>/dev/null | od -An -tx1 | 
 fi
 sudo chown "$(id -u):$(id -g)" "$OUT"/* 2>/dev/null
 say "VBIOS: $(stat -c %s "$OUT/vbios.rom") bytes, read via $got"
+echo "vbios source: $got" > "$OUT/source.txt"
+case "$got" in PCI*) say "Note: this is the raw ROM; its tables may not decode. If you can, load nouveau and run again."
+                     say "(Это сырое ПЗУ — таблицы в нём могут не разобраться. По возможности запустите снова под nouveau.)";; esac
 
 # 3. системные сведения (без имени машины и пользователя)
 {

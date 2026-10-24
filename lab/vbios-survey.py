@@ -83,6 +83,8 @@ def parse(b):
         r['perf'] = {'ver': '40', 'len': ln, 'snr': snr, 'ssz': ssz, 'levels': lv}
     elif perf:
         r['perf'] = {'ver': f'{r8(perf):02x}'}
+        r['err'] = (f'таблица уровней по указателю {perf:#x} не найдена (версия {r8(perf):#04x}): похоже на сырой образ ПЗУ, '
+                    f'а не рабочую копию из nouveau (debugfs) / perf table not found: looks like a raw ROM image')
     # rammap + ramcfg
     if rammap and r8(rammap) in (0x10, 0x11):
         ver, hdr, cnt, ln, snr, ssz = r8(rammap), r8(rammap + 1), r8(rammap + 5), r8(rammap + 2), r8(rammap + 4), r8(rammap + 3)
