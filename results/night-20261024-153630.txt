@@ -1,0 +1,39 @@
+15:36:30 серия: драйвер /lib/modules/7.0.0-38-generic/updates/nouveau-fix/nouveau.ko, ядро 7.0.0-38-generic, POWEROFF=0 WAITMIN=60 DRY=0
+15:36:31 === тест 31: уровни 03-0f-07; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1
+15:36:33 тест 31: журнал hangtest-20261024-153632.txt
+15:51:31 тест 31: закончился, код 0
+15:51:25 подъём 60/60 в 15:51:19.053: gr до 998‰, скрипт B 13932 мкс, после: core 900 MHz memory 2004 MHz, gr 293‰
+=== 60 подъёмов без зависания (нагрузка browser). Лог: /home/user/Home/nouveau-fix/results/hangtest-20261024-153632.txt
+15:51:30 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+15:51:32 === тест 32: уровни 03-0f-07; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_volt_wait_us=200
+15:51:34 тест 32: журнал hangtest-20261024-155133.txt
+16:06:33 тест 32: закончился, код 0
+16:06:20 подъём 60/60 в 16:06:13.566: gr до 997‰, скрипт B 16666 мкс, после: core 900 MHz memory 2004 MHz, gr 267‰
+=== 60 подъёмов без зависания (нагрузка browser). Лог: /home/user/Home/nouveau-fix/results/hangtest-20261024-155133.txt
+16:06:24 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+16:06:33 === тест 33а: уровни 03-0f-07; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_e9e0=1
+16:06:36 тест 33а: журнал hangtest-20261024-160634.txt
+16:21:34 тест 33а: закончился, код 0
+16:21:21 подъём 60/60 в 16:21:15.049: gr до 992‰, скрипт B 16797 мкс, после: core 900 MHz memory 2004 MHz, gr 224‰
+=== 60 подъёмов без зависания (нагрузка browser). Лог: /home/user/Home/nouveau-fix/results/hangtest-20261024-160634.txt
+16:21:26 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+16:21:35 === тест 33б: уровни 03-0f-07; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_nv_22680=1
+16:21:37 тест 33б: журнал hangtest-20261024-162136.txt
+16:36:15 тест 33б: закончился, код 0
+16:36:02 подъём 60/60 в 16:35:55.935: gr до 997‰, скрипт B 16697 мкс, после: core 900 MHz memory 2004 MHz, gr 233‰
+=== 60 подъёмов без зависания (нагрузка browser). Лог: /home/user/Home/nouveau-fix/results/hangtest-20261024-162136.txt
+16:36:07 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+16:36:16 === тест 34а: уровни 03-0f-07; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_order=1
+16:36:18 тест 34а: журнал hangtest-20261024-163617.txt
+16:50:56 тест 34а: закончился, код 0
+16:50:51 подъём 60/60 в 16:50:44.378: gr до 997‰, скрипт B 16683 мкс, после: core 900 MHz memory 2004 MHz, gr 245‰
+=== 60 подъёмов без зависания (нагрузка browser). Лог: /home/user/Home/nouveau-fix/results/hangtest-20261024-163617.txt
+16:50:55 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+16:50:57 === тест 34б: уровни 03-0f-07; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_pll_keep=1
+16:50:59 тест 34б: журнал hangtest-20261024-165058.txt
+16:56:11 тест 34б: закончился, код 2
+    Нагрузка оставлена, lab_gov=0.
+    Снимок регистров: /var/log/gpu-blackbox/hang-*.txt (чёрный ящик). Журнал: journalctl -k -b 0 --since '2026-10-24 16:50:58'
+    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show
+16:56:11 ЗАВИСАНИЕ в тесте 34б — сохраняю журнал ядра, ящик и новые снимки
+16:56:12 POWEROFF=0 — машину не выключаю

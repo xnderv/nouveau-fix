@@ -1,0 +1,295 @@
+Oct 24 16:54:16.068091 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 24 16:54:16.068767 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: спуск — PCIe в конце (lab_nv_pcie_late=1, как NVIDIA)
+Oct 24 16:54:16.069132 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 950000 uV (id 0)
+Oct 24 16:54:16.069440 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage (память вместе с hubk07)
+Oct 24 16:54:16.069788 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 950000 uV (cstate voltage id 0)
+Oct 24 16:54:16.070118 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: путь NVIDIA (lab_gpc_div): want 101000 got 101250, VCO 1620000, ddiv 80000202 mdiv 8000000e, без PLL
+Oct 24 16:54:16.070471 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 270000 got 270000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000a0a mdiv 00000000
+Oct 24 16:54:16.070868 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 270000 got 270000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000a0a mdiv 00000000
+Oct 24 16:54:16.071232 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 270000 got 270000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000a
+Oct 24 16:54:16.071625 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 24 16:54:16.071952 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 135000 got 135000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000016
+Oct 24 16:54:16.072333 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: PMU как у NVIDIA (lab_pmu_div): want 203000 got 202500, VCO 1620000, mdiv 80000e0e
+Oct 24 16:54:16.072700 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 135000 got 135000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000016
+Oct 24 16:54:16.073003 host kernel: nouveau 0000:01:00.0: clk: LAB nv_hub07mem: hubk07, память, ядро без hubk07
+Oct 24 16:54:16.073411 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 16:54:16.073735 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 16:54:16.074048 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 16:54:16.074364 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 02 цель — делитель, PLL не выключаю (ctrl 00030005 coef 00012107)
+Oct 24 16:54:16.074672 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 16:54:16.074982 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 16:54:16.075310 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+Oct 24 16:54:16.075615 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 324 МГц, цель 135 МГц, шагов 2 (lab_mem_replay=15)
+Oct 24 16:54:16.075920 host kernel: nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: в memx 37 записей, 9 ожиданий, 8 пауз, пропущено 6 операций, ~145 слов
+Oct 24 16:54:16.076246 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 16:54:16.085084 host kernel: nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: выполнен за 16682 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18010000 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+Oct 24 16:54:16.085742 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 1
+Oct 24 16:54:16.086479 host kernel: nouveau 0000:01:00.0: fb: LAB replay E 324->135: в memx 58 записей, 5 ожиданий, 10 пауз, пропущено 8 операций, ~174 слов
+Oct 24 16:54:16.087320 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 16:54:16.102097 host kernel: nouveau 0000:01:00.0: fb: LAB replay E 324->135: выполнен за 16129 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=81201616 0x1373f0=00000001 0x132000=18010000 0x10f290=02060505 0x10f300=00000115 0x611200=00000030
+Oct 24 16:54:16.102973 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 24 16:54:16.103792 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 16:54:16.104343 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 16:54:16.104837 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:16.105442 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2717 нс (чтений 2, статус 0002000a), запас 0 мкс
+Oct 24 16:54:16.105941 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:16.106407 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2251 нс (чтений 2, статус 00020002), запас 0 мкс
+Oct 24 16:54:16.106727 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 16:54:16.107019 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 00 цель — делитель, PLL не выключаю (ctrl 00030005 coef 00012809)
+Oct 24 16:54:16.107372 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 01 цель — делитель, PLL не выключаю (ctrl 00030005 coef 00012107)
+Oct 24 16:54:16.107727 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 07 цель — делитель, PLL не выключаю (ctrl 00030005 coef 00014110)
+Oct 24 16:54:16.108049 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 16:54:16.108397 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 16:54:16.108723 host kernel: nouveau 0000:01:00.0: clk: LAB prog_4 idx 00: пост-делитель 81200000 -> 000e под скобкой
+Oct 24 16:54:16.109018 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:16.109392 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 4881 нс (чтений 1, статус 0002000a), запас 0 мкс
+Oct 24 16:54:16.109733 host kernel: nouveau 0000:01:00.0: clk: LAB prog_4 idx 07: пост-делитель 81200002 -> 000a под скобкой
+Oct 24 16:54:16.110003 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:16.110315 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2736 нс (чтений 2, статус 00020002), запас 0 мкс
+Oct 24 16:54:16.110652 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 24 16:54:16.110935 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255 (в конце спуска)
+Oct 24 16:54:16.111271 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+Oct 24 16:54:16.111562 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+Oct 24 16:54:21.276085 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 24 16:54:21.276614 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+Oct 24 16:54:21.276966 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+Oct 24 16:54:21.277286 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 24 16:54:21.277575 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage (память вместе с hubk07)
+Oct 24 16:54:21.277867 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 24 16:54:21.278159 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 16:54:21.278488 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 16:54:21.278782 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 1907000 got 1909285 ssel 00000004 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 16:54:21.279053 host kernel: nouveau 0000:01:00.0: clk: LAB calc_pll idx 07: опора nouveau 1620000 kHz, с делителем опоры 405000 kHz (lab_gpc_seq&8)
+Oct 24 16:54:21.279339 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 1645000 got 1645312 ssel 00000080 coef 00014110 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 16:54:21.279652 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 1645000 got 1645000 ssel 00000100 coef 00000000 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 16:54:21.279951 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 24 16:54:21.280277 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: PMU как у NVIDIA (lab_pmu_div): want 203000 got 202500, VCO 1620000, mdiv 80000e0e
+Oct 24 16:54:21.280540 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 24 16:54:21.280813 host kernel: nouveau 0000:01:00.0: clk: LAB nv_hub07mem: ядро без hubk07, память, hubk07
+Oct 24 16:54:21.281080 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 16:54:21.281358 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 16:54:21.281622 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:21.281903 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2368 нс (чтений 2, статус 0002000a), запас 0 мкс
+Oct 24 16:54:21.282207 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:21.282485 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2357 нс (чтений 2, статус 00020002), запас 0 мкс
+Oct 24 16:54:21.282749 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 16:54:21.282998 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 00 PLL уже захвачена с тем же coef 00012809 (ctrl 00030005), не трогаю
+Oct 24 16:54:21.283312 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 01 PLL уже захвачена с тем же coef 00012107 (ctrl 00030005), не трогаю
+Oct 24 16:54:21.283670 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 07 PLL уже захвачена с тем же coef 00014110 (ctrl 00030005), не трогаю
+Oct 24 16:54:21.283950 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 16:54:21.284290 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 24 16:54:21.284583 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_pre405: делительный путь на VCO/4 перед PLL: 0x1371d0 81200202 -> 81200202, 0x137250 8120000e -> 81200002
+Oct 24 16:54:21.285056 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:21.285346 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2366 нс (чтений 2, статус 0002000a), запас 0 мкс
+Oct 24 16:54:21.285650 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 24 16:54:21.286055 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 07 select PLL, 0x137100=00000003
+Oct 24 16:54:21.286439 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:21.286925 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2376 нс (чтений 2, статус 00020002), запас 0 мкс
+Oct 24 16:54:21.287505 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 08 select PLL, 0x137100=00000083
+Oct 24 16:54:21.288139 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 16:54:21.289024 host kernel: nouveau 0000:01:00.0: clk: LAB prog_4 idx 00: пост-делитель 81200002 -> 0000 под скобкой
+Oct 24 16:54:21.289587 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:21.290188 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2135 нс (чтений 3, статус 0002000a), запас 0 мкс
+Oct 24 16:54:21.290518 host kernel: nouveau 0000:01:00.0: clk: LAB prog_4 idx 07: пост-делитель 8120000a -> 0000 под скобкой
+Oct 24 16:54:21.290893 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:21.291327 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2132 нс (чтений 3, статус 00020002), запас 0 мкс
+Oct 24 16:54:21.291681 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+Oct 24 16:54:21.292086 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 135 МГц, цель 2004 МГц, шагов 2 (lab_mem_replay=15)
+Oct 24 16:54:21.292409 host kernel: nouveau 0000:01:00.0: fb: LAB replay A 135->324: в memx 62 записей, 9 ожиданий, 9 пауз, пропущено 8 операций, ~200 слов
+Oct 24 16:54:21.292734 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 16:54:21.293044 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 493
+Oct 24 16:54:21.293390 host kernel: nouveau 0000:01:00.0: fb: LAB replay A 135->324: выполнен за 13221 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18010000 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+Oct 24 16:54:21.293722 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 1
+Oct 24 16:54:21.294056 host kernel: nouveau 0000:01:00.0: fb: LAB replay B 324->2004: в memx 81 записей, 7 ожиданий, 12 пауз, пропущено 10 операций, ~240 слов
+Oct 24 16:54:21.294360 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 16:54:21.294630 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 16
+Oct 24 16:54:21.306079 host kernel: nouveau 0000:01:00.0: fb: LAB replay B 324->2004: выполнен за 16747 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=89200816 0x1373f0=00000002 0x132000=18030101 0x10f290=0c3c362a 0x10f300=00000a4d 0x611200=00000030
+Oct 24 16:54:21.306622 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей после скрипта: 8
+Oct 24 16:54:21.307337 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 24 16:54:21.307791 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 16:54:21.308312 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 16:54:21.308698 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 16:54:21.309217 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 02 PLL уже захвачена с тем же coef 00012107 (ctrl 00030005), не трогаю
+Oct 24 16:54:21.309701 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 16:54:21.310121 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 02 select PLL, 0x137100=00000183
+Oct 24 16:54:21.310542 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 16:54:21.310850 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 24 16:54:21.311174 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+Oct 24 16:54:27.794077 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 24 16:54:27.794724 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: спуск — PCIe в конце (lab_nv_pcie_late=1, как NVIDIA)
+Oct 24 16:54:27.795017 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 1)
+Oct 24 16:54:27.795460 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage (память вместе с hubk07)
+Oct 24 16:54:27.795925 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 1)
+Oct 24 16:54:27.796397 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: путь NVIDIA (lab_gpc_div): want 810000 got 810000, VCO 1620000, ddiv 80000202 mdiv 00000000, без PLL
+Oct 24 16:54:27.796849 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 24 16:54:27.797169 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 24 16:54:27.797516 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 24 16:54:27.797819 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 24 16:54:27.798119 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 24 16:54:27.798432 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: PMU как у NVIDIA (lab_pmu_div): want 203000 got 202500, VCO 1620000, mdiv 80000e0e
+Oct 24 16:54:27.798759 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 24 16:54:27.799053 host kernel: nouveau 0000:01:00.0: clk: LAB nv_hub07mem: hubk07, память, ядро без hubk07
+Oct 24 16:54:27.799380 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 16:54:27.799685 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 16:54:27.800005 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 16:54:27.800467 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 02 цель — делитель, PLL не выключаю (ctrl 00030005 coef 00012107)
+Oct 24 16:54:27.800778 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 16:54:27.801061 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 16:54:27.801381 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+Oct 24 16:54:27.801690 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 2004 МГц, цель 324 МГц, шагов 2 (lab_mem_replay=15)
+Oct 24 16:54:27.801998 host kernel: nouveau 0000:01:00.0: fb: LAB replay C 2004->324: в memx 76 записей, 9 ожиданий, 10 пауз, пропущено 13 операций, ~231 слов
+Oct 24 16:54:27.802330 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 16:54:27.802631 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 7
+Oct 24 16:54:27.802935 host kernel: nouveau 0000:01:00.0: fb: LAB replay C 2004->324: выполнен за 310 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18030001 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+Oct 24 16:54:27.803272 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 1
+Oct 24 16:54:27.803573 host kernel: nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): в memx 37 записей, 9 ожиданий, 8 пауз, пропущено 6 операций, ~145 слов
+Oct 24 16:54:27.803878 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 16:54:27.804169 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 20
+Oct 24 16:54:27.812096 host kernel: nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): выполнен за 16637 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18010000 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+Oct 24 16:54:27.812649 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей после скрипта: 16
+Oct 24 16:54:27.812976 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 24 16:54:27.813340 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 16:54:27.813648 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 16:54:27.823109 host kernel: workqueue: nvkm_pstate_work [nouveau] hogged CPU for >10000us 4 times, consider switching to WQ_UNBOUND
+Oct 24 16:54:29.812188 host kernel: ------------[ cut here ]------------
+Oct 24 16:54:29.812287 host kernel: nouveau 0000:01:00.0: timeout
+Oct 24 16:54:29.812313 host kernel: WARNING: nvkm/subdev/clk/gf100.c:826 at gf100_clk_prog_1+0x262/0x3f0 [nouveau], CPU#7: kworker/7:1/44669
+Oct 24 16:54:29.812472 host kernel: CPU: 7 UID: 0 PID: 44669 Comm: kworker/7:1 Kdump: loaded Tainted: G        W  OE       7.0.0-38-generic #38-Ubuntu PREEMPT(lazy) 
+Oct 24 16:54:29.812495 host kernel: Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+Oct 24 16:54:29.812514 host kernel: Hardware name: Gigabyte Technology Co., Ltd. To be filled by O.E.M./Z68X-UD3P-B3, BIOS U1g 11/13/2017
+Oct 24 16:54:29.812531 host kernel: Workqueue: events nvkm_pstate_work [nouveau]
+Oct 24 16:54:29.813390 host kernel: ---[ end trace 0000000000000000 ]---
+Oct 24 16:54:29.813417 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:29.814002 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2304 нс (чтений 3, статус 0002000a), запас 0 мкс
+Oct 24 16:54:29.814756 host kernel: nouveau 0000:01:00.0: clk: LAB nv_hubpost idx 07: пост-делитель 81200000 -> 81200002 до мультиплексора
+Oct 24 16:54:29.815378 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:29.816057 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2126 нс (чтений 3, статус 00020002), запас 0 мкс
+Oct 24 16:54:29.816699 host kernel: nouveau 0000:01:00.0: clk: LAB nv_hubpost idx 08: пост-делитель 81200000 -> 81200002 до мультиплексора
+Oct 24 16:54:29.817050 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 16:54:29.817474 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 00 цель — делитель, PLL не выключаю (ctrl 00030005 coef 00012809)
+Oct 24 16:54:29.817910 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 01 цель — делитель, PLL не выключаю (ctrl 00030005 coef 00012107)
+Oct 24 16:54:29.818347 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 07 цель — делитель, PLL не выключаю (ctrl 00030005 coef 00014110)
+Oct 24 16:54:29.818798 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 16:54:29.819247 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 16:54:29.819901 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 24 16:54:29.820626 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255 (в конце спуска)
+Oct 24 16:54:29.821464 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+Oct 24 16:54:29.822150 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+Oct 24 16:54:31.846078 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 24 16:54:31.846739 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: спуск — PCIe в конце (lab_nv_pcie_late=1, как NVIDIA)
+Oct 24 16:54:31.847365 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 950000 uV (id 0)
+Oct 24 16:54:31.848130 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage (память вместе с hubk07)
+Oct 24 16:54:31.848783 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 950000 uV (cstate voltage id 0)
+Oct 24 16:54:31.849450 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: путь NVIDIA (lab_gpc_div): want 101000 got 101250, VCO 1620000, ddiv 80000202 mdiv 8000000e, без PLL
+Oct 24 16:54:31.850147 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 270000 got 270000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000a0a mdiv 00000000
+Oct 24 16:54:31.850755 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 270000 got 270000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000a0a mdiv 00000000
+Oct 24 16:54:31.851387 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 270000 got 270000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000a
+Oct 24 16:54:31.852022 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 24 16:54:31.852662 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 135000 got 135000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000016
+Oct 24 16:54:31.853325 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: PMU как у NVIDIA (lab_pmu_div): want 203000 got 202500, VCO 1620000, mdiv 80000e0e
+Oct 24 16:54:31.854006 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 135000 got 135000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000016
+Oct 24 16:54:31.854723 host kernel: nouveau 0000:01:00.0: clk: LAB nv_hub07mem: hubk07, память, ядро без hubk07
+Oct 24 16:54:31.855377 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 16:54:31.856137 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 16:54:31.856925 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 16:54:31.857637 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 02 цель — делитель, PLL не выключаю (ctrl 00030005 coef 00012107)
+Oct 24 16:54:31.858295 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 16:54:31.858970 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 16:54:31.859798 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+Oct 24 16:54:31.860491 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 324 МГц, цель 135 МГц, шагов 2 (lab_mem_replay=15)
+Oct 24 16:54:31.860855 host kernel: nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: в memx 37 записей, 9 ожиданий, 8 пауз, пропущено 6 операций, ~145 слов
+Oct 24 16:54:31.861369 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 16:54:31.865087 host kernel: nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: выполнен за 16571 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18010000 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+Oct 24 16:54:31.865717 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 1
+Oct 24 16:54:31.866198 host kernel: nouveau 0000:01:00.0: fb: LAB replay E 324->135: в memx 58 записей, 5 ожиданий, 10 пауз, пропущено 8 операций, ~174 слов
+Oct 24 16:54:31.866708 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 16:54:31.882084 host kernel: nouveau 0000:01:00.0: fb: LAB replay E 324->135: выполнен за 16464 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=81201616 0x1373f0=00000001 0x132000=18010000 0x10f290=02060505 0x10f300=00000115 0x611200=00000030
+Oct 24 16:54:31.882618 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 24 16:54:31.883285 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 16:54:31.883769 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 16:54:31.884246 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:31.884711 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2339 нс (чтений 2, статус 0002000a), запас 0 мкс
+Oct 24 16:54:31.885181 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:31.885599 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2242 нс (чтений 2, статус 00020002), запас 0 мкс
+Oct 24 16:54:31.885965 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 16:54:31.886381 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 00 цель — делитель, PLL не выключаю (ctrl 00030005 coef 00012809)
+Oct 24 16:54:31.886758 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 01 цель — делитель, PLL не выключаю (ctrl 00030005 coef 00012107)
+Oct 24 16:54:31.887191 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 07 цель — делитель, PLL не выключаю (ctrl 00030005 coef 00014110)
+Oct 24 16:54:31.887626 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 16:54:31.888017 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 16:54:31.888434 host kernel: nouveau 0000:01:00.0: clk: LAB prog_4 idx 00: пост-делитель 81200000 -> 000e под скобкой
+Oct 24 16:54:31.888866 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:31.889292 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2250 нс (чтений 2, статус 0002000a), запас 0 мкс
+Oct 24 16:54:31.889814 host kernel: nouveau 0000:01:00.0: clk: LAB prog_4 idx 07: пост-делитель 81200002 -> 000a под скобкой
+Oct 24 16:54:31.890285 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:31.890851 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2277 нс (чтений 2, статус 00020002), запас 0 мкс
+Oct 24 16:54:31.891636 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 24 16:54:31.892375 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255 (в конце спуска)
+Oct 24 16:54:31.893139 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+Oct 24 16:54:31.893870 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+Oct 24 16:54:35.315096 host kernel: nouveau 0000:01:00.0: bus: MMIO write of 00000002 FAULT at 13b154 [ PRIVRING ]
+Oct 24 16:54:35.657087 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 24 16:54:35.657503 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+Oct 24 16:54:35.657811 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+Oct 24 16:54:35.658464 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 1075000 uV (id 2)
+Oct 24 16:54:35.659185 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage (память вместе с hubk07)
+Oct 24 16:54:35.659903 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 1075000 uV (cstate voltage id 2)
+Oct 24 16:54:35.660681 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 1800000 got 1800000 ssel 00000001 coef 00012809 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 16:54:35.661435 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 1907000 got 1909285 ssel 00000002 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 16:54:35.662183 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 1907000 got 1909285 ssel 00000004 coef 00012107 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 16:54:35.662879 host kernel: nouveau 0000:01:00.0: clk: LAB calc_pll idx 07: опора nouveau 1620000 kHz, с делителем опоры 405000 kHz (lab_gpc_seq&8)
+Oct 24 16:54:35.663654 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 1645000 got 1645312 ssel 00000080 coef 00014110 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 16:54:35.664355 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 1645000 got 1645000 ssel 00000100 coef 00000000 dsrc 00000000 ddiv 00000000 mdiv 00000000
+Oct 24 16:54:35.665080 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 24 16:54:35.665869 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: PMU как у NVIDIA (lab_pmu_div): want 203000 got 202500, VCO 1620000, mdiv 80000e0e
+Oct 24 16:54:35.666541 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 540000 got 540000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000004
+Oct 24 16:54:35.667216 host kernel: nouveau 0000:01:00.0: clk: LAB nv_hub07mem: ядро без hubk07, память, hubk07
+Oct 24 16:54:35.667878 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 16:54:35.668589 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 16:54:35.669258 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:35.670053 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2337 нс (чтений 2, статус 0002000a), запас 0 мкс
+Oct 24 16:54:35.670770 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:35.671536 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2372 нс (чтений 2, статус 00020002), запас 0 мкс
+Oct 24 16:54:35.672173 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 16:54:35.672835 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 00 PLL уже захвачена с тем же coef 00012809 (ctrl 00030005), не трогаю
+Oct 24 16:54:35.673546 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 01 PLL уже захвачена с тем же coef 00012107 (ctrl 00030005), не трогаю
+Oct 24 16:54:35.674177 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 07 PLL уже захвачена с тем же coef 00014110 (ctrl 00030005), не трогаю
+Oct 24 16:54:35.674807 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 16:54:35.675471 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 00 select PLL, 0x137100=00000000
+Oct 24 16:54:35.676194 host kernel: nouveau 0000:01:00.0: clk: LAB gpc_pre405: делительный путь на VCO/4 перед PLL: 0x1371d0 81200202 -> 81200202, 0x137250 8120000e -> 81200002
+Oct 24 16:54:35.677055 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:35.677852 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2203 нс (чтений 2, статус 0002000a), запас 0 мкс
+Oct 24 16:54:35.678607 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 01 select PLL, 0x137100=00000001
+Oct 24 16:54:35.679299 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 07 select PLL, 0x137100=00000003
+Oct 24 16:54:35.680054 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:35.680730 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2336 нс (чтений 2, статус 00020002), запас 0 мкс
+Oct 24 16:54:35.681525 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 08 select PLL, 0x137100=00000083
+Oct 24 16:54:35.682127 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 16:54:35.682915 host kernel: nouveau 0000:01:00.0: clk: LAB prog_4 idx 00: пост-делитель 81200002 -> 0000 под скобкой
+Oct 24 16:54:35.683719 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:35.684391 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2327 нс (чтений 3, статус 0002000a), запас 0 мкс
+Oct 24 16:54:35.684961 host kernel: nouveau 0000:01:00.0: clk: LAB prog_4 idx 07: пост-делитель 8120000a -> 0000 под скобкой
+Oct 24 16:54:35.685734 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 16:54:35.686909 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2202 нс (чтений 3, статус 00020002), запас 0 мкс
+Oct 24 16:54:35.687491 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+Oct 24 16:54:35.688226 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 135 МГц, цель 2004 МГц, шагов 2 (lab_mem_replay=15)
+Oct 24 16:54:35.688737 host kernel: nouveau 0000:01:00.0: fb: LAB replay A 135->324: в memx 62 записей, 9 ожиданий, 9 пауз, пропущено 8 операций, ~200 слов
+Oct 24 16:54:35.689122 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 16:54:35.689527 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 493
+Oct 24 16:54:35.689863 host kernel: nouveau 0000:01:00.0: fb: LAB replay A 135->324: выполнен за 10561 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18010000 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+Oct 24 16:54:35.690334 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 1
+Oct 24 16:54:35.690786 host kernel: nouveau 0000:01:00.0: fb: LAB replay B 324->2004: в memx 81 записей, 7 ожиданий, 12 пауз, пропущено 10 операций, ~240 слов
+Oct 24 16:54:35.691261 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 16:54:35.691693 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 16
+Oct 24 16:54:35.692119 host kernel: nouveau 0000:01:00.0: fb: LAB replay B 324->2004: выполнен за 16714 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=89200816 0x1373f0=00000002 0x132000=18030101 0x10f290=0c3c362a 0x10f300=00000a4d 0x611200=00000030
+Oct 24 16:54:35.692563 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей после скрипта: 8
+Oct 24 16:54:35.692875 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 24 16:54:35.693272 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 16:54:35.693635 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 16:54:35.694296 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 16:54:35.694720 host kernel: nouveau 0000:01:00.0: clk: LAB pll_keep: idx 02 PLL уже захвачена с тем же coef 00012107 (ctrl 00030005), не трогаю
+Oct 24 16:54:35.695101 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 16:54:35.695449 host kernel: nouveau 0000:01:00.0: clk: LAB prog_3 idx 02 select PLL, 0x137100=00000183
+Oct 24 16:54:35.695771 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 16:54:35.696049 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 1075000 uV
+Oct 24 16:54:35.696355 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0

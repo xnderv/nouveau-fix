@@ -3,13 +3,13 @@
 03:27:40 тест 19b: журнал hangtest-20261024-032739.txt
 03:40:05 тест 19b: закончился, код 0
 03:39:55 подъём 60/60 в 03:39:48.621: gr до 883‰, скрипт B 10818 мкс, после: core 900 MHz memory 2004 MHz, gr 218‰
-=== 60 подъёмов без зависания (нагрузка browser). Лог: /home/alex/Home/nouveau-fix/results/hangtest-20261024-032739.txt
+=== 60 подъёмов без зависания (нагрузка browser). Лог: /home/user/Home/nouveau-fix/results/hangtest-20261024-032739.txt
 03:39:57 регулятор возвращён (lab_gov=0), режим: core 405 MHz memory 324 MHz
 03:40:05 === тест 20: уровни 03-07; отличия от базы: lab_therm=0
 03:40:07 тест 20: журнал hangtest-20261024-034006.txt
 03:52:32 тест 20: закончился, код 0
 03:52:22 подъём 60/60 в 03:52:16.025: gr до 991‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 985‰
-=== 60 подъёмов без зависания (нагрузка browser). Лог: /home/alex/Home/nouveau-fix/results/hangtest-20261024-034006.txt
+=== 60 подъёмов без зависания (нагрузка browser). Лог: /home/user/Home/nouveau-fix/results/hangtest-20261024-034006.txt
 03:52:24 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
 03:52:32 === тест 21: уровни 03-07; отличия от базы: lab_clk_mmu_lock=1
 03:52:34 тест 21: журнал hangtest-20261024-035233.txt
@@ -18,4 +18,4 @@
     Снимок регистров: /var/log/gpu-blackbox/hang-*.txt (чёрный ящик). Журнал: journalctl -k -b 0 --since '2026-10-24 03:52:33'
     Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show
 03:55:05 ЗАВИСАНИЕ в тесте 21 — сохраняю журнал ядра, ящик и новые снимки
-03:55:05 СЕРИЯ ЗАВЕРШЕНА (hung). Жду разрешения на выключение (/home/alex/Home/nouveau-archive/night-poweroff.ok), не дольше 60 мин
+03:55:05 СЕРИЯ ЗАВЕРШЕНА (hung). Жду разрешения на выключение (/home/user/Home/nouveau-archive/night-poweroff.ok), не дольше 60 мин

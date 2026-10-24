@@ -1,7 +1,7 @@
 hangtest 2026-10-24 00:26:30: подъёмов 60, нагрузка browser, удержание 0f 6с, lab_gov был 2, ядро 7.0.0-38-generic
 параметры: lab_mem_order=Y lab_mem_op13=1 lab_mem_op34=1 lab_mem_op3a=0 lab_mem_replay=15 lab_pcie=0 lab_gpc_seq=13 
 00:26:33 старт: core 405 MHz memory 324 MHz; lab_mem=N lab_core=Y lab_volt_min_uv=1075000 lab_gr_pause=0 lab_gr_gate=0 lab_gr_wait=0 lab_xbar=0 lab_e9e0=0 lab_pll_keep=0 lab_order=0 lab_order_us=0 lab_therm=1 lab_therm_us=24 lab_therm_us_gpc=0 lab_therm_us_hub=0 lab_therm_probe=1 khz: gpc=0 rop=0 hub07=0 hub06=0 hub01=0
-00:26:33 нагрузка: /usr/bin/yandex-browser (pid 5883, профиль /home/alex/.cache/nouveau-hangtest-profile), страница hangload.html; прогрев 10 с
+00:26:33 нагрузка: /usr/bin/yandex-browser (pid 5883, профиль /home/user/.cache/nouveau-hangtest-profile), страница hangload.html; прогрев 10 с
 00:26:43 загрузка GR перед циклами: 992‰
 00:26:52 подъём 1/60 в 00:26:46.021: gr до 839‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 857‰
 00:27:05 подъём 2/60 в 00:26:59.715: gr до 854‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 974‰
@@ -63,5 +63,5 @@ hangtest 2026-10-24 00:26:30: подъёмов 60, нагрузка browser, у�
 00:38:16 подъём 58/60 в 00:38:10.375: gr до 871‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 899‰
 00:38:28 подъём 59/60 в 00:38:22.199: gr до 873‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 900‰
 00:38:42 подъём 60/60 в 00:38:35.831: gr до 885‰, скрипт B , после: core 900 MHz memory 324 MHz, gr 889‰
-=== 60 подъёмов без зависания (нагрузка browser). Лог: /home/alex/Home/nouveau-fix/results/hangtest-20261024-002625.txt
+=== 60 подъёмов без зависания (нагрузка browser). Лог: /home/user/Home/nouveau-fix/results/hangtest-20261024-002625.txt
 00:38:44 регулятор возвращён (lab_gov=2), режим: core 405 MHz memory 324 MHz

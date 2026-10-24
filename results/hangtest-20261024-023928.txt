@@ -1,7 +1,7 @@
 hangtest 2026-10-24 02:39:28: уровни 03↔07, подъёмов 60, нагрузка browser, удержание 0f 6с, lab_gov был 0, ядро 7.0.0-38-generic
 параметры: lab_mem_order=Y lab_mem_op13=1 lab_mem_op34=1 lab_mem_op3a=0 lab_mem_replay=15 lab_pcie=1 lab_gpc_seq=13 
 02:39:31 старт: core 50 MHz memory 135 MHz; lab_mem=Y lab_core=Y lab_volt_min_uv=0 lab_gr_pause=0 lab_gr_gate=0 lab_gr_wait=0 lab_xbar=0 lab_e9e0=0 lab_pll_keep=0 lab_order=0 lab_order_us=0 lab_therm=1 lab_therm_us=24 lab_therm_us_gpc=0 lab_therm_us_hub=0 lab_therm_probe=0 lab_therm_wait=1 lab_therm_wait_us=0 lab_therm_real=0 lab_clk_mmu_lock=0 lab_therm_div=1 khz: gpc=0 rop=0 hub07=0 hub06=0 hub01=0
-02:39:32 нагрузка: /usr/bin/yandex-browser (pid 18394, профиль /home/alex/.cache/nouveau-hangtest-profile), страница hangload.html; прогрев 10 с
+02:39:32 нагрузка: /usr/bin/yandex-browser (pid 18394, профиль /home/user/.cache/nouveau-hangtest-profile), страница hangload.html; прогрев 10 с
 02:39:42 загрузка GR перед циклами: 993‰
 02:39:51 подъём 1/60 в 02:39:45.223: gr до 990‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 989‰
 02:40:01 подъём 2/60 в 02:39:55.116: gr до 992‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 857‰
