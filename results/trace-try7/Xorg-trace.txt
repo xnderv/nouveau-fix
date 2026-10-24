@@ -1,0 +1,394 @@
+[   236.655] 
+X.Org X Server 1.21.1.4
+X Protocol Version 11, Revision 0
+[   236.655] Current Operating System: Linux u2204-trace 5.15.0-198-generic #208-Ubuntu SMP Fri Sep 4 10:22:38 UTC 2026 x86_64
+[   236.655] Kernel command line: BOOT_IMAGE=/boot/vmlinuz-5.15.0-198-generic root=UUID=b3bec440-3824-4571-921d-824258138b6f ro
+[   236.655] xorg-server 2:21.1.4-2ubuntu1.7~22.04.16 (For technical support please see http://www.ubuntu.com/support) 
+[   236.655] Current version of pixman: 0.40.0
+[   236.655] 	Before reporting problems, check http://wiki.x.org
+	to make sure that you have the latest version.
+[   236.655] Markers: (--) probed, (**) from config file, (==) default setting,
+	(++) from command line, (!!) notice, (II) informational,
+	(WW) warning, (EE) error, (NI) not implemented, (??) unknown.
+[   236.655] (==) Log file: "/var/log/Xorg.0.log", Time: Sat Oct 24 05:02:46 2026
+[   236.655] (==) Using config file: "/etc/X11/xorg.conf"
+[   236.655] (==) Using system config directory "/usr/share/X11/xorg.conf.d"
+[   236.655] (==) No Layout section.  Using the first Screen section.
+[   236.655] (==) No screen section available. Using defaults.
+[   236.655] (**) |-->Screen "Default Screen Section" (0)
+[   236.655] (**) |   |-->Monitor "<default monitor>"
+[   236.655] (==) No device specified for screen "Default Screen Section".
+	Using the first device section listed.
+[   236.655] (**) |   |-->Device "nv"
+[   236.655] (==) No monitor specified for screen "Default Screen Section".
+	Using a default monitor configuration.
+[   236.655] (==) Automatically adding devices
+[   236.655] (==) Automatically enabling devices
+[   236.655] (==) Automatically adding GPU devices
+[   236.655] (==) Automatically binding GPU devices
+[   236.655] (==) Max clients allowed: 256, resource mask: 0x1fffff
+[   236.655] (WW) The directory "/usr/share/fonts/X11/cyrillic" does not exist.
+[   236.655] 	Entry deleted from font path.
+[   236.655] (WW) The directory "/usr/share/fonts/X11/100dpi/" does not exist.
+[   236.655] 	Entry deleted from font path.
+[   236.655] (WW) The directory "/usr/share/fonts/X11/75dpi/" does not exist.
+[   236.655] 	Entry deleted from font path.
+[   236.655] (WW) The directory "/usr/share/fonts/X11/Type1" does not exist.
+[   236.655] 	Entry deleted from font path.
+[   236.655] (WW) The directory "/usr/share/fonts/X11/100dpi" does not exist.
+[   236.655] 	Entry deleted from font path.
+[   236.655] (WW) The directory "/usr/share/fonts/X11/75dpi" does not exist.
+[   236.655] 	Entry deleted from font path.
+[   236.655] (==) FontPath set to:
+	/usr/share/fonts/X11/misc,
+	built-ins
+[   236.655] (==) ModulePath set to "/usr/lib/xorg/modules"
+[   236.655] (II) The server relies on udev to provide the list of input devices.
+	If no devices become available, reconfigure udev or disable AutoAddDevices.
+[   236.655] (II) Loader magic: 0x563ec12b3020
+[   236.655] (II) Module ABI versions:
+[   236.655] 	X.Org ANSI C Emulation: 0.4
+[   236.655] 	X.Org Video Driver: 25.2
+[   236.655] 	X.Org XInput driver : 24.4
+[   236.655] 	X.Org Server Extension : 10.0
+[   236.770] (++) using VT number 2
+
+[   236.770] (II) systemd-logind: logind integration requires -keeptty and -keeptty was not provided, disabling logind integration
+[   236.771] (II) xfree86: Adding drm device (/dev/dri/card0)
+[   236.771] (II) Platform probe for /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/drm/card0
+[   236.772] (**) OutputClass "nvidia" ModulePath extended to "/usr/lib/x86_64-linux-gnu/nvidia/xorg,/usr/lib/xorg/modules"
+[   236.772] (--) PCI:*(1@0:0:0) 10de:1200:1458:3515 rev 161, Mem @ 0xf4000000/33554432, 0xe0000000/134217728, 0xe8000000/67108864, I/O @ 0x0000e000/128, BIOS @ 0x????????/131072
+[   236.773] (II) LoadModule: "glx"
+[   236.773] (II) Loading /usr/lib/x86_64-linux-gnu/nvidia/xorg/libglx.so
+[   236.775] (II) Module glx: vendor="NVIDIA Corporation"
+[   236.776] 	compiled for 4.0.2, module version = 1.0.0
+[   236.776] 	Module class: X.Org Server Extension
+[   236.776] (II) NVIDIA GLX Module  390.157  Wed Oct 12 09:19:15 UTC 2022
+[   236.776] (II) LoadModule: "nvidia"
+[   236.776] (II) Loading /usr/lib/x86_64-linux-gnu/nvidia/xorg/nvidia_drv.so
+[   236.776] (II) Module nvidia: vendor="NVIDIA Corporation"
+[   236.776] 	compiled for 4.0.2, module version = 1.0.0
+[   236.776] 	Module class: X.Org Video Driver
+[   236.776] (II) NVIDIA dlloader X Driver  390.157  Wed Oct 12 09:21:41 UTC 2022
+[   236.776] (II) NVIDIA Unified Driver for all Supported NVIDIA GPUs
+[   236.790] (II) Loading sub module "fb"
+[   236.790] (II) LoadModule: "fb"
+[   236.790] (II) Module "fb" already built-in
+[   236.790] (II) Loading sub module "wfb"
+[   236.790] (II) LoadModule: "wfb"
+[   236.790] (II) Loading /usr/lib/xorg/modules/libwfb.so
+[   236.790] (II) Module wfb: vendor="X.Org Foundation"
+[   236.790] 	compiled for 1.21.1.4, module version = 1.0.0
+[   236.790] 	ABI class: X.Org ANSI C Emulation, version 0.4
+[   236.791] (II) Loading sub module "ramdac"
+[   236.791] (II) LoadModule: "ramdac"
+[   236.791] (II) Module "ramdac" already built-in
+[   236.938] (II) NVIDIA(0): Creating default Display subsection in Screen section
+	"Default Screen Section" for depth/fbbpp 24/32
+[   236.938] (==) NVIDIA(0): Depth 24, (==) framebuffer bpp 32
+[   236.938] (==) NVIDIA(0): RGB weight 888
+[   236.938] (==) NVIDIA(0): Default visual is TrueColor
+[   236.938] (==) NVIDIA(0): Using gamma correction (1.0, 1.0, 1.0)
+[   236.938] (II) Applying OutputClass "nvidia" options to /dev/dri/card0
+[   236.938] (**) NVIDIA(0): Option "AllowEmptyInitialConfiguration"
+[   236.938] (**) NVIDIA(0): Option "Coolbits" "8"
+[   236.938] (**) NVIDIA(0): Enabling 2D acceleration
+[   238.443] (--) NVIDIA(0): Valid display device(s) on GPU-0 at PCI:1:0:0
+[   238.443] (--) NVIDIA(0):     CRT-0
+[   238.443] (--) NVIDIA(0):     CRT-1
+[   238.443] (--) NVIDIA(0):     DFP-0
+[   238.443] (--) NVIDIA(0):     DFP-1 (boot)
+[   238.443] (--) NVIDIA(0):     DFP-2
+[   238.448] (II) NVIDIA(0): NVIDIA GPU GeForce GTX 560 Ti (GF114) at PCI:1:0:0 (GPU-0)
+[   238.448] (--) NVIDIA(0): Memory: 1048576 kBytes
+[   238.448] (--) NVIDIA(0): VideoBIOS: 70.24.11.00.01
+[   238.448] (II) NVIDIA(0): Detected PCI Express Link width: 16X
+[   238.453] (--) NVIDIA(GPU-0): CRT-0: disconnected
+[   238.453] (--) NVIDIA(GPU-0): CRT-0: 400.0 MHz maximum pixel clock
+[   238.453] (--) NVIDIA(GPU-0): 
+[   238.457] (--) NVIDIA(GPU-0): CRT-1: disconnected
+[   238.457] (--) NVIDIA(GPU-0): CRT-1: 400.0 MHz maximum pixel clock
+[   238.457] (--) NVIDIA(GPU-0): 
+[   238.462] (--) NVIDIA(GPU-0): DFP-0: disconnected
+[   238.462] (--) NVIDIA(GPU-0): DFP-0: Internal TMDS
+[   238.462] (--) NVIDIA(GPU-0): DFP-0: 330.0 MHz maximum pixel clock
+[   238.462] (--) NVIDIA(GPU-0): 
+[   238.508] (--) NVIDIA(GPU-0): Microstep MPG271QX OLED (DFP-1): connected
+[   238.508] (--) NVIDIA(GPU-0): Microstep MPG271QX OLED (DFP-1): Internal TMDS
+[   238.508] (--) NVIDIA(GPU-0): Microstep MPG271QX OLED (DFP-1): 225.0 MHz maximum pixel clock
+[   238.508] (--) NVIDIA(GPU-0): 
+[   238.512] (--) NVIDIA(GPU-0): DFP-2: disconnected
+[   238.512] (--) NVIDIA(GPU-0): DFP-2: Internal TMDS
+[   238.512] (--) NVIDIA(GPU-0): DFP-2: 330.0 MHz maximum pixel clock
+[   238.512] (--) NVIDIA(GPU-0): 
+[   238.519] (==) NVIDIA(0): 
+[   238.519] (==) NVIDIA(0): No modes were requested; the default mode "nvidia-auto-select"
+[   238.519] (==) NVIDIA(0):     will be used as the requested mode.
+[   238.519] (==) NVIDIA(0): 
+[   238.519] (II) NVIDIA(0): Validated MetaModes:
+[   238.519] (II) NVIDIA(0):     "DFP-1:nvidia-auto-select"
+[   238.519] (II) NVIDIA(0): Virtual screen size determined to be 1920 x 1080
+[   238.529] (--) NVIDIA(0): DPI set to (79, 80); computed from "UseEdidDpi" X config
+[   238.529] (--) NVIDIA(0):     option
+[   238.529] (II) NVIDIA: Using 6144.00 MB of virtual memory for indirect memory
+[   238.529] (II) NVIDIA:     access.
+[   239.389] (II) NVIDIA(0): ACPI: failed to connect to the ACPI event daemon; the daemon
+[   239.389] (II) NVIDIA(0):     may not be running or the "AcpidSocketPath" X
+[   239.389] (II) NVIDIA(0):     configuration option may not be set correctly.  When the
+[   239.389] (II) NVIDIA(0):     ACPI event daemon is available, the NVIDIA X driver will
+[   239.389] (II) NVIDIA(0):     try to use it to receive ACPI event notifications.  For
+[   239.389] (II) NVIDIA(0):     details, please see the "ConnectToAcpid" and
+[   239.389] (II) NVIDIA(0):     "AcpidSocketPath" X configuration options in Appendix B: X
+[   239.389] (II) NVIDIA(0):     Config Options in the README.
+[   239.559] (II) NVIDIA(0): Setting mode "DFP-1:nvidia-auto-select"
+[   239.809] (==) NVIDIA(0): Disabling shared memory pixmaps
+[   239.809] (==) NVIDIA(0): Backing store enabled
+[   239.809] (==) NVIDIA(0): Silken mouse enabled
+[   239.817] (==) NVIDIA(0): DPMS enabled
+[   239.817] (II) Loading sub module "dri2"
+[   239.817] (II) LoadModule: "dri2"
+[   239.817] (II) Module "dri2" already built-in
+[   239.817] (II) NVIDIA(0): [DRI2] Setup complete
+[   239.817] (II) NVIDIA(0): [DRI2]   VDPAU driver: nvidia
+[   239.817] (II) Initializing extension Generic Event Extension
+[   239.817] (II) Initializing extension SHAPE
+[   239.817] (II) Initializing extension MIT-SHM
+[   239.818] (II) Initializing extension XInputExtension
+[   239.818] (II) Initializing extension XTEST
+[   239.818] (II) Initializing extension BIG-REQUESTS
+[   239.818] (II) Initializing extension SYNC
+[   239.818] (II) Initializing extension XKEYBOARD
+[   239.818] (II) Initializing extension XC-MISC
+[   239.818] (II) Initializing extension SECURITY
+[   239.818] (II) Initializing extension XFIXES
+[   239.818] (II) Initializing extension RENDER
+[   239.818] (II) Initializing extension RANDR
+[   239.818] (II) Initializing extension COMPOSITE
+[   239.819] (II) Initializing extension DAMAGE
+[   239.819] (II) Initializing extension MIT-SCREEN-SAVER
+[   239.819] (II) Initializing extension DOUBLE-BUFFER
+[   239.819] (II) Initializing extension RECORD
+[   239.819] (II) Initializing extension DPMS
+[   239.819] (II) Initializing extension Present
+[   239.819] (II) Initializing extension DRI3
+[   239.819] (II) Initializing extension X-Resource
+[   239.819] (II) Initializing extension XVideo
+[   239.819] (II) Initializing extension XVideo-MotionCompensation
+[   239.819] (II) Initializing extension SELinux
+[   239.819] (II) SELinux: Disabled on system
+[   239.819] (II) Initializing extension XFree86-VidModeExtension
+[   239.819] (II) Initializing extension XFree86-DGA
+[   239.819] (II) Initializing extension XFree86-DRI
+[   239.819] (II) Initializing extension DRI2
+[   239.819] (II) Initializing extension GLX
+[   239.819] (II) Initializing extension GLX
+[   239.819] (II) Indirect GLX disabled.
+[   239.820] (II) Initializing extension NV-GLX
+[   239.820] (II) Initializing extension NV-CONTROL
+[   239.820] (II) Initializing extension XINERAMA
+[   240.058] (II) config/udev: Adding input device Power Button (/dev/input/event1)
+[   240.058] (**) Power Button: Applying InputClass "libinput keyboard catchall"
+[   240.058] (II) LoadModule: "libinput"
+[   240.058] (II) Loading /usr/lib/xorg/modules/input/libinput_drv.so
+[   240.059] (II) Module libinput: vendor="X.Org Foundation"
+[   240.059] 	compiled for 1.20.14, module version = 1.2.1
+[   240.059] 	Module class: X.Org XInput Driver
+[   240.059] 	ABI class: X.Org XInput driver, version 24.1
+[   240.059] (II) Using input driver 'libinput' for 'Power Button'
+[   240.059] (**) Power Button: always reports core events
+[   240.059] (**) Option "Device" "/dev/input/event1"
+[   240.061] (II) event1  - Power Button: is tagged by udev as: Keyboard
+[   240.061] (II) event1  - Power Button: device is a keyboard
+[   240.061] (II) event1  - Power Button: device removed
+[   240.061] (**) Option "config_info" "udev:/sys/devices/LNXSYSTM:00/LNXPWRBN:00/input/input1/event1"
+[   240.061] (II) XINPUT: Adding extended input device "Power Button" (type: KEYBOARD, id 6)
+[   240.061] (**) Option "xkb_model" "pc105"
+[   240.061] (**) Option "xkb_layout" "us"
+[   240.062] (II) event1  - Power Button: is tagged by udev as: Keyboard
+[   240.062] (II) event1  - Power Button: device is a keyboard
+[   240.062] (II) config/udev: Adding input device Power Button (/dev/input/event0)
+[   240.062] (**) Power Button: Applying InputClass "libinput keyboard catchall"
+[   240.062] (II) Using input driver 'libinput' for 'Power Button'
+[   240.062] (**) Power Button: always reports core events
+[   240.062] (**) Option "Device" "/dev/input/event0"
+[   240.063] (II) event0  - Power Button: is tagged by udev as: Keyboard
+[   240.063] (II) event0  - Power Button: device is a keyboard
+[   240.063] (II) event0  - Power Button: device removed
+[   240.063] (**) Option "config_info" "udev:/sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0C0C:00/input/input0/event0"
+[   240.063] (II) XINPUT: Adding extended input device "Power Button" (type: KEYBOARD, id 7)
+[   240.063] (**) Option "xkb_model" "pc105"
+[   240.063] (**) Option "xkb_layout" "us"
+[   240.063] (II) event0  - Power Button: is tagged by udev as: Keyboard
+[   240.063] (II) event0  - Power Button: device is a keyboard
+[   240.064] (II) config/udev: Adding input device HDA NVidia HDMI/DP,pcm=3 (/dev/input/event8)
+[   240.064] (II) No input driver specified, ignoring this device.
+[   240.064] (II) This device may have been added with another device file.
+[   240.064] (II) config/udev: Adding input device HDA NVidia HDMI/DP,pcm=7 (/dev/input/event9)
+[   240.064] (II) No input driver specified, ignoring this device.
+[   240.064] (II) This device may have been added with another device file.
+[   240.065] (II) config/udev: Adding input device HDA NVidia HDMI/DP,pcm=8 (/dev/input/event10)
+[   240.065] (II) No input driver specified, ignoring this device.
+[   240.065] (II) This device may have been added with another device file.
+[   240.065] (II) config/udev: Adding input device HDA NVidia HDMI/DP,pcm=9 (/dev/input/event11)
+[   240.065] (II) No input driver specified, ignoring this device.
+[   240.065] (II) This device may have been added with another device file.
+[   240.065] (II) config/udev: Adding input device Logitech Logitech USB Keyboard (/dev/input/event5)
+[   240.065] (**) Logitech Logitech USB Keyboard: Applying InputClass "libinput keyboard catchall"
+[   240.065] (II) Using input driver 'libinput' for 'Logitech Logitech USB Keyboard'
+[   240.065] (**) Logitech Logitech USB Keyboard: always reports core events
+[   240.065] (**) Option "Device" "/dev/input/event5"
+[   240.066] (II) event5  - Logitech Logitech USB Keyboard: is tagged by udev as: Keyboard
+[   240.066] (II) event5  - Logitech Logitech USB Keyboard: device is a keyboard
+[   240.067] (II) event5  - Logitech Logitech USB Keyboard: device removed
+[   240.067] (**) Option "config_info" "udev:/sys/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.1/1-1.1:1.0/0003:046D:C30A.0001/input/input10/event5"
+[   240.067] (II) XINPUT: Adding extended input device "Logitech Logitech USB Keyboard" (type: KEYBOARD, id 8)
+[   240.067] (**) Option "xkb_model" "pc105"
+[   240.067] (**) Option "xkb_layout" "us"
+[   240.068] (II) event5  - Logitech Logitech USB Keyboard: is tagged by udev as: Keyboard
+[   240.068] (II) event5  - Logitech Logitech USB Keyboard: device is a keyboard
+[   240.069] (II) config/udev: Adding input device Logitech Logitech USB Keyboard (/dev/input/event6)
+[   240.069] (**) Logitech Logitech USB Keyboard: Applying InputClass "libinput pointer catchall"
+[   240.069] (**) Logitech Logitech USB Keyboard: Applying InputClass "libinput keyboard catchall"
+[   240.069] (II) Using input driver 'libinput' for 'Logitech Logitech USB Keyboard'
+[   240.069] (**) Logitech Logitech USB Keyboard: always reports core events
+[   240.069] (**) Option "Device" "/dev/input/event6"
+[   240.069] (II) event6  - Logitech Logitech USB Keyboard: is tagged by udev as: Keyboard Mouse
+[   240.070] (II) event6  - Logitech Logitech USB Keyboard: device is a pointer
+[   240.070] (II) event6  - Logitech Logitech USB Keyboard: device is a keyboard
+[   240.070] (II) event6  - Logitech Logitech USB Keyboard: device removed
+[   240.070] (II) libinput: Logitech Logitech USB Keyboard: needs a virtual subdevice
+[   240.070] (**) Option "config_info" "udev:/sys/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.1/1-1.1:1.1/0003:046D:C30A.0002/input/input11/event6"
+[   240.070] (II) XINPUT: Adding extended input device "Logitech Logitech USB Keyboard" (type: MOUSE, id 9)
+[   240.070] (**) Option "AccelerationScheme" "none"
+[   240.070] (**) Logitech Logitech USB Keyboard: (accel) selected scheme none/0
+[   240.070] (**) Logitech Logitech USB Keyboard: (accel) acceleration factor: 2.000
+[   240.070] (**) Logitech Logitech USB Keyboard: (accel) acceleration threshold: 4
+[   240.071] (II) event6  - Logitech Logitech USB Keyboard: is tagged by udev as: Keyboard Mouse
+[   240.071] (II) event6  - Logitech Logitech USB Keyboard: device is a pointer
+[   240.071] (II) event6  - Logitech Logitech USB Keyboard: device is a keyboard
+[   240.072] (II) config/udev: Adding input device Logitech Logitech USB Keyboard (/dev/input/js0)
+[   240.072] (II) No input driver specified, ignoring this device.
+[   240.072] (II) This device may have been added with another device file.
+[   240.072] (II) config/udev: Adding input device Logitech Logitech USB Keyboard (/dev/input/mouse1)
+[   240.072] (II) No input driver specified, ignoring this device.
+[   240.072] (II) This device may have been added with another device file.
+[   240.073] (II) config/udev: Adding input device Logitech G102 Prodigy Gaming Mouse (/dev/input/event2)
+[   240.073] (**) Logitech G102 Prodigy Gaming Mouse: Applying InputClass "libinput pointer catchall"
+[   240.073] (II) Using input driver 'libinput' for 'Logitech G102 Prodigy Gaming Mouse'
+[   240.073] (**) Logitech G102 Prodigy Gaming Mouse: always reports core events
+[   240.073] (**) Option "Device" "/dev/input/event2"
+[   240.133] (II) event2  - Logitech G102 Prodigy Gaming Mouse: is tagged by udev as: Mouse
+[   240.133] (II) event2  - Logitech G102 Prodigy Gaming Mouse: device is a pointer
+[   240.133] (II) event2  - Logitech G102 Prodigy Gaming Mouse: device removed
+[   240.135] (**) Option "config_info" "udev:/sys/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.2/1-1.2:1.0/0003:046D:C084.0003/input/input5/event2"
+[   240.135] (II) XINPUT: Adding extended input device "Logitech G102 Prodigy Gaming Mouse" (type: MOUSE, id 10)
+[   240.135] (**) Option "AccelerationScheme" "none"
+[   240.135] (**) Logitech G102 Prodigy Gaming Mouse: (accel) selected scheme none/0
+[   240.135] (**) Logitech G102 Prodigy Gaming Mouse: (accel) acceleration factor: 2.000
+[   240.135] (**) Logitech G102 Prodigy Gaming Mouse: (accel) acceleration threshold: 4
+[   240.197] (II) event2  - Logitech G102 Prodigy Gaming Mouse: is tagged by udev as: Mouse
+[   240.197] (II) event2  - Logitech G102 Prodigy Gaming Mouse: device is a pointer
+[   240.198] (II) config/udev: Adding input device Logitech G102 Prodigy Gaming Mouse (/dev/input/mouse0)
+[   240.198] (II) No input driver specified, ignoring this device.
+[   240.199] (II) This device may have been added with another device file.
+[   240.200] (II) config/udev: Adding input device Logitech G102 Prodigy Gaming Mouse Keyboard (/dev/input/event3)
+[   240.200] (**) Logitech G102 Prodigy Gaming Mouse Keyboard: Applying InputClass "libinput keyboard catchall"
+[   240.200] (II) Using input driver 'libinput' for 'Logitech G102 Prodigy Gaming Mouse Keyboard'
+[   240.200] (**) Logitech G102 Prodigy Gaming Mouse Keyboard: always reports core events
+[   240.200] (**) Option "Device" "/dev/input/event3"
+[   240.201] (II) event3  - Logitech G102 Prodigy Gaming Mouse Keyboard: is tagged by udev as: Keyboard
+[   240.202] (II) event3  - Logitech G102 Prodigy Gaming Mouse Keyboard: device is a keyboard
+[   240.202] (II) event3  - Logitech G102 Prodigy Gaming Mouse Keyboard: device removed
+[   240.202] (II) libinput: Logitech G102 Prodigy Gaming Mouse Keyboard: needs a virtual subdevice
+[   240.202] (**) Option "config_info" "udev:/sys/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.2/1-1.2:1.1/0003:046D:C084.0004/input/input6/event3"
+[   240.202] (II) XINPUT: Adding extended input device "Logitech G102 Prodigy Gaming Mouse Keyboard" (type: MOUSE, id 11)
+[   240.202] (**) Option "AccelerationScheme" "none"
+[   240.202] (**) Logitech G102 Prodigy Gaming Mouse Keyboard: (accel) selected scheme none/0
+[   240.202] (**) Logitech G102 Prodigy Gaming Mouse Keyboard: (accel) acceleration factor: 2.000
+[   240.202] (**) Logitech G102 Prodigy Gaming Mouse Keyboard: (accel) acceleration threshold: 4
+[   240.204] (II) event3  - Logitech G102 Prodigy Gaming Mouse Keyboard: is tagged by udev as: Keyboard
+[   240.204] (II) event3  - Logitech G102 Prodigy Gaming Mouse Keyboard: device is a keyboard
+[   240.205] (II) config/udev: Adding input device Creative Live! Cam Sync 1080p V (/dev/input/event7)
+[   240.205] (**) Creative Live! Cam Sync 1080p V: Applying InputClass "libinput keyboard catchall"
+[   240.205] (II) Using input driver 'libinput' for 'Creative Live! Cam Sync 1080p V'
+[   240.205] (**) Creative Live! Cam Sync 1080p V: always reports core events
+[   240.205] (**) Option "Device" "/dev/input/event7"
+[   240.207] (II) event7  - Creative Live! Cam Sync 1080p V: is tagged by udev as: Keyboard
+[   240.207] (II) event7  - Creative Live! Cam Sync 1080p V: device is a keyboard
+[   240.207] (II) event7  - Creative Live! Cam Sync 1080p V: device removed
+[   240.207] (**) Option "config_info" "udev:/sys/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.4/1-1.4:1.0/input/input12/event7"
+[   240.207] (II) XINPUT: Adding extended input device "Creative Live! Cam Sync 1080p V" (type: KEYBOARD, id 12)
+[   240.207] (**) Option "xkb_model" "pc105"
+[   240.207] (**) Option "xkb_layout" "us"
+[   240.209] (II) event7  - Creative Live! Cam Sync 1080p V: is tagged by udev as: Keyboard
+[   240.209] (II) event7  - Creative Live! Cam Sync 1080p V: device is a keyboard
+[   240.210] (II) config/udev: Adding input device HDA Intel PCH Front Mic (/dev/input/event12)
+[   240.210] (II) No input driver specified, ignoring this device.
+[   240.210] (II) This device may have been added with another device file.
+[   240.210] (II) config/udev: Adding input device HDA Intel PCH Rear Mic (/dev/input/event13)
+[   240.210] (II) No input driver specified, ignoring this device.
+[   240.210] (II) This device may have been added with another device file.
+[   240.211] (II) config/udev: Adding input device HDA Intel PCH Line (/dev/input/event14)
+[   240.211] (II) No input driver specified, ignoring this device.
+[   240.211] (II) This device may have been added with another device file.
+[   240.211] (II) config/udev: Adding input device HDA Intel PCH Line Out Front (/dev/input/event15)
+[   240.211] (II) No input driver specified, ignoring this device.
+[   240.211] (II) This device may have been added with another device file.
+[   240.212] (II) config/udev: Adding input device HDA Intel PCH Line Out Surround (/dev/input/event16)
+[   240.212] (II) No input driver specified, ignoring this device.
+[   240.212] (II) This device may have been added with another device file.
+[   240.212] (II) config/udev: Adding input device HDA Intel PCH Line Out CLFE (/dev/input/event17)
+[   240.212] (II) No input driver specified, ignoring this device.
+[   240.212] (II) This device may have been added with another device file.
+[   240.213] (II) config/udev: Adding input device HDA Intel PCH Line Out Side (/dev/input/event18)
+[   240.213] (II) No input driver specified, ignoring this device.
+[   240.213] (II) This device may have been added with another device file.
+[   240.213] (II) config/udev: Adding input device HDA Intel PCH Front Headphone (/dev/input/event19)
+[   240.213] (II) No input driver specified, ignoring this device.
+[   240.213] (II) This device may have been added with another device file.
+[   240.214] (II) config/udev: Adding input device MS MSI Gaming Controller (/dev/input/event4)
+[   240.214] (II) No input driver specified, ignoring this device.
+[   240.214] (II) This device may have been added with another device file.
+[   240.223] (**) Logitech Logitech USB Keyboard: Applying InputClass "libinput pointer catchall"
+[   240.223] (**) Logitech Logitech USB Keyboard: Applying InputClass "libinput keyboard catchall"
+[   240.223] (II) Using input driver 'libinput' for 'Logitech Logitech USB Keyboard'
+[   240.223] (**) Logitech Logitech USB Keyboard: always reports core events
+[   240.223] (**) Option "Device" "/dev/input/event6"
+[   240.223] (II) libinput: Logitech Logitech USB Keyboard: is a virtual subdevice
+[   240.223] (**) Option "config_info" "udev:/sys/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.1/1-1.1:1.1/0003:046D:C30A.0002/input/input11/event6"
+[   240.223] (II) XINPUT: Adding extended input device "Logitech Logitech USB Keyboard" (type: KEYBOARD, id 13)
+[   240.223] (**) Option "xkb_model" "pc105"
+[   240.223] (**) Option "xkb_layout" "us"
+[   240.223] (**) Logitech G102 Prodigy Gaming Mouse Keyboard: Applying InputClass "libinput keyboard catchall"
+[   240.223] (II) Using input driver 'libinput' for 'Logitech G102 Prodigy Gaming Mouse Keyboard'
+[   240.223] (**) Logitech G102 Prodigy Gaming Mouse Keyboard: always reports core events
+[   240.223] (**) Option "Device" "/dev/input/event3"
+[   240.223] (II) libinput: Logitech G102 Prodigy Gaming Mouse Keyboard: is a virtual subdevice
+[   240.224] (**) Option "config_info" "udev:/sys/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.2/1-1.2:1.1/0003:046D:C084.0004/input/input6/event3"
+[   240.224] (II) XINPUT: Adding extended input device "Logitech G102 Prodigy Gaming Mouse Keyboard" (type: KEYBOARD, id 14)
+[   240.224] (**) Option "xkb_model" "pc105"
+[   240.224] (**) Option "xkb_layout" "us"
+[   257.688] (EE) event5  - Logitech Logitech USB Keyboard: client bug: event processing lagging behind by 16368ms, your system is too slow
+[   277.044] (EE) event5  - Logitech Logitech USB Keyboard: client bug: event processing lagging behind by 35724ms, your system is too slow
+[   296.474] (EE) event5  - Logitech Logitech USB Keyboard: client bug: event processing lagging behind by 55154ms, your system is too slow
+[   316.284] (EE) event5  - Logitech Logitech USB Keyboard: client bug: event processing lagging behind by 74963ms, your system is too slow
+[   335.816] (EE) event5  - Logitech Logitech USB Keyboard: client bug: event processing lagging behind by 94496ms, your system is too slow
+[   335.816] (EE) event5  - Logitech Logitech USB Keyboard: WARNING: log rate limit exceeded (5 msgs per 60min). Discarding future messages.
+[   437.014] (II) event1  - Power Button: device removed
+[   437.014] (II) event0  - Power Button: device removed
+[   437.014] (II) event5  - Logitech Logitech USB Keyboard: device removed
+[   437.014] (II) event2  - Logitech G102 Prodigy Gaming Mouse: device removed
+[   437.016] (II) event7  - Creative Live! Cam Sync 1080p V: device removed
+[   437.016] (II) event6  - Logitech Logitech USB Keyboard: device removed
+[   437.016] (II) event3  - Logitech G102 Prodigy Gaming Mouse Keyboard: device removed
+[   437.018] (II) UnloadModule: "libinput"
+[   437.018] (II) UnloadModule: "libinput"
+[   437.018] (II) UnloadModule: "libinput"
+[   437.018] (II) UnloadModule: "libinput"
+[   437.018] (II) UnloadModule: "libinput"
+[   437.018] (II) UnloadModule: "libinput"
+[   437.018] (II) UnloadModule: "libinput"
+[   437.018] (II) UnloadModule: "libinput"
+[   437.018] (II) UnloadModule: "libinput"
+[   438.271] (II) NVIDIA(GPU-0): Deleting GPU-0
+[   438.296] (II) Server terminated successfully (0). Closing log file.

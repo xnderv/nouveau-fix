@@ -164,10 +164,10 @@ CATPID=$!
 sleep 2
 run_pass запись
 mark "конец записи"
+finish   # сторож снимается ДО остановки mmiotrace: в прогоне 7 остановка шла > 2 мин, и сторож выключил машину
 sleep 1
 echo nop > "$T/current_tracer"
 sleep 1; kill "$CATPID" 2>/dev/null || true
-finish
 dmesg > "$OUT/dmesg.txt"
 grep -q 'mmiotrace has lost events' "$OUT/dmesg.txt" && say "!!! Запись потеряла часть событий (буфер не успел)" || say "Потерь в записи нет"
 if [ -s "$OUT/mmiotrace.txt" ]; then
