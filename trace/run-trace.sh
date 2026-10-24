@@ -24,7 +24,8 @@ OUT="$HERE/out-$(date +%Y%m%d-%H%M%S)"; mkdir -p "$OUT"
 LOG="$OUT/steps.txt"
 say() { echo "$(date +%T) $*" | tee -a "$LOG"; sync; }
 
-say "Ядро $(uname -r), версия сценария 5 (постоянная лёгкая нагрузка, без простоя)"
+NOTRACE="${NOTRACE:-0}"   # 1 — тот же сценарий БЕЗ mmiotrace (контроль: виновата запись или карта/драйвер)
+say "Ядро $(uname -r), версия сценария 5 (постоянная лёгкая нагрузка, без простоя)$( [ "$NOTRACE" = 1 ] && echo ', БЕЗ ЗАПИСИ — контроль')"
 lsmod | grep -q '^nvidia ' && { say "СТОП: драйвер nvidia уже загружен — начало не запишется. Перезагрузись."; exit 1; }
 [ -e "$HERE/regdump4.py" ] || { say "СТОП: нет $HERE/regdump4.py"; exit 1; }
 command -v glxgears >/dev/null || { say "СТОП: нет glxgears (пакет mesa-utils)"; exit 1; }
@@ -38,10 +39,14 @@ say "Снимок регистров «до драйвера» сделан"
 
 say "Включаю запись (остальные ядра процессора на время записи выключатся — это нормально)"
 echo nop > "$T/current_tracer"
+if [ "$NOTRACE" != 1 ]; then
 echo 65536 > "$T/buffer_size_kb"     # как в версии 2. Размер записи задаёт не буфер, а нагрузка: 842 МБ в версии 1 — от glmark2 1600x900
 echo mmiotrace > "$T/current_tracer"
 nice -n -20 cat "$T/trace_pipe" > "$OUT/mmiotrace.txt" &
 CATPID=$!
+else
+say "Контроль: mmiotrace НЕ включается, все ядра процессора работают"; CATPID=""
+fi
 sleep 2
 mark() { echo "MARK: $*" > "$T/trace_marker"; say "MARK: $*"; }
 
@@ -119,12 +124,14 @@ sleep 2
 mark "конец записи"
 sleep 1
 echo nop > "$T/current_tracer"
-sleep 1; kill "$CATPID" 2>/dev/null || true
+sleep 1; [ -n "$CATPID" ] && kill "$CATPID" 2>/dev/null || true
 cp /var/log/Xorg.0.log "$OUT/" 2>/dev/null || true
 dmesg > "$OUT/dmesg.txt"
 grep -q 'mmiotrace has lost events' "$OUT/dmesg.txt" && say "!!! Запись потеряла часть событий (буфер не успел)" || say "Потерь в записи нет"
+if [ -s "$OUT/mmiotrace.txt" ]; then
 say "Записано строк: $(wc -l < "$OUT/mmiotrace.txt"). Сжимаю..."
 xz -T0 -6 "$OUT/mmiotrace.txt"
+fi
 ls -lh "$OUT" | tee -a "$LOG"
 sync
 say "ГОТОВО. Результат: $OUT. Перезагрузись в основную систему: sudo reboot"
