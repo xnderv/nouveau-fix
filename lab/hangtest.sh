@@ -17,8 +17,8 @@ set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; KIT="$(dirname "$HERE")"; PRM=/sys/module/nouveau/parameters
 N="${1:-60}"; [[ "$N" =~ ^[0-9]+$ ]] || { echo "Число подъёмов"; exit 1; }
 LOAD="${LOAD:-browser}"
-# 24.10 вечер: FAST=1 — частые переходы (ловить редкий тайм-аут переключателя GPC быстрее): пауза перед подъёмом 0,2–0,8 с,
-# на 0f HOLD=1 с (если не задан), после спуска — по 0,5 с. Зависание в этом режиме — GR >= 999‰ на 0f четыре цикла подряд
+# 24.10 вечер: FAST=1 — частые переходы (ловить редкий тайм-аут переключателя GPC быстрее): пауза перед подъёмом 0,1–0,5 с,
+# на 0f HOLD=1 с (если не задан), после спуска — по 0,3 с. Зависание в этом режиме — GR >= 999‰ на 0f четыре цикла подряд
 # (счётчик не сбрасывается между циклами) или подпись в журнале ядра. Длительности ожиданий — время, а не флаги карты: это
 # темп опыта, а не часть драйвера.
 FAST="${FAST:-0}"; if [ "$FAST" = 1 ]; then HOLD="${HOLD:-1}"; else HOLD="${HOLD:-6}"; fi
@@ -93,7 +93,7 @@ echo "$(date +%T) загрузка GR перед циклами: $G‰" | tee -a
 DONE=0; busy=0
 for c in $(seq 1 "$N"); do
     [ -n "$LP" ] && ! kill -0 "$LP" 2>/dev/null && { echo "$(date +%T) СТОП: нагрузка завершилась сама" | tee -a "$LOG"; break; }
-    if [ "$FAST" = 1 ]; then sleep "$(shuf -i 2-8 -n1 | awk '{print $1/10}')"   # FAST: 0,2–0,8 с
+    if [ "$FAST" = 1 ]; then sleep "$(shuf -i 1-5 -n1 | awk '{print $1/10}')"   # FAST: 0,1–0,5 с
     else sleep "$(shuf -i 15-55 -n1 | awk '{print $1/10}')"; fi      # случайная фаза 1.5–5.5 с, как у регулятора
     G0="$(gr)"; pstate $HIGH; TS="$(date +%T.%N | cut -c1-12)"
     [ "$FAST" = 1 ] || busy=0; hung=""
@@ -125,7 +125,7 @@ for c in $(seq 1 "$N"); do
           echo "    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show"; } | tee -a "$LOG"; sync
         exit 2
     fi
-    W2=2; [ "$FAST" = 1 ] && W2=0.5
+    W2=2; [ "$FAST" = 1 ] && W2=0.3
     [ -n "$MID" ] && { pstate $MID; sleep $W2; }
     pstate $LOW; sleep $W2; DONE=$c
     case "$(ac)" in *"memory $(memof $LOW) MHz"*) ;; *) [ "$MEM0" = Y ] && { echo "$(date +%T) СТОП: после спуска не $(memof $LOW) МГц: $(ac)" | tee -a "$LOG"; break; };; esac
