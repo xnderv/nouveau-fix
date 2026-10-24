@@ -1,0 +1,11 @@
+# 24.10 07:40, основная система (nouveau, лабораторный драйвер, уровень 03/07). sudo lspci -vv | grep LnkCap/LnkCtl/LnkSta
+== видеокарта 01:00.0
+                LnkCap: Port #0, Speed 2.5GT/s, Width x16, ASPM L0s L1, Exit Latency L0s <256ns, L1 <4us
+                LnkCtl: ASPM Disabled; RCB 64 bytes, LnkDisable- CommClk+
+                LnkSta: Speed 2.5GT/s, Width x16
+== корневой порт 00:01.0
+                LnkCap: Port #2, Speed 8GT/s, Width x16, ASPM L0s L1, Exit Latency L0s <256ns, L1 <8us
+                LnkCtl: ASPM Disabled; RCB 64 bytes, LnkDisable- CommClk+
+                LnkSta: Speed 2.5GT/s, Width x16
+# Под драйвером NVIDIA (записи try1, try5): зеркало конфигурации 0x088088 (LnkCtl) = 0x0140 — Common Clock + Clock PM,
+# биты ASPM 0–1 = 0, то есть ASPM выключен и у NVIDIA. 0x088080 (DevCtl/DevSta) = 0x2910 / 0x12910 (сброс флага CorrErr).
