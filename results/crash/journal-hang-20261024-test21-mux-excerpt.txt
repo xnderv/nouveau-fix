@@ -1,0 +1,79 @@
+Oct 24 03:53:26.837056 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+Oct 24 03:53:26.837674 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255
+Oct 24 03:53:26.838125 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+Oct 24 03:53:26.838512 host kernel: nouveau 0000:01:00.0: clk: LAB voltage-first ret 0, now 950000 uV (id 1)
+Oct 24 03:53:26.838926 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)
+Oct 24 03:53:26.839373 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage
+Oct 24 03:53:26.839779 host kernel: nouveau 0000:01:00.0: clk: LAB voltage after raise: 950000 uV (cstate voltage id 1)
+Oct 24 03:53:26.840221 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 00 dom 19: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 24 03:53:26.840578 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 01 dom 20: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 24 03:53:26.840993 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 02 dom 23: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 80000202 mdiv 00000000
+Oct 24 03:53:26.841360 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 07 dom 22: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 24 03:53:26.841653 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 08 dom 21: want 810000 got 810000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000002
+Oct 24 03:53:26.841933 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 09 dom 24: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 24 03:53:26.842240 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0c dom 25: want 203000 got 216000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 8000000d
+Oct 24 03:53:26.842517 host kernel: nouveau 0000:01:00.0: clk: LAB calc idx 0e dom 27: want 405000 got 405000 ssel 00000000 coef 00000000 dsrc 00000003 ddiv 00000000 mdiv 80000006
+Oct 24 03:53:26.842833 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 0
+Oct 24 03:53:26.843173 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 1
+Oct 24 03:53:28.838132 host kernel: ------------[ cut here ]------------
+Oct 24 03:53:28.838253 host kernel: nouveau 0000:01:00.0: timeout
+Oct 24 03:53:28.839154 host kernel: WARNING: nvkm/subdev/clk/gf100.c:722 at gf100_clk_prog_1+0x1ec/0x210 [nouveau], CPU#2: kworker/2:0/24871
+Oct 24 03:53:28.839249 host kernel:  snd_intel_sdw_acpi snd_seq_midi snd_hwdep bluetooth snd_seq_midi_event mc snd_pcm snd_rawmidi snd_seq snd_seq_device snd_timer snd mei_me soundcore mei input_leds joydev mac_hid sch_fq_codel efi_pstore nouveau(OE) drm_ttm_helper ttm gpu_sched i2c_algo_bit drm_gpuvm drm_exec mxm_wmi drm_display_helper psmouse cec rc_core ghash_clmulni_intel serio_raw video ahci wmi libahci hid_logitech ff_memless hid_generic uas usb_storage usbhid hid lp ppdev ramoops parport reed_solomon msr dmi_sysfs autofs4 aesni_intel
+Oct 24 03:53:28.839287 host kernel: CPU: 2 UID: 0 PID: 24871 Comm: kworker/2:0 Kdump: loaded Tainted: G           OE       7.0.0-38-generic #38-Ubuntu PREEMPT(lazy) 
+Oct 24 03:53:28.839308 host kernel: Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+Oct 24 03:53:28.839324 host kernel: Hardware name: Gigabyte Technology Co., Ltd. To be filled by O.E.M./Z68X-UD3P-B3, BIOS U1g 11/13/2017
+Oct 24 03:53:28.839342 host kernel: Workqueue: events nvkm_pstate_work [nouveau]
+Oct 24 03:53:28.839360 host kernel: RIP: 0010:gf100_clk_prog_1+0x1f2/0x210 [nouveau]
+Oct 24 03:53:28.839378 host kernel: Code: 48 8b 85 30 ff ff ff 48 8b 40 10 48 8b 78 10 48 8b 5f 50 48 85 db 74 1c e8 5b f3 02 d7 48 8d 3d 54 b4 1c 00 48 89 da 48 89 c6 <67> 48 0f b9 3a e9 78 ff ff ff 48 8b 1f eb df e8 ba 35 6f d7 66 2e
+Oct 24 03:53:28.839396 host kernel: RSP: 0018:ffffca51588bbc30 EFLAGS: 00010246
+Oct 24 03:53:28.839413 host kernel: RAX: ffffffffc0d4b541 RBX: ffff895680c4fc20 RCX: 0000000000000000
+Oct 24 03:53:28.839435 host kernel: RDX: ffff895680c4fc20 RSI: ffffffffc0d4b541 RDI: ffffffffc0c01510
+Oct 24 03:53:28.839450 host kernel: RBP: ffffca51588bbd10 R08: 0000000000000000 R09: 0000000000000000
+Oct 24 03:53:28.839467 host kernel: R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000001
+Oct 24 03:53:28.839487 host kernel: R13: 0000000000000000 R14: 0000000000000000 R15: ffff895687a53c00
+Oct 24 03:53:28.839505 host kernel: FS:  0000000000000000(0000) GS:ffff8959f3cfb000(0000) knlGS:0000000000000000
+Oct 24 03:53:28.839522 host kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Oct 24 03:53:28.839538 host kernel: CR2: 00005a09ad0cb4d8 CR3: 0000000109fb6003 CR4: 00000000001726f0
+Oct 24 03:53:28.839556 host kernel: Call Trace:
+Oct 24 03:53:28.839570 host kernel:  <TASK>
+Oct 24 03:53:28.839597 host kernel:  gf100_clk_prog+0x1ad/0xa40 [nouveau]
+Oct 24 03:53:28.839613 host kernel:  ? __dev_printk+0x52/0x80
+Oct 24 03:53:28.839631 host kernel:  ? __pfx_gf100_clk_prog_0+0x10/0x10 [nouveau]
+Oct 24 03:53:28.839650 host kernel:  ? __pfx_gf100_clk_prog_1+0x10/0x10 [nouveau]
+Oct 24 03:53:28.839669 host kernel:  ? __pfx_gf100_clk_prog_2+0x10/0x10 [nouveau]
+Oct 24 03:53:28.839686 host kernel:  ? __pfx_gf100_clk_prog_3+0x10/0x10 [nouveau]
+Oct 24 03:53:28.839698 host kernel:  ? __pfx_gf100_clk_prog_4+0x10/0x10 [nouveau]
+Oct 24 03:53:28.839713 host kernel:  nvkm_pstate_work+0x666/0x7d0 [nouveau]
+Oct 24 03:53:28.839731 host kernel:  ? finish_task_switch.isra.0+0x95/0x2f0
+Oct 24 03:53:28.839756 host kernel:  process_one_work+0x1ac/0x3d0
+Oct 24 03:53:28.839774 host kernel:  worker_thread+0x1b8/0x360
+Oct 24 03:53:28.839792 host kernel:  ? _raw_spin_lock_irqsave+0xe/0x20
+Oct 24 03:53:28.839808 host kernel:  ? __pfx_worker_thread+0x10/0x10
+Oct 24 03:53:28.839826 host kernel:  kthread+0xf7/0x130
+Oct 24 03:53:28.839843 host kernel:  ? __pfx_kthread+0x10/0x10
+Oct 24 03:53:28.839859 host kernel:  ret_from_fork+0x195/0x2a0
+Oct 24 03:53:28.839876 host kernel:  ? __pfx_kthread+0x10/0x10
+Oct 24 03:53:28.839896 host kernel:  ? __pfx_kthread+0x10/0x10
+Oct 24 03:53:28.839911 host kernel:  ret_from_fork_asm+0x1a/0x30
+Oct 24 03:53:28.839925 host kernel:  </TASK>
+Oct 24 03:53:28.839941 host kernel: ---[ end trace 0000000000000000 ]---
+Oct 24 03:53:28.839957 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 00 (FSRM 0): по признаку, запас 0 мкс; до FSRM2 00000000 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000000 00000000 00004040 00110068; статус 0000ff00
+Oct 24 03:53:28.840598 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 00: признак через 2702 нс (чтений 2, статус 0002000a), запас 0 мкс
+Oct 24 03:53:28.841138 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 03:53:28.841676 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 8190 нс (чтений 2, статус 00020002), запас 0 мкс
+Oct 24 03:53:28.842157 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 2
+Oct 24 03:53:28.842521 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 3
+Oct 24 03:53:28.842972 host kernel: nouveau 0000:01:00.0: clk: LAB prog stage 4
+Oct 24 03:53:28.843298 host kernel: nouveau 0000:01:00.0: clk: LAB prog_4 idx 07: пост-делитель 8120000a -> 0002 под скобкой
+Oct 24 03:53:28.843669 host kernel: nouveau 0000:01:00.0: clk: LAB therm idx 07 (FSRM 1): по признаку, запас 0 мкс; до FSRM2 00000082 FSRM3 00000000 FSRM4 00004040 CTRL1 00110068; после 00000082 00000000 00004040 00110068; статус 0000ff00
+Oct 24 03:53:28.844145 host kernel: nouveau 0000:01:00.0: clk: LAB therm wait idx 07: признак через 2794 нс (чтений 2, статус 00020002), запас 0 мкс
+Oct 24 03:53:28.844898 host kernel: nouveau 0000:01:00.0: clk: LAB clk: блокировка MMU на время стадий, ожидание захвата 0 мкс
+Oct 24 03:53:28.845791 host kernel: nouveau 0000:01:00.0: clk: LAB voltage final: 950000 uV
+Oct 24 03:53:28.846663 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+Oct 24 03:53:28.847140 host kernel: nouveau 0000:01:00.0: fb: LAB replay: память сейчас 135 МГц, цель 324 МГц, шагов 1 (lab_mem_replay=15)
+Oct 24 03:53:28.847701 host kernel: nouveau 0000:01:00.0: fb: LAB replay A 135->324: в memx 62 записей, 9 ожиданий, 9 пауз, пропущено 8 операций, ~200 слов
+Oct 24 03:53:28.848085 host kernel: nouveau 0000:01:00.0: clk: LAB ram calc ret 0
+Oct 24 03:53:28.848490 host kernel: nouveau 0000:01:00.0: fb: LAB replay: прямых записей до скрипта: 493
+Oct 24 03:53:28.848868 host kernel: nouveau 0000:01:00.0: fb: LAB replay A 135->324: выполнен за 9813 мкс (op13×1 op34=1 op3a=0), ret 0; 0x137310=81200816 0x1373f0=00000001 0x132000=18010000 0x10f290=040e0c0a 0x10f300=00000115 0x611200=00000030
+Oct 24 03:53:28.849211 host kernel: nouveau 0000:01:00.0: clk: LAB ram prog ret 0
+Oct 24 03:53:28.849589 host kernel: nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0

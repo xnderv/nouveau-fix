@@ -34,3 +34,8 @@ for idx, nm in names.items():
         print(f'    опора PLL: dsrc R[{0x137120+idx*4:06x}]={rd(0x137120+idx*4):08x}  dctl R[{0x137140+idx*4:06x}]={rd(0x137140+idx*4):08x}')
     print(f'    делитель: dsrc R[{0x137160+idx*4:06x}]={rd(0x137160+idx*4):08x}  ddiv R[{0x1371d0+idx*4:06x}]={rd(0x1371d0+idx*4):08x}')
     print(f'    итоговый mdiv R[{0x137250+idx*4:06x}]={rd(0x137250+idx*4):08x}')
+# 24.10: состояние замедлителя PTHERM (скобка): FSRM 0 = GPC, FSRM 1 = hubk06; покой — статус 0000ff00, CTRL_1 00110068
+print(f'--- PTHERM: CTRL_1 R[020004]={rd(0x020004):08x}')
+for i, nm in ((0, 'GPC'), (1, 'hubk06')):
+    print(f'    FSRM {i} {nm}: статус R[{0x0201e0+i*4:06x}]={rd(0x0201e0+i*4):08x}  FSRM2={rd(0x020160+i*4):08x} '
+          f'FSRM3={rd(0x020180+i*4):08x} FSRM4={rd(0x0201a0+i*4):08x}')

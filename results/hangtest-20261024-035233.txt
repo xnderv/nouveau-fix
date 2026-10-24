@@ -1,0 +1,14 @@
+hangtest 2026-10-24 03:52:33: уровни 03↔07, подъёмов 60, нагрузка browser, удержание 0f 6с, lab_gov был 0, ядро 7.0.0-38-generic
+параметры: lab_mem_order=Y lab_mem_op13=1 lab_mem_op34=1 lab_mem_op3a=0 lab_mem_replay=15 lab_pcie=1 lab_gpc_seq=13 
+03:52:36 старт: core 50 MHz memory 135 MHz; lab_mem=Y lab_core=Y lab_volt_min_uv=0 lab_gr_pause=0 lab_gr_gate=0 lab_gr_wait=0 lab_xbar=0 lab_e9e0=0 lab_pll_keep=0 lab_order=0 lab_order_us=0 lab_therm=1 lab_therm_us=24 lab_therm_us_gpc=0 lab_therm_us_hub=0 lab_therm_probe=0 lab_therm_wait=1 lab_therm_wait_us=0 lab_therm_real=0 lab_clk_mmu_lock=1 lab_therm_div=1 khz: gpc=0 rop=0 hub07=0 hub06=0 hub01=0
+03:52:36 нагрузка: /usr/bin/yandex-browser (pid 25947, профиль /home/alex/.cache/nouveau-hangtest-profile), страница hangload.html; прогрев 10 с
+03:52:46 загрузка GR перед циклами: 993‰
+03:52:57 подъём 1/60 в 03:52:50.889: gr до 993‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 885‰
+03:53:08 подъём 2/60 в 03:53:02.116: gr до 996‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 881‰
+03:53:20 подъём 3/60 в 03:53:14.325: gr до 997‰, скрипт B , после: core 405 MHz memory 324 MHz, gr 882‰
+03:53:34 подъём 4/60 в 03:53:28.856: gr до 997‰, скрипт B , после: core 0 MHz memory 324 MHz, gr 999‰ — ЗАВИСАНИЕ: gr=999‰ 4с подряд, ошибок журнала 0
+03:53:34 подозрение на зависание (gr=999‰ 4с подряд, ошибок журнала 0) — жду подтверждения ядра до 90 с, не перезагружайте
+=== ЗАВИСАНИЕ ВОСПРОИЗВЕДЕНО на подъёме 4 (нагрузка browser): gr=999‰ 4с подряд, ошибок журнала 0; ни ядро, ни подпись ящика за 90 с не подтвердили (GR 1000‰, но eng0/gr700 меняются) — НЕ ЗАСЧИТЫВАТЬ
+    Нагрузка оставлена, lab_gov=0.
+    Снимок регистров: /var/log/gpu-blackbox/hang-*.txt (чёрный ящик). Журнал: journalctl -k -b 0 --since '2026-10-24 03:52:33'
+    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show
