@@ -25,10 +25,15 @@ switched on separately:
   heat; NVIDIA does). lab_gov_hot: at or above this temperature the governor stays out of 0f
   (and leaves it for 07); lab_gov_crit: drops to 03 and stays; released lab_gov_hyst degrees
   below the threshold. Both 0 by default (= off). lab_gov_temp shows the last reading.
+- gf100.c, 24.10: lab_gov_nv — governor timing taken from the NVIDIA 390 trace under load
+  (run 7): up straight to 0f on the first sample >= 50 % (NVIDIA was there ~0.25 s after the
+  load appeared and never stepped 03->07), down one level after 8 s of low load (0f->07 at
+  <15 %, 07->03 at <5 %), no 5 s dwell after a switch. Load thresholds and the temperature
+  brake stay ours. 0 by default (= the rules above).
 
 diff -ruN a/nvkm/subdev/pmu/fuc/gf100.fuc3.h b/nvkm/subdev/pmu/fuc/gf100.fuc3.h
---- a/nvkm/subdev/pmu/fuc/gf100.fuc3.h	2026-10-22 13:29:18.537972372 +0300
-+++ b/nvkm/subdev/pmu/fuc/gf100.fuc3.h	2026-10-22 13:28:49.070012540 +0300
+--- a/nvkm/subdev/pmu/fuc/gf100.fuc3.h	2026-10-24 11:43:52.108786731 +0300
++++ b/nvkm/subdev/pmu/fuc/gf100.fuc3.h	2026-10-24 11:43:52.111000865 +0300
 @@ -69,8 +69,8 @@
  	0x00000000,
  	0x00000000,
@@ -925,8 +930,8 @@ diff -ruN a/nvkm/subdev/pmu/fuc/gf100.fuc3.h b/nvkm/subdev/pmu/fuc/gf100.fuc3.h
  	0x00000000,
  	0x00000000,
 diff -ruN a/nvkm/subdev/pmu/fuc/perf.fuc b/nvkm/subdev/pmu/fuc/perf.fuc
---- a/nvkm/subdev/pmu/fuc/perf.fuc	2026-10-22 13:29:18.538247309 +0300
-+++ b/nvkm/subdev/pmu/fuc/perf.fuc	2026-10-22 13:28:49.070332420 +0300
+--- a/nvkm/subdev/pmu/fuc/perf.fuc	2026-10-24 11:43:52.113964245 +0300
++++ b/nvkm/subdev/pmu/fuc/perf.fuc	2026-10-24 11:43:52.116000831 +0300
 @@ -22,6 +22,19 @@
   * Authors: Ben Skeggs
   */
@@ -1130,9 +1135,9 @@ diff -ruN a/nvkm/subdev/pmu/fuc/perf.fuc b/nvkm/subdev/pmu/fuc/perf.fuc
  // $r0  - zero
  perf_init:
 diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
---- a/nvkm/subdev/pmu/gf100.c	2026-10-22 13:29:18.538274487 +0300
-+++ b/nvkm/subdev/pmu/gf100.c	2026-10-22 13:29:02.567432488 +0300
-@@ -25,6 +25,250 @@
+--- a/nvkm/subdev/pmu/gf100.c	2026-10-24 11:43:52.118729690 +0300
++++ b/nvkm/subdev/pmu/gf100.c	2026-10-24 11:43:52.120879357 +0300
+@@ -25,6 +25,257 @@
  #include "fuc/gf100.fuc3.h"
  
  #include <subdev/mc.h>
@@ -1195,6 +1200,12 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 +static int lab_gov_temp;
 +module_param(lab_gov_temp, int, 0444);
 +MODULE_PARM_DESC(lab_gov_temp, "LAB: last temperature seen by the governor (C)");
++/* LAB 24.10: lab_gov_nv — правила как у регулятора NVIDIA в записи 7: вверх — сразу на 0f по первому замеру >= 50 %
++ * (через ~0,25 с после появления нагрузки; подъёма 03 -> 07 у NVIDIA не было ни разу), вниз — по ступени после 8 с низкой
++ * нагрузки (0f -> 07 при < 15 %, 07 -> 03 при < 5 %), без 5-секундной выдержки после переключения. Пороги загрузки свои. */
++static int lab_gov_nv;
++module_param(lab_gov_nv, int, 0644);
++MODULE_PARM_DESC(lab_gov_nv, "LAB: governor timing as NVIDIA: up straight to 0f on the first sample >= 50%, down one level after 8 s low load, no 03->07 upshift");
 +
 +static struct {
 +	int mode;		/* с каким lab_gov работали в прошлый раз */
@@ -1252,7 +1263,7 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 +	struct nvkm_clk *clk = pmu->subdev.device->clk;
 +	int mode = READ_ONCE(lab_gov);
 +	u32 load = max(gr, vid);
-+	int per_s = 1000 / max(ms, 1), nxt = -1, ret, brake;
++	int per_s = 1000 / max(ms, 1), nxt = -1, ret, brake, nv;
 +	const char *why = "";
 +
 +	if (!clk || (mode != 1 && mode != 2)) {
@@ -1277,7 +1288,8 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 +		lab_gov_st.low = load < 150 ? lab_gov_st.low + 1 : 0;
 +	else
 +		lab_gov_st.low = load < 50 ? lab_gov_st.low + 1 : 0;
-+	if (time_before(jiffies, lab_gov_st.last + msecs_to_jiffies(5000)))
++	nv = READ_ONCE(lab_gov_nv);
++	if (!nv && time_before(jiffies, lab_gov_st.last + msecs_to_jiffies(5000)))
 +		return;
 +
 +	brake = lab_gov_brake(pmu);
@@ -1285,14 +1297,14 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 +		nxt = 0x03, why = "температура: очень горячо";
 +	else if (brake == 1 && lab_gov_st.cur == 0x0f)
 +		nxt = 0x07, why = "температура: горячо";
-+	else if (brake <= 0 && lab_gov_st.cur != 0x0f && lab_gov_st.hi >= 2)
-+		nxt = 0x0f, why = "загрузка >= 50 % два замера";
-+	else if (brake <= 1 && lab_gov_st.cur == 0x03 && lab_gov_st.mid >= 2)
++	else if (brake <= 0 && lab_gov_st.cur != 0x0f && lab_gov_st.hi >= (nv ? 1 : 2))
++		nxt = 0x0f, why = nv ? "загрузка >= 50 % (как NVIDIA: сразу на 0f)" : "загрузка >= 50 % два замера";
++	else if (!nv && brake <= 1 && lab_gov_st.cur == 0x03 && lab_gov_st.mid >= 2)
 +		nxt = 0x07, why = "загрузка >= 15 % два замера";
-+	else if (lab_gov_st.cur == 0x0f && lab_gov_st.low >= 15 * per_s)
-+		nxt = 0x07, why = "загрузка < 15 % 15 с";
-+	else if (lab_gov_st.cur == 0x07 && lab_gov_st.low >= 30 * per_s)
-+		nxt = 0x03, why = "загрузка < 5 % 30 с";
++	else if (lab_gov_st.cur == 0x0f && lab_gov_st.low >= (nv ? 8 : 15) * per_s)
++		nxt = 0x07, why = nv ? "загрузка < 15 % 8 с (как NVIDIA)" : "загрузка < 15 % 15 с";
++	else if (lab_gov_st.cur == 0x07 && lab_gov_st.low >= (nv ? 8 : 30) * per_s)
++		nxt = 0x03, why = nv ? "загрузка < 5 % 8 с (как NVIDIA)" : "загрузка < 5 % 30 с";
 +	if (nxt < 0)
 +		return;
 +
@@ -1383,7 +1395,7 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
  
  void
  gf100_pmu_reset(struct nvkm_pmu *pmu)
-@@ -49,8 +293,8 @@
+@@ -49,8 +300,8 @@
  	.data.size = sizeof(gf100_pmu_data),
  	.enabled = gf100_pmu_enabled,
  	.reset = gf100_pmu_reset,

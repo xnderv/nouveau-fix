@@ -1,7 +1,7 @@
 diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
---- base/nvkm/subdev/clk/base.c	2026-10-22 15:46:27.112235201 +0300
-+++ lab-n13/nvkm/subdev/clk/base.c	2026-10-22 15:46:27.314690095 +0300
-@@ -33,6 +33,31 @@
+--- base/nvkm/subdev/clk/base.c	2026-10-24 11:39:04.999583407 +0300
++++ lab-n13/nvkm/subdev/clk/base.c	2026-10-24 11:40:21.655346534 +0300
+@@ -33,6 +33,45 @@
  #include <subdev/volt.h>
  
  #include <core/option.h>
@@ -30,10 +30,24 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
 +static bool lab_volt_first;
 +module_param(lab_volt_first, bool, 0644);
 +MODULE_PARM_DESC(lab_volt_first, "LAB: raise voltage before memory reclock");
++/* LAB 24.10, по записи NVIDIA 7: lab_nv_pcie_late — на спуске NVIDIA переводит PCIe в gen1 ПОСЛЕ частот и памяти
++ * (на подъёме — в начале, как и nouveau); lab_nv_hub07mem — hubk07 (idx 2) идёт вместе с памятью: подъём — ядро, память,
++ * hubk07; спуск — hubk07, память, ядро (записи 1, 3, 5, 7). */
++static uint lab_nv_pcie_late;
++module_param(lab_nv_pcie_late, uint, 0644);
++MODULE_PARM_DESC(lab_nv_pcie_late, "LAB: going down, retrain PCIe after clocks and memory (as NVIDIA); going up it stays first");
++static uint lab_nv_hub07mem;
++module_param(lab_nv_hub07mem, uint, 0644);
++MODULE_PARM_DESC(lab_nv_hub07mem, "LAB: switch hubk07 together with memory as NVIDIA (up: core, memory, hubk07; down: hubk07, memory, core)");
++extern u32 lab_clk_prog_mask;	/* clk/gf100.c */
++static struct nvkm_pstate *lab_h07_pstate;	/* задан только на время вызова из nvkm_pstate_prog с lab_nv_hub07mem */
++static int lab_h07_pstatei;
++static bool lab_h07_up;
++static void lab_pstate_mem(struct nvkm_clk *clk, struct nvkm_pstate *pstate, int pstatei);
  
  /******************************************************************************
   * misc
-@@ -190,12 +215,19 @@
+@@ -190,12 +229,30 @@
  			nvkm_error(subdev, "failed to raise voltage: %d\n", ret);
  			return ret;
  		}
@@ -47,7 +61,18 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
 -		clk->func->tidy(clk);
 +	if (lab_core) {
 +		ret = clk->func->calc(clk, cstate);
-+		if (ret == 0) {
++		if (ret == 0 && lab_h07_pstate) {
++			u32 h07 = 1u << 2;
++
++			nvkm_info(subdev, "LAB nv_hub07mem: %s\n", lab_h07_up ? "ядро без hubk07, память, hubk07" : "hubk07, память, ядро без hubk07");
++			lab_clk_prog_mask = lab_h07_up ? ~h07 : h07;
++			ret = clk->func->prog(clk);
++			lab_pstate_mem(clk, lab_h07_pstate, lab_h07_pstatei);
++			lab_clk_prog_mask = lab_h07_up ? h07 : ~h07;
++			ret |= clk->func->prog(clk);
++			lab_clk_prog_mask = ~0u;
++			clk->func->tidy(clk);
++		} else if (ret == 0) {
 +			ret = clk->func->prog(clk);
 +			clk->func->tidy(clk);
 +		}
@@ -57,7 +82,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  	}
  
  	if (volt) {
-@@ -203,6 +235,7 @@
+@@ -203,6 +260,7 @@
  				       pstate->base.voltage, clk->temp, -1);
  		if (ret && ret != -ENODEV)
  			nvkm_error(subdev, "failed to lower voltage: %d\n", ret);
@@ -65,7 +90,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  	}
  
  	if (therm) {
-@@ -263,14 +296,41 @@
+@@ -263,14 +321,41 @@
  /******************************************************************************
   * P-States
   *****************************************************************************/
@@ -108,7 +133,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  	list_for_each_entry(pstate, &clk->states, head) {
  		if (idx++ == pstatei)
-@@ -278,22 +338,41 @@
+@@ -278,22 +363,58 @@
  	}
  
  	nvkm_debug(subdev, "setting performance state %d\n", pstatei);
@@ -128,7 +153,9 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
 -		ram->func->tidy(ram);
 +	nvkm_info(subdev, "LAB pstate %d: flags pcie=%d mem=%d core=%d volt_first=%d\n",
 +		  pstatei, lab_pcie, lab_mem, lab_core, lab_volt_first);
-+	if (lab_pcie == 1) {
++	if (lab_pcie == 1 && lab_nv_pcie_late && !up) {
++		nvkm_info(subdev, "LAB pstate %d: спуск — PCIe в конце (lab_nv_pcie_late=1, как NVIDIA)\n", pstatei);
++	} else if (lab_pcie == 1) {
 +		nvkm_info(subdev, "LAB pstate %d: pcie speed %d width %d\n", pstatei, pstate->pcie_speed, pstate->pcie_width);
 +		nvkm_pcie_set_link(pci, pstate->pcie_speed, pstate->pcie_width);
 +		nvkm_info(subdev, "LAB pstate %d: pcie done\n", pstatei);
@@ -148,23 +175,38 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
 +			  r, nvkm_volt_get(volt), pstate->base.voltage);
 +	}
 +
-+	if (!(lab_mem_order && up))
-+		lab_pstate_mem(clk, pstate, pstatei);
-+	else
-+		nvkm_info(subdev, "LAB pstate %d: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)\n", pstatei);
++	if (lab_nv_hub07mem && lab_core) {
++		/* память — внутри nvkm_cstate_prog, между hubk07 и остальными узлами */
++		lab_h07_pstate = pstate;
++		lab_h07_pstatei = pstatei;
++		lab_h07_up = up;
++		nvkm_info(subdev, "LAB pstate %d: programming core clocks/voltage (память вместе с hubk07)\n", pstatei);
++		ret = nvkm_cstate_prog(clk, pstate, NVKM_CLK_CSTATE_HIGHEST);
++		lab_h07_pstate = NULL;
++	} else {
++		if (!(lab_mem_order && up))
++			lab_pstate_mem(clk, pstate, pstatei);
++		else
++			nvkm_info(subdev, "LAB pstate %d: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)\n", pstatei);
 +
-+	nvkm_info(subdev, "LAB pstate %d: programming core clocks/voltage\n", pstatei);
-+	ret = nvkm_cstate_prog(clk, pstate, NVKM_CLK_CSTATE_HIGHEST);
-+	if (lab_mem_order && up)
-+		lab_pstate_mem(clk, pstate, pstatei);
++		nvkm_info(subdev, "LAB pstate %d: programming core clocks/voltage\n", pstatei);
++		ret = nvkm_cstate_prog(clk, pstate, NVKM_CLK_CSTATE_HIGHEST);
++		if (lab_mem_order && up)
++			lab_pstate_mem(clk, pstate, pstatei);
++	}
++	if (lab_pcie == 1 && lab_nv_pcie_late && !up) {
++		nvkm_info(subdev, "LAB pstate %d: pcie speed %d width %d (в конце спуска)\n", pstatei, pstate->pcie_speed, pstate->pcie_width);
++		nvkm_pcie_set_link(pci, pstate->pcie_speed, pstate->pcie_width);
++		nvkm_info(subdev, "LAB pstate %d: pcie done\n", pstatei);
++	}
 +	nvkm_info(subdev, "LAB pstate %d: done ret %d\n", pstatei, ret);
 +	return ret;
  }
  
  static void
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-24 02:11:44.800993360 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 05:21:40.518984667 +0300
+--- base/nvkm/subdev/clk/gf100.c	2026-10-24 11:39:05.000208355 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 11:39:35.315658010 +0300
 @@ -23,11 +23,18 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -249,7 +291,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +314,128 @@
+@@ -270,6 +314,142 @@
  	return ret;
  }
  
@@ -355,6 +397,20 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +static uint lab_pmu_div;
 +module_param(lab_pmu_div, uint, 0644);
 +MODULE_PARM_DESC(lab_pmu_div, "LAB: PMU clock divider rounded to nearest, both fields as BIOS/NVIDIA (0x81200e0e = 202.5 MHz); 0 = nouveau (rounds down: 216 MHz)");
++/* LAB 24.10, по записи NVIDIA 7 (переходы под нагрузкой):
++ * lab_gpc_pre405 — перед переводом GPC на PLL NVIDIA всегда ставит делительный путь на VCO/4 (405 МГц) внутри скобки: с 03 —
++ *   пост-делитель 0x137250 = …02 (296,047 с), с 07 — основной делитель 0x1371d0 = …06 (запись 1, 35,5539). Мультиплексор
++ *   переключается с 405 на PLL 1800 (разрыв ~4,4), а не со 101,25 (17,8) или 810.
++ * lab_nv_hubpost — на спуске с PLL NVIDIA ставит пост-делитель hubk06 и hubk01 ДО мультиплексора (hubk06 — внутри скобки);
++ *   nouveau ставит его на стадии 4, и между стадиями 1 и 4 узел работает на 1620 МГц. */
++static uint lab_gpc_pre405;
++module_param(lab_gpc_pre405, uint, 0644);
++MODULE_PARM_DESC(lab_gpc_pre405, "LAB: before switching GPC to its PLL set the divider path to VCO/4 (405 MHz) inside the bracket, as NVIDIA");
++static uint lab_nv_hubpost;
++module_param(lab_nv_hubpost, uint, 0644);
++MODULE_PARM_DESC(lab_nv_hubpost, "LAB: hubk06/hubk01 leaving the PLL: write the post-divider before the mux, as NVIDIA (no 1620 MHz transient)");
++/* LAB: какие узлы программирует gf100_clk_prog (бит = idx); clk/base.c сужает маску для hubk07 вместе с памятью */
++u32 lab_clk_prog_mask = ~0u;
 +
 +static u32
 +lab_override(int idx, u32 freq)
@@ -378,7 +434,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +448,75 @@
+@@ -282,6 +462,75 @@
  	if (!freq)
  		return 0;
  
@@ -454,7 +510,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +526,9 @@
+@@ -291,7 +540,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -465,7 +521,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +555,8 @@
+@@ -318,6 +569,8 @@
  		info->freq = clk1;
  	}
  
@@ -474,7 +530,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -351,15 +590,227 @@
+@@ -351,15 +604,235 @@
  	}
  }
  
@@ -648,6 +704,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static void
  gf100_clk_prog_1(struct gf100_clk *clk, int idx)
  {
++	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
 +	struct lab_therm_save th = { .on = false };
 +	bool chg = !!(nvkm_rd32(device, 0x137100) & (1 << idx));
@@ -656,6 +713,13 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +		lab_therm_enter(clk, idx, &th);
 +	else if (lab_therm && (idx == 0 || idx == 7))
 +		nvkm_info(&clk->base.subdev, "LAB therm idx %02x: стадия 1, бит не меняется — без скобки\n", idx);
++	if (lab_nv_hubpost && (idx == 7 || idx == 8) && chg && !info->ssel) {
++		u32 was = nvkm_rd32(device, 0x137250 + (idx * 0x04));
++
++		nvkm_mask(device, 0x137250 + (idx * 0x04), 0x0000003f, info->mdiv & 0x0000003f);
++		nvkm_info(&clk->base.subdev, "LAB nv_hubpost idx %02x: пост-делитель %08x -> %08x до мультиплексора\n",
++			  idx, was, nvkm_rd32(device, 0x137250 + (idx * 0x04)));
++	}
  	nvkm_mask(device, 0x137100, (1 << idx), 0x00000000);
  	nvkm_msec(device, 2000,
  		if (!(nvkm_rd32(device, 0x137100) & (1 << idx)))
@@ -702,7 +766,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static void
-@@ -369,19 +820,52 @@
+@@ -369,19 +842,52 @@
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
  	if (idx <= 7) {
@@ -758,7 +822,28 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +879,35 @@
+@@ -390,17 +896,58 @@
+ }
+ 
+ static void
++lab_gpc_div405(struct gf100_clk *clk)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 d = nvkm_rd32(device, 0x1371d0), p = nvkm_rd32(device, 0x137250);
++	u32 a = d & 0x3f, f = p & 0x3f;
++
++	/* делительный путь = VCO * 2 / (a + 2) * 2 / (f + 2); цель VCO / 4, то есть (a + 2) * (f + 2) = 16 */
++	if ((p & 0x80000000) && f && 16 % (a + 2) == 0 && 16 / (a + 2) >= 2)
++		nvkm_mask(device, 0x137250, 0x0000003f, 16 / (a + 2) - 2);	/* с 03: пост-делителем */
++	else
++		nvkm_mask(device, 0x1371d0, 0x0000003f, 0x06);			/* с 07: основным делителем /4 */
++	nvkm_info(&clk->base.subdev, "LAB gpc_pre405: делительный путь на VCO/4 перед PLL: 0x1371d0 %08x -> %08x, 0x137250 %08x -> %08x\n",
++		  d, nvkm_rd32(device, 0x1371d0), p, nvkm_rd32(device, 0x137250));
++}
++
++static void
+ gf100_clk_prog_3(struct gf100_clk *clk, int idx)
+ {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -770,6 +855,8 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +			lab_therm_enter(clk, idx, &th);
 +		else if (lab_therm && (idx == 0 || idx == 7))
 +			nvkm_info(&clk->base.subdev, "LAB therm idx %02x: стадия 3, бит не меняется — без скобки\n", idx);
++		if (idx == 0 && lab_gpc_pre405 && chg && !(nvkm_rd32(device, 0x137100) & 1))
++			lab_gpc_div405(clk);
  		nvkm_mask(device, 0x137100, (1 << idx), info->ssel);
 -		nvkm_msec(device, 2000,
 +		if (nvkm_msec(device, 2000,
@@ -796,7 +883,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -409,7 +916,17 @@
+@@ -409,7 +956,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -814,7 +901,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static int
-@@ -426,15 +943,138 @@
+@@ -426,15 +983,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -907,7 +994,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 -			if (!clk->eng[j].freq)
 +			int e = (lab_order && mux_stage) ? (up ? up_order[j] : down_order[j]) : j;
 +
-+			if (!clk->eng[e].freq)
++			if (!clk->eng[e].freq || !(lab_clk_prog_mask & (1u << e)))
  				continue;
 -			stage[i].exec(clk, j);
 +			stage[i].exec(clk, e);
@@ -955,7 +1042,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +1117,5 @@
+@@ -477,5 +1157,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
@@ -963,8 +1050,8 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	return nvkm_clk_ctor(&gf100_clk, device, type, inst, true, &clk->base);
  }
 diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
---- base/nvkm/subdev/fb/ramgf100.c	2026-10-22 15:46:27.121287900 +0300
-+++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-22 15:46:27.283508950 +0300
+--- base/nvkm/subdev/fb/ramgf100.c	2026-10-24 11:39:05.017751030 +0300
++++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-24 11:39:05.314379012 +0300
 @@ -25,6 +25,16 @@
  #include "ram.h"
  #include "ramfuc.h"
@@ -1832,8 +1919,8 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  }
  
 diff -ru base/nvkm/subdev/volt/base.c lab-n13/nvkm/subdev/volt/base.c
---- base/nvkm/subdev/volt/base.c	2026-10-22 15:46:27.161236166 +0300
-+++ lab-n13/nvkm/subdev/volt/base.c	2026-10-22 15:46:27.283844658 +0300
+--- base/nvkm/subdev/volt/base.c	2026-10-24 11:39:05.040131018 +0300
++++ lab-n13/nvkm/subdev/volt/base.c	2026-10-24 11:39:05.314501263 +0300
 @@ -28,6 +28,8 @@
  #include <subdev/bios/volt.h>
  #include <subdev/therm.h>
