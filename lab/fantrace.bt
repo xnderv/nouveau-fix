@@ -1,0 +1,35 @@
+#!/usr/bin/env bpftrace
+// ВЕНТИЛЯТОР (24.10): почему nouveau иногда читает скважность ШИМ как 0 % (или 100 %) и разгоняет вентилятор заново с 3 %.
+// Только наблюдение: пробы на возврат nv50_fan_pwm_get / nvkm_fanpwm_get, в железо ничего не пишется.
+//   nv50_fan_pwm_get: ret != 0 — бит включения ШИМ (0xe28c бит 0, линия 16) прочитан снятым;
+//                     ret == 0 — печатаем сырые 0xe114 (период) и 0xe118 (скважность), если они странные
+//   nvkm_fanpwm_get:  итоговый процент, если он <= 5 или >= 99, со стеком — кто спрашивал (таймер регулятора или sysfs)
+// Запуск: sudo timeout -s INT 120 bpftrace ~/Home/nouveau-fix/lab/fantrace.bt | tee ~/Home/nouveau-fix/results/fantrace-$(date +%H%M%S).txt
+
+kprobe:nv50_fan_pwm_get { @pd[tid] = arg2; @pu[tid] = arg3; }
+
+kretprobe:nv50_fan_pwm_get
+{
+	@calls = count();
+	if (retval != 0) {
+		@ctrl_off = count();
+		printf("%s pwm_get ret %d (бит ШИМ в 0xe28c снят), %s cpu %d\n", strftime("%H:%M:%S.%f", nsecs), (int32)retval, comm, cpu);
+	} else {
+		$d = *(uint32 *)@pd[tid];
+		$u = *(uint32 *)@pu[tid];
+		if ($d == 0 || $u == 0 || ($u & 0x7fffffff) >= $d || ($u & 0x80000000)) {
+			@odd = count();
+			printf("%s pwm_get 0xe114 %08x 0xe118 %08x, %s cpu %d\n", strftime("%H:%M:%S.%f", nsecs), $d, $u, comm, cpu);
+		}
+	}
+	delete(@pd[tid]);
+	delete(@pu[tid]);
+}
+
+kretprobe:nvkm_fanpwm_get /(int32)retval <= 5 || (int32)retval >= 99/
+{
+	@extreme = count();
+	printf("%s => %d %%, %s cpu %d%s\n", strftime("%H:%M:%S.%f", nsecs), (int32)retval, comm, cpu, kstack(8));
+}
+
+END { clear(@pd); clear(@pu); }
