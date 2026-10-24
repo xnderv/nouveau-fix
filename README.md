@@ -63,7 +63,7 @@ Needs `dkms build-essential patch git linux-headers-generic`.
 |---|---|
 | `bash stable/stable.sh install` | stable driver via DKMS (rebuilt for every new kernel): patches 0001 + 0003 + 0010 |
 | `bash stable/stable.sh status` | loaded driver, level, load, temperature, PCIe link, events |
-| `bash lab/lab.sh install` | lab driver: 0001 + lab 0002 + 0003 + 0004 + 0005, with `lab_*` switches for every step |
+| `bash lab/lab.sh install` | lab driver: 0001 + lab 0002 + 0003 + 0004 + 0005 + 0006, with `lab_*` switches for every step |
 | `bash tools/card-report.sh` | read-only report about your card (see above) |
 
 Reclocking is active only on the reference board. On any other card the driver behaves like upstream; the stable
@@ -76,6 +76,8 @@ driver tries other GF114 boards with `nouveau.gf114_board=1` (untested; watch fo
 - `0003` — HDMI was refused when the monitor supports SCDC and the GPU does not; refuse only above 340 MHz.
   Fixed upstream independently in Sept 2026 (`1717fcc5be57`); skipped automatically where present.
 - `0004` (lab) — load accounting in the PMU firmware and the in-driver governor. `0005` (lab) — HDMI AVI InfoFrame ITC.
+- `0006` — the fan could drop to 3 % on its own: nouveau read back the PWM duty with the update bit still set, and its
+  u32 math turned that into 0 % (race between its two fan timers; `docs/2026-10-24/vent-20261024.md`). Candidate for upstream.
 - `0010` — stable reclocking for the reference board (22–24 Oct); it does not yet have the shader-divider and PMU
   clock fixes from the lab driver.
 - `lab/0002` — the instrumented reclocking with all switches.
@@ -158,7 +160,7 @@ NVIDIA, — только открытыми методами — и старае
 |---|---|
 | `bash stable/stable.sh install` | стабильный драйвер через DKMS (сам пересобирается под каждое новое ядро): патчи 0001 + 0003 + 0010 |
 | `bash stable/stable.sh status` | какой драйвер загружен, уровень, загрузка, температура, шина PCIe, события |
-| `bash lab/lab.sh install` | лабораторный драйвер: 0001 + лабораторный 0002 + 0003 + 0004 + 0005, с переключателями `lab_*` на каждый шаг |
+| `bash lab/lab.sh install` | лабораторный драйвер: 0001 + лабораторный 0002 + 0003 + 0004 + 0005 + 0006, с переключателями `lab_*` на каждый шаг |
 | `bash newkernel.sh` | после установки нового ядра, до перезагрузки: проверить и при необходимости дособрать драйвер |
 | `bash tools/card-report.sh` | отчёт о вашей карте, только чтение (см. выше) |
 

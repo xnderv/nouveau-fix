@@ -1,0 +1,56 @@
+From: Alex <xnderv@yandex.com>
+Subject: [PATCH] drm/nouveau/therm: mask the update bit when reading back the fan PWM duty
+
+nv50_fan_pwm_set() and gf119_fan_pwm_set() write the duty cycle to 0xe118
+with bit 31 set. Read back right after such a write, the register still
+has bit 31 set, and nv50_fan_pwm_get()/gf119_fan_pwm_get() return it as
+part of the duty cycle. nvkm_fanpwm_get() then takes divs = max(divs, duty),
+so divs becomes 0x8000xxxx too, and duty * 100 overflows u32
+(0x80000000 * 100 == 0 mod 2^32): the fan reads as 0%. nvkm_fan_update()
+uses that as the current speed and steps from it, so the fan is set to 3%
+and climbs back by 3% per bump period.
+
+The writer and the reader are the two nouveau timers: the 1 s thermal poll
+(nvkm_therm_alarm) and the fan bump alarm (nvkm_fan_alarm). When the target
+moves by more than one 3% step, the second bump lands on the next poll tick;
+one of them writes 0xe118 and the other reads it a few microseconds later.
+
+Seen on a GTX 560 Ti (GF114, nv50 PWM path) under a load that makes the
+temperature swing quickly: traced with bpftrace, 7 of 239 duty reads in two
+minutes came 7-25 us after the other timer's write, with bit 31 still set
+(e.g. 0x800001e1 with divs 0x21c), and each was followed by a drop to 3%.
+
+gm107_fan_pwm_get() and the PTHERM PWM path of gf119_fan_pwm_get() already
+mask their duty reads; do the same for 0xe118.
+
+---
+diff --git a/nvkm/subdev/therm/nv50.c b/nvkm/subdev/therm/nv50.c
+--- a/nvkm/subdev/therm/nv50.c
++++ b/nvkm/subdev/therm/nv50.c
+@@ -72,7 +72,10 @@
+ 
+ 	if (nvkm_rd32(device, ctrl) & (1 << line)) {
+ 		*divs = nvkm_rd32(device, 0x00e114 + (id * 8));
+-		*duty = nvkm_rd32(device, 0x00e118 + (id * 8));
++		/* bit 31 is the trigger set by pwm_set(), and can
++		 * still read back as set right after a write
++		 */
++		*duty = nvkm_rd32(device, 0x00e118 + (id * 8)) & 0x7fffffff;
+ 		return 0;
+ 	}
+ 
+diff --git a/nvkm/subdev/therm/gf119.c b/nvkm/subdev/therm/gf119.c
+--- a/nvkm/subdev/therm/gf119.c
++++ b/nvkm/subdev/therm/gf119.c
+@@ -74,7 +74,10 @@
+ 	else if (indx < 2) {
+ 		if (nvkm_rd32(device, 0x00d610 + (line * 0x04)) & 0x00000040) {
+ 			*divs = nvkm_rd32(device, 0x00e114 + (indx * 8));
+-			*duty = nvkm_rd32(device, 0x00e118 + (indx * 8));
++			/* bit 31 is the trigger set by pwm_set(), and can
++			 * still read back as set right after a write
++			 */
++			*duty = nvkm_rd32(device, 0x00e118 + (indx * 8)) & 0x7fffffff;
+ 			return 0;
+ 		}
+ 	} else if (indx == 2) {
