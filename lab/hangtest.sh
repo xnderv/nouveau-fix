@@ -16,7 +16,12 @@
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; KIT="$(dirname "$HERE")"; PRM=/sys/module/nouveau/parameters
 N="${1:-60}"; [[ "$N" =~ ^[0-9]+$ ]] || { echo "Число подъёмов"; exit 1; }
-LOAD="${LOAD:-browser}"; HOLD="${HOLD:-6}"
+LOAD="${LOAD:-browser}"
+# 24.10 вечер: FAST=1 — частые переходы (ловить редкий тайм-аут переключателя GPC быстрее): пауза перед подъёмом 0,2–0,8 с,
+# на 0f HOLD=1 с (если не задан), после спуска — по 0,5 с. Зависание в этом режиме — GR >= 999‰ на 0f четыре цикла подряд
+# (счётчик не сбрасывается между циклами) или подпись в журнале ядра. Длительности ожиданий — время, а не флаги карты: это
+# темп опыта, а не часть драйвера.
+FAST="${FAST:-0}"; if [ "$FAST" = 1 ]; then HOLD="${HOLD:-1}"; else HOLD="${HOLD:-6}"; fi
 # 24.10: LOW/HIGH — пара уровней (по умолчанию 07 и 0f). LOW=03 HIGH=07 — переход 03↔07 (зависания 24.10 01:32 и 01:38).
 LOW="${LOW:-07}"; HIGH="${HIGH:-0f}"
 # 24.10 (серия В): MID — спуск через промежуточный уровень, как регулятор NVIDIA: LOW=03 HIGH=0f MID=07 — подъём 03 -> 0f,
@@ -46,7 +51,7 @@ finish() {
 }
 trap finish EXIT
 T0="$(date '+%Y-%m-%d %H:%M:%S')"
-{ echo "hangtest $T0: уровни $LOW↔$HIGH${MID:+ (спуск через $MID)}, подъёмов $N, нагрузка $LOAD, удержание 0f ${HOLD}с, lab_gov был $GOV0, ядро $(uname -r)"
+{ echo "hangtest $T0: $([ "$FAST" = 1 ] && echo "БЫСТРЫЙ режим, ")уровни $LOW↔$HIGH${MID:+ (спуск через $MID)}, подъёмов $N, нагрузка $LOAD, удержание 0f ${HOLD}с, lab_gov был $GOV0, ядро $(uname -r)"
   echo "параметры: $(for p in lab_mem_order lab_mem_op13 lab_mem_op34 lab_mem_op3a lab_mem_replay lab_pcie lab_gpc_seq; do printf '%s=%s ' $p "$(cat $PRM/$p)"; done)"
 } | tee "$LOG"; sync
 sudo sh -c "echo 0 > $PRM/lab_gov"
@@ -85,12 +90,13 @@ if [ "$LOAD" != none ]; then
     [ "$G" -ge 300 ] 2>/dev/null || { echo "$(date +%T) СТОП: нагрузка не поднялась (gr $G‰): окно нагрузки не на виду или без ускорения. Тест не начат." | tee -a "$LOG"; exit 1; }
 fi
 echo "$(date +%T) загрузка GR перед циклами: $G‰" | tee -a "$LOG"; sync
-DONE=0
+DONE=0; busy=0
 for c in $(seq 1 "$N"); do
     [ -n "$LP" ] && ! kill -0 "$LP" 2>/dev/null && { echo "$(date +%T) СТОП: нагрузка завершилась сама" | tee -a "$LOG"; break; }
-    sleep "$(shuf -i 15-55 -n1 | awk '{print $1/10}')"       # случайная фаза 1.5–5.5 с, как у регулятора
+    if [ "$FAST" = 1 ]; then sleep "$(shuf -i 2-8 -n1 | awk '{print $1/10}')"   # FAST: 0,2–0,8 с
+    else sleep "$(shuf -i 15-55 -n1 | awk '{print $1/10}')"; fi      # случайная фаза 1.5–5.5 с, как у регулятора
     G0="$(gr)"; pstate $HIGH; TS="$(date +%T.%N | cut -c1-12)"
-    busy=0; hung=""
+    [ "$FAST" = 1 ] || busy=0; hung=""
     for s in $(seq 1 "$HOLD"); do
         sleep 1; g="$(gr)"
         [ "$g" -ge 999 ] 2>/dev/null && busy=$((busy + 1)) || busy=0
@@ -119,8 +125,9 @@ for c in $(seq 1 "$N"); do
           echo "    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show"; } | tee -a "$LOG"; sync
         exit 2
     fi
-    [ -n "$MID" ] && { pstate $MID; sleep 2; }
-    pstate $LOW; sleep 2; DONE=$c
+    W2=2; [ "$FAST" = 1 ] && W2=0.5
+    [ -n "$MID" ] && { pstate $MID; sleep $W2; }
+    pstate $LOW; sleep $W2; DONE=$c
     case "$(ac)" in *"memory $(memof $LOW) MHz"*) ;; *) [ "$MEM0" = Y ] && { echo "$(date +%T) СТОП: после спуска не $(memof $LOW) МГц: $(ac)" | tee -a "$LOG"; break; };; esac
 done
 echo "$(date +%T) тайм-аутов переключателя источника такта за тест: $(( $(cat "$PRM/lab_mux_timeouts" 2>/dev/null || echo 0) - MT0 )) (journalctl -k: «LAB mux»)" | tee -a "$LOG"
