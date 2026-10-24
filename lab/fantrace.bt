@@ -1,10 +1,26 @@
 #!/usr/bin/env bpftrace
-// ВЕНТИЛЯТОР (24.10): почему nouveau иногда читает скважность ШИМ как 0 % (или 100 %) и разгоняет вентилятор заново с 3 %.
-// Только наблюдение: пробы на возврат nv50_fan_pwm_get / nvkm_fanpwm_get, в железо ничего не пишется.
-//   nv50_fan_pwm_get: ret != 0 — бит включения ШИМ (0xe28c бит 0, линия 16) прочитан снятым;
-//                     ret == 0 — печатаем сырые 0xe114 (период) и 0xe118 (скважность), если они странные
-//   nvkm_fanpwm_get:  итоговый процент, если он <= 5 или >= 99, со стеком — кто спрашивал (таймер регулятора или sysfs)
+// ВЕНТИЛЯТОР (24.10): почему nouveau иногда читает скважность ШИМ как 0 % и разгоняет вентилятор заново с 3 %.
+// Только наблюдение: пробы на nv50_fan_pwm_get/set, nvkm_fanpwm_get и два таймера therm; в железо ничего не пишется.
+// Прогон 1 (18:07, results/fantrace-180742.txt): в момент сброса 0xe118 читается с битом 31 (0x800001e1 и т. п.) —
+//   значение, записанное nouveau как duty|0x80000000, ещё не применено. nvkm_fanpwm_get берёт max(0xe114, 0xe118)
+//   и умножает на 100 в u32 — переполнение, выходит 0 %.
+// Прогон 2 проверяет версию гонки: секундный опрос температуры и шаговый таймер вентилятора (+0,5 с) срабатывают в один
+//   тик; первый пишет новую скважность, второй через микросекунды читает её с ещё не снятым битом 31.
 // Запуск: sudo timeout -s INT 120 bpftrace ~/Home/nouveau-fix/lab/fantrace.bt | tee ~/Home/nouveau-fix/results/fantrace-$(date +%H%M%S).txt
+
+// кто сейчас работает в этом потоке: 1 — шаговый таймер вентилятора, 2 — секундный опрос температуры, 0 — другое (sysfs, порог)
+kprobe:nvkm_fan_alarm { @ctx[cpu] = 1; }
+kretprobe:nvkm_fan_alarm { @ctx[cpu] = 0; }
+kprobe:nvkm_therm_alarm { @ctx[cpu] = 2; }
+kretprobe:nvkm_therm_alarm { @ctx[cpu] = 0; }
+
+kprobe:nv50_fan_pwm_set
+{
+	@sets = count();
+	@last_set = nsecs;
+	@last_set_ctx = @ctx[cpu];
+	@last_set_duty = arg3;
+}
 
 kprobe:nv50_fan_pwm_get { @pd[tid] = arg2; @pu[tid] = arg3; }
 
@@ -19,17 +35,17 @@ kretprobe:nv50_fan_pwm_get
 		$u = *(uint32 *)@pu[tid];
 		if ($d == 0 || $u == 0 || ($u & 0x7fffffff) >= $d || ($u & 0x80000000)) {
 			@odd = count();
-			printf("%s pwm_get 0xe114 %08x 0xe118 %08x, %s cpu %d\n", strftime("%H:%M:%S.%f", nsecs), $d, $u, comm, cpu);
+			printf("%s pwm_get 0xe114 %08x 0xe118 %08x, читал %d, %s cpu %d; последняя запись %d мкс назад (писал %d, скважность %d)\n",
+			       strftime("%H:%M:%S.%f", nsecs), $d, $u, @ctx[cpu], comm, cpu,
+			       (nsecs - @last_set) / 1000, @last_set_ctx, @last_set_duty);
 		}
 	}
-	delete(@pd[tid]);
-	delete(@pu[tid]);
 }
 
 kretprobe:nvkm_fanpwm_get /(int32)retval <= 5 || (int32)retval >= 99/
 {
 	@extreme = count();
-	printf("%s => %d %%, %s cpu %d%s\n", strftime("%H:%M:%S.%f", nsecs), (int32)retval, comm, cpu, kstack(8));
+	printf("%s => %d %%, читал %d, %s cpu %d\n", strftime("%H:%M:%S.%f", nsecs), (int32)retval, @ctx[cpu], comm, cpu);
 }
 
-END { clear(@pd); clear(@pu); }
+END { clear(@pd); clear(@pu); clear(@ctx); clear(@last_set); clear(@last_set_ctx); clear(@last_set_duty); }
