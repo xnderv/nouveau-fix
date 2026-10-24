@@ -1,77 +1,54 @@
 #!/bin/bash
-# ЗАПИСЬ mmiotrace драйвера NVIDIA 390 на GTX 560 Ti (система u2204-trace). Версия 5 — «постоянная лёгкая нагрузка, без простоя» (24.10).
-# Основа — версия 2 (запуск записи, драйвера и X11), но без её снимка перед X11 (см. ниже); нагрузка — как в версии 1, но без того, что её
-# повесило: опроса nvidia-settings каждые 2 с и glmark2 1600x900. Уровень карты виден в самой записи (мультиплексор,
-# делители, PLL), nvidia-settings — только в точках снимков.
-# Зачем: в записях 1 и 2 переходы были только при старте X на пустой карте; нет ни одного перехода под нагрузкой и
-# ни одного подъёма 03 -> 07. Смотрим: где скобка PTHERM и сколько NVIDIA ждёт, пост-делители GPC/hubk06 на 03 <-> 07,
-# порядок hubk07/hubk06/hubk01 и памяти, PXBAR, 0x001548, 0x00e9e0, 0x022680, второе поле делителей.
-# Фазы — от безопасных к рискованным (зависание обрывает запись, но всё до него уже на диске):
-#   0  «максимум», запуск двух glxgears (300x300 и 640x480); большая — на паузу, маленькая крутится до конца записи
-#   A  адаптивный 60 с                             -> спуск под лёгкой нагрузкой (до 07 или 03 — решает NVIDIA)
-#   B  продолжение большой 30 с                    -> подъём под нагрузкой
-#   C  большая на паузе 40 с                       -> снова спуск под лёгкой нагрузкой
-#   D  «максимум» 10 с, «адаптивный» 30 с          -> 0f и спуск под лёгкой нагрузкой
+# ЗАПИСЬ mmiotrace драйвера NVIDIA 390 на GTX 560 Ti (система u2204-trace). Версия 6 — «контроль и запись за один запуск» (24.10).
+# Два прохода одного и того же сценария подряд, без перезагрузки и без ввода команд:
+#   1) КОНТРОЛЬ — драйвер и X без mmiotrace, все ядра процессора работают;
+#   2) ЗАПИСЬ — драйвер выгружается, включается mmiotrace (остаётся одно ядро), драйвер грузится заново, тот же сценарий.
+# Зачем контроль: записи 3–5 под NVIDIA ломались (сброс записи 0x070000 не завершается, Xid 79 «GPU has fallen off the bus»).
+# Если повиснет контроль — виноваты карта/драйвер NVIDIA под Linux, а не запись; если только запись — сама запись.
+# Сценарий прохода (маленькая программа крутится всё время — простоя нет нигде; уровни меняют большая программа и PowerMizer):
+#   0  «максимум», запуск двух glxgears (300x300 и 640x480) один раз; большая — на паузу (SIGSTOP), дальше только продолжение
+#   A  адаптивный 45 с                             -> спуск под лёгкой нагрузкой (до 07 или 03 — решает NVIDIA)
+#   B  продолжение большой 25 с                    -> подъём под нагрузкой
+#   C  большая на паузе 30 с                       -> снова спуск под лёгкой нагрузкой
+#   D  «максимум» 10 с, «адаптивный» 25 с          -> 0f и спуск под лёгкой нагрузкой
 #   E  всплески большой: 5 x (3 с, пауза 6 с)      -> резкие переходы
-# Простоя нет нигде: записи 3–5 под NVIDIA ломались при первом обращении драйвера к карте после простоя на 03/07
-# (сброс записи не завершается, Xid 79) — под mmiotrace, на одном ядре; под Windows карта на 03 годами работала.
-#   Если запись перевалила за 2 ГБ, оставшиеся фазы пропускаются.
-# Запуск: sudo ~/trace/run-trace.sh   (~6 минут, ничего не трогать; конец — строка «ГОТОВО»)
+# Уроки прошлых версий: снимка регистров между загрузкой драйвера и X нет (версия 2 на нём встала); regdump4 не читает
+# блоки PMU и PFB; нагрузка — glxgears, не glmark2 (версия 1: 842 МБ за 1,5 мин); запись больше 2 ГБ — фазы пропускаются.
+# Запуск: sudo ~/trace/run-trace.sh   (~9 минут, ничего не трогать; конец — строка «ГОТОВО»)
 set -euo pipefail
-[ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
+[ "$(id -u)" -eq 0 ] || [ "${TRACE_DRY:-0}" = 1 ] || exec sudo "$0" "$@"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 OUT="$HERE/out-$(date +%Y%m%d-%H%M%S)"; mkdir -p "$OUT"
 LOG="$OUT/steps.txt"
 say() { echo "$(date +%T) $*" | tee -a "$LOG"; sync; }
 
-NOTRACE="${NOTRACE:-0}"   # 1 — тот же сценарий БЕЗ mmiotrace (контроль: виновата запись или карта/драйвер)
-say "Ядро $(uname -r), версия сценария 5 (постоянная лёгкая нагрузка, без простоя)$( [ "$NOTRACE" = 1 ] && echo ', БЕЗ ЗАПИСИ — контроль')"
-lsmod | grep -q '^nvidia ' && { say "СТОП: драйвер nvidia уже загружен — начало не запишется. Перезагрузись."; exit 1; }
+say "Ядро $(uname -r), версия сценария 6 (контроль без записи, затем запись — за один запуск)"
+lsmod | grep -q '^nvidia ' && { say "СТОП: драйвер nvidia уже загружен — перезагрузись."; exit 1; }
 [ -e "$HERE/regdump4.py" ] || { say "СТОП: нет $HERE/regdump4.py"; exit 1; }
 command -v glxgears >/dev/null || { say "СТОП: нет glxgears (пакет mesa-utils)"; exit 1; }
-grep -q tracefs /proc/mounts || mount -t tracefs nodev /sys/kernel/tracing 2>/dev/null || true
-T=/sys/kernel/tracing; [ -e "$T/current_tracer" ] || { mount -t debugfs nodev /sys/kernel/debug 2>/dev/null || true; T=/sys/kernel/debug/tracing; }
+T="${TRACE_DIR:-}"
+if [ -z "$T" ]; then
+  grep -q tracefs /proc/mounts || mount -t tracefs nodev /sys/kernel/tracing 2>/dev/null || true
+  T=/sys/kernel/tracing; [ -e "$T/current_tracer" ] || { mount -t debugfs nodev /sys/kernel/debug 2>/dev/null || true; T=/sys/kernel/debug/tracing; }
+fi
 grep -qw mmiotrace "$T/available_tracers" || { say "СТОП: в ядре нет mmiotrace"; exit 1; }
 echo "$T" > /tmp/trace-dir
+mark() { echo "MARK: $*" > "$T/trace_marker" 2>/dev/null || true; say "MARK: $*"; }
 
 python3 "$HERE/regdump4.py" "0 до драйвера (после BIOS)" "$OUT/regs.txt"
 say "Снимок регистров «до драйвера» сделан"
 
-say "Включаю запись (остальные ядра процессора на время записи выключатся — это нормально)"
-echo nop > "$T/current_tracer"
-if [ "$NOTRACE" != 1 ]; then
-echo 65536 > "$T/buffer_size_kb"     # как в версии 2. Размер записи задаёт не буфер, а нагрузка: 842 МБ в версии 1 — от glmark2 1600x900
-echo mmiotrace > "$T/current_tracer"
-nice -n -20 cat "$T/trace_pipe" > "$OUT/mmiotrace.txt" &
-CATPID=$!
-else
-say "Контроль: mmiotrace НЕ включается, все ядра процессора работают"; CATPID=""
-fi
-sleep 2
-mark() { echo "MARK: $*" > "$T/trace_marker"; say "MARK: $*"; }
-
-mark "1 загрузка драйвера nvidia"
-modprobe nvidia
-modprobe nvidia_modeset
-modprobe nvidia_drm
-sleep 3
-mark "1 драйвер загружен"
-# Снимка между загрузкой драйвера и X11 НЕТ, как в версии 1. Версия 2 делала его (regdump.py, с блоком PMU) и зависла ровно
-# на запуске X11; версия 1 без него X11 запустила. Блок PMU читать под NVIDIA нельзя (regdump3/4 его не читают).
-
+make_session() {   # $1 — имя прохода; подписи меток и снимков начинаются с него
 cat > /tmp/xsession.sh <<EOF
 #!/bin/bash
-T=\$(cat /tmp/trace-dir); OUT="$OUT"; HERE="$HERE"
-mark() { echo "MARK: \$*" > "\$T/trace_marker"; echo "\$(date +%T) MARK: \$*" >> "\$OUT/steps.txt"; sync; }
-snap() { mark "снимок: \$1"; python3 "\$HERE/regdump4.py" "\$1" "\$OUT/regs.txt"
-         { echo "### \$1 \$(date +%T)"; nvidia-settings -t -q GPUCurrentPerfLevel -q GPUCurrentClockFreqs 2>&1; } >> "\$OUT/nvsettings.txt"; }
+T=\$(cat /tmp/trace-dir); OUT="$OUT"; HERE="$HERE"; P="$1"
+mark() { echo "MARK: \$P: \$*" > "\$T/trace_marker" 2>/dev/null; echo "\$(date +%T) MARK: \$P: \$*" >> "\$OUT/steps.txt"; sync; }
+snap() { mark "снимок: \$1"; python3 "\$HERE/regdump4.py" "\$P: \$1" "\$OUT/regs.txt"
+         { echo "### \$P: \$1 \$(date +%T)"; nvidia-settings -t -q GPUCurrentPerfLevel -q GPUCurrentClockFreqs 2>&1; } >> "\$OUT/nvsettings.txt"; }
 pm() { nvidia-settings -a "[gpu:0]/GPUPowerMizerMode=\$1" >/dev/null 2>&1 || true; }   # 0 адаптивный, 1 максимум
-LIMIT=2000000000   # запись больше 2 ГБ — дальше фазы не идут (в версии 1 тяжёлая нагрузка дала 842 МБ за 1,5 мин и повесила систему)
+LIMIT=2000000000
 big() { [ "\$(stat -c %s "\$OUT/mmiotrace.txt" 2>/dev/null || echo 0)" -gt "\$LIMIT" ]; }
 guard() { big && { mark "запись больше 2 ГБ — фаза \$1 и дальше пропущены"; snap "конец по размеру"; stop_loads; exit 0; }; }
-# Версия 4: программы нагрузки запускаются ОДИН раз, сразу после X на «максимуме» (0f), и дальше только
-# останавливаются / продолжаются (SIGSTOP / SIGCONT) — драйверу больше не нужно выделять и обнулять память.
-# Записи 3 и 4 зависли ровно на этом: первая крупная запись драйвера в память карты после 2 мин простоя на 03.
 G1=""; G2=""
 start_loads() { __GL_SYNC_TO_VBLANK=0 glxgears -geometry 300x300+40+40 >/dev/null 2>&1 & G1=\$!
                 __GL_SYNC_TO_VBLANK=0 glxgears -geometry 640x480+380+40 >/dev/null 2>&1 & G2=\$!; }
@@ -80,31 +57,28 @@ go()   { alive "\$1"; kill -CONT "\$1" 2>/dev/null; }   # продолжить �
 halt() { kill -STOP "\$1" 2>/dev/null; }                # остановить, память остаётся за программой
 stop_loads() { kill -9 \$G1 \$G2 2>/dev/null; }
 sleep 3
-# Версия 5: маленькая программа (G1, 300x300) крутится ВСЁ время — карта ни разу не простаивает. Запись 5 (версия 4)
-# прошла фазу 0, но после простоя на 03 при первом же обращении драйвера карта отвалилась от шины (Xid 79); записи 3 и 4
-# встали на первой крупной записи в память после простоя. Уровни теперь меняет вторая программа (G2) и PowerMizer.
-mark "0 максимум, запуск обеих программ (300x300, 640x480); большая — на паузу, маленькая крутится всё время"
+mark "0 максимум, запуск обеих программ; большая — на паузу, маленькая крутится всё время"
 pm 1; sleep 2
 start_loads; sleep 4
 halt \$G2
 pm 0
-mark "A адаптивный 60 с, крутится только маленькая (спуск под лёгкой нагрузкой)"
-sleep 60
+mark "A адаптивный 45 с, крутится только маленькая (спуск под лёгкой нагрузкой)"
+sleep 45
 snap "A лёгкая нагрузка"
 guard B
-mark "B продолжение большой 30 с (подъём под нагрузкой)"
-go \$G2; sleep 25
+mark "B продолжение большой 25 с (подъём под нагрузкой)"
+go \$G2; sleep 20
 snap "B обе программы"
 sleep 5; halt \$G2
-mark "C большая на паузе, 40 с (спуск под лёгкой нагрузкой)"
-sleep 40
+mark "C большая на паузе, 30 с (спуск под лёгкой нагрузкой)"
+sleep 30
 snap "C лёгкая нагрузка"
 guard D
 mark "D максимум 10 с (0f под лёгкой нагрузкой)"
 pm 1; sleep 10
 snap "D максимум"
-mark "D адаптивный 30 с (спуск под лёгкой нагрузкой)"
-pm 0; sleep 30
+mark "D адаптивный 25 с (спуск под лёгкой нагрузкой)"
+pm 0; sleep 25
 snap "D адаптивный"
 guard E
 mark "E всплески большой: 5 x (продолжение 3 с, пауза 6 с), маленькая крутится"
@@ -112,25 +86,54 @@ for i in 1 2 3 4 5; do
   mark "E всплеск \$i"; go \$G2; sleep 3; halt \$G2; sleep 6
 done
 snap "E после всплесков"
-mark "F конец: обе программы снимаются"
+mark "конец прохода: обе программы снимаются"
 stop_loads
-mark "выход из X11"
 EOF
 chmod +x /tmp/xsession.sh
-mark "2 запуск X11"
-xinit /tmp/xsession.sh -- :0 vt2 >"$OUT/xinit.txt" 2>&1 || true
-mark "X11 закрыт"
+}
+
+run_pass() {   # $1 — имя прохода
+  mark "== проход «$1»: загрузка драйвера nvidia"
+  modprobe nvidia
+  modprobe nvidia_modeset
+  modprobe nvidia_drm
+  sleep 3
+  mark "$1: драйвер загружен, запуск X11"
+  make_session "$1"
+  xinit /tmp/xsession.sh -- :0 vt2 >"$OUT/xinit-$1.txt" 2>&1 || true
+  mark "$1: X11 закрыт"
+  cp /var/log/Xorg.0.log "$OUT/Xorg-$1.log" 2>/dev/null || true
+  sleep 2
+}
+
+# Проход 1: контроль, без записи, все ядра работают.
+run_pass контроль
+# Драйвер выгружается: mmiotrace видит только отображения регистров, сделанные ПОСЛЕ его включения.
+systemctl stop nvidia-persistenced 2>/dev/null || true
+if ! modprobe -r nvidia_drm nvidia_modeset nvidia 2>>"$LOG"; then
+  say "СТОП: драйвер nvidia не выгрузился — записать его заново нельзя. Контроль сделан, результат: $OUT"
+  exit 1
+fi
+say "Контроль прошёл, драйвер выгружен"
+
+# Проход 2: запись.
+say "Включаю запись (остальные ядра процессора на время записи выключатся — это нормально)"
+echo nop > "$T/current_tracer"
+echo 65536 > "$T/buffer_size_kb"     # размер записи задаёт нагрузка, а не буфер
+echo mmiotrace > "$T/current_tracer"
+nice -n -20 cat "$T/trace_pipe" > "$OUT/mmiotrace.txt" &
+CATPID=$!
 sleep 2
+run_pass запись
 mark "конец записи"
 sleep 1
 echo nop > "$T/current_tracer"
-sleep 1; [ -n "$CATPID" ] && kill "$CATPID" 2>/dev/null || true
-cp /var/log/Xorg.0.log "$OUT/" 2>/dev/null || true
+sleep 1; kill "$CATPID" 2>/dev/null || true
 dmesg > "$OUT/dmesg.txt"
 grep -q 'mmiotrace has lost events' "$OUT/dmesg.txt" && say "!!! Запись потеряла часть событий (буфер не успел)" || say "Потерь в записи нет"
 if [ -s "$OUT/mmiotrace.txt" ]; then
-say "Записано строк: $(wc -l < "$OUT/mmiotrace.txt"). Сжимаю..."
-xz -T0 -6 "$OUT/mmiotrace.txt"
+  say "Записано строк: $(wc -l < "$OUT/mmiotrace.txt"). Сжимаю..."
+  xz -T0 -6 "$OUT/mmiotrace.txt"
 fi
 ls -lh "$OUT" | tee -a "$LOG"
 sync
