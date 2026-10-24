@@ -1,0 +1,9 @@
+22:21:08 серия: драйвер /lib/modules/7.0.0-38-generic/updates/nouveau-fix/nouveau.ko, ядро 7.0.0-38-generic, POWEROFF=1 WAITMIN=20 DRY=0
+22:21:09 === тест 44: уровни 03-0f-07, подъёмов 400; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_mux_guard=1
+22:21:11 тест 44: журнал hangtest-20261024-222110.txt
+23:57:46 тест 44: закончился, код 0
+23:57:45 тайм-аутов переключателя источника такта за тест: 0 (journalctl -k: «LAB mux»)
+=== 400 подъёмов без зависания (нагрузка browser). Лог: /home/user/Home/nouveau-fix/results/hangtest-20261024-222110.txt
+23:57:45 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+23:57:46 === серия закончена без зависаний; параметры как у службы, регулятор lab_gov=0
+23:57:46 СЕРИЯ ЗАВЕРШЕНА (clean). Жду разрешения на выключение (/home/user/Home/nouveau-archive/night-poweroff.ok), не дольше 20 мин
