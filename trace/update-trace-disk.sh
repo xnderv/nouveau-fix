@@ -10,7 +10,8 @@ DEV="$(blkid -L u2204-trace 2>/dev/null)" || { echo "Диск записи (ме
 MNT=/mnt/u2204-trace; mkdir -p "$MNT"
 mountpoint -q "$MNT" && { echo "$MNT уже смонтирован — отмонтируй: sudo umount $MNT"; exit 1; }
 mount "$DEV" "$MNT"
-trap 'sync; umount "$MNT"' EXIT
+# отмонтировать с повтором: сразу после копирования GNOME/udisks на секунду заглядывает в раздел («target is busy»)
+trap 'sync; for i in 1 2 3 4 5; do umount "$MNT" 2>/dev/null && { echo "=== Диск отмонтирован"; break; }; sleep 2; done; mountpoint -q "$MNT" && echo "!!! Диск не отмонтировался: sudo umount $MNT"' EXIT
 D="$(ls -d "$MNT"/home/*/trace 2>/dev/null | head -n 1)"
 [ -n "$D" ] || { echo "На диске нет каталога home/*/trace"; exit 1; }
 SAVE="$(dirname "$HERE")/../nouveau-archive/trace-disk-scripts/$(date +%Y%m%d-%H%M%S)"
