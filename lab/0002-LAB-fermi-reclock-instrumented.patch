@@ -162,9 +162,8 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  }
  
  static void
-diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 --- base/nvkm/subdev/clk/gf100.c	2026-10-24 02:11:44.800993360 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 02:11:44.803820269 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 04:18:26.196001292 +0300
 @@ -23,11 +23,18 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -249,7 +248,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +314,112 @@
+@@ -270,6 +314,121 @@
  	return ret;
  }
  
@@ -339,6 +338,15 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +static uint lab_gpc_ref_khz;
 +module_param(lab_gpc_ref_khz, uint, 0644);
 +MODULE_PARM_DESC(lab_gpc_coef, "LAB: force gpc PLL coefficients (P<<16|N<<8|M), 0 = normal");
++/* LAB 24.10: источник GPC как у NVIDIA. В записях NVIDIA (try1/try2) PLL включается только на 0f (0x137100 = 0x187);
++ * на 07 и 03 все узлы на делителе (0x137100 = 0), а у GPC на 03 тот же делитель, что на 07 (0x1371d0, поле 0x02:
++ * 1620 -> 810 МГц), плюс пост-делитель 0x137250 = 0x8120000e (/8 -> 101,25 МГц). nouveau на 03 берёт PLL (100 894 кГц),
++ * потому что он на 106 кГц ближе к таблице (101 000), чем делитель (101 250), и на 03->07 уводит GPC с PLL — такого
++ * переключения у NVIDIA нет (24.10: 6 тайм-аутов мультиплексора, все на нём). 1 = для GPC, если частота не выше VCO/2,
++ * путь NVIDIA: делитель /2 + пост-делитель на остаток, PLL не пробуем; 03<->07 у GPC — только смена пост-делителя. */
++static uint lab_gpc_div;
++module_param(lab_gpc_div, uint, 0644);
++MODULE_PARM_DESC(lab_gpc_div, "LAB: GPC source as NVIDIA: divider /2 + post-divider when freq <= VCO/2, no PLL (0 = nouveau: closest of divider/PLL)");
 +
 +static u32
 +lab_override(int idx, u32 freq)
@@ -362,7 +370,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +432,41 @@
+@@ -282,6 +441,59 @@
  	if (!freq)
  		return 0;
  
@@ -401,10 +409,28 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +		return 0;
 +	}
 +
++	if (idx == 0x00 && lab_gpc_div) {
++		u32 vco = read_vco(clk, 0x137160 + (idx * 4));
++
++		if (vco && freq <= vco / 2) {
++			div0 = 2;                                         /* (2+2)/2: VCO/2, как поле 0x02 у NVIDIA */
++			clk0 = (vco * 2) / (div0 + 2);
++			clk0 = calc_div(clk, idx, clk0, freq, &div1D);    /* остаток — пост-делителем */
++			info->dsrc = 0x00000003;
++			info->ddiv = 0x80000000 | (div0 << 8) | div0;
++			info->mdiv = div1D ? (0x80000000 | div1D) : 0;
++			info->ssel = info->coef = 0;
++			info->freq = clk0;
++			nvkm_info(&clk->base.subdev, "LAB calc idx 00 dom %d: путь NVIDIA (lab_gpc_div): want %u got %u, VCO %u, ddiv %08x mdiv %08x, без PLL\n",
++				  dom, freq, info->freq, vco, info->ddiv, info->mdiv);
++			return 0;
++		}
++	}
++
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +476,9 @@
+@@ -291,7 +503,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -415,7 +441,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +505,8 @@
+@@ -318,6 +532,8 @@
  		info->freq = clk1;
  	}
  
@@ -424,7 +450,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -351,15 +540,227 @@
+@@ -351,15 +567,227 @@
  	}
  }
  
@@ -652,7 +678,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static void
-@@ -369,19 +770,52 @@
+@@ -369,19 +797,52 @@
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
  	if (idx <= 7) {
@@ -708,7 +734,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -395,12 +829,35 @@
+@@ -395,12 +856,35 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (info->ssel) {
@@ -746,7 +772,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -409,7 +866,17 @@
+@@ -409,7 +893,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -764,7 +790,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static int
-@@ -426,15 +893,138 @@
+@@ -426,15 +920,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -905,7 +931,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +1067,5 @@
+@@ -477,5 +1094,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
