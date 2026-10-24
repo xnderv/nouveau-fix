@@ -19,6 +19,9 @@ N="${1:-60}"; [[ "$N" =~ ^[0-9]+$ ]] || { echo "Число подъёмов"; ex
 LOAD="${LOAD:-browser}"; HOLD="${HOLD:-6}"
 # 24.10: LOW/HIGH — пара уровней (по умолчанию 07 и 0f). LOW=03 HIGH=07 — переход 03↔07 (зависания 24.10 01:32 и 01:38).
 LOW="${LOW:-07}"; HIGH="${HIGH:-0f}"
+# 24.10 (серия В): MID — спуск через промежуточный уровень, как регулятор NVIDIA: LOW=03 HIGH=0f MID=07 — подъём 03 -> 0f,
+# спуск 0f -> 07 -> 03. Без MID — прямой спуск HIGH -> LOW, как раньше.
+MID="${MID:-}"
 memof() { case "$1" in 03) echo 135;; 07) echo 324;; 0f) echo 2004;; esac; }
 [ -e "$PRM/lab_gov" ] || { echo "Нужен лабораторный драйвер (нет $PRM/lab_gov)"; exit 1; }
 systemctl is-active -q gpu-blackbox || echo "⚠ чёрный ящик не запущен (lab/blackbox.sh install) — снимка регистров при зависании не будет"
@@ -42,7 +45,7 @@ finish() {
 }
 trap finish EXIT
 T0="$(date '+%Y-%m-%d %H:%M:%S')"
-{ echo "hangtest $T0: уровни $LOW↔$HIGH, подъёмов $N, нагрузка $LOAD, удержание 0f ${HOLD}с, lab_gov был $GOV0, ядро $(uname -r)"
+{ echo "hangtest $T0: уровни $LOW↔$HIGH${MID:+ (спуск через $MID)}, подъёмов $N, нагрузка $LOAD, удержание 0f ${HOLD}с, lab_gov был $GOV0, ядро $(uname -r)"
   echo "параметры: $(for p in lab_mem_order lab_mem_op13 lab_mem_op34 lab_mem_op3a lab_mem_replay lab_pcie lab_gpc_seq; do printf '%s=%s ' $p "$(cat $PRM/$p)"; done)"
 } | tee "$LOG"; sync
 sudo sh -c "echo 0 > $PRM/lab_gov"
@@ -58,7 +61,7 @@ if [ "$MEM0" = N ] || [ "$MEM0" = 0 ]; then
 else
     pstate $LOW; sleep 3
 fi
-echo "$(date +%T) старт: $(ac); lab_mem=$MEM0 lab_core=$(cat $PRM/lab_core) lab_volt_min_uv=$(cat $PRM/lab_volt_min_uv) lab_gr_pause=$(cat $PRM/lab_gr_pause 2>/dev/null) lab_gr_gate=$(cat $PRM/lab_gr_gate 2>/dev/null) lab_gr_wait=$(cat $PRM/lab_gr_wait 2>/dev/null) lab_xbar=$(cat $PRM/lab_xbar 2>/dev/null) lab_e9e0=$(cat $PRM/lab_e9e0 2>/dev/null) lab_pll_keep=$(cat $PRM/lab_pll_keep 2>/dev/null) lab_order=$(cat $PRM/lab_order 2>/dev/null) lab_order_us=$(cat $PRM/lab_order_us 2>/dev/null) lab_therm=$(cat $PRM/lab_therm 2>/dev/null) lab_therm_us=$(cat $PRM/lab_therm_us 2>/dev/null) lab_therm_us_gpc=$(cat $PRM/lab_therm_us_gpc 2>/dev/null) lab_therm_us_hub=$(cat $PRM/lab_therm_us_hub 2>/dev/null) lab_therm_probe=$(cat $PRM/lab_therm_probe 2>/dev/null) lab_therm_wait=$(cat $PRM/lab_therm_wait 2>/dev/null) lab_therm_wait_us=$(cat $PRM/lab_therm_wait_us 2>/dev/null) lab_therm_real=$(cat $PRM/lab_therm_real 2>/dev/null) lab_clk_mmu_lock=$(cat $PRM/lab_clk_mmu_lock 2>/dev/null) lab_therm_div=$(cat $PRM/lab_therm_div 2>/dev/null) lab_gpc_div=$(cat $PRM/lab_gpc_div 2>/dev/null) lab_pmu_div=$(cat $PRM/lab_pmu_div 2>/dev/null) lab_gpc_pre405=$(cat $PRM/lab_gpc_pre405 2>/dev/null) lab_nv_hubpost=$(cat $PRM/lab_nv_hubpost 2>/dev/null) lab_nv_pcie_late=$(cat $PRM/lab_nv_pcie_late 2>/dev/null) lab_nv_hub07mem=$(cat $PRM/lab_nv_hub07mem 2>/dev/null) lab_pcie=$(cat $PRM/lab_pcie 2>/dev/null) khz: gpc=$(cat $PRM/lab_gpc_khz) rop=$(cat $PRM/lab_rop_khz) hub07=$(cat $PRM/lab_hub07_khz) hub06=$(cat $PRM/lab_hub06_khz) hub01=$(cat $PRM/lab_hub01_khz)" | tee -a "$LOG"; sync
+echo "$(date +%T) старт: $(ac); lab_mem=$MEM0 lab_core=$(cat $PRM/lab_core) lab_volt_min_uv=$(cat $PRM/lab_volt_min_uv) lab_gr_pause=$(cat $PRM/lab_gr_pause 2>/dev/null) lab_gr_gate=$(cat $PRM/lab_gr_gate 2>/dev/null) lab_gr_wait=$(cat $PRM/lab_gr_wait 2>/dev/null) lab_xbar=$(cat $PRM/lab_xbar 2>/dev/null) lab_e9e0=$(cat $PRM/lab_e9e0 2>/dev/null) lab_pll_keep=$(cat $PRM/lab_pll_keep 2>/dev/null) lab_order=$(cat $PRM/lab_order 2>/dev/null) lab_order_us=$(cat $PRM/lab_order_us 2>/dev/null) lab_therm=$(cat $PRM/lab_therm 2>/dev/null) lab_therm_us=$(cat $PRM/lab_therm_us 2>/dev/null) lab_therm_us_gpc=$(cat $PRM/lab_therm_us_gpc 2>/dev/null) lab_therm_us_hub=$(cat $PRM/lab_therm_us_hub 2>/dev/null) lab_therm_probe=$(cat $PRM/lab_therm_probe 2>/dev/null) lab_therm_wait=$(cat $PRM/lab_therm_wait 2>/dev/null) lab_therm_wait_us=$(cat $PRM/lab_therm_wait_us 2>/dev/null) lab_therm_real=$(cat $PRM/lab_therm_real 2>/dev/null) lab_clk_mmu_lock=$(cat $PRM/lab_clk_mmu_lock 2>/dev/null) lab_therm_div=$(cat $PRM/lab_therm_div 2>/dev/null) lab_gpc_div=$(cat $PRM/lab_gpc_div 2>/dev/null) lab_pmu_div=$(cat $PRM/lab_pmu_div 2>/dev/null) lab_gpc_pre405=$(cat $PRM/lab_gpc_pre405 2>/dev/null) lab_nv_hubpost=$(cat $PRM/lab_nv_hubpost 2>/dev/null) lab_nv_pcie_late=$(cat $PRM/lab_nv_pcie_late 2>/dev/null) lab_nv_hub07mem=$(cat $PRM/lab_nv_hub07mem 2>/dev/null) lab_pcie=$(cat $PRM/lab_pcie 2>/dev/null) lab_volt_wait_us=$(cat $PRM/lab_volt_wait_us 2>/dev/null) lab_nv_22680=$(cat $PRM/lab_nv_22680 2>/dev/null) lab_nv_divb=$(cat $PRM/lab_nv_divb 2>/dev/null) lab_nv_disphold=$(cat $PRM/lab_nv_disphold 2>/dev/null) khz: gpc=$(cat $PRM/lab_gpc_khz) rop=$(cat $PRM/lab_rop_khz) hub07=$(cat $PRM/lab_hub07_khz) hub06=$(cat $PRM/lab_hub06_khz) hub01=$(cat $PRM/lab_hub01_khz)" | tee -a "$LOG"; sync
 case "$LOAD" in
   browser)
     B="$(command -v yandex-browser || command -v chromium || command -v google-chrome || true)"
@@ -115,6 +118,7 @@ for c in $(seq 1 "$N"); do
           echo "    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show"; } | tee -a "$LOG"; sync
         exit 2
     fi
+    [ -n "$MID" ] && { pstate $MID; sleep 2; }
     pstate $LOW; sleep 2; DONE=$c
     case "$(ac)" in *"memory $(memof $LOW) MHz"*) ;; *) [ "$MEM0" = Y ] && { echo "$(date +%T) СТОП: после спуска не $(memof $LOW) МГц: $(ac)" | tee -a "$LOG"; break; };; esac
 done

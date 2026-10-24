@@ -1,5 +1,5 @@
 #!/bin/bash
-# СЕРИЯ ТЕСТОВ БЕЗ ПРИСМОТРА (24.10, тест А: 30а–30г — все пять ключей NVIDIA из серии 25–29 вместе; прежние серии — в истории git).
+# СЕРИЯ ТЕСТОВ БЕЗ ПРИСМОТРА (24.10, серия В: 31–37 — новые части «как у NVIDIA» по одной поверх пяти ключей теста А; прежние серии — в истории git).
 # Запуск из терминала в графическом сеансе, окно браузера с нагрузкой будет на экране:
 #   POWEROFF=0 bash ~/Home/nouveau-fix/lab/night.sh       (днём: машину в конце не выключать)
 # Один раз пароль sudo (дальше его держит сам hangtest: sudo вызывается каждые несколько секунд).
@@ -31,7 +31,7 @@ if [ -z "${NIGHT_INHIBITED:-}" ]; then
          --reason "nouveau night tests" bash "$0" "$@"
 fi
 if [ "$DRY" != 1 ]; then
-    for p in lab_therm_div lab_gpc_div lab_pmu_div lab_gpc_pre405 lab_nv_hubpost lab_nv_pcie_late lab_nv_hub07mem lab_gov_nv; do
+    for p in lab_therm_div lab_gpc_div lab_pmu_div lab_gpc_pre405 lab_nv_hubpost lab_nv_pcie_late lab_nv_hub07mem lab_gov_nv lab_volt_wait_us lab_nv_22680 lab_nv_divb lab_nv_disphold; do
         [ -e "$PRM/$p" ] || { echo "Нет параметра $p — загружен не тот драйвер (lab.sh install и перезагрузка)"; exit 1; }
     done
     [ "$(cat $PRM/lab_perf_ticks)" -gt 0 ] || { echo "Замеры загрузки PMU выключены (lab_perf_ticks=0) — служба gpu-autoclock не отработала"; exit 1; }
@@ -53,7 +53,8 @@ say() { echo "$(date +%T) $*" | tee -a "$LOG"; sync; }
 setp() { local kv; for kv in "$@"; do $SUDO sh -c "echo ${kv#*=} > $PRM/${kv%%=*}"; done; }
 base() { setp lab_gov=0 lab_mem=1 lab_pcie=1 lab_volt_min_uv=0 lab_therm=1 lab_therm_wait=1 lab_therm_wait_us=0 \
               lab_therm_real=0 lab_therm_div=1 lab_clk_mmu_lock=0 lab_gpc_div=1 lab_pmu_div=1 \
-              lab_gpc_pre405=0 lab_nv_hubpost=0 lab_nv_pcie_late=0 lab_nv_hub07mem=0 lab_gov_nv=0 lab_perf_ms=1000 lab_perf_log=0; }
+              lab_gpc_pre405=0 lab_nv_hubpost=0 lab_nv_pcie_late=0 lab_nv_hub07mem=0 lab_gov_nv=0 lab_perf_ms=1000 lab_perf_log=0 \
+              lab_volt_wait_us=0 lab_nv_22680=0 lab_nv_divb=0 lab_nv_disphold=0 lab_e9e0=0 lab_order=0 lab_pll_keep=0; }
 GOV_START="$(cat $PRM/lab_gov 2>/dev/null || echo 0)"; NT0="$(date '+%Y-%m-%d %H:%M:%S')"
 finish_night() {   # $1 = clean | hung
     [ "$POWEROFF" = 1 ] || { restore_idle; say "POWEROFF=0 — машину не выключаю"; exit 0; }
@@ -84,12 +85,13 @@ hung() {   # $1 = имя теста
     sync
     finish_night hung
 }
-run() {   # run ИМЯ НИЗ-ВЕРХ [параметр=значение ...]
+run() {   # run ИМЯ НИЗ-ВЕРХ[-СЕРЕДИНА] [параметр=значение ...]; с серединой спуск идёт через неё
     local name="$1" lv="$2"; shift 2
     base; [ "$#" -gt 0 ] && setp "$@"
     say "=== тест $name: уровни $lv; отличия от базы: ${*:-нет}"
     local t0 R="" rc=0 pid kerr k w; t0="$(date '+%Y-%m-%d %H:%M:%S')"; touch "$MARK"; sleep 1
-    LOW="${lv%%-*}" HIGH="${lv##*-}" bash "$HT" 60 & pid=$!
+    local lo hi mid; IFS=- read -r lo hi mid <<< "$lv"
+    LOW="$lo" HIGH="$hi" MID="$mid" bash "$HT" 60 & pid=$!
     # журнал именно этого теста: созданный после метки (ждём до 60 с)
     for k in $(seq 1 60); do
         R="$(find "$RES" -maxdepth 1 -name 'hangtest-*.txt' -newer "$MARK" -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -n1 | cut -d' ' -f2-)"
@@ -162,12 +164,17 @@ gov() {   # gov ИМЯ [параметр=значение ...] — регуля�
 systemctl is-active -q gpu-blackbox && grep "### blackbox start" /var/log/gpu-blackbox/current.txt 2>/dev/null | tail -n1 | grep -q " v4" \
     || say "⚠ чёрный ящик не v4 или не запущен — температуры процессора в ящике не будет"
 say "серия: драйвер $(modinfo -n nouveau 2>/dev/null), ядро $(uname -r), POWEROFF=$POWEROFF WAITMIN=$WAITMIN DRY=$DRY"
-# Тест А: все пять ключей вместе (по одному каждый прошёл 60/60 в серии 25–29, 24.10). Зависание обрывает серию.
+# Серия В: по одной новой части «как у NVIDIA» поверх пяти ключей теста А (они станут умолчанием). Путь как у регулятора
+# NVIDIA: подъём 03 -> 0f, спуск 0f -> 07 -> 03. Зависание обрывает серию.
 NV="lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1"
-run 30а 03-0f $NV                               # прямой 03↔0f, как делает регулятор NVIDIA
-run 30б 07-0f $NV                               # 07↔0f
-run 30в 03-07 $NV                               # старая пара 03↔07: не сломали ли её новые ключи (база — тесты 22, 23)
-gov 30г $NV lab_perf_ms=250                     # регулятор сам со всеми ключами, опрос 4 раза в секунду
+run 31  03-0f-07 $NV                            # контроль: путь регулятора NVIDIA с пятью ключами, без новых частей
+run 32  03-0f-07 $NV lab_volt_wait_us=200       # В1: выдержка после смены напряжения (NVIDIA ~195 мкс, вверх и вниз)
+run 33а 03-0f-07 $NV lab_e9e0=1                 # В2: хост-домен по уровню (270 / 405 / 540)
+run 33б 03-0f-07 $NV lab_nv_22680=1             # В2: 0x022680 из байта 0x0c записи уровня VBIOS
+run 34а 03-0f-07 $NV lab_order=1                # В3: мультиплексоры узел за узлом, зеркально
+run 34б 03-0f-07 $NV lab_pll_keep=1             # В3: PLL не выключать на спуске, не перепрограммировать захваченный
+run 35  03-0f-07 $NV lab_nv_divb=1              # В4: в запасном поле делителя — делитель самого низкого уровня
+run 36  03-0f-07 $NV lab_nv_disphold=1          # В5: бит 0 в 0x610300 на всё время перехода (дисплей)
 base; setp lab_gov="$GOV_START"
 say "=== серия закончена без зависаний; параметры как у службы, регулятор lab_gov=$GOV_START"
 finish_night clean
