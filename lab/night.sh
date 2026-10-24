@@ -1,9 +1,12 @@
 #!/bin/bash
-# НОЧНАЯ СЕРИЯ ТЕСТОВ (24.10; вторая ночь: 19b, 20, 21 — тест 19 сделан в первую). Запуск из терминала в графическом сеансе, окно браузера с нагрузкой будет на экране:
-#   bash ~/Home/nouveau-fix/lab/night.sh
+# СЕРИЯ ТЕСТОВ БЕЗ ПРИСМОТРА (24.10, днём: 25а–29б — шаги NVIDIA из записи 7, по одному ключу на тест; прежние серии — в истории git).
+# Запуск из терминала в графическом сеансе, окно браузера с нагрузкой будет на экране:
+#   POWEROFF=0 bash ~/Home/nouveau-fix/lab/night.sh       (днём: машину в конце не выключать)
 # Один раз пароль sudo (дальше его держит сам hangtest: sudo вызывается каждые несколько секунд).
 # Экран не гаснет и система не засыпает (gnome-session-inhibit; проверяется перед стартом). Тесты по очереди, по 60
-# подъёмов; каждый — база (боевая конфигурация: память, PCIe, напряжение по таблице, скобка по признаку) + свои отличия.
+# подъёмов; каждый — база (боевая конфигурация службы gpu-autoclock: память, PCIe, скобка по признаку, GPC на 03 на делителе,
+# PMU 202,5 МГц; новые ключи 0) + свои отличия. Тесты 29а/б — регулятор сам (lab_gov=2): нагрузка браузера включается и
+# снимается, время переходов — в results/gov-*.txt. В конце чистой серии параметры и регулятор — как у службы.
 # На первом зависании: копия журнала ядра, ящика и нового снимка в results/, sync; дальнейшие тесты не идут.
 # Итог — results/night-*.txt. В конце (и при зависании) серия ЖДЁТ разрешения на выключение: файл
 # ~/Home/nouveau-archive/night-poweroff.ok (его создаёт ассистент после разбора), но не дольше WAITMIN (60) минут;
@@ -20,6 +23,7 @@ STUCK="${NIGHT_STUCK:-240}"                # журнал теста не рас
 GRACE="${NIGHT_GRACE:-100}"                # после подписи зависания в ядре дать тесту и ящику записать своё
 WAITSTEP="${NIGHT_WAITSTEP:-10}"           # шаг ожидания разрешения, с
 DRY="${NIGHT_DRY:-0}"
+GOV_N="${NIGHT_GOV_N:-3}"; GOV_ON="${NIGHT_GOV_ON:-20}"; GOV_OFF="${NIGHT_GOV_OFF:-30}"   # тест регулятора: циклы, нагрузка, без неё (с)
 if [ "$DRY" = 1 ]; then SUDO="echo [dry-sudo]"; else SUDO="sudo"; fi
 if [ -z "${NIGHT_INHIBITED:-}" ]; then
     rm -f "$FLAG"
@@ -27,9 +31,10 @@ if [ -z "${NIGHT_INHIBITED:-}" ]; then
          --reason "nouveau night tests" bash "$0" "$@"
 fi
 if [ "$DRY" != 1 ]; then
-    for p in lab_therm_div lab_clk_mmu_lock lab_therm_real; do
-        [ -e "$PRM/$p" ] || { echo "Нет параметра $p — загружен не тот драйвер"; exit 1; }
+    for p in lab_therm_div lab_gpc_div lab_pmu_div lab_gpc_pre405 lab_nv_hubpost lab_nv_pcie_late lab_nv_hub07mem lab_gov_nv; do
+        [ -e "$PRM/$p" ] || { echo "Нет параметра $p — загружен не тот драйвер (lab.sh install и перезагрузка)"; exit 1; }
     done
+    [ "$(cat $PRM/lab_perf_ticks)" -gt 0 ] || { echo "Замеры загрузки PMU выключены (lab_perf_ticks=0) — служба gpu-autoclock не отработала"; exit 1; }
     INH="$(gdbus call --session --dest org.gnome.SessionManager --object-path /org/gnome/SessionManager \
            --method org.gnome.SessionManager.IsInhibited 8 2>&1)"
     [ "$INH" = "(true,)" ] || { echo "Запрет гашения экрана не работает ($INH) — экран погаснет, тесты будут без нагрузки. Не запускаю."; exit 1; }
@@ -47,7 +52,9 @@ mkdir -p "$RES"; LOG="$RES/night-$(date +%Y%m%d-%H%M%S).txt"; MARK="$RES/.night-
 say() { echo "$(date +%T) $*" | tee -a "$LOG"; sync; }
 setp() { local kv; for kv in "$@"; do $SUDO sh -c "echo ${kv#*=} > $PRM/${kv%%=*}"; done; }
 base() { setp lab_gov=0 lab_mem=1 lab_pcie=1 lab_volt_min_uv=0 lab_therm=1 lab_therm_wait=1 lab_therm_wait_us=0 \
-              lab_therm_real=0 lab_therm_div=1 lab_clk_mmu_lock=0; }
+              lab_therm_real=0 lab_therm_div=1 lab_clk_mmu_lock=0 lab_gpc_div=1 lab_pmu_div=1 \
+              lab_gpc_pre405=0 lab_nv_hubpost=0 lab_nv_pcie_late=0 lab_nv_hub07mem=0 lab_gov_nv=0 lab_perf_ms=1000 lab_perf_log=0; }
+GOV_START="$(cat $PRM/lab_gov 2>/dev/null || echo 0)"; NT0="$(date '+%Y-%m-%d %H:%M:%S')"
 finish_night() {   # $1 = clean | hung
     [ "$POWEROFF" = 1 ] || { restore_idle; say "POWEROFF=0 — машину не выключаю"; exit 0; }
     say "СЕРИЯ ЗАВЕРШЕНА ($1). Жду разрешения на выключение ($FLAG), не дольше $WAITMIN мин"
@@ -111,14 +118,58 @@ run() {   # run ИМЯ НИЗ-ВЕРХ [параметр=значение ...]
     grep -q "ЗАВИСАНИЕ ВОСПРОИЗВЕДЕНО" "$R" && hung "$name"
     grep -q "подъёмов без зависания" "$R" || { say "тест $name не дошёл до конца (код $rc) — серия остановлена"; finish_night clean; }
 }
+gsleep() {   # gsleep СЕК ИМЯ — пауза теста регулятора; каждые 5 с журнал ядра с начала серии на подписи зависания
+    local s=0 k
+    while [ "$s" -lt "$1" ]; do
+        sleep 5; s=$((s + 5))
+        k="$(journalctl -k -b 0 --no-pager --since "$NT0" 2>/dev/null | grep -cE 'intr.c:191|vmmgf100.c|g84_bar_flush|failed to idle' || true)"
+        if [ "${k:-0}" -gt 0 ]; then
+            say "тест $2: в журнале ядра подпись зависания ($k строк) — жду ${GRACE} с, чтобы ящик записал своё"
+            sleep "$GRACE"; hung "$2"
+        fi
+    done
+}
+gov() {   # gov ИМЯ [параметр=значение ...] — регулятор переключает сам: GOV_N раз нагрузка GOV_ON с, без неё GOV_OFF с
+    local name="$1" B PROF LP c f; shift
+    base; [ "$#" -gt 0 ] && setp "$@"
+    B="$(command -v yandex-browser || command -v chromium || command -v google-chrome || true)"
+    [ -n "$B" ] || { say "тест $name: браузер не найден — пропущен"; return; }
+    PROF="$HOME/.cache/nouveau-hangtest-profile"
+    f="$RES/gov-$name-$(date +%Y%m%d-%H%M%S).txt"
+    say "=== тест $name: регулятор сам (lab_gov=2), $GOV_N x (нагрузка $GOV_ON с, без неё $GOV_OFF с); отличия от базы: ${*:-нет}"
+    local gt0; gt0="$(date '+%Y-%m-%d %H:%M:%S')"
+    setp lab_perf_log=1 lab_gov=2
+    logger -t labgov "$name: регулятор включён, без нагрузки $GOV_OFF с"
+    gsleep "$GOV_OFF" "$name"
+    for c in $(seq 1 "$GOV_N"); do
+        if [ "$DRY" = 1 ]; then sleep 1000 & LP=$!
+        else
+            rm -rf "$PROF"; mkdir -p "$PROF"
+            "$B" --user-data-dir="$PROF" --no-first-run --no-default-browser-check --disable-sync --new-window \
+                 --app="file://$HERE/hangload.html" >/dev/null 2>&1 & LP=$!
+        fi
+        logger -t labgov "$name: нагрузка $c ВКЛ (браузер запущен)"; say "тест $name: нагрузка $c вкл"
+        gsleep "$GOV_ON" "$name"
+        kill "$LP" 2>/dev/null; wait "$LP" 2>/dev/null
+        logger -t labgov "$name: нагрузка $c ВЫКЛ (браузер закрыт)"; say "тест $name: нагрузка $c выкл"
+        gsleep "$GOV_OFF" "$name"
+    done
+    setp lab_gov=0 lab_perf_log=0
+    journalctl -b 0 -o short-precise --no-pager --since "$gt0" 2>/dev/null | grep -E 'LAB (gov|perf):|labgov' > "$f"
+    grep -E 'LAB gov:|labgov' "$f" | sed 's/^/    /' >> "$LOG"
+    say "тест $name: закончился; переключений регулятора $(grep -c 'LAB gov: ->' "$f"), подробно (с загрузкой по замерам) — $(basename "$f")"
+}
 systemctl is-active -q gpu-blackbox && grep "### blackbox start" /var/log/gpu-blackbox/current.txt 2>/dev/null | tail -n1 | grep -q " v4" \
     || say "⚠ чёрный ящик не v4 или не запущен — температуры процессора в ящике не будет"
-say "ночная серия: драйвер $(modinfo -n nouveau 2>/dev/null), ядро $(uname -r), POWEROFF=$POWEROFF WAITMIN=$WAITMIN DRY=$DRY"
-# Тест 19 (03↔07 с этой базой) прошёл в первую ночь: зависание на 32-м подъёме, машина встала целиком.
-# Порядок — от меньшего риска встать намертво к большему: зависание обрывает серию.
-run 19b 07-0f                                   # база на проверенной паре 07↔0f (240 подъёмов без lab_therm_div) — не сломал ли её lab_therm_div
-run 20  03-07 lab_therm=0                       # контроль: скобки нет совсем (lab_therm=0 выключает и стадию 4), как до 24.10
-run 21  03-07 lab_clk_mmu_lock=1                # база + блокировка MMU на время стадий частот
-setp lab_therm=1 lab_therm_div=1 lab_clk_mmu_lock=1
-say "=== серия закончена без зависаний; параметры по умолчанию, регулятор оставлен выключенным"
+say "серия: драйвер $(modinfo -n nouveau 2>/dev/null), ядро $(uname -r), POWEROFF=$POWEROFF WAITMIN=$WAITMIN DRY=$DRY"
+# Шаги NVIDIA из записи 7 (docs/2026-10-24/nvidia-vs-lab-map.md, разделы 17–18). Зависание обрывает серию.
+run 25а 03-0f                                   # прямой 03↔0f на базе: GPC 101,25 МГц на делителе <-> PLL 1800 (ещё не проверялся)
+run 25б 03-0f lab_gpc_pre405=1                  # то же через 405 МГц на делительном пути перед PLL, как NVIDIA
+run 26  07-0f lab_nv_hubpost=1                  # hubk06/hubk01 на спуске: пост-делитель до мультиплексора (база 07↔0f — тест 24, 60/60)
+run 27  07-0f lab_nv_pcie_late=1                # PCIe -> gen1 в конце спуска
+run 28  07-0f lab_nv_hub07mem=1                 # hubk07 вместе с памятью
+gov 29а lab_gov_nv=1                            # регулятор с таймингами NVIDIA, опрос раз в 1 с (как у службы)
+gov 29б lab_gov_nv=1 lab_perf_ms=250            # то же с опросом 4 раза в секунду (NVIDIA поднимается за ~0,25 с)
+base; setp lab_gov="$GOV_START"
+say "=== серия закончена без зависаний; параметры как у службы, регулятор lab_gov=$GOV_START"
 finish_night clean
