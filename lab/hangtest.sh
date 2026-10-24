@@ -37,7 +37,10 @@ sudo -v || exit 1
 ac()     { sudo sh -c "grep '^AC' '$PSF'" | sed 's/^AC: //'; }
 pstate() { sudo sh -c "echo $1 > '$PSF'"; }
 gr()     { cat "$PRM/lab_perf_gr" 2>/dev/null || echo 0; }
-errs()   { journalctl -k -b 0 --no-pager --since "$T0" 2>/dev/null | grep -cE 'failed to idle|SCHED_ERROR|runl|fifo:.*INTR|vmmgf100.c' || true; }
+# 24.10 22:20: журнал смотрим с начала цикла минус 30 с ($ES), а не с начала теста: на длинных тестах проверка с T0 тянулась
+# всё дольше и растягивала стоянку на 0f (тест 43: 6 → 12 с). Подпись зависания приходит через 35–45 с — окно подтверждения
+# (до 90 с) отсчитывается от того же $ES и её покрывает.
+errs()   { journalctl -k -b 0 --no-pager --since "${ES:-$T0}" 2>/dev/null | grep -cE 'failed to idle|SCHED_ERROR|runl|fifo:.*INTR|vmmgf100.c' || true; }
 bdur()   { journalctl -k -b 0 --no-pager --since "$T0" 2>/dev/null | grep -oE 'replay B 324->2004: выполнен за [0-9]+ мкс' | tail -n1 | grep -oE '[0-9]+ мкс'; }
 GOV0="$(cat "$PRM/lab_gov")"; LP=""; HUNG=0
 MT0="$(cat "$PRM/lab_mux_timeouts" 2>/dev/null || echo 0)"   # 24.10: тайм-ауты переключателя источника такта за тест
@@ -95,7 +98,7 @@ for c in $(seq 1 "$N"); do
     [ -n "$LP" ] && ! kill -0 "$LP" 2>/dev/null && { echo "$(date +%T) СТОП: нагрузка завершилась сама" | tee -a "$LOG"; break; }
     if [ "$FAST" = 1 ]; then sleep "$(shuf -i 1-5 -n1 | awk '{print $1/10}')"   # FAST: 0,1–0,5 с
     else sleep "$(shuf -i 15-55 -n1 | awk '{print $1/10}')"; fi      # случайная фаза 1.5–5.5 с, как у регулятора
-    G0="$(gr)"; pstate $HIGH; TS="$(date +%T.%N | cut -c1-12)"
+    G0="$(gr)"; ES="$(date -d '-30 sec' '+%Y-%m-%d %H:%M:%S')"; pstate $HIGH; TS="$(date +%T.%N | cut -c1-12)"
     [ "$FAST" = 1 ] || busy=0; hung=""
     for s in $(seq 1 "$HOLD"); do
         sleep 1; g="$(gr)"
