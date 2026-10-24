@@ -12,7 +12,8 @@
 #   C  лёгкая нагрузка 30 с (адаптивный)           -> подъём из 03 (07 или 0f — решает NVIDIA)
 #   D  лёгкая нагрузка + «максимум» 10 с           -> 0f под нагрузкой; «адаптивный» 30 с с нагрузкой -> спуск под нагрузкой
 #   E  всплески: 5 x (нагрузка 3 с, пауза 6 с)     -> резкие переходы
-#   F  средняя нагрузка 30 с, затем крупнее 20 с   -> рискованно (в версии 1 тяжёлая нагрузка повесила запись)
+#   F  средняя нагрузка 640x480 30 с              -> последней (в версии 1 glmark2 1600x900 дал 842 МБ за 1,5 мин и повесил)
+#   Если запись перевалила за 2 ГБ, оставшиеся фазы пропускаются.
 # Запуск: sudo ~/trace/run-trace.sh   (~8 минут, ничего не трогать; конец — строка «ГОТОВО»)
 set -euo pipefail
 [ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
@@ -35,7 +36,7 @@ say "Снимок регистров «до драйвера» сделан"
 
 say "Включаю запись (остальные ядра процессора на время записи выключатся — это нормально)"
 echo nop > "$T/current_tracer"
-echo 262144 > "$T/buffer_size_kb" 2>/dev/null || echo 65536 > "$T/buffer_size_kb"   # версия 2: 65536; под нагрузкой событий больше
+echo 65536 > "$T/buffer_size_kb"     # как в версии 2. Размер записи задаёт не буфер, а нагрузка: 842 МБ в версии 1 — от glmark2 1600x900
 echo mmiotrace > "$T/current_tracer"
 nice -n -20 cat "$T/trace_pipe" > "$OUT/mmiotrace.txt" &
 CATPID=$!
@@ -59,6 +60,9 @@ snap() { mark "снимок: \$1"; python3 "\$HERE/regdump4.py" "\$1" "\$OUT/reg
          { echo "### \$1 \$(date +%T)"; nvidia-settings -t -q GPUCurrentPerfLevel -q GPUCurrentClockFreqs 2>&1; } >> "\$OUT/nvsettings.txt"; }
 pm() { nvidia-settings -a "[gpu:0]/GPUPowerMizerMode=\$1" >/dev/null 2>&1 || true; }   # 0 адаптивный, 1 максимум
 LOADPID=""
+LIMIT=2000000000   # запись больше 2 ГБ — дальше фазы не идут (в версии 1 тяжёлая нагрузка дала 842 МБ за 1,5 мин и повесила систему)
+big() { [ "\$(stat -c %s "\$OUT/mmiotrace.txt" 2>/dev/null || echo 0)" -gt "\$LIMIT" ]; }
+guard() { big && { mark "запись больше 2 ГБ — фаза \$1 и дальше пропущены"; snap "конец по размеру"; exit 0; }; }
 load_on() { __GL_SYNC_TO_VBLANK=0 glxgears -geometry "\$1+40+40" >/dev/null 2>&1 & LOADPID=\$!; }
 load_off() { [ -n "\$LOADPID" ] && kill "\$LOADPID" 2>/dev/null; wait "\$LOADPID" 2>/dev/null; LOADPID=""; }
 sleep 3
@@ -72,12 +76,14 @@ snap "B максимум, простой"
 mark "B PowerMizer адаптивный, простой 45 с (спуск без нагрузки)"
 pm 0; sleep 45
 snap "B адаптивный, простой"
+guard C
 mark "C лёгкая нагрузка 300x300, адаптивный, 30 с (подъём из 03)"
 load_on 300x300; sleep 25
 snap "C лёгкая нагрузка"
 sleep 5; load_off
 mark "C нагрузка снята, простой 40 с"
 sleep 40
+guard D
 mark "D лёгкая нагрузка + максимум 10 с (0f под нагрузкой)"
 load_on 300x300; sleep 3; pm 1; sleep 10
 snap "D максимум под нагрузкой"
@@ -87,17 +93,17 @@ snap "D адаптивный под нагрузкой"
 load_off
 mark "D нагрузка снята, простой 40 с"
 sleep 40
+guard E
 mark "E всплески: 5 x (нагрузка 3 с, пауза 6 с)"
 for i in 1 2 3 4 5; do
   mark "E всплеск \$i"; load_on 300x300; sleep 3; load_off; sleep 6
 done
 snap "E после всплесков"
-mark "F средняя нагрузка 640x480 30 с (рискованно)"
+guard F
+mark "F средняя нагрузка 640x480 30 с (последней: крупное окно — то, что повесило версию 1)"
 load_on 640x480; sleep 25
 snap "F средняя нагрузка"
 sleep 5; load_off
-mark "F нагрузка 1024x768 20 с (рискованно)"
-load_on 1024x768; sleep 20; load_off
 mark "F нагрузка снята, простой 30 с"
 sleep 30
 snap "F конец, простой"
