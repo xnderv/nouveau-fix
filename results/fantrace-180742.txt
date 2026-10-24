@@ -1,0 +1,147 @@
+/home/alex/Home/nouveau-fix/lab/fantrace.bt:25:2-18: WARNING: Return value discarded.
+    delete(@pd[tid]);
+    ~~~~~~~~~~~~~~~~
+/home/alex/Home/nouveau-fix/lab/fantrace.bt:26:2-18: WARNING: Return value discarded.
+    delete(@pu[tid]);
+    ~~~~~~~~~~~~~~~~
+18:08:03.552303 pwm_get 0xe114 0000021c 0xe118 800001e1, swapper/4 cpu 4
+18:08:03.552306 => 0 %, swapper/4 cpu 4
+        nvkm_fan_update+142
+        nvkm_fan_alarm+28
+        nvkm_timer_alarm_trigger+435
+        nv04_timer_intr+134
+        nvkm_timer_intr+26
+        nvkm_subdev_intr+26
+        nvkm_intr_subdev+18
+        nvkm_intr+346
+
+18:08:04.052356 => 3 %, swapper/4 cpu 4
+        nvkm_fan_update+142
+        nvkm_fan_alarm+28
+        nvkm_timer_alarm_trigger+435
+        nv04_timer_intr+134
+        nvkm_timer_intr+26
+        nvkm_subdev_intr+26
+        nvkm_intr_subdev+18
+        nvkm_intr+346
+
+18:08:21.553314 pwm_get 0xe114 0000021c 0xe118 800001dc, swapper/4 cpu 4
+18:08:21.553316 => 0 %, swapper/4 cpu 4
+        nvkm_fan_update+142
+        nvkm_fan_alarm+28
+        nvkm_timer_alarm_trigger+435
+        nv04_timer_intr+134
+        nvkm_timer_intr+26
+        nvkm_subdev_intr+26
+        nvkm_intr_subdev+18
+        nvkm_intr+346
+
+18:08:22.053382 => 3 %, swapper/4 cpu 4
+        nvkm_fan_update+142
+        nvkm_fan_alarm+28
+        nvkm_timer_alarm_trigger+435
+        nv04_timer_intr+134
+        nvkm_timer_intr+26
+        nvkm_subdev_intr+26
+        nvkm_intr_subdev+18
+        nvkm_intr+346
+
+18:08:35.554143 pwm_get 0xe114 0000021c 0xe118 800001cb, swapper/4 cpu 4
+18:08:35.554146 => 0 %, swapper/4 cpu 4
+        nvkm_fan_update+142
+        nvkm_fan_alarm+28
+        nvkm_timer_alarm_trigger+435
+        nv04_timer_intr+134
+        nvkm_timer_intr+26
+        nvkm_subdev_intr+26
+        nvkm_intr_subdev+18
+        nvkm_intr+346
+
+18:08:36.054211 => 3 %, swapper/4 cpu 4
+        nvkm_fan_update+142
+        nvkm_fan_alarm+28
+        nvkm_timer_alarm_trigger+435
+        nv04_timer_intr+134
+        nvkm_timer_intr+26
+        nvkm_subdev_intr+26
+        nvkm_intr_subdev+18
+        nvkm_intr+346
+
+18:08:59.555499 pwm_get 0xe114 0000021c 0xe118 800001c6, swapper/4 cpu 4
+18:08:59.555501 => 0 %, swapper/4 cpu 4
+        nvkm_fan_update+142
+        nvkm_fan_alarm+28
+        nvkm_timer_alarm_trigger+435
+        nv04_timer_intr+134
+        nvkm_timer_intr+26
+        nvkm_subdev_intr+26
+        nvkm_intr_subdev+18
+        nvkm_intr+346
+
+18:08:59.930295 => 3 %, cat cpu 6
+        nvkm_therm_fan_user_get+28
+        nouveau_read+743
+        hwmon_attr_show+112
+        dev_attr_show+31
+        sysfs_kf_seq_show+202
+        kernfs_seq_show+39
+        seq_read_iter+304
+        kernfs_fop_read_iter+49
+
+18:09:00.055583 => 3 %, swapper/4 cpu 4
+        nvkm_fan_update+142
+        nvkm_fan_alarm+28
+        nvkm_timer_alarm_trigger+435
+        nv04_timer_intr+134
+        nvkm_timer_intr+26
+        nvkm_subdev_intr+26
+        nvkm_intr_subdev+18
+        nvkm_intr+346
+
+18:09:29.557345 pwm_get 0xe114 0000021c 0xe118 800001b6, yandex_browser cpu 4
+18:09:29.557348 => 0 %, yandex_browser cpu 4
+        nvkm_fan_update+142
+        nvkm_fan_alarm+28
+        nvkm_timer_alarm_trigger+435
+        nv04_timer_intr+134
+        nvkm_timer_intr+26
+        nvkm_subdev_intr+26
+        nvkm_intr_subdev+18
+        nvkm_intr+346
+
+18:09:30.057419 => 3 %, swapper/4 cpu 4
+        nvkm_fan_update+142
+        nvkm_fan_alarm+28
+        nvkm_timer_alarm_trigger+435
+        nv04_timer_intr+134
+        nvkm_timer_intr+26
+        nvkm_subdev_intr+26
+        nvkm_intr_subdev+18
+        nvkm_intr+346
+
+18:09:40.557962 pwm_get 0xe114 0000021c 0xe118 80000175, swapper/4 cpu 4
+18:09:40.557966 => 0 %, swapper/4 cpu 4
+        nvkm_fan_update+142
+        nvkm_therm_fan_set+25
+        nvkm_therm_update+455
+        nvkm_therm_alarm+26
+        nvkm_timer_alarm_trigger+435
+        nv04_timer_intr+134
+        nvkm_timer_intr+26
+        nvkm_subdev_intr+26
+
+18:09:41.058025 => 3 %, swapper/4 cpu 4
+        nvkm_fan_update+142
+        nvkm_fan_alarm+28
+        nvkm_timer_alarm_trigger+435
+        nv04_timer_intr+134
+        nvkm_timer_intr+26
+        nvkm_subdev_intr+26
+        nvkm_intr_subdev+18
+        nvkm_intr+346
+
+
+
+@calls: 232
+@extreme: 13
+@odd: 6
