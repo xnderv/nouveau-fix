@@ -1,162 +1,181 @@
-# nouveau-fix: full reclocking for GeForce GTX 560 Ti (GF114) on Linux
+# nouveau-fix: full reclocking for GeForce GTX 560 Ti (Fermi, GF114) on Linux
 
-**English summary — the rest of this file is in Russian.**
+**English first; the same in Russian below. / Русская версия — ниже.**
 
-Upstream nouveau leaves Fermi cards at their boot clocks (GTX 560 Ti: core 50 MHz, memory 135 MHz),
-because its memory reclock sequence for GF100-class chips was recorded from one old board and does not
-work on others. This repository contains a nouveau driver build in which a GTX 560 Ti runs at its
-full factory clocks, switching between performance levels automatically, the way the NVIDIA driver does:
+Upstream nouveau keeps Fermi cards at their boot clocks: a GTX 560 Ti stays at 50 MHz core and 135 MHz memory, so it
+is slow in 3D and video. This project makes the card switch between its performance levels the way the NVIDIA
+driver does, using only open methods, and tries to turn what we learn into changes that can go upstream.
 
 | Level | Core / shader | Memory | When |
 |---|---|---|---|
-| 03 | 50 / 101 MHz | 135 MHz | idle |
+| 03 | 50 / 101.25 MHz | 135 MHz | idle |
 | 07 | 405 / 810 MHz | 324 MHz | desktop, video |
-| 0f | 900 / 1800 MHz | 2004 MHz (4 GT/s) | 3D load |
+| 0f | 900 / 1800 MHz | 2004 MHz (4 GT/s) | 3D, heavy load |
 
-How it was done: the NVIDIA 390 driver was traced with mmiotrace on this board; the PMU memory scripts,
-PLL settings, voltages, PCIe link speed, busy-counter setup and the order of operations were extracted
-from the trace and reproduced in nouveau, one change at a time, each verified on the hardware
-(`docs/`, `results/`). The load accounting runs in the PMU firmware (a new `PERF` process), the decision
-is taken in the driver once a second; a thermal brake lowers the level at 90 / 95 °C.
+The reference board is a Gigabyte GV-N560OC-1GI (PCI subsystem 1458:3515). Its 0f level is a factory overclock;
+03 and 07 are the chip's standard levels.
 
-**Patches** (`patches/`, on top of the nouveau in Linux 7.0.x):
-- `0001` — fix for a GPU hang when a Chromium-based app deletes an engine object while the channel is busy
-  (`nouveau_abi16.c`, candidate for upstream);
-- `0003` — HDMI mode was refused (fell back to DVI, no audio/InfoFrames) whenever the monitor supports SCDC
-  and the GPU does not; only refuse above 340 MHz. Fixed upstream independently in Sept 2026
-  (commit `1717fcc5be57`); kept here for 7.0.x kernels and skipped automatically once the fix is present;
-- `0010` — the reclocking itself. Board-gated: active only on Gigabyte GV-N560 (PCI subsystem 1458:3515);
-  everywhere else the driver behaves like upstream. `nouveau.gf114_board=1` enables it on any GF114 board
-  (untested — the memory scripts come from this board's VBIOS, yours may differ; watch for VRAM errors),
-  `nouveau.gf114_gov=0` disables the governor, `/sys/module/nouveau/parameters/gf114_*` shows load and temperature.
+## Status (24 Oct 2026) — beta
 
-**Install** (Ubuntu, kernel 7.0.x; needs `dkms build-essential patch git linux-headers-generic`):
-`bash stable/stable.sh install`, reboot, `bash stable/stable.sh status`. DKMS rebuilds the module for every
-new kernel. `lab/` holds the instrumented driver (`lab/0002-*.patch`, `patches/0004`, `0005`) with runtime
-switches for every step, and the scripts of all experiments; `trace/` is the mmiotrace tooling.
+- **Reclocking works on the reference board** — core, shader, memory, voltage, PCIe 2.5/5 GT/s, and an automatic
+  governor that uses load measured in the PMU firmware.
+- **The cause of the remaining hangs is found and fixed in the lab driver.** The VBIOS stores whole megahertz
+  (101 for 101.25 MHz), and nouveau took that as an exact target. At level 03 it therefore put the shader clock
+  on its PLL, while NVIDIA uses the 1620 MHz divider. Switching away from that PLL could wedge the GPU. With the
+  divider, as NVIDIA does it, 900 level switches under browser load (tests 22–33a, 60 per test) passed without a
+  single hang. The same rounding made nouveau run the PMU at 216 instead of 202.5 MHz; that is fixed too.
+- **NVIDIA's order of operations is reproduced step by step**, each step behind its own switch and tested alone:
+  `docs/2026-10-24/nvidia-logic.md` explains what NVIDIA does and why.
+- **The author's daily driver** is the lab driver (`lab/`) with these settings, applied by `daily/gpu-autoclock.py`.
+  The stable patch (`patches/0010`) does not have the divider and PMU fixes yet; a clean stable version with them is next.
+- **Memory reclock is board-specific for now.** It replays the memory scripts recorded on the reference board,
+  just as upstream nouveau replays a sequence recorded on another board. A generator from each card's own VBIOS
+  tables is in progress (`docs/2026-10-24/memory-scripts-vs-nouveau.md`). **Data from other cards is what it needs.**
 
-**Status (23 Oct 2026):** daily driver on the author's machine since 20 Oct. One open problem: a rare hard
-hang (3 in 3 days, `nvkm_intr read 0xffffffff from PMC_BOOT_0` → MCE, machine needs Reset) that does not
-reproduce on demand — ~100 level switches under bus/CPU load and with screenshots passed clean. PCIe link
-switching, memory replay under load and the governor were each ruled out individually (`docs/HANDOFF-2026-10-22.md`).
-Until it is found, treat this as **beta**: `lab/blackbox.sh install` records the card state once a second to
-disk and `lab/trap.sh on` makes a hard lockup panic into ramoops, so the next hang leaves a trace — please
-attach it to a "Hang report" issue.
+## How we work
 
-Known differences from the NVIDIA driver and open questions are listed in `docs/2026-10-22/review-driver.md`.
-Reports from other GTX 560 / 560 Ti boards are welcome (open an issue with `dmesg | grep -i nouveau` and
-`stable.sh status` output).
+- **Only open methods.** We observe how the NVIDIA 390 driver talks to the hardware (the kernel's built-in
+  mmiotrace), read the VBIOS data tables, and use open sources: nouveau, envytools, and NVIDIA's own open nvgpu
+  driver. We do not use decompiled or disassembled NVIDIA code, or anything derived from it.
+- **No NVIDIA binaries in this repository.** VBIOS images and raw traces stay private; only findings and register
+  values are published.
+- **One change per test.** Every step is a separate switch, tested alone on the hardware, with the logs in `results/`.
+
+## Help wanted: data from other Fermi cards
+
+Owners of other Fermi cards — GTX 460–590, GTS 450, GT 4xx/5xx and mobile parts — can help the most by sharing their
+card's VBIOS tables:
+
+1. `git clone https://github.com/xnderv/nouveau-fix && cd nouveau-fix && bash tools/card-report.sh`.
+   It only reads. It prints a summary of your VBIOS tables, asks a few questions (vendor, cooling, factory
+   overclock), and with your consent saves an archive in your home folder.
+2. Open a **Card data** issue and paste the summary there.
+3. Send the archive to **xnderv@yandex.com**. Please don't attach it to the issue: the image belongs to NVIDIA and your
+   card's vendor, so we never publish it, only values from its tables.
+
+Hangs and results on other boards: the **Hang report** and **Hardware report** issue forms.
+
+## Install (Ubuntu, kernel 7.0.x)
+
+Needs `dkms build-essential patch git linux-headers-generic`.
+
+| Command | What it does |
+|---|---|
+| `bash stable/stable.sh install` | stable driver via DKMS (rebuilt for every new kernel): patches 0001 + 0003 + 0010 |
+| `bash stable/stable.sh status` | loaded driver, level, load, temperature, PCIe link, events |
+| `bash lab/lab.sh install` | lab driver: 0001 + lab 0002 + 0003 + 0004 + 0005, with `lab_*` switches for every step |
+| `bash tools/card-report.sh` | read-only report about your card (see above) |
+
+Reclocking is active only on the reference board. On any other card the driver behaves like upstream; the stable
+driver tries other GF114 boards with `nouveau.gf114_board=1` (untested; watch for VRAM errors).
+
+## Patches (`patches/`, on top of nouveau in Linux 7.0.x)
+
+- `0001` — a GPU hang when a Chromium-based app deletes an engine object while the channel is still busy
+  (`nouveau_abi16.c`; candidate for upstream).
+- `0003` — HDMI was refused when the monitor supports SCDC and the GPU does not; refuse only above 340 MHz.
+  Fixed upstream independently in Sept 2026 (`1717fcc5be57`); skipped automatically where present.
+- `0004` (lab) — load accounting in the PMU firmware and the in-driver governor. `0005` (lab) — HDMI AVI InfoFrame ITC.
+- `0010` — stable reclocking for the reference board (22–24 Oct); it does not yet have the shader-divider and PMU
+  clock fixes from the lab driver.
+- `lab/0002` — the instrumented reclocking with all switches.
+
+## Where things are
+
+| Path | Contents |
+|---|---|
+| `docs/2026-10-24/nvidia-logic.md` | how NVIDIA reclocks GF114 and why: rules, open questions, what we do the same way |
+| `docs/2026-10-24/nvidia-vs-lab-map.md` | register-level map: NVIDIA vs the lab driver, every recording |
+| `docs/2026-10-24/memory-scripts-vs-nouveau.md` | memory scripts: NVIDIA vs nouveau vs VBIOS tables |
+| `docs/2026-10-23/hang-20261023-1802.md` | the hang investigation, tests 1–24 |
+| `lab/` | lab driver, test series (`night.sh`, `hangtest.sh`), probes, VBIOS parsers |
+| `trace/` | mmiotrace recording kit (a separate boot disk with the NVIDIA 390 driver) |
+| `results/` | test logs |
+| `stable/`, `daily/` | stable DKMS driver; the service that applies the daily settings |
 
 ---
 
-# nouveau-fix — исправление зависаний GTX 560 Ti (Fermi) в Ubuntu
+# nouveau-fix: полная смена частот для GeForce GTX 560 Ti (Fermi, GF114) в Linux
 
-## Что это и зачем
+Штатный nouveau оставляет карты Fermi на частотах загрузки: GTX 560 Ti так и работает на 50 МГц ядра и 135 МГц памяти,
+в 3D и видео она медленная. Проект научил карту переключать уровни производительности так же, как это делает драйвер
+NVIDIA, — только открытыми методами — и старается превратить найденное в правки, пригодные для основного ядра.
 
-Драйвер nouveau (ядро Linux 7.0 и новее, проверено до 7.3) при удалении графического объекта
-по запросу программы не дожидается, пока карта закончит связанную работу. Программы на Chromium
-(Яндекс Браузер, Claude, Cursor) при старте создают и сразу удаляют пробные 3D-объекты. Если в этот
-момент карта занята рабочим столом (анимация запуска из Dash, движение мыши), она обращается к уже
-удалённому контексту → `fifo: fault ... [HUB/CTXCTL] ... PAGE_NOT_PRESENT` → канал убит → экран встаёт.
+| Уровень | Ядро / шейдеры | Память | Когда |
+|---|---|---|---|
+| 03 | 50 / 101,25 МГц | 135 МГц | простой |
+| 07 | 405 / 810 МГц | 324 МГц | рабочий стол, видео |
+| 0f | 900 / 1800 МГц | 2004 МГц (4 ГТ/с) | 3D, тяжёлая нагрузка |
 
-Исправление (`patches/0001-...patch`, ~15 строк, файл `nouveau_abi16.c`) добавляет ожидание
-`nouveau_channel_idle()` перед удалением объекта — так же, как это делает старый путь `GPUOBJ_FREE`.
-Проверено 2026-10-19: 10 запусков из Dash подряд без ошибок (до исправления падало почти каждый раз).
+Эталонная плата — Gigabyte GV-N560OC-1GI (подсистема PCI 1458:3515). Уровень 0f у неё — заводской разгон;
+03 и 07 — штатные уровни чипа.
 
-Пока исправление не принято в ядро, **каждое новое ядро Ubuntu приходит без него** — его нужно пересобрать.
+## Состояние (24.10.2026) — бета
 
-## Стабильный драйвер (с 22.10.2026) — основной способ
+- **Смена частот работает на эталонной плате**: ядро, шейдеры, память, напряжение, PCIe 2,5/5 ГТ/с и регулятор,
+  который сам выбирает уровень по загрузке, измеренной в прошивке PMU.
+- **Причина оставшихся зависаний найдена и устранена в лабораторном драйвере.** VBIOS хранит целые мегагерцы
+  (101 вместо 101,25 МГц), а nouveau принимал это число за точную цель. Поэтому на уровне 03 он ставил шейдерный
+  такт на PLL, а NVIDIA — на делитель от 1620 МГц. Переход с этого PLL мог подвесить карту. С делителем, как у NVIDIA,
+  900 переключений уровней под нагрузкой браузера (тесты 22–33а, по 60 в каждом) прошли без единого зависания.
+  То же округление заставляло nouveau гнать PMU на 216 МГц вместо 202,5 — тоже исправлено.
+- **Порядок действий NVIDIA повторён по шагам**: каждый шаг — отдельный переключатель, проверен отдельно.
+  Что и зачем делает NVIDIA — `docs/2026-10-24/nvidia-logic.md`.
+- **Ежедневный драйвер автора** — лабораторный (`lab/`) с этими настройками, их выставляет служба
+  `daily/gpu-autoclock.py`. В стабильном патче (`patches/0010`) исправлений делителя и PMU ещё нет; чистая стабильная версия с ними — следующий шаг.
+- **Смена частоты памяти пока привязана к плате.** Она проигрывает скрипты памяти, записанные на эталонной плате, —
+  так же, как штатный nouveau проигрывает последовательность, записанную когда-то на другой плате. Генератор по
+  таблицам VBIOS каждой карты в работе (`docs/2026-10-24/memory-scripts-vs-nouveau.md`). **Ему нужны данные других карт.**
 
-Один драйвер, без переключателей, ставится через DKMS и **сам пересобирается под каждое новое ядро**:
-исправление гонки (0001) + HDMI без SCDC (0003) + полная смена частот для GTX 560 Ti (0010):
-память скриптами NVIDIA, PLL как у NVIDIA, порядок как у NVIDIA, PCIe 2,5/5 GT/s, учёт загрузки в прошивке PMU,
-регулятор режимов 03/07/0f в драйвере с температурным тормозом (≥ 90 °C — не выше 07, ≥ 95 °C — 03), флаг ITC в HDMI.
-Всё включается только на плате Gigabyte 1458:3515; на других картах драйвер ведёт себя как штатный
-(`nouveau.gf114_board=1` — попробовать на другой GF114, `nouveau.gf114_gov=0` — выключить регулятор).
+## Как мы работаем
 
-| Команда | Что делает | Пароль |
-|---|---|---|
-| `bash ~/Home/nouveau-fix/stable/stable.sh install` | ставит исходники в DKMS, собирает под текущее ядро, убирает службу и ручные сборки | да |
-| `bash ~/Home/nouveau-fix/stable/stable.sh status` | какой драйвер загружен, режим, загрузка, температура, шина, события | частично |
-| `bash ~/Home/nouveau-fix/newkernel.sh` | после установки нового ядра, до перезагрузки: проверить/досабрать | при сборке |
-| `bash ~/Home/nouveau-fix/lab/lab.sh install` | поставить лабораторный драйвер (с переключателями `lab_*`) вместо стабильного | да |
+- **Только открытые методы.** Наблюдаем, как драйвер NVIDIA 390 обращается к железу (встроенный в ядро mmiotrace),
+  читаем таблицы данных VBIOS, опираемся на открытые источники: nouveau, envytools и открытый драйвер самой NVIDIA nvgpu.
+  Декомпилированный или дизассемблированный код NVIDIA и всё, что из него получено, не используем.
+- **Никаких бинарных файлов NVIDIA в репозитории.** Образы VBIOS и сырые записи остаются у нас; публикуются только
+  выводы и значения регистров.
+- **Одно изменение на опыт.** Каждый шаг — отдельный переключатель, проверенный отдельно на железе; журналы — в `results/`.
 
-Нужны пакеты: `dkms build-essential patch git` и заголовки ядра (`linux-headers-generic`).
+## Нужна помощь: данные других карт Fermi
 
-## Команды (старый путь: только исправление гонки)
+Больше всего помогут владельцы других карт Fermi — GTX 460–590, GTS 450, GT 4xx/5xx и мобильных — если поделятся
+таблицами VBIOS своей карты:
 
-| Команда | Что делает | Пароль |
-|---|---|---|
-| `~/Home/nouveau-fix/rebuild.sh` | скачивает исходники nouveau под **самое новое установленное** ядро, накладывает исправление, собирает и (после твоего `y`) ставит | только на установке |
-| `~/Home/nouveau-fix/rebuild.sh 7.0.0-40-generic` | то же для конкретного ядра | только на установке |
-| `~/Home/nouveau-fix/check.sh` | показывает, какой драйвер работает сейчас, сколько раз сработало исправление и были ли ошибки карты | нет |
-| `~/Home/nouveau-fix/revert.sh` | возвращает стандартный драйвер Ubuntu для текущего ядра | да |
+1. `git clone https://github.com/xnderv/nouveau-fix && cd nouveau-fix && bash tools/card-report.sh`.
+   Скрипт только читает. Он печатает разбор таблиц VBIOS, задаёт несколько вопросов (производитель, охлаждение,
+   заводской разгон) и с вашего согласия сохраняет архив в домашнем каталоге.
+2. Откройте на GitHub заявку **Card data** и вставьте туда разбор.
+3. Сам архив отправьте на **xnderv@yandex.com**. Не прикладывайте его к заявке: образ принадлежит NVIDIA и производителю
+   карты, поэтому мы его никогда не публикуем — только значения из его таблиц.
 
-Стандартный драйвер Ubuntu никогда не удаляется: наш кладётся рядом, в `/lib/modules/<ядро>/updates/nouveau-fix/`.
+Зависания и результаты на других платах — формы **Hang report** и **Hardware report**.
 
-## Порядок действий при обновлении ядра
+## Установка (Ubuntu, ядро 7.0.x)
 
-1. Ubuntu поставила обновления, среди них новое ядро (`linux-image-...`).
-2. **До перезагрузки** открой Терминал и запусти `~/Home/nouveau-fix/rebuild.sh`.
-   Скрипт сам возьмёт самое новое ядро. Ответь `y`, введи пароль.
-3. Перезагрузись.
-4. Запусти `~/Home/nouveau-fix/check.sh` — должно быть «НАШ драйвер с исправлением ✅».
+Нужны пакеты `dkms build-essential patch git linux-headers-generic`.
 
-Если забыл и уже перезагрузился в новое ядро — ничего страшного: пока не пересоберёшь, запускай
-Яндекс и Claude **из Терминала** (так гонка почти не возникает), выполни `rebuild.sh` и перезагрузись.
+| Команда | Что делает |
+|---|---|
+| `bash stable/stable.sh install` | стабильный драйвер через DKMS (сам пересобирается под каждое новое ядро): патчи 0001 + 0003 + 0010 |
+| `bash stable/stable.sh status` | какой драйвер загружен, уровень, загрузка, температура, шина PCIe, события |
+| `bash lab/lab.sh install` | лабораторный драйвер: 0001 + лабораторный 0002 + 0003 + 0004 + 0005, с переключателями `lab_*` на каждый шаг |
+| `bash newkernel.sh` | после установки нового ядра, до перезагрузки: проверить и при необходимости дособрать драйвер |
+| `bash tools/card-report.sh` | отчёт о вашей карте, только чтение (см. выше) |
 
-## Что может сказать `rebuild.sh`
+Смена частот включается только на эталонной плате; на других картах драйвер ведёт себя как штатный. Стабильный драйвер
+можно попробовать на другой плате GF114 параметром `nouveau.gf114_board=1` (не проверено; следите за ошибками видеопамяти).
 
-- **«Исправление наложено… Готово»** — всё хорошо.
-- **«Исправление УЖЕ ЕСТЬ в этой версии Linux»** — разработчики приняли правку, пересобирать больше не нужно.
-  Можно запустить `revert.sh` на старых ядрах, а сам набор хранить на память.
-- **«Исправление НЕ накладывается»** — код драйвера в новой версии изменился. Ничего не установлено,
-  система на стандартном драйвере. Покажи вывод ассистенту — патч нужно обновить.
-- **«Сборка НЕ удалась» / «Нет заголовков ядра»** — ничего не установлено. Для заголовков:
-  `sudo apt install linux-headers-<версия ядра>`. Остальное — показать ассистенту лог из `~/Home/nouveau-build/fix-<ядро>/build.log`.
+Старый путь «только исправление 0001» (`rebuild.sh`, `check.sh`, `revert.sh`) сохранён для истории.
 
-## Подробный журнал драйвера
+## Где что лежит
 
-Для разбора неисправностей драйвер умеет писать подробный журнал. Включается параметром загрузки
-`nouveau.debug=...` в `/etc/default/grub` (строка `GRUB_CMDLINE_LINUX_DEFAULT`), затем `sudo update-grub` и перезагрузка.
-
-- Для частот (сейчас): `nouveau.debug=clk=trace,fb=trace,volt=trace,pmu=debug` — молчит, пока частоты не трогают.
-- Для гонки (использовался 19.10): `nouveau.debug=fifo=trace,gr=trace` — ~9 тыс. строк в минуту, держать долго нельзя.
-- **Выключить совсем** (вернуть чистые параметры `quiet splash nouveau.hdmimhz=297`):
-  ```bash
-  sudo cp /etc/default/grub.before-trace /etc/default/grub && sudo update-grub
-  ```
-
-## Лаборатория частот (`lab/`)
-
-Только для опытов. `lab/lab.sh install` ставит экспериментальный драйвер: исправление гонки +
-разрешение смены частот + подробные строки `LAB ...` в журнале. Стабильный драйвер сохраняется
-в `~/Home/nouveau-build/stable-<ядро>-nouveau.ko`. `lab/lab.sh try 07 0f` — опыт со страховкой: после
-каждого режима 15 с ждёт Enter («вижу экран»); нет ответа → возврат в 03; снова нет → сам сохраняет
-журнал в `results/` и перезагружает компьютер. `lab/lab.sh pstate 07` — переключить без страховки.
-
-Серия опытов «по одному параметру» (каждый — `try 0f 03`, со страховкой):
-
-| Опыт | Команда | Что меняется |
-|---|---|---|
-| A | `lab/lab.sh exp A` | только напряжение до уровня 0f |
-| B | `lab/lab.sh exp B` | напряжение (первым) + память |
-| C | `lab/lab.sh exp C` | напряжение (первым) + ядро |
-| D | `lab/lab.sh exp D` | всё: PCIe + напряжение + память + ядро |
-
-Порядок этапов в драйвере nouveau: PCIe → память → вентилятор → напряжение ↑ → ядро → напряжение ↓.
-Память меняется ДО подъёма напряжения — подозреваемый; переключатель `lab_volt_first` поднимает напряжение первым.
-`lab/lab.sh flags` показывает переключатели (`/sys/module/nouveau/parameters/lab_*`). `lab/lab.sh restore` — вернуть стабильный драйвер. После перезагрузки карта всегда
-на исходных частотах, сама частота не поднимается.
-
-## Что нужно на компьютере
-
-`git`, `make`, `gcc` и заголовки ядра (`linux-headers-...`). Скрипт сам проверит и скажет, чего не хватает.
-Нужен интернет: исходники качаются с GitHub-зеркала стабильных ядер `gregkh/linux` (тег вида `v7.0.14`;
-ядро Ubuntu 7.0.0-38 основано на Linux 7.0.14).
-
-## Связанные материалы
-
-- `handoff-2026-10-19-evening-nouveau-fix.md` на рабочем столе — полный разбор, что проверяли и почему.
-- Открытые вопросы: отправить исправление разработчикам nouveau; падение ядра при «шторме» закрытий
-  (`nouveau_fence_sync`, use-after-free); смена частот карты (`gf100_clk_prog_3` timeout).
+| Путь | Что там |
+|---|---|
+| `docs/2026-10-24/nvidia-logic.md` | как NVIDIA меняет частоты GF114 и почему: правила, белые пятна, что у нас так же |
+| `docs/2026-10-24/nvidia-vs-lab-map.md` | карта регистров: NVIDIA против лабораторного драйвера, все записи |
+| `docs/2026-10-24/memory-scripts-vs-nouveau.md` | скрипты памяти: NVIDIA, nouveau и таблицы VBIOS |
+| `docs/2026-10-23/hang-20261023-1802.md` | расследование зависаний, тесты 1–24 |
+| `lab/` | лабораторный драйвер, серии тестов (`night.sh`, `hangtest.sh`), пробники, разборщики VBIOS |
+| `trace/` | набор для записи mmiotrace (отдельный загрузочный диск с драйвером NVIDIA 390) |
+| `results/` | журналы тестов |
+| `stable/`, `daily/` | стабильный драйвер DKMS; служба, выставляющая ежедневные настройки |

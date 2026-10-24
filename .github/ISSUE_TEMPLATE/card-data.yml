@@ -1,0 +1,53 @@
+name: Card data (VBIOS for research)
+description: Share your Fermi card's VBIOS tables so the reclocking can be made to work on boards other than ours
+title: "Card data: <vendor> <model>"
+labels: ["card data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you! Run `bash tools/card-report.sh` (read-only, changes nothing). It prints a summary of your VBIOS tables
+        and saves an archive in your home folder. Paste the summary below. Send the archive itself as the README says,
+        **do not attach it here**: the VBIOS image belongs to NVIDIA and your card's vendor, so we never publish it.
+  - type: input
+    id: board
+    attributes:
+      label: Board vendor and model (as on the box or sticker)
+      placeholder: Gigabyte GV-N560OC-1GI
+    validations:
+      required: true
+  - type: dropdown
+    id: cooling
+    attributes:
+      label: Cooling
+      options: ["1 fan", "2 fans", "3 fans", "blower", "passive", "water", "don't know"]
+    validations:
+      required: true
+  - type: dropdown
+    id: oc
+    attributes:
+      label: Factory overclocked?
+      options: ["yes", "no", "don't know"]
+  - type: dropdown
+    id: flashed
+    attributes:
+      label: Was this VBIOS ever flashed or edited?
+      options: ["no", "yes", "don't know"]
+  - type: textarea
+    id: summary
+    attributes:
+      label: Output of tools/card-report.sh (the VBIOS summary)
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else (hangs, artifacts, temperatures, kernel and distro)
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Consent
+      options:
+        - label: This is my card. I agree that its VBIOS is used for research in nouveau-fix. The image itself is not published, only values from its tables, without my name.
+          required: true
