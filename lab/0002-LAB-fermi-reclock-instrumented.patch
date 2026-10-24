@@ -1,7 +1,7 @@
 diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
 --- base/nvkm/subdev/clk/base.c	2026-10-22 14:07:17.000000000 +0300
-+++ lab-n13/nvkm/subdev/clk/base.c	2026-10-24 14:50:27.447349942 +0300
-@@ -33,6 +33,55 @@
++++ lab-n13/nvkm/subdev/clk/base.c	2026-10-24 17:18:05.931293958 +0300
+@@ -33,6 +33,56 @@
  #include <subdev/volt.h>
  
  #include <core/option.h>
@@ -49,7 +49,8 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
 +static uint lab_nv_disphold;
 +module_param(lab_nv_disphold, uint, 0644);
 +MODULE_PARM_DESC(lab_nv_disphold, "LAB: set bit 0 of 0x610300 for the whole level switch, as NVIDIA (display)");
-+extern u32 lab_clk_prog_mask;	/* clk/gf100.c */
++extern u32 lab_clk_prog_mask;
++extern u32 lab_mux_stuck;	/* clk/gf100.c: узлы, оставшиеся на PLL после неудачного переключения (lab_mux_guard) */	/* clk/gf100.c */
 +static struct nvkm_pstate *lab_h07_pstate;	/* задан только на время вызова из nvkm_pstate_prog с lab_nv_hub07mem */
 +static int lab_h07_pstatei;
 +static bool lab_h07_up;
@@ -57,7 +58,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  /******************************************************************************
   * misc
-@@ -190,12 +239,30 @@
+@@ -190,19 +240,42 @@
  			nvkm_error(subdev, "failed to raise voltage: %d\n", ret);
  			return ret;
  		}
@@ -69,6 +70,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
 -	if (ret == 0) {
 -		ret = clk->func->prog(clk);
 -		clk->func->tidy(clk);
++	lab_mux_stuck = 0;
 +	if (lab_core) {
 +		ret = clk->func->calc(clk, cstate);
 +		if (ret == 0 && lab_h07_pstate) {
@@ -91,8 +93,12 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
 +		ret = 0;
  	}
  
- 	if (volt) {
-@@ -203,6 +270,7 @@
+-	if (volt) {
++	if (volt && lab_mux_stuck) {
++		nvkm_error(subdev, "LAB mux_guard: узлы %08x остались на PLL — напряжение не снижаю (%d мкВ)\n",
++			   lab_mux_stuck, nvkm_volt_get(volt));
++	} else if (volt) {
+ 		ret = nvkm_volt_set_id(volt, cstate->voltage,
  				       pstate->base.voltage, clk->temp, -1);
  		if (ret && ret != -ENODEV)
  			nvkm_error(subdev, "failed to lower voltage: %d\n", ret);
@@ -100,7 +106,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  	}
  
  	if (therm) {
-@@ -263,14 +331,67 @@
+@@ -263,14 +336,67 @@
  /******************************************************************************
   * P-States
   *****************************************************************************/
@@ -169,7 +175,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  	list_for_each_entry(pstate, &clk->states, head) {
  		if (idx++ == pstatei)
-@@ -278,22 +399,72 @@
+@@ -278,22 +404,72 @@
  	}
  
  	nvkm_debug(subdev, "setting performance state %d\n", pstatei);
@@ -256,7 +262,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  static void
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 --- base/nvkm/subdev/clk/gf100.c	2026-10-22 14:07:17.000000000 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 14:50:48.007534130 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 17:18:17.063603962 +0300
 @@ -23,11 +23,18 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -612,7 +618,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -351,15 +636,235 @@
+@@ -351,15 +636,291 @@
  	}
  }
  
@@ -783,6 +789,38 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	sv->on = false;
 +}
 +
++/* LAB 24.10 вечер (зависание 16:54, тест 34б): переключатель источника 0x137100 иногда не уходит с PLL на делитель за 2 с
++ * (всегда GPC, спуск с 0f; ~3–4 на 1000 переходов с 23.10). Раньше это маскировала стадия 2 — она выключает PLL; с
++ * lab_pll_keep GPC остался на PLL 1800 МГц при 0,95 В. Снимок состояния в момент тайм-аута пишется всегда (поведение не
++ * меняется), счётчик — lab_mux_timeouts. lab_mux_guard (0 — выкл): до трёх повторов (новая скобка + запись бита, по 20 мс);
++ * если узел так и остался на PLL — стадия 2 его PLL не выключает, а clk/base.c не снижает напряжение в этом переходе. */
++static int lab_mux_timeouts;
++module_param(lab_mux_timeouts, int, 0444);
++MODULE_PARM_DESC(lab_mux_timeouts, "LAB: clock source mux switch timeouts since load (read-only counter)");
++static uint lab_mux_guard;
++module_param(lab_mux_guard, uint, 0644);
++MODULE_PARM_DESC(lab_mux_guard, "LAB: on a mux timeout retry up to 3 times; if a unit stays on its PLL keep that PLL on and do not lower the voltage (0 off, 1 on)");
++/* LAB: узлы, оставшиеся на PLL после неудачного переключения в текущем переходе (бит = idx); сбрасывает clk/base.c */
++u32 lab_mux_stuck;
++
++static void
++lab_mux_dump(struct gf100_clk *clk, int idx, const char *what)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 pll = idx <= 7 ? 0x137000 + idx * 0x20 : 0x1370e0;	/* у hubk01 (8) — PLL hubk06 */
++
++	nvkm_error(&clk->base.subdev, "LAB mux %s idx %02x: 137100 %08x; PLL ctrl %08x coef %08x; опора %08x/%08x; "
++		   "делитель src %08x div %08x пост %08x; FSRM статус GPC %08x hub06 %08x, FSRM2 %08x/%08x; CTRL1 %08x; "
++		   "GR 400700 %08x 400500 %08x; 002640 %08x\n", what, idx,
++		   nvkm_rd32(device, 0x137100), nvkm_rd32(device, pll), nvkm_rd32(device, pll + 4),
++		   nvkm_rd32(device, 0x137120 + (idx & 7) * 4), nvkm_rd32(device, 0x137140 + (idx & 7) * 4),
++		   nvkm_rd32(device, 0x137160 + idx * 4), idx <= 2 ? nvkm_rd32(device, 0x1371d0 + idx * 4) : 0,
++		   nvkm_rd32(device, 0x137250 + idx * 4),
++		   nvkm_rd32(device, 0x0201e0), nvkm_rd32(device, 0x0201e4),
++		   nvkm_rd32(device, 0x020160), nvkm_rd32(device, 0x020164), nvkm_rd32(device, 0x020004),
++		   nvkm_rd32(device, 0x400700), nvkm_rd32(device, 0x400500), nvkm_rd32(device, 0x002640));
++}
++
  static void
  gf100_clk_prog_1(struct gf100_clk *clk, int idx)
  {
@@ -803,10 +841,36 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +			  idx, was, nvkm_rd32(device, 0x137250 + (idx * 0x04)));
 +	}
  	nvkm_mask(device, 0x137100, (1 << idx), 0x00000000);
- 	nvkm_msec(device, 2000,
+-	nvkm_msec(device, 2000,
++	if (nvkm_msec(device, 2000,
  		if (!(nvkm_rd32(device, 0x137100) & (1 << idx)))
  			break;
- 	);
+-	);
++	) < 0) {
++		lab_mux_timeouts++;
++		lab_mux_dump(clk, idx, "ТАЙМ-АУТ PLL -> делитель");
++		if (lab_mux_guard) {
++			int t;
++
++			for (t = 1; t <= 3 && (nvkm_rd32(device, 0x137100) & (1 << idx)); t++) {
++				lab_therm_leave(clk, idx, &th);
++				if (!lab_therm_real || chg)
++					lab_therm_enter(clk, idx, &th);
++				nvkm_mask(device, 0x137100, (1 << idx), 0x00000000);
++				nvkm_msec(device, 20,
++					if (!(nvkm_rd32(device, 0x137100) & (1 << idx)))
++						break;
++				);
++				nvkm_error(&clk->base.subdev, "LAB mux_guard idx %02x: попытка %d — %s (137100 %08x)\n", idx, t,
++					   (nvkm_rd32(device, 0x137100) & (1 << idx)) ? "всё ещё на PLL" : "ушёл на делитель",
++					   nvkm_rd32(device, 0x137100));
++			}
++			if (nvkm_rd32(device, 0x137100) & (1 << idx)) {
++				lab_mux_stuck |= 1 << idx;
++				lab_mux_dump(clk, idx, "ОСТАЛСЯ НА PLL после 3 повторов");
++			}
++		}
++	}
 +	lab_therm_leave(clk, idx, &th);
 +}
 +
@@ -848,9 +912,15 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static void
-@@ -369,19 +874,52 @@
+@@ -368,20 +929,58 @@
+ 	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
++	if (idx <= 7 && lab_mux_guard && (lab_mux_stuck & (1 << idx))) {
++		nvkm_error(&clk->base.subdev, "LAB mux_guard idx %02x: узел на PLL — PLL не выключаю (ctrl %08x)\n",
++			   idx, nvkm_rd32(device, addr));
++		return;
++	}
  	if (idx <= 7) {
 +		if (lab_pll_keep) {
 +			u32 ctrl = nvkm_rd32(device, addr + 0x00), coef = nvkm_rd32(device, addr + 0x04);
@@ -904,7 +974,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +928,58 @@
+@@ -390,17 +989,58 @@
  }
  
  static void
@@ -946,10 +1016,10 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  			if (tmp == info->ssel)
  				break;
 -		);
-+		) < 0)
-+			nvkm_error(&clk->base.subdev, "LAB prog_3 idx %02x SWITCH TIMEOUT 0x137100=%08x pllctrl=%08x\n",
-+				   idx, nvkm_rd32(device, 0x137100),
-+				   idx <= 7 ? nvkm_rd32(device, 0x137000 + idx * 0x20) : 0);
++		) < 0) {
++			lab_mux_timeouts++;
++			lab_mux_dump(clk, idx, "ТАЙМ-АУТ делитель -> PLL");
++		}
 +		lab_therm_leave(clk, idx, &th);
 +		if (idx == 0 && (lab_gpc_fix & 4)) {
 +			u32 r = nvkm_rd32(device, 0x137120);
@@ -965,7 +1035,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -409,7 +988,17 @@
+@@ -409,7 +1049,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -983,7 +1053,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static int
-@@ -426,15 +1015,138 @@
+@@ -426,15 +1076,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1124,7 +1194,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +1189,5 @@
+@@ -477,5 +1250,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
@@ -1133,7 +1203,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
 diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
 --- base/nvkm/subdev/fb/ramgf100.c	2026-10-22 14:07:17.000000000 +0300
-+++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-24 14:48:51.087011281 +0300
++++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-24 17:16:47.995115828 +0300
 @@ -25,6 +25,16 @@
  #include "ram.h"
  #include "ramfuc.h"
@@ -2002,7 +2072,7 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  
 diff -ru base/nvkm/subdev/volt/base.c lab-n13/nvkm/subdev/volt/base.c
 --- base/nvkm/subdev/volt/base.c	2026-10-22 14:07:17.000000000 +0300
-+++ lab-n13/nvkm/subdev/volt/base.c	2026-10-24 14:50:27.446202038 +0300
++++ lab-n13/nvkm/subdev/volt/base.c	2026-10-24 17:16:47.995264464 +0300
 @@ -28,6 +28,8 @@
  #include <subdev/bios/volt.h>
  #include <subdev/therm.h>
