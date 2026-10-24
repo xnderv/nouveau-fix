@@ -1,15 +1,19 @@
 #!/bin/bash
-# ЗАПИСЬ mmiotrace драйвера NVIDIA 390 на GTX 560 Ti (система u2204-trace). Версия 2 — «лёгкая».
-# Урок 1-й попытки: под записью любое обращение к карте в сотни раз медленнее, тяжёлый glmark2
-# в окне 1600x900 и опрос nvidia-settings каждые 2 с переполнили запись и повесили систему.
-# Теперь: маленький glxgears 300x300, nvidia-settings только в точках снимков, весь сценарий ~1 мин.
-# Этапы (метки MARK в записи):
-#   0 снимок регистров до драйвера
-#   1 загрузка nvidia + nvidia_modeset + nvidia_drm (запуск PMU, отпирание, начальные частоты)
-#   2 X11 без окон, простой
-#   3 PowerMizer «максимум» + glxgears 15 с → переход в 0f (смена памяти, PLL ядра, напряжение)
-#   4 PowerMizer «адаптивный», простой 30 с → спуск в 07/03
-# Запуск: sudo ~/trace/run-trace.sh
+# ЗАПИСЬ mmiotrace драйвера NVIDIA 390 на GTX 560 Ti (система u2204-trace). Версия 3 — «переходы под нагрузкой» (24.10).
+# Основа — версия 2 (запуск записи, драйвера и X11), но без её снимка перед X11 (см. ниже); нагрузка — как в версии 1, но без того, что её
+# повесило: опроса nvidia-settings каждые 2 с и glmark2 1600x900. Уровень карты виден в самой записи (мультиплексор,
+# делители, PLL), nvidia-settings — только в точках снимков.
+# Зачем: в записях 1 и 2 переходы были только при старте X на пустой карте; нет ни одного перехода под нагрузкой и
+# ни одного подъёма 03 -> 07. Смотрим: где скобка PTHERM и сколько NVIDIA ждёт, пост-делители GPC/hubk06 на 03 <-> 07,
+# порядок hubk07/hubk06/hubk01 и памяти, PXBAR, 0x001548, 0x00e9e0, 0x022680, второе поле делителей.
+# Фазы — от безопасных к рискованным (зависание обрывает запись, но всё до него уже на диске):
+#   A  простой 60 с                               -> карта сама опускается до 03
+#   B  PowerMizer «максимум» в простое 10 с        -> 03 -> 0f без нагрузки; «адаптивный» 45 с -> спуск без нагрузки
+#   C  лёгкая нагрузка 30 с (адаптивный)           -> подъём из 03 (07 или 0f — решает NVIDIA)
+#   D  лёгкая нагрузка + «максимум» 10 с           -> 0f под нагрузкой; «адаптивный» 30 с с нагрузкой -> спуск под нагрузкой
+#   E  всплески: 5 x (нагрузка 3 с, пауза 6 с)     -> резкие переходы
+#   F  средняя нагрузка 30 с, затем крупнее 20 с   -> рискованно (в версии 1 тяжёлая нагрузка повесила запись)
+# Запуск: sudo ~/trace/run-trace.sh   (~8 минут, ничего не трогать; конец — строка «ГОТОВО»)
 set -euo pipefail
 [ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -17,19 +21,21 @@ OUT="$HERE/out-$(date +%Y%m%d-%H%M%S)"; mkdir -p "$OUT"
 LOG="$OUT/steps.txt"
 say() { echo "$(date +%T) $*" | tee -a "$LOG"; sync; }
 
-say "Ядро $(uname -r), версия сценария 2 (лёгкая)"
+say "Ядро $(uname -r), версия сценария 3 (переходы под нагрузкой)"
 lsmod | grep -q '^nvidia ' && { say "СТОП: драйвер nvidia уже загружен — начало не запишется. Перезагрузись."; exit 1; }
+[ -e "$HERE/regdump4.py" ] || { say "СТОП: нет $HERE/regdump4.py"; exit 1; }
+command -v glxgears >/dev/null || { say "СТОП: нет glxgears (пакет mesa-utils)"; exit 1; }
 grep -q tracefs /proc/mounts || mount -t tracefs nodev /sys/kernel/tracing 2>/dev/null || true
 T=/sys/kernel/tracing; [ -e "$T/current_tracer" ] || { mount -t debugfs nodev /sys/kernel/debug 2>/dev/null || true; T=/sys/kernel/debug/tracing; }
 grep -qw mmiotrace "$T/available_tracers" || { say "СТОП: в ядре нет mmiotrace"; exit 1; }
 echo "$T" > /tmp/trace-dir
 
-python3 "$HERE/regdump.py" "0 до драйвера (после BIOS)" "$OUT/regs.txt"
+python3 "$HERE/regdump4.py" "0 до драйвера (после BIOS)" "$OUT/regs.txt"
 say "Снимок регистров «до драйвера» сделан"
 
 say "Включаю запись (остальные ядра процессора на время записи выключатся — это нормально)"
 echo nop > "$T/current_tracer"
-echo 65536 > "$T/buffer_size_kb"
+echo 262144 > "$T/buffer_size_kb" 2>/dev/null || echo 65536 > "$T/buffer_size_kb"   # версия 2: 65536; под нагрузкой событий больше
 echo mmiotrace > "$T/current_tracer"
 nice -n -20 cat "$T/trace_pipe" > "$OUT/mmiotrace.txt" &
 CATPID=$!
@@ -42,26 +48,60 @@ modprobe nvidia_modeset
 modprobe nvidia_drm
 sleep 3
 mark "1 драйвер загружен"
-python3 "$HERE/regdump.py" "1 драйвер загружен, X11 ещё нет" "$OUT/regs.txt"
+# Снимка между загрузкой драйвера и X11 НЕТ, как в версии 1. Версия 2 делала его (regdump.py, с блоком PMU) и зависла ровно
+# на запуске X11; версия 1 без него X11 запустила. Блок PMU читать под NVIDIA нельзя (regdump3/4 его не читают).
 
 cat > /tmp/xsession.sh <<EOF
 #!/bin/bash
 T=\$(cat /tmp/trace-dir); OUT="$OUT"; HERE="$HERE"
 mark() { echo "MARK: \$*" > "\$T/trace_marker"; echo "\$(date +%T) MARK: \$*" >> "\$OUT/steps.txt"; sync; }
-snap() { mark "снимок: \$1"; python3 "\$HERE/regdump.py" "\$1" "\$OUT/regs.txt"
+snap() { mark "снимок: \$1"; python3 "\$HERE/regdump4.py" "\$1" "\$OUT/regs.txt"
          { echo "### \$1 \$(date +%T)"; nvidia-settings -t -q GPUCurrentPerfLevel -q GPUCurrentClockFreqs 2>&1; } >> "\$OUT/nvsettings.txt"; }
+pm() { nvidia-settings -a "[gpu:0]/GPUPowerMizerMode=\$1" >/dev/null 2>&1 || true; }   # 0 адаптивный, 1 максимум
+LOADPID=""
+load_on() { __GL_SYNC_TO_VBLANK=0 glxgears -geometry "\$1+40+40" >/dev/null 2>&1 & LOADPID=\$!; }
+load_off() { [ -n "\$LOADPID" ] && kill "\$LOADPID" 2>/dev/null; wait "\$LOADPID" 2>/dev/null; LOADPID=""; }
 sleep 3
-mark "2 X11 запущен, простой"
-snap "2 X11, простой"
-mark "3 PowerMizer максимум + glxgears 15 с (ожидаю 0f)"
-nvidia-settings -a '[gpu:0]/GPUPowerMizerMode=1' >/dev/null 2>&1 || true
-__GL_SYNC_TO_VBLANK=0 timeout 15 glxgears -geometry 300x300+50+50 >/dev/null 2>&1 || true
-snap "3 после нагрузки, максимум"
-mark "4 PowerMizer адаптивный, простой 30 с (спуск)"
-nvidia-settings -a '[gpu:0]/GPUPowerMizerMode=0' >/dev/null 2>&1 || true
+pm 0
+mark "A простой 60 с (ожидаю спуск до 03)"
+sleep 60
+snap "A простой"
+mark "B PowerMizer максимум в простое 10 с (03 -> 0f без нагрузки)"
+pm 1; sleep 10
+snap "B максимум, простой"
+mark "B PowerMizer адаптивный, простой 45 с (спуск без нагрузки)"
+pm 0; sleep 45
+snap "B адаптивный, простой"
+mark "C лёгкая нагрузка 300x300, адаптивный, 30 с (подъём из 03)"
+load_on 300x300; sleep 25
+snap "C лёгкая нагрузка"
+sleep 5; load_off
+mark "C нагрузка снята, простой 40 с"
+sleep 40
+mark "D лёгкая нагрузка + максимум 10 с (0f под нагрузкой)"
+load_on 300x300; sleep 3; pm 1; sleep 10
+snap "D максимум под нагрузкой"
+mark "D адаптивный, нагрузка продолжается 30 с (спуск под нагрузкой)"
+pm 0; sleep 30
+snap "D адаптивный под нагрузкой"
+load_off
+mark "D нагрузка снята, простой 40 с"
+sleep 40
+mark "E всплески: 5 x (нагрузка 3 с, пауза 6 с)"
+for i in 1 2 3 4 5; do
+  mark "E всплеск \$i"; load_on 300x300; sleep 3; load_off; sleep 6
+done
+snap "E после всплесков"
+mark "F средняя нагрузка 640x480 30 с (рискованно)"
+load_on 640x480; sleep 25
+snap "F средняя нагрузка"
+sleep 5; load_off
+mark "F нагрузка 1024x768 20 с (рискованно)"
+load_on 1024x768; sleep 20; load_off
+mark "F нагрузка снята, простой 30 с"
 sleep 30
-snap "4 простой 30 с"
-mark "5 выход из X11"
+snap "F конец, простой"
+mark "выход из X11"
 EOF
 chmod +x /tmp/xsession.sh
 mark "2 запуск X11"
