@@ -12,6 +12,8 @@
 #  - modprobe (/etc/modprobe.d/nouveau-select.conf → /usr/local/sbin/nouveau-select): лабораторный — только при
 #    nouveau_lab=1 в строке ядра; иначе стабильная копия /usr/local/lib/nouveau-fallback/<ядро>/nouveau.ko (insmod, зависимости
 #    модуля — modprobe). Нет nouveau_lab=1 (сломался GRUB-скрипт, режим восстановления) — тоже стабильный: отказ безопасный.
+#  - initramfs (/etc/initramfs-tools/hooks/zz-nouveau-fix-no-nouveau): nouveau в него НЕ кладём — иначе модуль грузится ещё
+#    до корневого раздела (MODULES=most, 25.10: 5,9 с против 6,5 с) в обход выбора. Заставка при загрузке — без nouveau.
 #  - служба nouveau-lab-ok: через 60 с после графического входа, если загружен лабораторный и карта за ним (драйвер привязан),
 #    пишет nouveau_try=0 — загрузка подтверждена. Зависания в тестах позже — уже не «неудачная загрузка».
 # Команды (sudo спросит пароль):
@@ -30,6 +32,7 @@ SEL=/usr/local/sbin/nouveau-select
 OKS=/usr/local/sbin/nouveau-lab-ok
 MODCONF=/etc/modprobe.d/nouveau-select.conf
 UNIT=/etc/systemd/system/nouveau-lab-ok.service
+IHOOK=/etc/initramfs-tools/hooks/zz-nouveau-fix-no-nouveau
 DEFGRUB=/etc/default/grub
 DEFSAVE=/etc/default/grub.before-nouveau-fallback
 
@@ -120,6 +123,24 @@ EOF
     fi
     grep -E '^GRUB_CMDLINE_LINUX_DEFAULT=' "$DEFGRUB"
     sudo update-grub 2>&1 | tail -n 2
+    sudo tee "$IHOOK" >/dev/null <<'HOOK'
+#!/bin/sh
+# nouveau-fix (lab/fallback.sh): nouveau не кладём в initramfs — его грузит с корневого раздела выбор
+# /usr/local/sbin/nouveau-select (лабораторный или стабильный по строке ядра). depmod mkinitramfs делает после хуков.
+PREREQ=""
+prereqs() { echo "$PREREQ"; }
+case "$1" in prereqs) prereqs; exit 0 ;; esac
+[ -n "${DESTDIR}" ] || exit 0
+find "${DESTDIR}/lib/modules" "${DESTDIR}/usr/lib/modules" -name 'nouveau.ko*' -delete 2>/dev/null
+rm -f "${DESTDIR}/etc/modprobe.d/nouveau-select.conf" "${DESTDIR}/usr/lib/modprobe.d/nouveau-select.conf"
+exit 0
+HOOK
+    sudo chmod 755 "$IHOOK"
+    sudo update-initramfs -u -k "$KVER" 2>&1 | tail -n 1
+    if sudo lsinitramfs "/boot/initrd.img-$KVER" | grep 'nouveau\.ko' >/dev/null; then
+        echo "⚠ nouveau всё ещё в initramfs — откат не сработает, покажи этот вывод ассистенту"; exit 1
+    fi
+    echo "=== initramfs без nouveau"
     sudo grub-editenv "$ENV" set nouveau_try=0 nouveau_lab_off=0
     echo "=== в grub.cfg:"; sudo grep -nE 'nouveau_sel|nouveau-fix' /boot/grub/grub.cfg | head -n 8 || true
     echo "=== поставлено. Дальше: перезагрузка → bash $0 status (ждём nouveau_lab=1, через минуту nouveau_try=0)"
@@ -133,6 +154,7 @@ status)
     elif [ "$(genv nouveau_try)" = 1 ]; then echo "следующая загрузка: ОТКАТ на стабильный, если эту не подтвердить (служба подтверждает через минуту)"
     else echo "следующая загрузка: лабораторный"; fi
     journalctl -b 0 -t nouveau-select -t nouveau-lab-ok -o cat --no-pager 2>/dev/null | tail -n 3
+    journalctl -b 0 -t nouveau-select -o cat --no-pager 2>/dev/null | grep -q . || echo "⚠ выбор nouveau-select в этой загрузке не срабатывал (модуль из initramfs?)"
     ;;
 test)
     sudo grub-editenv "$ENV" set nouveau_try=1 nouveau_lab_off=0
@@ -142,7 +164,8 @@ on)  sudo grub-editenv "$ENV" set nouveau_try=0 nouveau_lab_off=0; echo "Сле�
 off) sudo grub-editenv "$ENV" set nouveau_lab_off=1; echo "Следующие загрузки — стабильный, пока не: $0 on" ;;
 uninstall)
     sudo systemctl disable nouveau-lab-ok.service 2>/dev/null || true
-    sudo rm -f "$UNIT" "$OKS" "$SEL" "$MODCONF" "$GRUBD"
+    sudo rm -f "$UNIT" "$OKS" "$SEL" "$MODCONF" "$GRUBD" "$IHOOK"
+    sudo update-initramfs -u -k "$KVER" 2>&1 | tail -n 1
     sudo systemctl daemon-reload
     [ -e "$DEFSAVE" ] && sudo cp -p "$DEFSAVE" "$DEFGRUB" && sudo rm -f "$DEFSAVE"
     sudo update-grub 2>&1 | tail -n 1
