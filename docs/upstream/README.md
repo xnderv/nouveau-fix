@@ -39,3 +39,23 @@ nouveau_channel_idle() из ioctl_del эмитит ограждение в то�
 В upstream в таком виде не пойдёт (привязка к одной плате, скрипты из записи NVIDIA). Путь в upstream —
 через обсуждение с разработчиками nouveau (список nouveau@lists.freedesktop.org, IRC #nouveau): показать
 запись и различия (`docs/2026-10-22/review-driver.md`), спросить, как они видят общий механизм для Fermi.
+
+## 0006 — вентилятор: бит 31 при чтении скважности ШИМ (подготовлено 25.10.2026, НЕ отправлено)
+Файл `0006-drm-nouveau-therm-mask-pwm-update-bit.patch` — письмо для `git send-email`, сделано `git format-patch` на ветке
+torvalds/linux от 24.10.2026 (21a7f44). Проверено:
+- ошибка в свежем ядре на месте; therm-код (nv50.c, gf119.c, fan.c, fanpwm.c, base.c, gt215.c) совпадает с 7.0;
+- правка собирается без предупреждений (дерево 7.0.14, те же файлы); на карте — 0 ложных чтений из 155 (fantrace-123706);
+- `checkpatch.pl --strict`: только «Missing Signed-off-by» (ставит автор сам) и «Unknown commit id» для обоих Fixes —
+  из-за неполного клона; оба коммита проверены через GitHub: cb9fa62671ac «drm/nv50/pm: add support for pwm fan control»,
+  bc79202f4c8f «nvd0/therm: implement more appropriate pwm fan control functions»;
+- адресаты (`get_maintainer.pl`): Lyude Paul, Danilo Krummrich, dri-devel@, nouveau@ (+ drm-misc сопровождающие — как и
+  для 0001, не ставим);
+- правила ядра для ИИ-ассистентов (Documentation/process/coding-assistants.rst, generated-content.rst): ассистент НЕ ставит
+  Signed-off-by; в описании сказано, что сделал ассистент и как проверено, чего не проверено (gf119 на железе).
+Отправка (после прочтения и добавления своей строки `Signed-off-by: Alex <xnderv@yandex.com>` после `Cc: stable@…`):
+```
+cd ~/Home/nouveau-fix && git send-email --to='Lyude Paul <lyude@redhat.com>' --to='Danilo Krummrich <dakr@kernel.org>' \
+  --cc=dri-devel@lists.freedesktop.org --cc=nouveau@lists.freedesktop.org --cc=linux-kernel@vger.kernel.org \
+  docs/upstream/0006-drm-nouveau-therm-mask-pwm-update-bit.patch
+```
+(`Cc: stable@vger.kernel.org` из текста git send-email добавит в копию сам.)
