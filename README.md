@@ -99,6 +99,7 @@ repository.
 |---|---|
 | `docs/2026-10-24/nvidia-logic.md` | how NVIDIA reclocks GF114 and why: rules, open questions, what we do the same way |
 | `docs/boot-recovery.md` | the author's machine does not boot during lab tests: the GRUB fallback line |
+| `docs/glossary.md` | glossary of abbreviations (Russian) |
 | `docs/2026-10-24/nvidia-vs-lab-map.md` | register-level map: NVIDIA vs the lab driver, every recording |
 | `docs/2026-10-24/memory-scripts-vs-nouveau.md` | memory scripts: NVIDIA vs nouveau vs VBIOS tables |
 | `docs/2026-10-23/hang-20261023-1802.md` | the hang investigation, tests 1–24 |
@@ -201,6 +202,7 @@ MIT (файл `LICENSE`) на всё в репозитории. Патчи ме�
 |---|---|
 | `docs/2026-10-24/nvidia-logic.md` | как NVIDIA меняет частоты GF114 и почему: правила, белые пятна, что у нас так же |
 | `docs/boot-recovery.md` | машина автора не загружается во время лабораторных тестов: запасная строка GRUB |
+| `docs/glossary.md` | словарь сокращений: GPC, PLL, FSRM, PMU и другие |
 | `docs/2026-10-24/nvidia-vs-lab-map.md` | карта регистров: NVIDIA против лабораторного драйвера, все записи |
 | `docs/2026-10-24/memory-scripts-vs-nouveau.md` | скрипты памяти: NVIDIA, nouveau и таблицы VBIOS |
 | `docs/2026-10-23/hang-20261023-1802.md` | расследование зависаний, тесты 1–24 |
