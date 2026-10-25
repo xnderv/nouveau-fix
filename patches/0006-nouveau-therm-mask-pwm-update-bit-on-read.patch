@@ -27,13 +27,14 @@ mask their duty reads; do the same for 0xe118.
 diff --git a/nvkm/subdev/therm/nv50.c b/nvkm/subdev/therm/nv50.c
 --- a/nvkm/subdev/therm/nv50.c
 +++ b/nvkm/subdev/therm/nv50.c
-@@ -72,7 +72,10 @@
+@@ -72,7 +72,11 @@
  
  	if (nvkm_rd32(device, ctrl) & (1 << line)) {
  		*divs = nvkm_rd32(device, 0x00e114 + (id * 8));
 -		*duty = nvkm_rd32(device, 0x00e118 + (id * 8));
-+		/* bit 31 is the trigger set by pwm_set(), and can
-+		 * still read back as set right after a write
++		/*
++		 * Bit 31 is the update trigger set by pwm_set();
++		 * it can still read back as set after a write.
 +		 */
 +		*duty = nvkm_rd32(device, 0x00e118 + (id * 8)) & 0x7fffffff;
  		return 0;
@@ -42,13 +43,14 @@ diff --git a/nvkm/subdev/therm/nv50.c b/nvkm/subdev/therm/nv50.c
 diff --git a/nvkm/subdev/therm/gf119.c b/nvkm/subdev/therm/gf119.c
 --- a/nvkm/subdev/therm/gf119.c
 +++ b/nvkm/subdev/therm/gf119.c
-@@ -74,7 +74,10 @@
+@@ -74,7 +74,11 @@
  	else if (indx < 2) {
  		if (nvkm_rd32(device, 0x00d610 + (line * 0x04)) & 0x00000040) {
  			*divs = nvkm_rd32(device, 0x00e114 + (indx * 8));
 -			*duty = nvkm_rd32(device, 0x00e118 + (indx * 8));
-+			/* bit 31 is the trigger set by pwm_set(), and can
-+			 * still read back as set right after a write
++			/*
++			 * Bit 31 is the update trigger set by pwm_set();
++			 * it can still read back as set after a write.
 +			 */
 +			*duty = nvkm_rd32(device, 0x00e118 + (indx * 8)) & 0x7fffffff;
  			return 0;
