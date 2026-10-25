@@ -47,6 +47,9 @@ PARAMS = {  # всё, что нашли 20.10: PLL как у NVIDIA, памят�
     'lab_clk_mmu_lock': '0', # блокировка MMU на время стадий не нужна: все тесты 22–24 шли без неё
     'lab_gpc_div': '1',      # GPC на 03 на делителе (101,25 МГц), а не на PLL, как NVIDIA: 03↔07 180/180 (тесты 22, 23)
     'lab_pmu_div': '1',      # PMU 202,5 МГц, как BIOS/NVIDIA, а не 216: тесты 23, 24 по 60/60
+    'lab_nv_div_late': '1',  # 25.10: делитель ядра меняется внутри скобки прямо перед переключателем, как NVIDIA: в плохой
+                             # сессии тайм-аутов переключателя нет (тесты 55, 56: 0 на 2400+; без этого ~1–2 %)
+    'lab_mux_guard': '1',    # 25.10: если переключатель всё-таки застрял — повторы, PLL и напряжение не трогать (страховка)
 }
 # 25.10 (тест 54, гипотеза «линии»): поле B делителей ядра, ROP и hubk07 с самой загрузки не затирать — держать значение,
 # которое ставит VBIOS при включении (1e у ядра, 0a у ROP/hubk07), как NVIDIA и как nouveau для Kepler с 2014. Ставится
@@ -57,6 +60,138 @@ if os.path.exists(DIVB_FLAG):
 
 def log(msg):
     print(msg, flush=True)
+
+DRY = os.environ.get('GPU_AUTOCLOCK_DRY') == '1'   # проверка сторожа без уведомлений: печатать вместо отправки
+
+def say(title, body, urgency='normal'):
+    """Уведомление на рабочий стол всем вошедшим пользователям (без ожидания сеанса); всегда — строка в журнал службы.
+    False — некому показать (никто не вошёл или сеанс моложе 30 с): сторож отложит уведомление."""
+    import subprocess, pwd
+    log(f'уведомление: {title} — {body}')
+    if DRY:
+        return True
+    shown = False
+    for b in glob.glob('/run/user/*/bus'):
+        st = os.stat(b)
+        if st.st_uid < 1000 or time.time() - st.st_mtime < 30:
+            continue
+        pw = pwd.getpwuid(st.st_uid)
+        n = os.path.join(pw.pw_dir, 'Home/nouveau-fix/daily/notify-gpu.sh')
+        if os.access(n, os.X_OK):
+            subprocess.run(['sudo', '-u', pw.pw_name, 'env', f'DBUS_SESSION_BUS_ADDRESS=unix:path={b}',
+                            f'XDG_RUNTIME_DIR=/run/user/{st.st_uid}', 'setsid', '-f', n, title, body, urgency],
+                           stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            shown = True
+    return shown
+
+# 25.10: сторож. Новые строки nouveau уровня «предупреждение» и выше в журнале ядра — уведомление (так видно и то, чего мы
+# заранее не знаем); рост счётчика тайм-аутов переключателя ядра — отдельное уведомление; сводка через 15 мин после старта
+# и потом раз в сутки. Одинаковые строки (без чисел) — не чаще раза в 10 мин, всего не больше 6 уведомлений в час.
+# Уведомлением не показываются, но считаются в сводке как известные:
+#   строки, которые были при каждой из 13 загрузок 22–25.10 (нет прошивок видеодекодера и копировщика; ловушка графики
+#   RT_HEIGHT_OVERRUN от пробы gst-plugin-scan при входе в сеанс — известна с 21.10, к частотам отношения не имеет);
+#   строки стека после WARNING;
+#   строки защиты переключателя (LAB mux, mux_guard) и WARNING ожидания переключателя — за таким WARNING в пределах 0,5 с
+#   идёт строка LAB mux / mux_guard; об этих событиях говорит уведомление по счётчику.
+WATCH_BOOT = ('loading out-of-tree module taints kernel', 'msvld:', 'nvce_fuc084', 'failed to create ce channel',
+              'module verification failed')
+WATCH_GST = 'gst-plugin-scan'
+WATCH_MUX = ('LAB mux', 'mux_guard')
+WATCH_TRACE = r'\s|(Workqueue|Call Trace|RIP|Modules linked in|CPU|Hardware name|Code|Tainted|R[0-9A-Z]{1,2}):|</?TASK>'
+WATCH_STEP, WATCH_SAME, WATCH_HOUR, WATCH_FIRST, WATCH_DAY, WATCH_LAG = 10, 600, 6, 900, 86400, 2
+
+def watch_lines(since, until):
+    """Строки nouveau уровня warning и выше в журнале ядра этой загрузки, since < время <= until (unix-время).
+    Возвращает (новые [(время, текст)], сколько известных пропущено, строки защиты переключателя [(время, текст)])."""
+    import subprocess, re
+    args = ['journalctl', '-k', '-b', '0', '-p', 'warning', '-o', 'short-unix', '--no-pager']
+    if since:
+        args += ['--since', f'@{since:.6f}']
+    lines = []
+    for l in subprocess.run(args, capture_output=True, text=True).stdout.splitlines():
+        m = re.match(r'(\d+\.\d+) \S+ kernel: (.*)', l)
+        if m and float(m.group(1)) > since:
+            lines.append((float(m.group(1)), m.group(2)))
+    new, known, mux, gst = [], 0, [], -1e9
+    for i, (t, text) in enumerate(lines):
+        if t > until:
+            break   # ещё рано: строки защиты после WARNING могут не успеть попасть в журнал
+        if 'nouveau' not in text or re.match(WATCH_TRACE, text):
+            continue
+        if WATCH_GST in text:
+            gst = t
+        if any(s in text for s in WATCH_MUX):
+            mux.append((t, text))
+        elif (any(s in text for s in WATCH_BOOT) or WATCH_GST in text or (t - gst < 1 and 'trap:' in text)
+              or text.endswith(': timeout')   # первая строка WARNING ожидания; место — в следующей строке WARNING
+              or (text.startswith('WARNING:') and any(any(s in x for s in WATCH_MUX)
+                                                      for t2, x in lines[i + 1:i + 200] if t2 - t <= 0.5))):
+            known += 1
+        else:
+            new.append((t, text))
+    return new, known, mux
+
+def watch(prm, once=False):
+    import re, subprocess
+    seen_t = 0.0; last_key = {}; sent = []; held = 0; shown = 0; known = 0; mux_l = []; pend = []; mux_t = -1e9
+    rd = lambda p: open(f'{prm}/{p}').read().strip() if os.path.exists(f'{prm}/{p}') else ''
+    mux = mux_prev = int(rd('lab_mux_timeouts') or -1)
+    next_sum = time.time() + WATCH_FIRST
+    log(f'сторож включён: предупреждения nouveau в журнале ядра, тайм-ауты переключателя (сейчас {mux}), сводка раз в сутки')
+
+    def tell(*a):
+        if pend or not say(*a):
+            pend.append(a)
+            log(f'  никто не вошёл в сеанс — отложено (в очереди {len(pend)})')
+
+    while True:
+        now = time.time()
+        if pend and say(*pend[0]):
+            for a in pend[1:10]:
+                say(*a)
+            if len(pend) > 10:
+                say('GTX 560 Ti: ещё сообщения nouveau', f'ещё {len(pend) - 10} отложенных не показано — '
+                    'полный список: journalctl -k -b -p warning | grep nouveau')
+            pend.clear()
+        sent = [t for t in sent if now - t < 3600]
+        mux_now = int(rd('lab_mux_timeouts') or -1)
+        first = not seen_t
+        new, k, ml = watch_lines(seen_t, now if once else now - WATCH_LAG)
+        seen_t = now if once else now - WATCH_LAG; known += k
+        mux_l = (mux_l + ml)[-50:] if not first else []   # первый проход: старые события уже в счётчике
+        for t, text in new:
+            shown += 1
+            key = re.sub(r'[0-9a-fA-F]{4,}|\d+', '#', text)
+            if now - last_key.get(key, -1e9) < WATCH_SAME or len(sent) >= WATCH_HOUR:
+                held += 1; continue
+            last_key[key] = now; sent.append(now)
+            tell('GTX 560 Ti: сообщение драйвера nouveau', time.strftime('%H:%M:%S ', time.localtime(t)) + text[:300])
+        if held and len(sent) < WATCH_HOUR:
+            sent.append(now)
+            tell('GTX 560 Ti: ещё сообщения nouveau', f'{held} похожих или сверх 6 в час не показано — '
+                 'полный список: journalctl -k -b -p warning | grep nouveau')
+            held = 0
+        # счётчик, прочитанный на прошлом проходе: строки защиты к этому моменту уже в журнале и прочитаны
+        grown = (mux_now if once else mux_prev) - mux
+        if mux >= 0 and grown > 0 and now - mux_t >= WATCH_SAME:   # не чаще раза в 10 мин, рост копится
+            txt = ' '.join(x for _, x in mux_l)
+            how = ('Повторы не помогли: ядро оставлено на PLL, напряжение не снижено — до следующего перехода.'
+                   if 'ОСТАЛСЯ НА PLL' in txt else 'Повтор помог: ядро перешло на делитель.' if 'ушёл на делитель' in txt
+                   else 'Защита выключена (lab_mux_guard=0).' if rd('lab_mux_guard') == '0' else '')
+            tell('GTX 560 Ti: тайм-аут переключателя ядра', f'{time.strftime("%H:%M:%S")}: +{grown}, всего с загрузки '
+                 f'{mux + grown}. {how} Подробно: journalctl -k -b | grep "LAB mux"')
+            mux += grown; mux_l.clear(); mux_t = now
+        mux_prev = mux_now
+        if now >= next_sum or once:
+            sw = len(re.findall(r'LAB pstate \d: flags', subprocess.run(
+                ['journalctl', '-k', '-b', '0', '-o', 'cat', '--no-pager'], capture_output=True, text=True).stdout))
+            tell('GTX 560 Ti: сводка драйвера', f'С загрузки: переключений уровней {sw}, тайм-аутов переключателя ядра '
+                 f'{mux_now if mux_now >= 0 else "нет счётчика"}; сообщений nouveau (предупреждения и ошибки): новых '
+                 f'{shown}, известных {known} (известные не показываются).', 'low')
+            next_sum = now + WATCH_DAY
+        if once:
+            return
+        time.sleep(WATCH_STEP)
 
 def notify(mode, tries=60):
     """Уведомление с кнопкой «Подготовить драйвер» всем вошедшим пользователям; ждёт сеанс до tries×10 с."""
@@ -158,8 +293,7 @@ def main():
         log('решает ДРАЙВЕР, как у NVIDIA: прошивка PMU считает загрузку, драйвер раз в секунду решает и переключает '
             '(lab_gov=2). Служба только выставила параметры и спит. '
             'Вернуть решение службе: sudo touch /etc/gpu-autoclock.legacy && sudo systemctl restart gpu-autoclock')
-        while True:
-            time.sleep(3600)
+        watch(prm)
     if os.path.exists(prm + '/lab_gov'):
         with open(prm + '/lab_gov', 'w') as f:
             f.write('0')
@@ -209,4 +343,7 @@ def main():
             cur = nxt; last = time.monotonic(); hi = mid = low_s = 0
 
 if __name__ == '__main__':
+    if sys.argv[1:] == ['--watch-test']:   # один проход сторожа по журналу этой загрузки, без уведомлений и без настройки карты
+        DRY = True
+        sys.exit(watch('/sys/module/nouveau/parameters', once=True))
     sys.exit(main())
