@@ -1,6 +1,7 @@
 #!/bin/bash
-# СЕРИЯ ТЕСТОВ БЕЗ ПРИСМОТРА. Сейчас (25.10): тест 48 — lab_nv_mux_release=1 (замедление снимается сразу после записи
-# мультиплексора, как у NVIDIA), ~45 мин; при нуле тайм-аутов — контроль тест 47 с ключом 0, ещё ~25 мин; прежние серии — в git.
+# СЕРИЯ ТЕСТОВ БЕЗ ПРИСМОТРА. Сейчас (25.10): тест 49 — делитель ядра как у NVIDIA (lab_nv_div_late). 49а — контроль без
+# ключа до 2 тайм-аутов (не больше 600 подъёмов, ~25 мин): плохая ли сессия; если был хоть один — 49б с ключом, 1500 подъёмов
+# (~65 мин). Прежние серии — в git.
 # Запуск из терминала в графическом сеансе, окно браузера с нагрузкой будет на экране:
 #   POWEROFF=0 bash ~/Home/nouveau-fix/lab/night.sh       (днём: машину в конце не выключать)
 # Один раз пароль sudo (дальше его держит сам hangtest: sudo вызывается каждые несколько секунд).
@@ -32,7 +33,7 @@ if [ -z "${NIGHT_INHIBITED:-}" ]; then
          --reason "nouveau night tests" bash "$0" "$@"
 fi
 if [ "$DRY" != 1 ]; then
-    for p in lab_therm_div lab_gpc_div lab_pmu_div lab_gpc_pre405 lab_nv_hubpost lab_nv_pcie_late lab_nv_hub07mem lab_gov_nv lab_volt_wait_us lab_nv_22680 lab_nv_divb lab_nv_disphold lab_mux_guard lab_mux_timeouts lab_boot_snap lab_nv_mux_release; do
+    for p in lab_therm_div lab_gpc_div lab_pmu_div lab_gpc_pre405 lab_nv_hubpost lab_nv_pcie_late lab_nv_hub07mem lab_gov_nv lab_volt_wait_us lab_nv_22680 lab_nv_divb lab_nv_disphold lab_mux_guard lab_mux_timeouts lab_boot_snap lab_nv_mux_release lab_nv_div_late; do
         [ -e "$PRM/$p" ] || { echo "Нет параметра $p — загружен не тот драйвер (lab.sh install и перезагрузка)"; exit 1; }
     done
     [ "$(cat $PRM/lab_perf_ticks)" -gt 0 ] || { echo "Замеры загрузки PMU выключены (lab_perf_ticks=0) — служба gpu-autoclock не отработала"; exit 1; }
@@ -55,7 +56,9 @@ setp() { local kv; for kv in "$@"; do $SUDO sh -c "echo ${kv#*=} > $PRM/${kv%%=*
 base() { setp lab_gov=0 lab_mem=1 lab_pcie=1 lab_volt_min_uv=0 lab_therm=1 lab_therm_wait=1 lab_therm_wait_us=0 \
               lab_therm_real=0 lab_therm_div=1 lab_clk_mmu_lock=0 lab_gpc_div=1 lab_pmu_div=1 \
               lab_gpc_pre405=0 lab_nv_hubpost=0 lab_nv_pcie_late=0 lab_nv_hub07mem=0 lab_gov_nv=0 lab_perf_ms=1000 lab_perf_log=0 \
-              lab_volt_wait_us=0 lab_nv_22680=0 lab_nv_divb=0 lab_nv_disphold=0 lab_e9e0=0 lab_order=0 lab_pll_keep=0 lab_mux_guard=0 lab_nv_mux_release=0; }
+              lab_volt_wait_us=0 lab_nv_22680=0 lab_nv_divb=0 lab_nv_disphold=0 lab_e9e0=0 lab_order=0 lab_pll_keep=0 lab_mux_guard=0 lab_nv_mux_release=0 lab_nv_div_late=0; }
+MTF="${NIGHT_MTF:-$PRM/lab_mux_timeouts}"   # счётчик тайм-аутов переключателя (сухой прогон подставляет свой файл)
+mt() { cat "$MTF" 2>/dev/null || echo 0; }
 GOV_START="$(cat $PRM/lab_gov 2>/dev/null || echo 0)"; NT0="$(date '+%Y-%m-%d %H:%M:%S')"
 finish_night() {   # $1 = clean | hung
     [ "$POWEROFF" = 1 ] || { restore_idle; say "POWEROFF=0 — машину не выключаю"; exit 0; }
@@ -101,7 +104,7 @@ run() {   # run ИМЯ НИЗ-ВЕРХ[-СЕРЕДИНА] [параметр=зн
         sleep 1
     done
     [ -n "$R" ] || { say "тест $name: журнал теста не появился"; wait "$pid"; finish_night clean; }
-    say "тест $name: журнал $(basename "$R")"
+    say "тест $name: журнал $(basename "$R")"; HTLOG="$R"
     # сторож: тест сам может застрять (карта пропала с шины — тест 18); журнал теста растёт каждые ~12 с
     while kill -0 "$pid" 2>/dev/null; do
         sleep 10
@@ -170,32 +173,35 @@ for REF in $(ls -t "$RES"/bootsnap-*-bad.txt 2>/dev/null); do
     say "снимок этой загрузки ($(uptime -s)) против $(basename "$REF"): $(bash "$HERE/bootsnap.sh" 0 "$REF" 2>&1 | tail -n 1)"
 done
 bash "$HERE/bootsnap.sh" 0 "$(ls -t "$RES"/bootsnap-*-bad.txt 2>/dev/null | head -n1)" 2>&1 | grep -v '^сравнено' | sed 's/^/    /' >> "$LOG"
-# Тесты 48 и 47 (25.10). Тайм-ауты переключателя ядра PLL → делитель бывают в «плохих» загрузках (~0,3–1 %) и не бывают в
-# «хороших»; от сборки и режима это не зависит. NVIDIA (записи t1/t2) пишет мультиплексор и сразу снимает замедление FSRM,
-# подтверждение смотрит позже; мы ждём подтверждения до 2 с под замедлением.
-# 48 — ключ lab_nv_mux_release=1 (как NVIDIA), 1000 быстрых циклов (~45 мин). Тайм-ауты есть — ключ не помогает, конец.
-# 47 — только если в 48 тайм-аутов 0: контроль в этой же загрузке, ключ 0, 600 циклов (~25 мин); тайм-ауты есть — загрузка
-#      плохая и помог ключ; нет — загрузка хорошая, тест 48 ничего не доказал. Снимок регистров загрузки — в results/bootsnap-*.
+# Тест 49 (25.10). Тайм-ауты переключателя ядра PLL → делитель бывают в одних сессиях (~0,3–1 %) и не бывают в других;
+# регистры загрузок при этом одинаковые. У NVIDIA (записи t1/t2) делитель ядра меняется прямо перед переключением (внутри
+# скобки, за ~2 мкс до 0x137100), на 0f простаивает на 06; у нас он стоит 81200202 с первого перехода после загрузки.
+# Гипотеза: внутреннее состояние делителя складывается раз на сессию, а NVIDIA его обновляет на каждом переключении.
+# 49а — контроль, ключ 0: до 2 тайм-аутов, не больше 600 подъёмов (~25 мин). Нет ни одного — сессия хорошая, 49б не идёт
+#       (ничего бы не доказал): перезагрузиться и запустить снова.
+# 49б — lab_nv_div_late=1 в той же сессии, 1500 подъёмов (~65 мин). Ключ включается на ходу: первый спуск после включения
+#       пишет 02 поверх 02, со следующего подъёма — как у NVIDIA. Снимок регистров загрузки — в results/bootsnap-*.
 NV="lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1"
 BOOT="$(date -d "$(uptime -s)" +%Y%m%d-%H%M)"
 export FAST=1
-RUNS=1000
-MT0="$(cat $PRM/lab_mux_timeouts 2>/dev/null || echo 0)"
-run 48  03-0f-07 $NV lab_mux_guard=1 lab_nv_mux_release=1   # снять замедление сразу после мультиплексора, как NVIDIA
-MT1="$(cat $PRM/lab_mux_timeouts 2>/dev/null || echo 0)"
-T48=$((MT1 - MT0))
-say "=== тест 48 (lab_nv_mux_release=1): тайм-аутов $T48 на $RUNS"
-if [ "$T48" -gt 0 ]; then
-    KIND=bad
-    say "=== ключ не помогает: тайм-ауты есть и с ним. Контроль (тест 47) не нужен"
+RUNS=600
+MT0="$(mt)"
+export STOPMUX=2
+run 49а 03-0f-07 $NV lab_mux_guard=1                       # контроль: ключ 0, до 2 тайм-аутов
+unset STOPMUX
+MT1="$(mt)"; T49A=$((MT1 - MT0)); N49A="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 49а (ключ 0): тайм-аутов $T49A на $N49A подъёмов"
+if [ "$T49A" -eq 0 ]; then
+    KIND=good
+    say "=== сессия ХОРОШАЯ (0 на $N49A без ключа) — тест 49б ничего не докажет; перезагрузись и запусти снова"
 else
-    RUNS=600
-    MT0="$MT1"
-    run 47  03-0f-07 $NV lab_mux_guard=1            # контроль в этой же загрузке: ключ 0
-    MT1="$(cat $PRM/lab_mux_timeouts 2>/dev/null || echo 0)"
-    T47=$((MT1 - MT0))
-    if [ "$T47" -gt 0 ]; then KIND=bad; say "=== загрузка ПЛОХАЯ (тест 47: $T47 на $RUNS без ключа), а с ключом — 0 на 1000: ПОМОГАЕТ"
-    else KIND=good; say "=== загрузка ХОРОШАЯ (тест 47: 0 на $RUNS без ключа) — тест 48 ничего не доказал, перезагрузись и запусти снова"; fi
+    KIND=bad
+    RUNS=1500
+    run 49б 03-0f-07 $NV lab_mux_guard=1 lab_nv_div_late=1   # делитель меняется прямо перед переключателем, как у NVIDIA
+    MT2="$(mt)"; T49B=$((MT2 - MT1)); N49B="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+    say "=== тест 49б (lab_nv_div_late=1): тайм-аутов $T49B на $N49B подъёмов; без ключа в этой сессии было $T49A на $N49A"
+    if [ "$T49B" -eq 0 ]; then say "=== сессия ПЛОХАЯ, а с ключом — 0 на $N49B: ПОХОЖЕ, ПОМОГАЕТ"
+    else say "=== с ключом тайм-ауты есть ($T49B на $N49B) — один ключ не спасает; сравни частоты: $T49A/$N49A без ключа и $T49B/$N49B с ним"; fi
 fi
 unset FAST HOLD
 bash "$HERE/bootsnap.sh" 0 > "$RES/bootsnap-$BOOT-$KIND.txt" 2>&1

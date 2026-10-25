@@ -1,6 +1,6 @@
 diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
---- base/nvkm/subdev/clk/base.c	2026-10-25 13:51:51.194953277 +0300
-+++ lab-n13/nvkm/subdev/clk/base.c	2026-10-25 13:51:51.376010912 +0300
+--- base/nvkm/subdev/clk/base.c	2026-10-25 14:37:49.875991098 +0300
++++ lab-n13/nvkm/subdev/clk/base.c	2026-10-25 14:37:49.090875994 +0300
 @@ -33,6 +33,57 @@
  #include <subdev/volt.h>
  
@@ -271,8 +271,8 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  	if (clk->func->init)
  		return clk->func->init(clk);
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-25 13:51:51.195583202 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-25 13:51:51.376162004 +0300
+--- base/nvkm/subdev/clk/gf100.c	2026-10-25 14:37:49.875904288 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-25 14:39:31.099861969 +0300
 @@ -23,11 +23,18 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -357,7 +357,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +314,170 @@
+@@ -270,6 +314,179 @@
  	return ret;
  }
  
@@ -481,6 +481,15 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +static uint lab_nv_divb;
 +module_param(lab_nv_divb, uint, 0644);
 +MODULE_PARM_DESC(lab_nv_divb, "LAB: keep the lowest level's divider in the inactive field B of GPC/ROP/hubk07 dividers, as NVIDIA");
++/* LAB 25.10 (записи t1/t2): у NVIDIA делитель ядра меняется прямо перед переключением. На спуске 0f -> 07 — внутри скобки,
++ * после выдержки, за ~2 мкс до записи в 0x137100 (поле A 06 -> 02); на 0f, пока ядро на PLL, делитель простаивает на 06
++ * (405 МГц). У нас 0x1371d0 = 81200202 с первого перехода после загрузки и до конца сессии не меняется. 1 = как у NVIDIA:
++ * после перехода ядра на PLL поле A = 06; на спуске с PLL делитель пишется не на стадии 0, а внутри скобки прямо перед
++ * мультиплексором. Только ядро (idx 0): тайм-ауты были только у него. */
++static uint lab_nv_div_late;
++module_param(lab_nv_div_late, uint, 0644);
++MODULE_PARM_DESC(lab_nv_div_late, "LAB: GPC divider as NVIDIA: field A = 06 (405 MHz) while the core is on its PLL; leaving the PLL, write the divider inside the bracket right before the mux (0 off, 1 on)");
++static bool lab_div_late_pending;	/* стадия 0 отложила запись делителя ядра до стадии 1 */
 +
 +/* LAB: какие узлы программирует gf100_clk_prog (бит = idx); clk/base.c сужает маску для hubk07 вместе с памятью */
 +u32 lab_clk_prog_mask = ~0u;
@@ -528,7 +537,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +490,77 @@
+@@ -282,6 +499,77 @@
  	if (!freq)
  		return 0;
  
@@ -606,7 +615,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +570,9 @@
+@@ -291,7 +579,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -617,7 +626,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +599,10 @@
+@@ -318,6 +608,10 @@
  		info->freq = clk1;
  	}
  
@@ -628,7 +637,16 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -351,15 +636,357 @@
+@@ -346,20 +640,378 @@
+ 	struct gf100_clk_info *info = &clk->eng[idx];
+ 	struct nvkm_device *device = clk->base.subdev.device;
+ 	if (idx < 7 && !info->ssel) {
+-		nvkm_mask(device, 0x1371d0 + (idx * 0x04), 0x80003f3f, info->ddiv);
++		if (idx == 0 && lab_nv_div_late && (nvkm_rd32(device, 0x137100) & 1))
++			lab_div_late_pending = true;	/* ядро на PLL: делитель запишет стадия 1 внутри скобки */
++		else
++			nvkm_mask(device, 0x1371d0 + (idx * 0x04), 0x80003f3f, info->ddiv);
+ 		nvkm_wr32(device, 0x137160 + (idx * 0x04), info->dsrc);
  	}
  }
  
@@ -883,14 +901,16 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +
 +	nvkm_error(&clk->base.subdev, "LAB mux %s idx %02x: 137100 %08x; PLL ctrl %08x coef %08x; опора %08x/%08x; "
 +		   "делитель src %08x div %08x пост %08x; FSRM статус GPC %08x hub06 %08x, FSRM2 %08x/%08x; CTRL1 %08x; "
-+		   "GR 400700 %08x 400500 %08x; 002640 %08x\n", what, idx,
++		   "GR 400700 %08x 400500 %08x; 002640 %08x; SPPLL0 %08x/%08x SPPLL1 %08x/%08x\n", what, idx,
 +		   nvkm_rd32(device, 0x137100), nvkm_rd32(device, pll), nvkm_rd32(device, pll + 4),
 +		   nvkm_rd32(device, 0x137120 + (idx & 7) * 4), nvkm_rd32(device, 0x137140 + (idx & 7) * 4),
 +		   nvkm_rd32(device, 0x137160 + idx * 4), idx <= 2 ? nvkm_rd32(device, 0x1371d0 + idx * 4) : 0,
 +		   nvkm_rd32(device, 0x137250 + idx * 4),
 +		   nvkm_rd32(device, 0x0201e0), nvkm_rd32(device, 0x0201e4),
 +		   nvkm_rd32(device, 0x020160), nvkm_rd32(device, 0x020164), nvkm_rd32(device, 0x020004),
-+		   nvkm_rd32(device, 0x400700), nvkm_rd32(device, 0x400500), nvkm_rd32(device, 0x002640));
++		   nvkm_rd32(device, 0x400700), nvkm_rd32(device, 0x400500), nvkm_rd32(device, 0x002640),
++		   nvkm_rd32(device, 0x00e800), nvkm_rd32(device, 0x00e804),	/* опорный генератор ядра и делителей */
++		   nvkm_rd32(device, 0x00e820), nvkm_rd32(device, 0x00e824));
 +}
 +
  static void
@@ -900,6 +920,8 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	struct nvkm_device *device = clk->base.subdev.device;
 +	struct lab_therm_save th = { .on = false };
 +	bool chg = !!(nvkm_rd32(device, 0x137100) & (1 << idx));
++	bool late = false;
++	u32 dl = 0;
 +
 +	if (!lab_therm_real || chg)
 +		lab_therm_enter(clk, idx, &th);
@@ -911,6 +933,12 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +		nvkm_mask(device, 0x137250 + (idx * 0x04), 0x0000003f, info->mdiv & 0x0000003f);
 +		nvkm_info(&clk->base.subdev, "LAB nv_hubpost idx %02x: пост-делитель %08x -> %08x до мультиплексора\n",
 +			  idx, was, nvkm_rd32(device, 0x137250 + (idx * 0x04)));
++	}
++	if (idx == 0 && lab_div_late_pending) {
++		/* без журнала до записи мультиплексора: между делителем и 0x137100 — ничего */
++		dl = nvkm_mask(device, 0x1371d0, 0x80003f3f, info->ddiv);
++		lab_div_late_pending = false;
++		late = true;
 +	}
  	nvkm_mask(device, 0x137100, (1 << idx), 0x00000000);
 -	nvkm_msec(device, 2000,
@@ -948,6 +976,9 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +		}
 +	}
 +	lab_therm_leave(clk, idx, &th);
++	if (late)
++		nvkm_info(&clk->base.subdev, "LAB nv_div_late: делитель 0x1371d0 %08x -> %08x внутри скобки перед мультиплексором\n",
++			  dl, nvkm_rd32(device, 0x1371d0));
 +}
 +
 +/* LAB: опыт с PLL ядра (idx 0). У ядра, в отличие от ROP/hub, BIOS оставляет два бита,
@@ -988,7 +1019,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static void
-@@ -368,20 +995,58 @@
+@@ -368,20 +1020,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -1050,7 +1081,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +1055,60 @@
+@@ -390,17 +1080,66 @@
  }
  
  static void
@@ -1099,6 +1130,12 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +			lab_mux_dump(clk, idx, "ТАЙМ-АУТ делитель -> PLL");
 +		}
 +		lab_therm_leave(clk, idx, &th);
++		if (idx == 0 && lab_nv_div_late && (nvkm_rd32(device, 0x137100) & 1)) {
++			u32 d = nvkm_mask(device, 0x1371d0, 0x0000003f, 0x06);	/* ядро на PLL: делитель простаивает */
++
++			nvkm_info(&clk->base.subdev, "LAB nv_div_late: ядро на PLL, простаивающий делитель 0x1371d0 %08x -> %08x (405 МГц, как у NVIDIA на 0f)\n",
++				  d, nvkm_rd32(device, 0x1371d0));
++		}
 +		if (idx == 0 && (lab_gpc_fix & 4)) {
 +			u32 r = nvkm_rd32(device, 0x137120);
 +			if (!lab_gpc_saved) {
@@ -1113,7 +1150,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -409,7 +1117,17 @@
+@@ -409,7 +1148,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -1131,7 +1168,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static int
-@@ -426,15 +1144,138 @@
+@@ -426,15 +1175,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1272,7 +1309,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +1318,5 @@
+@@ -477,5 +1349,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
@@ -1280,8 +1317,8 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	return nvkm_clk_ctor(&gf100_clk, device, type, inst, true, &clk->base);
  }
 diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
---- base/nvkm/subdev/fb/ramgf100.c	2026-10-25 13:51:51.210493735 +0300
-+++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-25 13:51:51.397897118 +0300
+--- base/nvkm/subdev/fb/ramgf100.c	2026-10-25 14:37:49.875781280 +0300
++++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-25 14:37:49.138320357 +0300
 @@ -25,6 +25,16 @@
  #include "ram.h"
  #include "ramfuc.h"
@@ -2149,8 +2186,8 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  }
  
 diff -ru base/nvkm/subdev/volt/base.c lab-n13/nvkm/subdev/volt/base.c
---- base/nvkm/subdev/volt/base.c	2026-10-25 13:51:51.230236081 +0300
-+++ lab-n13/nvkm/subdev/volt/base.c	2026-10-25 13:51:51.412588844 +0300
+--- base/nvkm/subdev/volt/base.c	2026-10-25 14:37:49.875528818 +0300
++++ lab-n13/nvkm/subdev/volt/base.c	2026-10-25 14:37:49.379506072 +0300
 @@ -28,6 +28,8 @@
  #include <subdev/bios/volt.h>
  #include <subdev/therm.h>
