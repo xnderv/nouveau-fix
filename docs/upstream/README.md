@@ -40,7 +40,7 @@ nouveau_channel_idle() из ioctl_del эмитит ограждение в то�
 через обсуждение с разработчиками nouveau (список nouveau@lists.freedesktop.org, IRC #nouveau): показать
 запись и различия (`docs/2026-10-22/review-driver.md`), спросить, как они видят общий механизм для Fermi.
 
-## 0006 — вентилятор: бит 31 при чтении скважности ШИМ (подготовлено 25.10.2026, НЕ отправлено)
+## 0006 — вентилятор: бит 31 при чтении скважности ШИМ (подготовлено и отправлено 25.10.2026)
 Файл `0006-drm-nouveau-therm-mask-pwm-update-bit.patch` — письмо для `git send-email`, сделано `git format-patch` на ветке
 torvalds/linux от 24.10.2026 (21a7f44). Проверено:
 - ошибка в свежем ядре на месте; therm-код (nv50.c, gf119.c, fan.c, fanpwm.c, base.c, gt215.c) совпадает с 7.0;
@@ -59,3 +59,8 @@ cd ~/Home/nouveau-fix && git send-email --to='Lyude Paul <lyude@redhat.com>' --t
   docs/upstream/0006-drm-nouveau-therm-mask-pwm-update-bit.patch
 ```
 (`Cc: stable@vger.kernel.org` из текста git send-email добавит в копию сам.)
+
+**Отправлено 25.10.2026 13:16 (MSK)** через `git send-email`, Message-ID `<20261025101640.49779-1-xnderv@yandex.com>`.
+Кому: Lyude Paul, Danilo Krummrich; копии: dri-devel@, nouveau@, linux-kernel@, stable@, автор.
+**Ушло без строки `Signed-off-by` автора** (не была добавлена перед отправкой). Если попросят — ответ в ту же ветку
+со строкой подписи или v2 с подписью.
