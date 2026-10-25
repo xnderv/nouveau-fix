@@ -18,7 +18,7 @@ driver does, using only open methods, and tries to turn what we learn into chang
 The reference board is a Gigabyte GV-N560OC-1GI (PCI subsystem 1458:3515). Its 0f level is a factory overclock;
 03 and 07 are the chip's standard levels.
 
-## Status (24 Oct 2026) — beta
+## Status (25 Oct 2026) — beta
 
 - **Reclocking works on the reference board** — core, shader, memory, voltage, PCIe 2.5/5 GT/s, and an automatic
   governor that uses load measured in the PMU firmware.
@@ -27,10 +27,20 @@ The reference board is a Gigabyte GV-N560OC-1GI (PCI subsystem 1458:3515). Its 0
   on its PLL, while NVIDIA uses the 1620 MHz divider. Switching away from that PLL could wedge the GPU. With the
   divider, as NVIDIA does it, 900 level switches under browser load (tests 22–33a, 60 per test) passed without a
   single hang. The same rounding made nouveau run the PMU at 216 instead of 202.5 MHz; that is fixed too.
+- **A rare clock-switch timeout is worked around; its cause is not known yet.** In some boots (a boot is either good
+  or bad as a whole) the shader clock switch stays on its PLL for 2 s in about 1 % of the 0f→07 downshifts. NVIDIA
+  writes a new value into the core divider right before every switch; in nouveau the divider value never changes after
+  the first switch. Doing it the NVIDIA way (`lab_nv_div_late`) gave 0 timeouts in 2700 load cycles (03→0f→07) in a
+  bad boot, against 27 in 2279 without it in the same boot. Why this works and what differs between boots is still
+  open. A guard (`lab_mux_guard`) retries a stuck switch and then keeps the PLL and the voltage: with it, those 27
+  timeouts did not hang the card. Details: `docs/2026-10-24/hang-20261024-1654.md`.
 - **NVIDIA's order of operations is reproduced step by step**, each step behind its own switch and tested alone:
   `docs/2026-10-24/nvidia-logic.md` explains what NVIDIA does and why.
 - **The author's daily driver** is the lab driver (`lab/`) with these settings, applied by `daily/gpu-autoclock.py`.
-  The stable patch (`patches/0010`) does not have the divider and PMU fixes yet; a clean stable version with them is next.
+  Since 25 Oct the service also turns on the divider write before the switch and the guard, and shows a desktop
+  notification on any switch timeout and on any nouveau warning or error except the known boot-time ones. The stable
+  patch (`patches/0010`) has none of the divider, PMU and divider-write fixes yet; a clean stable version with them is
+  next.
 - **Memory reclock is board-specific for now.** It replays the memory scripts recorded on the reference board,
   just as upstream nouveau replays a sequence recorded on another board. A generator from each card's own VBIOS
   tables is in progress (`docs/2026-10-24/memory-scripts-vs-nouveau.md`). **Data from other cards is what it needs.**
@@ -125,7 +135,7 @@ NVIDIA, — только открытыми методами — и старае
 Эталонная плата — Gigabyte GV-N560OC-1GI (подсистема PCI 1458:3515). Уровень 0f у неё — заводской разгон;
 03 и 07 — штатные уровни чипа.
 
-## Состояние (24.10.2026) — бета
+## Состояние (25.10.2026) — бета
 
 - **Смена частот работает на эталонной плате**: ядро, шейдеры, память, напряжение, PCIe 2,5/5 ГТ/с и регулятор,
   который сам выбирает уровень по загрузке, измеренной в прошивке PMU.
@@ -134,10 +144,21 @@ NVIDIA, — только открытыми методами — и старае
   такт на PLL, а NVIDIA — на делитель от 1620 МГц. Переход с этого PLL мог подвесить карту. С делителем, как у NVIDIA,
   900 переключений уровней под нагрузкой браузера (тесты 22–33а, по 60 в каждом) прошли без единого зависания.
   То же округление заставляло nouveau гнать PMU на 216 МГц вместо 202,5 — тоже исправлено.
+- **Редкий тайм-аут переключателя такта обойдён; его причина пока неизвестна.** В части загрузок (загрузка либо
+  хорошая, либо плохая целиком) переключатель шейдерного такта примерно в 1 % спусков 0f→07 застревает на PLL на 2 с.
+  NVIDIA прямо перед каждым переключением пишет в делитель ядра новое значение, а у nouveau значение делителя после
+  первого переключения не меняется. Сделать как NVIDIA (`lab_nv_div_late`) — в плохой загрузке 0 тайм-аутов на 2700
+  циклов нагрузки (03→0f→07) против 27 на 2279 без этого в той же загрузке. Почему это помогает и чем различаются
+  загрузки — пока открыто. Защита (`lab_mux_guard`) повторяет застрявшее переключение, а потом оставляет PLL и
+  напряжение как есть: с ней эти 27 тайм-аутов карту не подвесили. Подробно: `docs/2026-10-24/hang-20261024-1654.md`.
 - **Порядок действий NVIDIA повторён по шагам**: каждый шаг — отдельный переключатель, проверен отдельно.
   Что и зачем делает NVIDIA — `docs/2026-10-24/nvidia-logic.md`.
 - **Ежедневный драйвер автора** — лабораторный (`lab/`) с этими настройками, их выставляет служба
-  `daily/gpu-autoclock.py`. В стабильном патче (`patches/0010`) исправлений делителя и PMU ещё нет; чистая стабильная версия с ними — следующий шаг.
+  `daily/gpu-autoclock.py`. С 25.10 служба включает и запись делителя перед переключателем, и защиту, а о любом
+  тайм-ауте переключателя и о любом предупреждении или ошибке nouveau, кроме известных при загрузке, показывает
+  уведомление на рабочем столе.
+  В стабильном патче (`patches/0010`) исправлений делителя, PMU и записи делителя перед переключателем ещё нет; чистая
+  стабильная версия с ними — следующий шаг.
 - **Смена частоты памяти пока привязана к плате.** Она проигрывает скрипты памяти, записанные на эталонной плате, —
   так же, как штатный nouveau проигрывает последовательность, записанную когда-то на другой плате. Генератор по
   таблицам VBIOS каждой карты в работе (`docs/2026-10-24/memory-scripts-vs-nouveau.md`). **Ему нужны данные других карт.**
