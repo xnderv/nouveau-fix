@@ -1,15 +1,15 @@
-From 484ab5d54b3d44feb87b39be1d8525f200c393f1 Mon Sep 17 00:00:00 2001
+From 93a189ba28538490e467bcc78f414617df6aa7e7 Mon Sep 17 00:00:00 2001
 From: Alex <xnderv@yandex.com>
 Date: Sun, 25 Oct 2026 13:05:31 +0300
 Subject: [PATCH] drm/nouveau/therm: mask the update bit when reading back the
  fan PWM duty
 
 nv50_fan_pwm_set() and gf119_fan_pwm_set() write the fan duty cycle to
-0xe118 with bit 31 set.  When the register is read back shortly after
-such a write, bit 31 can still be set, and nv50_fan_pwm_get() and
-gf119_fan_pwm_get() return it as part of the duty cycle.
-nvkm_fanpwm_get() then takes divs = max(divs, duty), so divs becomes
-0x8000xxxx too, and duty * 100 wraps around in u32
+0xe118 with bit 31 set.  Normally the bit reads back clear, but when
+the register is read back shortly after such a write it can still be
+set, and nv50_fan_pwm_get() and gf119_fan_pwm_get() return it as part
+of the duty cycle.  nvkm_fanpwm_get() then takes divs = max(divs, duty),
+so divs becomes 0x8000xxxx too, and duty * 100 wraps around in u32
 (0x80000000 * 100 == 0 mod 2^32): the fan speed reads as 0%.
 nvkm_fan_update() uses that as the current speed and steps up from it,
 so it writes 3% to the fan and then ramps it back by 3% per bump
@@ -39,9 +39,9 @@ hunk changes the same register in the same way but was not tested on
 GF119 or later hardware.  Both files build without warnings.
 
 The problem was found and analysed, the bpftrace probes were written,
-and this fix and changelog were drafted with an AI assistant (Claude by
-Anthropic) during an interactive debugging session.  I reviewed the
-change and ran the tests on my card.
+and this fix and changelog were drafted with an AI assistant (Claude
+Opus 5.5 by Anthropic) during an interactive debugging session.  I
+reviewed the change and ran the tests on my card.
 
 Fixes: cb9fa62671ac ("drm/nv50/pm: add support for pwm fan control")
 Fixes: bc79202f4c8f ("nvd0/therm: implement more appropriate pwm fan control functions")
