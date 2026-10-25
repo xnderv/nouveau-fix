@@ -2,6 +2,16 @@
 
 **English first; the same in Russian below. / Русская версия — ниже.**
 
+> **Если машина автора не загружается (на время тестов лабораторного драйвера, с 25.10.2026)**
+> 1. Экран чёрный или завис — нажми кнопку **Reset** (или подожди: при панике ядра машина сама перезагрузится через 10 с).
+> 2. При старте 5 с видно меню GRUB (после сбоя оно ждёт 30 с). Стрелками выбери **третью строку**
+>    `Ubuntu - STABLE nouveau (if the lab driver fails)` и нажми **Enter**.
+> 3. Загрузится стабильный драйвер (копия от 19.10). Работай как обычно; лабораторный остаётся на диске, его разберём потом.
+> 4. Меню не появилось — при старте держи **Shift**. Совсем ничего не помогает — в меню «Advanced options» → «recovery mode».
+>
+> *If the author's machine does not boot during lab-driver tests: Reset, then pick the 3rd GRUB line
+> “Ubuntu - STABLE nouveau (if the lab driver fails)”. Set up by `lab/bootmenu.sh`.*
+
 Upstream nouveau keeps Fermi cards at their boot clocks: a GTX 560 Ti stays at 50 MHz core and 135 MHz memory, so it
 is slow in 3D and video. This project makes the card switch between its performance levels the way the NVIDIA
 driver does, using only open methods, and tries to turn what we learn into changes that can go upstream.
