@@ -48,6 +48,12 @@ PARAMS = {  # всё, что нашли 20.10: PLL как у NVIDIA, памят�
     'lab_gpc_div': '1',      # GPC на 03 на делителе (101,25 МГц), а не на PLL, как NVIDIA: 03↔07 180/180 (тесты 22, 23)
     'lab_pmu_div': '1',      # PMU 202,5 МГц, как BIOS/NVIDIA, а не 216: тесты 23, 24 по 60/60
 }
+# 25.10 (тест 54, гипотеза «линии»): поле B делителей ядра, ROP и hubk07 с самой загрузки не затирать — держать значение,
+# которое ставит VBIOS при включении (1e у ядра, 0a у ROP/hubk07), как NVIDIA и как nouveau для Kepler с 2014. Ставится
+# до первого переключения. Включается файлом /etc/gpu-autoclock.divb, выключается его удалением; со следующей загрузки.
+DIVB_FLAG = '/etc/gpu-autoclock.divb'
+if os.path.exists(DIVB_FLAG):
+    PARAMS['lab_nv_divb'] = '1'
 
 def log(msg):
     print(msg, flush=True)
@@ -87,6 +93,8 @@ def main():
             log(f'нет параметра {k} в драйвере — пропускаю'); continue
         with open(f'{prm}/{k}', 'w') as f:
             f.write(v)
+    if 'lab_nv_divb' in PARAMS:
+        log(f'есть {DIVB_FLAG}: lab_nv_divb=1 до первого переключения — поле B делителей остаётся как при включении')
     ps = sorted(glob.glob('/sys/kernel/debug/dri/*/pstate'))
     if not ps:
         log('Нет /sys/kernel/debug/dri/*/pstate — выхожу'); return 1
