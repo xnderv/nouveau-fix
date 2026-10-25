@@ -32,7 +32,7 @@ if [ -z "${NIGHT_INHIBITED:-}" ]; then
          --reason "nouveau night tests" bash "$0" "$@"
 fi
 if [ "$DRY" != 1 ]; then
-    for p in lab_therm_div lab_gpc_div lab_pmu_div lab_gpc_pre405 lab_nv_hubpost lab_nv_pcie_late lab_nv_hub07mem lab_gov_nv lab_volt_wait_us lab_nv_22680 lab_nv_divb lab_nv_disphold lab_mux_guard lab_mux_timeouts; do
+    for p in lab_therm_div lab_gpc_div lab_pmu_div lab_gpc_pre405 lab_nv_hubpost lab_nv_pcie_late lab_nv_hub07mem lab_gov_nv lab_volt_wait_us lab_nv_22680 lab_nv_divb lab_nv_disphold lab_mux_guard lab_mux_timeouts lab_boot_snap; do
         [ -e "$PRM/$p" ] || { echo "Нет параметра $p — загружен не тот драйвер (lab.sh install и перезагрузка)"; exit 1; }
     done
     [ "$(cat $PRM/lab_perf_ticks)" -gt 0 ] || { echo "Замеры загрузки PMU выключены (lab_perf_ticks=0) — служба gpu-autoclock не отработала"; exit 1; }
@@ -165,15 +165,18 @@ gov() {   # gov ИМЯ [параметр=значение ...] — регуля�
 systemctl is-active -q gpu-blackbox && grep "### blackbox start" /var/log/gpu-blackbox/current.txt 2>/dev/null | tail -n1 | grep -q " v4" \
     || say "⚠ чёрный ящик не v4 или не запущен — температуры процессора в ящике не будет"
 say "серия: драйвер $(modinfo -n nouveau 2>/dev/null), ядро $(uname -r), POWEROFF=$POWEROFF WAITMIN=$WAITMIN DRY=$DRY"
-# Тест 44 (24.10, 22:20): повтор условий теста 31 в этой загрузке. Итог 40–43: 0 тайм-аутов на 2750 спусков, но во всех них
-# карта стояла внизу < 1 с; во всех 7 прежних тайм-аутах — 4–7 с внизу с GR, забитым на 03 до 99 % (hang-20261024-1654.md,
-# «Пересмотр вводных»). Медленный режим (пауза 1,5–5,5 с, по 2 с на 07 и 03, 6 с на 0f), ключи теста 31 + защита.
-# Если тайм-ауты вернутся (~1 %), причина в стоянке внизу / загрузке на 03; если нет — в чём-то, что отличает загрузку.
-# 400 циклов ~ 1,5 ч (при 0,94 % ждём ~4, ноль случайно ~2 %).
+# Тесты 45–46 (25.10 днём): первая загрузка с новой сборкой (снимок регистров при загрузке lab_boot_snap + 0006 вентилятор).
+# Загрузки бывают «плохие» (тайм-ауты переключателя ядра PLL → делитель ~0,5–1 %) и «хорошие» (0); от сборки и режима теста
+# это не зависит (тест 44: 0 на 400 в загрузке 24.10 17:26, 2 на 400 в загрузке 25.10 06:32, сборка одна). Задачи:
+# 45 — быстрый режим с защитой, 600 циклов (~25 мин): ловит ли быстрый режим тайм-ауты в плохой загрузке (тогда он —
+#      20-минутная проверка «плохая/хорошая»); 46 — медленный, как тест 44, с защитой, 300 циклов (~70 мин): контроль загрузки.
 NV="lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1"
+export FAST=1
+RUNS=600
+run 45  03-0f-07 $NV lab_mux_guard=1            # быстрый + защита
 unset FAST HOLD
-RUNS=400
-run 44  03-0f-07 $NV lab_mux_guard=1            # тест 31 + защита, медленный режим
+RUNS=300
+run 46  03-0f-07 $NV lab_mux_guard=1            # медленный (как 44) + защита
 RUNS=60
 base; setp lab_gov="$GOV_START"
 say "=== серия закончена без зависаний; параметры как у службы, регулятор lab_gov=$GOV_START"
