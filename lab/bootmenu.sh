@@ -3,11 +3,11 @@
 #   1. Ubuntu                                   — по умолчанию, лабораторный nouveau (как сейчас)
 #   2. Advanced options for Ubuntu              — штатный пункт GRUB
 #   3. Ubuntu - STABLE nouveau (if the lab driver fails) — стабильный nouveau (копия от 19.10)
-# Как устроено: nouveau поднимается из образа initramfs, который GRUB грузит вместе с ядром (MODULES=most). Строка 3 — то
+# Как устроено: nouveau поднимается из образа initramfs (его собирает dracut), который GRUB грузит вместе с ядром. Строка 3 — то
 # же ядро и та же строка ядра, но второй образ /boot/initrd.img-<ядро>.nouveau-stable со стабильным модулем внутри. Больше
 # ничего не переключается: что выбрал в меню — то и загрузилось.
-# Второй образ собирается так: стабильный модуль временно кладётся на место лабораторного, mkinitramfs → второй образ,
-# лабораторный возвращается (при любой ошибке — тоже). Обычный образ при этом не трогается.
+# Второй образ собирается так: стабильный модуль временно кладётся на место лабораторного, dracut → второй образ,
+# лабораторный возвращается (при любой ошибке — тоже). Обычный образ при этом не трогается. Собирает dracut (как update-initramfs здесь).
 # Команды (sudo спросит пароль):
 #   bash ~/Home/nouveau-fix/lab/bootmenu.sh install    — снять старый механизм отката (fallback.sh), собрать второй образ,
 #                                                         показать меню 5 с, добавить строку 3
@@ -58,20 +58,25 @@ build_stable_image() {
     # вернуть лабораторный при любом выходе из этой функции, в том числе при ошибке
     trap 'sudo install -m 644 "'"$saved"'" "'"$SLOT"'"; sudo depmod -a "'"$KVER"'"; trap - EXIT' EXIT
     echo "=== собираю второй образ со стабильным nouveau (минуту-две)"
+    sudo rm -f "$IMG.new"
     sudo install -m 644 "$KEEP/nouveau.ko" "$SLOT"
     sudo depmod -a "$KVER"
-    sudo mkinitramfs -o "$IMG.new" "$KVER"
+    # образ собираем тем же, чем update-initramfs на этой системе, — dracut (initramfs-tools здесь не используется)
+    sudo dracut --force "$IMG.new" "$KVER" 2>&1 | tail -n 2
     sudo install -m 644 "$saved" "$SLOT"
     sudo depmod -a "$KVER"
     trap - EXIT
     cmp -s "$saved" "$SLOT" || { echo "⚠ лабораторный модуль не вернулся на место — покажи ассистенту"; exit 1; }
     # проверка содержимого: во втором образе — стабильный nouveau (без lab_*)
+    local path ext
+    path="$(sudo lsinitrd "$IMG.new" 2>/dev/null | grep -oE '[^ ]*/nouveau\.ko[^ ]*' | head -n1)"
+    [ -n "$path" ] || { echo "⚠ во втором образе нет nouveau — покажи ассистенту"; exit 1; }
+    ext="${path##*nouveau.ko}"
     tmp="$(mktemp -d)"
-    sudo unmkinitramfs "$IMG.new" "$tmp"
-    local ko; ko="$(sudo find "$tmp" -name 'nouveau.ko*' | head -n1)"
-    [ -n "$ko" ] || { sudo rm -rf "$tmp"; echo "⚠ во втором образе нет nouveau — покажи ассистенту"; exit 1; }
-    if sudo modinfo -p "$ko" | grep '^lab_' >/dev/null; then sudo rm -rf "$tmp"; echo "⚠ во втором образе лабораторный nouveau — покажи ассистенту"; exit 1; fi
-    sudo rm -rf "$tmp"
+    sudo lsinitrd -f "$path" "$IMG.new" > "$tmp/nouveau.ko$ext"
+    if modinfo -p "$tmp/nouveau.ko$ext" | grep '^lab_' >/dev/null; then rm -rf "$tmp"; echo "⚠ во втором образе лабораторный nouveau — покажи ассистенту"; exit 1; fi
+    modinfo -F vermagic "$tmp/nouveau.ko$ext" | grep "^$KVER " >/dev/null || { rm -rf "$tmp"; echo "⚠ nouveau во втором образе не читается — покажи ассистенту"; exit 1; }
+    rm -rf "$tmp"
     sudo mv -f "$IMG.new" "$IMG"
     echo "=== второй образ: $IMG (стабильный nouveau внутри — проверено)"
 }
