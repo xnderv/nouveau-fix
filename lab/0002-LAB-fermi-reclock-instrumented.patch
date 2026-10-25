@@ -272,7 +272,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  		return clk->func->init(clk);
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 --- base/nvkm/subdev/clk/gf100.c	2026-10-25 17:45:29.200428227 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-25 17:45:54.419512462 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-25 18:29:19.800902098 +0300
 @@ -23,11 +23,18 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -357,7 +357,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +314,179 @@
+@@ -270,6 +314,198 @@
  	return ret;
  }
  
@@ -490,6 +490,13 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +module_param(lab_nv_div_late, uint, 0644);
 +MODULE_PARM_DESC(lab_nv_div_late, "LAB: GPC divider as NVIDIA: field A = 06 (405 MHz) while the core is on its PLL; leaving the PLL, write the divider inside the bracket right before the mux (0 off, 1 on)");
 +static bool lab_div_late_pending;	/* стадия 0 отложила запись делителя ядра до стадии 1 */
++/* LAB 25.10 (тест 53, гипотеза «линии»: делитель при записи выравнивается по черте, длину которой задаёт поле B). Поле B
++ * делителя ядра — заданное значение при каждой записи делителя (0 — выкл., как сейчас: копия поля A). 03 (÷5) — «неправильная»
++ * линия: не делится на 4 и не делит 4; 1e (÷32) — линия NVIDIA. Только ядро (idx 0); у ядра поле B неактивно (0x137160
++ * бит 8 = 0), его такт от поля B не зависит. Важнее lab_nv_divb. */
++static uint lab_divb_force;
++module_param(lab_divb_force, uint, 0644);
++MODULE_PARM_DESC(lab_divb_force, "LAB: write this value into field B of the GPC divider at every divider write (0 off; e.g. 0x03 = /5, 0x1e = /32 as NVIDIA)");
 +
 +/* LAB: какие узлы программирует gf100_clk_prog (бит = idx); clk/base.c сужает маску для hubk07 вместе с памятью */
 +u32 lab_clk_prog_mask = ~0u;
@@ -534,10 +541,22 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +		  idx, low, b, info->ddiv);
 +}
 +
++static void
++lab_divb_force_apply(struct gf100_clk *clk, int idx)
++{
++	struct gf100_clk_info *info = &clk->eng[idx];
++	u32 b = lab_divb_force & 0x3f;
++
++	if (idx != 0 || !b || !(info->ddiv & 0x80000000))
++		return;
++	info->ddiv = (info->ddiv & ~0x00003f00) | (b << 8);
++	nvkm_info(&clk->base.subdev, "LAB divb_force idx 00: поле B -> %02x (÷%u), ddiv %08x\n", b, b + 2, info->ddiv);
++}
++
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +499,77 @@
+@@ -282,6 +518,78 @@
  	if (!freq)
  		return 0;
  
@@ -592,6 +611,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +				  dom, freq, info->freq, vco, info->ddiv, info->mdiv);
 +			if (lab_nv_divb)
 +				lab_divb(clk, idx, dom);
++			lab_divb_force_apply(clk, idx);
 +			return 0;
 +		}
 +	}
@@ -615,7 +635,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +579,9 @@
+@@ -291,7 +599,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -626,18 +646,19 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +608,10 @@
+@@ -318,6 +628,11 @@
  		info->freq = clk1;
  	}
  
 +	if (lab_nv_divb && idx <= 0x02 && (info->ddiv & 0x80000000))
 +		lab_divb(clk, idx, dom);
++	lab_divb_force_apply(clk, idx);
 +	nvkm_info(&clk->base.subdev, "LAB calc idx %02x dom %d: want %u got %u ssel %08x coef %08x dsrc %08x ddiv %08x mdiv %08x\n",
 +		  idx, dom, freq, info->freq, info->ssel, info->coef, info->dsrc, info->ddiv, info->mdiv);
  	return 0;
  }
  
-@@ -346,20 +640,383 @@
+@@ -346,20 +661,383 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -1024,7 +1045,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static void
-@@ -368,20 +1025,58 @@
+@@ -368,20 +1046,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -1086,7 +1107,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +1085,66 @@
+@@ -390,17 +1106,66 @@
  }
  
  static void
@@ -1155,7 +1176,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -409,7 +1153,17 @@
+@@ -409,7 +1174,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -1173,7 +1194,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static int
-@@ -426,15 +1180,138 @@
+@@ -426,15 +1201,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1272,9 +1293,9 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +			stage[i].exec(clk, e);
 +			if (lab_order_us && mux_stage)
 +				udelay(lab_order_us);
-+		}
-+	}
-+
+ 		}
+ 	}
+ 
 +	if (lab_xbar || lab_e9e0) {
 +		/* уровень по цели ядра (idx 0): 0f — PLL (ssel), 07 — делитель > 200 МГц, 03 — ниже */
 +		u32 gpc_khz = clk->eng[0].freq;
@@ -1289,14 +1310,14 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +				nvkm_wr32(device, 0x13c844, 3);
 +				nvkm_wr32(device, 0x13ec14, 1);
 +			}
- 		}
++		}
 +		if (lab_e9e0)
 +			nvkm_wr32(device, 0x00e9e0, lvl == 2 ? 0x81200a04 : lvl == 1 ? 0x81200a06 : 0x81200a0a);
 +		nvkm_info(&clk->base.subdev, "LAB xbar после (уровень %d): part0 %08x 13c844 %08x 13ec14 %08x e9e0 %08x\n",
 +			  lvl, nvkm_rd32(device, 0x13c054), nvkm_rd32(device, 0x13c844), nvkm_rd32(device, 0x13ec14),
 +			  nvkm_rd32(device, 0x00e9e0));
- 	}
- 
++	}
++
 +	if (gate == 1)
 +		nvkm_mask(device, 0x400500, 0x00000001, gr500 & 0x00000001);
 +	if (blocked) {
@@ -1314,7 +1335,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +1354,5 @@
+@@ -477,5 +1375,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  

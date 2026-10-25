@@ -3,7 +3,8 @@
 # ключа до 2 тайм-аутов (не больше 600 подъёмов, ~25 мин): плохая ли сессия; если был хоть один — 49б с ключом, 1500 подъёмов
 # (~65 мин). TEST=50 — для ХОРОШЕЙ сессии: 50а с ключом 1500 подъёмов, 50б без ключа 600 (испортит ли ключ сессию).
 # TEST=51 — как 49, но ключ lab_nv_divb (поле B делителя как у NVIDIA). TEST=52 — как 49, оба ключа сразу (полный рецепт
-# NVIDIA для делителя ядра). Прежние серии — в git.
+# NVIDIA для делителя ядра). TEST=53 — «линии»: поле B ядра 02 → 03 (÷5) → 1e (÷32) → 02, в любой сессии (нужна сборка
+# с lab_divb_force). Прежние серии — в git.
 # Запуск из терминала в графическом сеансе, окно браузера с нагрузкой будет на экране:
 #   POWEROFF=0 bash ~/Home/nouveau-fix/lab/night.sh       (днём: машину в конце не выключать)
 # Один раз пароль sudo (дальше его держит сам hangtest: sudo вызывается каждые несколько секунд).
@@ -38,6 +39,9 @@ if [ "$DRY" != 1 ]; then
     for p in lab_therm_div lab_gpc_div lab_pmu_div lab_gpc_pre405 lab_nv_hubpost lab_nv_pcie_late lab_nv_hub07mem lab_gov_nv lab_volt_wait_us lab_nv_22680 lab_nv_divb lab_nv_disphold lab_mux_guard lab_mux_timeouts lab_boot_snap lab_nv_mux_release lab_nv_div_late; do
         [ -e "$PRM/$p" ] || { echo "Нет параметра $p — загружен не тот драйвер (lab.sh install и перезагрузка)"; exit 1; }
     done
+    if [ "${TEST:-49}" = 53 ] && [ ! -e "$PRM/lab_divb_force" ]; then
+        echo "Нет параметра lab_divb_force — для теста 53 нужна новая сборка (lab.sh install и перезагрузка)"; exit 1
+    fi
     [ "$(cat $PRM/lab_perf_ticks)" -gt 0 ] || { echo "Замеры загрузки PMU выключены (lab_perf_ticks=0) — служба gpu-autoclock не отработала"; exit 1; }
     INH="$(gdbus call --session --dest org.gnome.SessionManager --object-path /org/gnome/SessionManager \
            --method org.gnome.SessionManager.IsInhibited 8 2>&1)"
@@ -58,7 +62,8 @@ setp() { local kv; for kv in "$@"; do $SUDO sh -c "echo ${kv#*=} > $PRM/${kv%%=*
 base() { setp lab_gov=0 lab_mem=1 lab_pcie=1 lab_volt_min_uv=0 lab_therm=1 lab_therm_wait=1 lab_therm_wait_us=0 \
               lab_therm_real=0 lab_therm_div=1 lab_clk_mmu_lock=0 lab_gpc_div=1 lab_pmu_div=1 \
               lab_gpc_pre405=0 lab_nv_hubpost=0 lab_nv_pcie_late=0 lab_nv_hub07mem=0 lab_gov_nv=0 lab_perf_ms=1000 lab_perf_log=0 \
-              lab_volt_wait_us=0 lab_nv_22680=0 lab_nv_divb=0 lab_nv_disphold=0 lab_e9e0=0 lab_order=0 lab_pll_keep=0 lab_mux_guard=0 lab_nv_mux_release=0 lab_nv_div_late=0; }
+              lab_volt_wait_us=0 lab_nv_22680=0 lab_nv_divb=0 lab_nv_disphold=0 lab_e9e0=0 lab_order=0 lab_pll_keep=0 lab_mux_guard=0 lab_nv_mux_release=0 lab_nv_div_late=0
+        [ -e "$PRM/lab_divb_force" ] && setp lab_divb_force=0; true; }   # в старых сборках этого ключа нет
 MTF="${NIGHT_MTF:-$PRM/lab_mux_timeouts}"   # счётчик тайм-аутов переключателя (сухой прогон подставляет свой файл)
 mt() { cat "$MTF" 2>/dev/null || echo 0; }
 GOV_START="$(cat $PRM/lab_gov 2>/dev/null || echo 0)"; NT0="$(date '+%Y-%m-%d %H:%M:%S')"
@@ -223,6 +228,37 @@ else
     say "=== оба чистые (0 на $N50A с ключом, 0 на $N50B без) — про делитель не узнали; перезагрузка и тест 49 заново"
 fi
 KIND=""
+elif [ "$TEST" = 53 ]; then
+# Тест 53 (25.10) — гипотеза «линии»: делитель ядра при каждой записи выравнивается по черте, длину которой задаёт поле B.
+# Держим в поле B ядра заданное значение (lab_divb_force, драйвер пишет его при каждой записи делителя):
+# 53а — 02 (÷4, как сейчас), 300 подъёмов — какая сессия; 53б — 03 (÷5: не делится на 4 и не делит 4 — «неправильная»
+# линия), 600 (стоп на 10 тайм-аутах) — по гипотезе ломает в любой сессии; 53в — 1e (÷32, линия NVIDIA), 600 (стоп на 10) —
+# по гипотезе лечит; 53г — снова 02, 300. Поле B у ядра неактивно (0x137160 бит 8 = 0): такт ядра от него не зависит.
+RUNS=300
+MT0="$(mt)"
+run 53а 03-0f-07 $NV lab_mux_guard=1
+MT1="$(mt)"; TA=$((MT1 - MT0)); NA="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 53а (поле B ядра 02 = ÷4, как сейчас): тайм-аутов $TA на $NA подъёмов"
+RUNS=600; export STOPMUX=10
+run 53б 03-0f-07 $NV lab_mux_guard=1 lab_divb_force=0x03
+MT2="$(mt)"; TB=$((MT2 - MT1)); NB="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 53б (поле B 03 = ÷5, «неправильная» линия): тайм-аутов $TB на $NB подъёмов"
+run 53в 03-0f-07 $NV lab_mux_guard=1 lab_divb_force=0x1e
+unset STOPMUX
+MT3="$(mt)"; TC=$((MT3 - MT2)); NC="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 53в (поле B 1e = ÷32, линия NVIDIA): тайм-аутов $TC на $NC подъёмов"
+RUNS=300
+run 53г 03-0f-07 $NV lab_mux_guard=1
+MT4="$(mt)"; TD=$((MT4 - MT3)); ND="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 53г (снова 02): тайм-аутов $TD на $ND подъёмов"
+if [ "$TB" -gt 0 ] && [ "$TC" -eq 0 ]; then
+    say "=== ЛИНИЯ РЕШАЕТ: с ÷5 тайм-ауты ($TB на $NB), с ÷32 как у NVIDIA — 0 на $NC (контроль: $TA/$NA до, $TD/$ND после)"
+elif [ "$TB" -eq 0 ]; then
+    say "=== «неправильная» линия ÷5 не ломает (0 на $NB) — поле B на выравнивание, похоже, не влияет (контроль: $TA/$NA, $TD/$ND; ÷32: $TC/$NC)"
+else
+    say "=== тайм-ауты и с ÷5 ($TB на $NB), и с ÷32 ($TC на $NC) — линия NVIDIA не лечит (контроль: $TA/$NA до, $TD/$ND после)"
+fi
+KIND=""; [ "$TA" -gt 0 ] && KIND=bad
 else
 # 49 и 51 — одна схема для плохой сессии: «а» — контроль без ключа до 2 тайм-аутов, «б» — с ключом, если тайм-аут был
 case "$TEST" in
