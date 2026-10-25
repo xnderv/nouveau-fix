@@ -75,12 +75,14 @@ driver tries other GF114 boards with `nouveau.gf114_board=1` (untested; watch fo
 ## Patches (`patches/`, on top of nouveau in Linux 7.0.x)
 
 - `0001` — a GPU hang when a Chromium-based app deletes an engine object while the channel is still busy
-  (`nouveau_abi16.c`; candidate for upstream).
+  (`nouveau_abi16.c`). **Sent upstream** 23 Oct 2026 (v2 the same day after an automated review), waiting for
+  review: [lore](https://lore.kernel.org/dri-devel/20261023144219.46478-1-xnderv@yandex.com/).
 - `0003` — HDMI was refused when the monitor supports SCDC and the GPU does not; refuse only above 340 MHz.
   Fixed upstream independently in Sept 2026 (`1717fcc5be57`); skipped automatically where present.
 - `0004` (lab) — load accounting in the PMU firmware and the in-driver governor. `0005` (lab) — HDMI AVI InfoFrame ITC.
 - `0006` — the fan could drop to 3 % on its own: nouveau read back the PWM duty with the update bit still set, and its
-  u32 math turned that into 0 % (race between its two fan timers; `docs/2026-10-24/vent-20261024.md`). Candidate for upstream.
+  u32 math turned that into 0 % (race between its two fan timers; `docs/2026-10-24/vent-20261024.md`). **Sent upstream**
+  25 Oct 2026, waiting for review: [lore](https://lore.kernel.org/dri-devel/20261025101640.49779-1-xnderv@yandex.com/).
 - `0010` — stable reclocking for the reference board (22–24 Oct); it does not yet have the shader-divider and PMU
   clock fixes from the lab driver.
 - `lab/0002` — the instrumented reclocking with all switches.
@@ -178,6 +180,15 @@ NVIDIA, — только открытыми методами — и старае
 можно попробовать на другой плате GF114 параметром `nouveau.gf114_board=1` (не проверено; следите за ошибками видеопамяти).
 
 Старый путь «только исправление 0001» (`rebuild.sh`, `check.sh`, `revert.sh`) сохранён для истории.
+
+## Отправлено в основное ядро
+
+- `0001` (зависание при удалении объекта движка, Chromium) — отправлено 23.10.2026, в тот же день v2 после автоматической
+  проверки; ждём ответа: [lore](https://lore.kernel.org/dri-devel/20261023144219.46478-1-xnderv@yandex.com/).
+- `0006` (вентилятор падает до 3 %) — отправлено 25.10.2026; ждём ответа:
+  [lore](https://lore.kernel.org/dri-devel/20261025101640.49779-1-xnderv@yandex.com/).
+
+Подробности и тексты писем — `docs/upstream/`.
 
 ## Лицензия
 
