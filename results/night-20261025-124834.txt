@@ -1,0 +1,11 @@
+12:48:34 серия: драйвер /lib/modules/7.0.0-38-generic/updates/nouveau-fix/nouveau.ko, ядро 7.0.0-38-generic, POWEROFF=0 WAITMIN=60 DRY=0
+12:48:35 === тест 47: уровни 03-0f-07, подъёмов 600; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_mux_guard=1
+12:48:37 тест 47: журнал hangtest-20261025-124836.txt
+13:17:19 тест 47: закончился, код 0
+13:17:12 тайм-аутов переключателя источника такта за тест: 2 (journalctl -k: «LAB mux»)
+=== 600 подъёмов без зависания (нагрузка browser). Лог: /home/alex/Home/nouveau-fix/results/hangtest-20261025-124836.txt
+13:17:12 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+13:17:19 === загрузка с 2026-10-25 12:45:51 ПЛОХАЯ: тайм-аутов 2 на 600
+13:17:19 снимок регистров загрузки: results/bootsnap-20261025-1245-bad.txt
+13:17:20 === серия закончена без зависаний; параметры как у службы, регулятор lab_gov=2
+13:17:20 POWEROFF=0 — машину не выключаю
