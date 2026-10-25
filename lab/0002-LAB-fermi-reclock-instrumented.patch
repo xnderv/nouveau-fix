@@ -1,6 +1,6 @@
 diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
---- base/nvkm/subdev/clk/base.c	2026-10-25 14:37:49.875991098 +0300
-+++ lab-n13/nvkm/subdev/clk/base.c	2026-10-25 14:37:49.090875994 +0300
+--- base/nvkm/subdev/clk/base.c	2026-10-25 17:45:29.200532775 +0300
++++ lab-n13/nvkm/subdev/clk/base.c	2026-10-25 17:45:28.592667188 +0300
 @@ -33,6 +33,57 @@
  #include <subdev/volt.h>
  
@@ -271,8 +271,8 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  	if (clk->func->init)
  		return clk->func->init(clk);
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-25 14:37:49.875904288 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-25 14:39:31.099861969 +0300
+--- base/nvkm/subdev/clk/gf100.c	2026-10-25 17:45:29.200428227 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-25 17:45:54.419512462 +0300
 @@ -23,11 +23,18 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -637,7 +637,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -346,20 +640,378 @@
+@@ -346,20 +640,383 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -864,6 +864,10 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +				    0x0204ec };
 +	static const u32 gpio[] = { 0x00e100, 0x00e104, 0x00e108, 0x00e280, 0x00e284, 0x00e28c,
 +				    0x00e114, 0x00e118, 0x00e11c, 0x00e120 };
++	/* LAB 25.10: прочие источники делителей (rnndb CLK11/12/14, CLK26/27 — назначение неизвестно) и два из восьми регистров
++	 * 0x139060 + k·0x40. При запуске NVIDIA посреди настройки PCIe пишет 0x1371c8/cc = 0x30000 (источник 100 МГц от платы ->
++	 * 108 МГц от кварца карты) и 0x139060…0x139220 = 0x74 (было 0x7c); nouveau их не трогает. Все адреса NVIDIA читает. */
++	static const u32 src2[] = { 0x13718c, 0x137190, 0x137198, 0x1371c8, 0x1371cc, 0x139060, 0x139220 };
 +	static int n;
 +	struct nvkm_subdev *subdev = &base->subdev;
 +
@@ -877,6 +881,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	lab_snap_line(subdev, n, "PTHERM", therm, ARRAY_SIZE(therm));
 +	lab_snap_line(subdev, n, "датчик", sens, ARRAY_SIZE(sens));
 +	lab_snap_line(subdev, n, "GPIO/ШИМ", gpio, ARRAY_SIZE(gpio));
++	lab_snap_line(subdev, n, "ист.26/27, PCIe", src2, ARRAY_SIZE(src2));
 +}
 +
 +static int lab_mux_timeouts;
@@ -1019,7 +1024,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static void
-@@ -368,20 +1020,58 @@
+@@ -368,20 +1025,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -1081,7 +1086,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +1080,66 @@
+@@ -390,17 +1085,66 @@
  }
  
  static void
@@ -1150,7 +1155,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -409,7 +1148,17 @@
+@@ -409,7 +1153,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -1168,7 +1173,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static int
-@@ -426,15 +1175,138 @@
+@@ -426,15 +1180,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1309,7 +1314,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +1349,5 @@
+@@ -477,5 +1354,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
@@ -1317,8 +1322,8 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	return nvkm_clk_ctor(&gf100_clk, device, type, inst, true, &clk->base);
  }
 diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
---- base/nvkm/subdev/fb/ramgf100.c	2026-10-25 14:37:49.875781280 +0300
-+++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-25 14:37:49.138320357 +0300
+--- base/nvkm/subdev/fb/ramgf100.c	2026-10-25 17:45:29.200166880 +0300
++++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-25 17:45:28.633232310 +0300
 @@ -25,6 +25,16 @@
  #include "ram.h"
  #include "ramfuc.h"
@@ -2186,8 +2191,8 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  }
  
 diff -ru base/nvkm/subdev/volt/base.c lab-n13/nvkm/subdev/volt/base.c
---- base/nvkm/subdev/volt/base.c	2026-10-25 14:37:49.875528818 +0300
-+++ lab-n13/nvkm/subdev/volt/base.c	2026-10-25 14:37:49.379506072 +0300
+--- base/nvkm/subdev/volt/base.c	2026-10-25 17:45:29.199772470 +0300
++++ lab-n13/nvkm/subdev/volt/base.c	2026-10-25 17:45:28.881963290 +0300
 @@ -28,6 +28,8 @@
  #include <subdev/bios/volt.h>
  #include <subdev/therm.h>
