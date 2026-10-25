@@ -1,7 +1,7 @@
 diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
---- base/nvkm/subdev/clk/base.c	2026-10-22 14:07:17.000000000 +0300
-+++ lab-n13/nvkm/subdev/clk/base.c	2026-10-24 17:18:05.931293958 +0300
-@@ -33,6 +33,56 @@
+--- base/nvkm/subdev/clk/base.c	2026-10-25 06:59:25.996135590 +0300
++++ lab-n13/nvkm/subdev/clk/base.c	2026-10-25 07:00:24.306767778 +0300
+@@ -33,6 +33,57 @@
  #include <subdev/volt.h>
  
  #include <core/option.h>
@@ -50,7 +50,8 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
 +module_param(lab_nv_disphold, uint, 0644);
 +MODULE_PARM_DESC(lab_nv_disphold, "LAB: set bit 0 of 0x610300 for the whole level switch, as NVIDIA (display)");
 +extern u32 lab_clk_prog_mask;
-+extern u32 lab_mux_stuck;	/* clk/gf100.c: узлы, оставшиеся на PLL после неудачного переключения (lab_mux_guard) */	/* clk/gf100.c */
++extern u32 lab_mux_stuck;	/* clk/gf100.c: узлы, оставшиеся на PLL после неудачного переключения (lab_mux_guard) */
++extern void lab_boot_snapshot(struct nvkm_clk *);	/* clk/gf100.c: снимок регистров при инициализации */
 +static struct nvkm_pstate *lab_h07_pstate;	/* задан только на время вызова из nvkm_pstate_prog с lab_nv_hub07mem */
 +static int lab_h07_pstatei;
 +static bool lab_h07_up;
@@ -58,7 +59,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  /******************************************************************************
   * misc
-@@ -190,19 +240,42 @@
+@@ -190,19 +241,42 @@
  			nvkm_error(subdev, "failed to raise voltage: %d\n", ret);
  			return ret;
  		}
@@ -106,7 +107,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  	}
  
  	if (therm) {
-@@ -263,14 +336,67 @@
+@@ -263,14 +337,67 @@
  /******************************************************************************
   * P-States
   *****************************************************************************/
@@ -175,7 +176,7 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  
  	list_for_each_entry(pstate, &clk->states, head) {
  		if (idx++ == pstatei)
-@@ -278,22 +404,72 @@
+@@ -278,22 +405,72 @@
  	}
  
  	nvkm_debug(subdev, "setting performance state %d\n", pstatei);
@@ -260,9 +261,18 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  }
  
  static void
+@@ -608,6 +785,8 @@
+ 	}
+ 
+ 	nvkm_pstate_info(clk, &clk->bstate);
++	if (subdev->device->card_type == NV_C0)
++		lab_boot_snapshot(clk);
+ 
+ 	if (clk->func->init)
+ 		return clk->func->init(clk);
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-22 14:07:17.000000000 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-24 17:18:17.063603962 +0300
+--- base/nvkm/subdev/clk/gf100.c	2026-10-25 06:59:25.997099393 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-25 07:01:05.022172772 +0300
 @@ -23,11 +23,18 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -618,7 +628,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -351,15 +636,291 @@
+@@ -351,15 +636,348 @@
  	}
  }
  
@@ -794,6 +804,63 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 + * lab_pll_keep GPC остался на PLL 1800 МГц при 0,95 В. Снимок состояния в момент тайм-аута пишется всегда (поведение не
 + * меняется), счётчик — lab_mux_timeouts. lab_mux_guard (0 — выкл): до трёх повторов (новая скобка + запись бита, по 20 мс);
 + * если узел так и остался на PLL — стадия 2 его PLL не выключает, а clk/base.c не снижает напряжение в этом переходе. */
++/* LAB 25.10: снимок регистров при каждой инициализации драйвера (загрузка, выход из сна) — только чтение, до выбора
++ * первого уровня. Тайм-ауты переключателя GPC были только в загрузках 24.10 00:43–16:57 и ни в одной другой; снимки
++ * разных загрузок можно сравнить (lab/bootsnap.sh). Блоки, которые всегда под тактом: тактирование, PTHERM, GPIO/ШИМ. */
++static uint lab_boot_snap = 1;
++module_param(lab_boot_snap, uint, 0644);
++MODULE_PARM_DESC(lab_boot_snap, "LAB: log a read-only register snapshot (clocks, PTHERM, GPIO/PWM) at every clk init (0 off, 1 on)");
++
++static void
++lab_snap_line(struct nvkm_subdev *subdev, int n, const char *name, const u32 *addr, int cnt)
++{
++	char buf[400];
++	int i, o = 0;
++
++	for (i = 0; i < cnt; i++)
++		o += scnprintf(buf + o, sizeof(buf) - o, " %06x=%08x", addr[i], nvkm_rd32(subdev->device, addr[i]));
++	nvkm_info(subdev, "LAB boot snap #%d %s:%s\n", n, name, buf);
++}
++
++void lab_boot_snapshot(struct nvkm_clk *base);	/* зовёт clk/base.c */
++
++void
++lab_boot_snapshot(struct nvkm_clk *base)
++{
++	static const u32 pll[] = { 0x00e800, 0x00e804, 0x00e820, 0x00e824, 0x00e9e0, 0x137100,
++				   0x137000, 0x137004, 0x137008, 0x137020, 0x137024, 0x137028,
++				   0x137040, 0x137044, 0x137048, 0x1370e0, 0x1370e4, 0x1370e8 };
++	static const u32 ref[] = { 0x137120, 0x137124, 0x137128, 0x13712c, 0x137130, 0x137134, 0x137138, 0x13713c,
++				   0x137140, 0x137144, 0x137148, 0x13714c, 0x137150, 0x137154, 0x137158, 0x13715c };
++	static const u32 div[] = { 0x137160, 0x137164, 0x137168, 0x13716c, 0x137170, 0x137174, 0x137178, 0x13717c,
++				   0x137180, 0x137184, 0x1371d0, 0x1371d4, 0x1371d8, 0x1371dc, 0x1371e0, 0x1371e4,
++				   0x1371e8, 0x1371ec, 0x1371f0, 0x1371f4 };
++	static const u32 post[] = { 0x137250, 0x137254, 0x137258, 0x13725c, 0x137260, 0x137264, 0x137268, 0x13726c,
++				    0x137270, 0x137274, 0x137280, 0x137300, 0x137310, 0x137320, 0x137330, 0x1373ec,
++				    0x1373f0, 0x1373f8, 0x132000, 0x132004 };
++	static const u32 therm[] = { 0x020000, 0x020004, 0x020008, 0x02000c, 0x020060, 0x020064, 0x020074, 0x020110,
++				     0x020114, 0x020138, 0x020160, 0x020164, 0x020180, 0x020184, 0x0201a0, 0x0201a4,
++				     0x0201e0, 0x0201e4 };
++	static const u32 sens[] = { 0x020400, 0x020404, 0x020408, 0x02040c, 0x020410, 0x020414, 0x020418, 0x020480,
++				    0x020484, 0x0204c0, 0x0204c4, 0x0204d8, 0x0204dc, 0x0204e0, 0x0204e4, 0x0204e8,
++				    0x0204ec };
++	static const u32 gpio[] = { 0x00e100, 0x00e104, 0x00e108, 0x00e280, 0x00e284, 0x00e28c,
++				    0x00e114, 0x00e118, 0x00e11c, 0x00e120 };
++	static int n;
++	struct nvkm_subdev *subdev = &base->subdev;
++
++	if (!lab_boot_snap)
++		return;
++	n++;
++	lab_snap_line(subdev, n, "PLL", pll, ARRAY_SIZE(pll));
++	lab_snap_line(subdev, n, "опора", ref, ARRAY_SIZE(ref));
++	lab_snap_line(subdev, n, "делители", div, ARRAY_SIZE(div));
++	lab_snap_line(subdev, n, "пост/память", post, ARRAY_SIZE(post));
++	lab_snap_line(subdev, n, "PTHERM", therm, ARRAY_SIZE(therm));
++	lab_snap_line(subdev, n, "датчик", sens, ARRAY_SIZE(sens));
++	lab_snap_line(subdev, n, "GPIO/ШИМ", gpio, ARRAY_SIZE(gpio));
++}
++
 +static int lab_mux_timeouts;
 +module_param(lab_mux_timeouts, int, 0444);
 +MODULE_PARM_DESC(lab_mux_timeouts, "LAB: clock source mux switch timeouts since load (read-only counter)");
@@ -912,7 +979,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static void
-@@ -368,20 +929,58 @@
+@@ -368,20 +986,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -974,7 +1041,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +989,58 @@
+@@ -390,17 +1046,58 @@
  }
  
  static void
@@ -1035,7 +1102,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -409,7 +1049,17 @@
+@@ -409,7 +1106,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -1053,7 +1120,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static int
-@@ -426,15 +1076,138 @@
+@@ -426,15 +1133,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1152,9 +1219,9 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +			stage[i].exec(clk, e);
 +			if (lab_order_us && mux_stage)
 +				udelay(lab_order_us);
- 		}
- 	}
- 
++		}
++	}
++
 +	if (lab_xbar || lab_e9e0) {
 +		/* уровень по цели ядра (idx 0): 0f — PLL (ssel), 07 — делитель > 200 МГц, 03 — ниже */
 +		u32 gpc_khz = clk->eng[0].freq;
@@ -1169,14 +1236,14 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +				nvkm_wr32(device, 0x13c844, 3);
 +				nvkm_wr32(device, 0x13ec14, 1);
 +			}
-+		}
+ 		}
 +		if (lab_e9e0)
 +			nvkm_wr32(device, 0x00e9e0, lvl == 2 ? 0x81200a04 : lvl == 1 ? 0x81200a06 : 0x81200a0a);
 +		nvkm_info(&clk->base.subdev, "LAB xbar после (уровень %d): part0 %08x 13c844 %08x 13ec14 %08x e9e0 %08x\n",
 +			  lvl, nvkm_rd32(device, 0x13c054), nvkm_rd32(device, 0x13c844), nvkm_rd32(device, 0x13ec14),
 +			  nvkm_rd32(device, 0x00e9e0));
-+	}
-+
+ 	}
+ 
 +	if (gate == 1)
 +		nvkm_mask(device, 0x400500, 0x00000001, gr500 & 0x00000001);
 +	if (blocked) {
@@ -1194,7 +1261,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +1250,5 @@
+@@ -477,5 +1307,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
@@ -1202,8 +1269,8 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	return nvkm_clk_ctor(&gf100_clk, device, type, inst, true, &clk->base);
  }
 diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
---- base/nvkm/subdev/fb/ramgf100.c	2026-10-22 14:07:17.000000000 +0300
-+++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-24 17:16:47.995115828 +0300
+--- base/nvkm/subdev/fb/ramgf100.c	2026-10-25 06:59:26.023125959 +0300
++++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-25 06:59:26.359988523 +0300
 @@ -25,6 +25,16 @@
  #include "ram.h"
  #include "ramfuc.h"
@@ -2071,8 +2138,8 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  }
  
 diff -ru base/nvkm/subdev/volt/base.c lab-n13/nvkm/subdev/volt/base.c
---- base/nvkm/subdev/volt/base.c	2026-10-22 14:07:17.000000000 +0300
-+++ lab-n13/nvkm/subdev/volt/base.c	2026-10-24 17:16:47.995264464 +0300
+--- base/nvkm/subdev/volt/base.c	2026-10-25 06:59:26.058108780 +0300
++++ lab-n13/nvkm/subdev/volt/base.c	2026-10-25 06:59:26.360094181 +0300
 @@ -28,6 +28,8 @@
  #include <subdev/bios/volt.h>
  #include <subdev/therm.h>
