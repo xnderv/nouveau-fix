@@ -1,6 +1,6 @@
 #!/bin/bash
-# СЕРИЯ ТЕСТОВ БЕЗ ПРИСМОТРА. Сейчас (25.10): тест 47 — проверка загрузки, «плохая» она или «хорошая» (тайм-ауты
-# переключателя GPC), ~25 мин; прежние серии — в истории git.
+# СЕРИЯ ТЕСТОВ БЕЗ ПРИСМОТРА. Сейчас (25.10): тест 48 — lab_nv_mux_release=1 (замедление снимается сразу после записи
+# мультиплексора, как у NVIDIA), ~45 мин; при нуле тайм-аутов — контроль тест 47 с ключом 0, ещё ~25 мин; прежние серии — в git.
 # Запуск из терминала в графическом сеансе, окно браузера с нагрузкой будет на экране:
 #   POWEROFF=0 bash ~/Home/nouveau-fix/lab/night.sh       (днём: машину в конце не выключать)
 # Один раз пароль sudo (дальше его держит сам hangtest: sudo вызывается каждые несколько секунд).
@@ -32,7 +32,7 @@ if [ -z "${NIGHT_INHIBITED:-}" ]; then
          --reason "nouveau night tests" bash "$0" "$@"
 fi
 if [ "$DRY" != 1 ]; then
-    for p in lab_therm_div lab_gpc_div lab_pmu_div lab_gpc_pre405 lab_nv_hubpost lab_nv_pcie_late lab_nv_hub07mem lab_gov_nv lab_volt_wait_us lab_nv_22680 lab_nv_divb lab_nv_disphold lab_mux_guard lab_mux_timeouts lab_boot_snap; do
+    for p in lab_therm_div lab_gpc_div lab_pmu_div lab_gpc_pre405 lab_nv_hubpost lab_nv_pcie_late lab_nv_hub07mem lab_gov_nv lab_volt_wait_us lab_nv_22680 lab_nv_divb lab_nv_disphold lab_mux_guard lab_mux_timeouts lab_boot_snap lab_nv_mux_release; do
         [ -e "$PRM/$p" ] || { echo "Нет параметра $p — загружен не тот драйвер (lab.sh install и перезагрузка)"; exit 1; }
     done
     [ "$(cat $PRM/lab_perf_ticks)" -gt 0 ] || { echo "Замеры загрузки PMU выключены (lab_perf_ticks=0) — служба gpu-autoclock не отработала"; exit 1; }
@@ -55,7 +55,7 @@ setp() { local kv; for kv in "$@"; do $SUDO sh -c "echo ${kv#*=} > $PRM/${kv%%=*
 base() { setp lab_gov=0 lab_mem=1 lab_pcie=1 lab_volt_min_uv=0 lab_therm=1 lab_therm_wait=1 lab_therm_wait_us=0 \
               lab_therm_real=0 lab_therm_div=1 lab_clk_mmu_lock=0 lab_gpc_div=1 lab_pmu_div=1 \
               lab_gpc_pre405=0 lab_nv_hubpost=0 lab_nv_pcie_late=0 lab_nv_hub07mem=0 lab_gov_nv=0 lab_perf_ms=1000 lab_perf_log=0 \
-              lab_volt_wait_us=0 lab_nv_22680=0 lab_nv_divb=0 lab_nv_disphold=0 lab_e9e0=0 lab_order=0 lab_pll_keep=0 lab_mux_guard=0; }
+              lab_volt_wait_us=0 lab_nv_22680=0 lab_nv_divb=0 lab_nv_disphold=0 lab_e9e0=0 lab_order=0 lab_pll_keep=0 lab_mux_guard=0 lab_nv_mux_release=0; }
 GOV_START="$(cat $PRM/lab_gov 2>/dev/null || echo 0)"; NT0="$(date '+%Y-%m-%d %H:%M:%S')"
 finish_night() {   # $1 = clean | hung
     [ "$POWEROFF" = 1 ] || { restore_idle; say "POWEROFF=0 — машину не выключаю"; exit 0; }
@@ -165,22 +165,42 @@ gov() {   # gov ИМЯ [параметр=значение ...] — регуля�
 systemctl is-active -q gpu-blackbox && grep "### blackbox start" /var/log/gpu-blackbox/current.txt 2>/dev/null | tail -n1 | grep -q " v4" \
     || say "⚠ чёрный ящик не v4 или не запущен — температуры процессора в ящике не будет"
 say "серия: драйвер $(modinfo -n nouveau 2>/dev/null), ядро $(uname -r), POWEROFF=$POWEROFF WAITMIN=$WAITMIN DRY=$DRY"
-# Тест 47 — ПРОВЕРКА ЗАГРУЗКИ (25.10 днём). Загрузки бывают «плохие» (тайм-ауты переключателя ядра PLL → делитель ~0,5–1 %)
-# и «хорошие» (0); от сборки и режима это не зависит. Быстрый режим ловит их за ~25 мин (тест 45 в плохой загрузке 25.10 12:30:
-# первый тайм-аут на 132-м подъёме). 600 быстрых циклов с защитой; в конце — вывод «плохая/хорошая» и снимок регистров этой
-# загрузки (lab_boot_snap) в results/bootsnap-<время загрузки>-<bad|good>.txt. Сравнить: bash lab/bootsnap.sh -N 0.
+# 25.10: до тестов — снимок регистров этой загрузки против сохранённых снимков плохих загрузок (lab/bootsnap.sh)
+for REF in $(ls -t "$RES"/bootsnap-*-bad.txt 2>/dev/null); do
+    say "снимок этой загрузки ($(uptime -s)) против $(basename "$REF"): $(bash "$HERE/bootsnap.sh" 0 "$REF" 2>&1 | tail -n 1)"
+done
+bash "$HERE/bootsnap.sh" 0 "$(ls -t "$RES"/bootsnap-*-bad.txt 2>/dev/null | head -n1)" 2>&1 | grep -v '^сравнено' | sed 's/^/    /' >> "$LOG"
+# Тесты 48 и 47 (25.10). Тайм-ауты переключателя ядра PLL → делитель бывают в «плохих» загрузках (~0,3–1 %) и не бывают в
+# «хороших»; от сборки и режима это не зависит. NVIDIA (записи t1/t2) пишет мультиплексор и сразу снимает замедление FSRM,
+# подтверждение смотрит позже; мы ждём подтверждения до 2 с под замедлением.
+# 48 — ключ lab_nv_mux_release=1 (как NVIDIA), 1000 быстрых циклов (~45 мин). Тайм-ауты есть — ключ не помогает, конец.
+# 47 — только если в 48 тайм-аутов 0: контроль в этой же загрузке, ключ 0, 600 циклов (~25 мин); тайм-ауты есть — загрузка
+#      плохая и помог ключ; нет — загрузка хорошая, тест 48 ничего не доказал. Снимок регистров загрузки — в results/bootsnap-*.
 NV="lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1"
-export FAST=1
-RUNS=600
-MT0="$(cat $PRM/lab_mux_timeouts 2>/dev/null || echo 0)"
-run 47  03-0f-07 $NV lab_mux_guard=1            # проверка загрузки: быстрый + защита
-unset FAST HOLD
-MT1="$(cat $PRM/lab_mux_timeouts 2>/dev/null || echo 0)"
 BOOT="$(date -d "$(uptime -s)" +%Y%m%d-%H%M)"
-if [ "$((MT1 - MT0))" -gt 0 ]; then KIND=bad; say "=== загрузка с $(uptime -s) ПЛОХАЯ: тайм-аутов $((MT1 - MT0)) на $RUNS"
-else KIND=good; say "=== загрузка с $(uptime -s) ХОРОШАЯ: 0 тайм-аутов на $RUNS"; fi
+export FAST=1
+RUNS=1000
+MT0="$(cat $PRM/lab_mux_timeouts 2>/dev/null || echo 0)"
+run 48  03-0f-07 $NV lab_mux_guard=1 lab_nv_mux_release=1   # снять замедление сразу после мультиплексора, как NVIDIA
+MT1="$(cat $PRM/lab_mux_timeouts 2>/dev/null || echo 0)"
+T48=$((MT1 - MT0))
+say "=== тест 48 (lab_nv_mux_release=1): тайм-аутов $T48 на $RUNS"
+if [ "$T48" -gt 0 ]; then
+    KIND=bad
+    say "=== ключ не помогает: тайм-ауты есть и с ним. Контроль (тест 47) не нужен"
+else
+    RUNS=600
+    MT0="$MT1"
+    run 47  03-0f-07 $NV lab_mux_guard=1            # контроль в этой же загрузке: ключ 0
+    MT1="$(cat $PRM/lab_mux_timeouts 2>/dev/null || echo 0)"
+    T47=$((MT1 - MT0))
+    if [ "$T47" -gt 0 ]; then KIND=bad; say "=== загрузка ПЛОХАЯ (тест 47: $T47 на $RUNS без ключа), а с ключом — 0 на 1000: ПОМОГАЕТ"
+    else KIND=good; say "=== загрузка ХОРОШАЯ (тест 47: 0 на $RUNS без ключа) — тест 48 ничего не доказал, перезагрузись и запусти снова"; fi
+fi
+unset FAST HOLD
 bash "$HERE/bootsnap.sh" 0 > "$RES/bootsnap-$BOOT-$KIND.txt" 2>&1
 say "снимок регистров загрузки: results/bootsnap-$BOOT-$KIND.txt"
+RUNS=60
 RUNS=60
 base; setp lab_gov="$GOV_START"
 say "=== серия закончена без зависаний; параметры как у службы, регулятор lab_gov=$GOV_START"

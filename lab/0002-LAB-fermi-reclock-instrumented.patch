@@ -1,6 +1,6 @@
 diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
---- base/nvkm/subdev/clk/base.c	2026-10-25 06:59:25.996135590 +0300
-+++ lab-n13/nvkm/subdev/clk/base.c	2026-10-25 07:00:24.306767778 +0300
+--- base/nvkm/subdev/clk/base.c	2026-10-25 13:51:51.194953277 +0300
++++ lab-n13/nvkm/subdev/clk/base.c	2026-10-25 13:51:51.376010912 +0300
 @@ -33,6 +33,57 @@
  #include <subdev/volt.h>
  
@@ -271,8 +271,8 @@ diff -ru base/nvkm/subdev/clk/base.c lab-n13/nvkm/subdev/clk/base.c
  	if (clk->func->init)
  		return clk->func->init(clk);
 diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
---- base/nvkm/subdev/clk/gf100.c	2026-10-25 06:59:25.997099393 +0300
-+++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-25 07:01:05.022172772 +0300
+--- base/nvkm/subdev/clk/gf100.c	2026-10-25 13:51:51.195583202 +0300
++++ lab-n13/nvkm/subdev/clk/gf100.c	2026-10-25 13:51:51.376162004 +0300
 @@ -23,11 +23,18 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -628,7 +628,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -351,15 +636,348 @@
+@@ -351,15 +636,357 @@
  	}
  }
  
@@ -864,6 +864,11 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +static int lab_mux_timeouts;
 +module_param(lab_mux_timeouts, int, 0444);
 +MODULE_PARM_DESC(lab_mux_timeouts, "LAB: clock source mux switch timeouts since load (read-only counter)");
++/* LAB 25.10: порядок как у NVIDIA (записи t1/t2): мультиплексор записан — замедление FSRM снимается сразу, подтверждение
++ * переключения ждём уже без замедления. Без ключа (как было) ждём до 2 с внутри скобки, и тайм-аут ~0,5–1 %. */
++static uint lab_nv_mux_release;
++module_param(lab_nv_mux_release, uint, 0644);
++MODULE_PARM_DESC(lab_nv_mux_release, "LAB: release the FSRM slowdown right after the clock mux write and wait for the switch outside it, as NVIDIA (0 off, 1 on)");
 +static uint lab_mux_guard;
 +module_param(lab_mux_guard, uint, 0644);
 +MODULE_PARM_DESC(lab_mux_guard, "LAB: on a mux timeout retry up to 3 times; if a unit stays on its PLL keep that PLL on and do not lower the voltage (0 off, 1 on)");
@@ -909,6 +914,8 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	}
  	nvkm_mask(device, 0x137100, (1 << idx), 0x00000000);
 -	nvkm_msec(device, 2000,
++	if (lab_nv_mux_release)
++		lab_therm_leave(clk, idx, &th);
 +	if (nvkm_msec(device, 2000,
  		if (!(nvkm_rd32(device, 0x137100) & (1 << idx)))
  			break;
@@ -924,6 +931,8 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +				if (!lab_therm_real || chg)
 +					lab_therm_enter(clk, idx, &th);
 +				nvkm_mask(device, 0x137100, (1 << idx), 0x00000000);
++				if (lab_nv_mux_release)
++					lab_therm_leave(clk, idx, &th);
 +				nvkm_msec(device, 20,
 +					if (!(nvkm_rd32(device, 0x137100) & (1 << idx)))
 +						break;
@@ -979,7 +988,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static void
-@@ -368,20 +986,58 @@
+@@ -368,20 +995,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -1041,7 +1050,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +1046,58 @@
+@@ -390,17 +1055,60 @@
  }
  
  static void
@@ -1078,6 +1087,8 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +			lab_gpc_div405(clk);
  		nvkm_mask(device, 0x137100, (1 << idx), info->ssel);
 -		nvkm_msec(device, 2000,
++		if (lab_nv_mux_release)
++			lab_therm_leave(clk, idx, &th);
 +		if (nvkm_msec(device, 2000,
  			u32 tmp = nvkm_rd32(device, 0x137100) & (1 << idx);
  			if (tmp == info->ssel)
@@ -1102,7 +1113,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	}
  }
  
-@@ -409,7 +1106,17 @@
+@@ -409,7 +1117,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -1120,7 +1131,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  }
  
  static int
-@@ -426,15 +1133,138 @@
+@@ -426,15 +1144,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1261,7 +1272,7 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
  	return 0;
  }
  
-@@ -477,5 +1307,5 @@
+@@ -477,5 +1318,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
@@ -1269,8 +1280,8 @@ diff -ru base/nvkm/subdev/clk/gf100.c lab-n13/nvkm/subdev/clk/gf100.c
 +	return nvkm_clk_ctor(&gf100_clk, device, type, inst, true, &clk->base);
  }
 diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
---- base/nvkm/subdev/fb/ramgf100.c	2026-10-25 06:59:26.023125959 +0300
-+++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-25 06:59:26.359988523 +0300
+--- base/nvkm/subdev/fb/ramgf100.c	2026-10-25 13:51:51.210493735 +0300
++++ lab-n13/nvkm/subdev/fb/ramgf100.c	2026-10-25 13:51:51.397897118 +0300
 @@ -25,6 +25,16 @@
  #include "ram.h"
  #include "ramfuc.h"
@@ -2138,8 +2149,8 @@ diff -ru base/nvkm/subdev/fb/ramgf100.c lab-n13/nvkm/subdev/fb/ramgf100.c
  }
  
 diff -ru base/nvkm/subdev/volt/base.c lab-n13/nvkm/subdev/volt/base.c
---- base/nvkm/subdev/volt/base.c	2026-10-25 06:59:26.058108780 +0300
-+++ lab-n13/nvkm/subdev/volt/base.c	2026-10-25 06:59:26.360094181 +0300
+--- base/nvkm/subdev/volt/base.c	2026-10-25 13:51:51.230236081 +0300
++++ lab-n13/nvkm/subdev/volt/base.c	2026-10-25 13:51:51.412588844 +0300
 @@ -28,6 +28,8 @@
  #include <subdev/bios/volt.h>
  #include <subdev/therm.h>
