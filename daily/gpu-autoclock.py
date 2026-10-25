@@ -131,7 +131,7 @@ def watch_lines(since, until):
             new.append((t, text))
     return new, known, mux
 
-def watch(prm, once=False):
+def watch(prm, once=False, missing=()):
     import re, subprocess
     seen_t = 0.0; last_key = {}; sent = []; held = 0; shown = 0; known = 0; mux_l = []; pend = []; mux_t = -1e9
     rd = lambda p: open(f'{prm}/{p}').read().strip() if os.path.exists(f'{prm}/{p}') else ''
@@ -143,6 +143,10 @@ def watch(prm, once=False):
         if pend or not say(*a):
             pend.append(a)
             log(f'  никто не вошёл в сеанс — отложено (в очереди {len(pend)})')
+
+    if missing:   # 25.10: без lab_nv_div_late в плохой сессии тайм-ауты вернутся — сказать сразу, а не молча
+        tell('GTX 560 Ti: в драйвере нет параметров', 'Служба их пропустила: ' + ', '.join(missing) +
+             '. Если это новая сборка — проверь, что в неё вошли все правки.')
 
     while True:
         now = time.time()
@@ -223,9 +227,10 @@ def main():
         log('Нет лабораторного драйвера с lab_mem_replay — ничего не трогаю. ' + m)
         notify('notloaded')
         return 1
+    missing = []
     for k, v in PARAMS.items():
         if not os.path.exists(f'{prm}/{k}'):
-            log(f'нет параметра {k} в драйвере — пропускаю'); continue
+            log(f'нет параметра {k} в драйвере — пропускаю'); missing.append(k); continue
         with open(f'{prm}/{k}', 'w') as f:
             f.write(v)
     if 'lab_nv_divb' in PARAMS:
@@ -293,7 +298,7 @@ def main():
         log('решает ДРАЙВЕР, как у NVIDIA: прошивка PMU считает загрузку, драйвер раз в секунду решает и переключает '
             '(lab_gov=2). Служба только выставила параметры и спит. '
             'Вернуть решение службе: sudo touch /etc/gpu-autoclock.legacy && sudo systemctl restart gpu-autoclock')
-        watch(prm)
+        watch(prm, missing=missing)
     if os.path.exists(prm + '/lab_gov'):
         with open(prm + '/lab_gov', 'w') as f:
             f.write('0')
