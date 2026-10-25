@@ -396,6 +396,7 @@ fi
 RUNS=60
 RUNS=60
 base; setp lab_gov="$GOV_START"
+setp lab_nv_div_late=1 lab_mux_guard=1   # 25.10: служба ставит их по умолчанию (команда перед переключателем, защита)
 [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1   # как ставит служба с этим файлом
 say "=== серия закончена без зависаний; параметры как у службы, регулятор lab_gov=$GOV_START"
 finish_night clean
