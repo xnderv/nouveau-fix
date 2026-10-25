@@ -1,0 +1,30 @@
+Oct 25 07:11:56.170325 host kernel: nouveau 0000:01:00.0: timeout
+Oct 25 07:11:56.170393 host kernel: WARNING: nvkm/subdev/clk/gf100.c:858 at gf100_clk_prog_1+0x27f/0x650 [nouveau], CPU#3: kworker/3:1/31252
+Oct 25 07:11:56.171496 host kernel: nouveau 0000:01:00.0: clk: LAB mux ТАЙМ-АУТ PLL -> делитель idx 00: 137100 00000183; PLL ctrl 00030005 coef 00012809; опора 00001003/81200606; делитель src 00000003 div 81200202 пост 81200000; FSRM статус GPC 0002000a hub06 0000ff00, FSRM2 000a008a/00000082; CTRL1 00110000; GR 400700 03000801 400500 00010001; 002640 90011007
+Oct 25 07:11:56.191265 host kernel: nouveau 0000:01:00.0: timeout
+Oct 25 07:11:56.191304 host kernel: WARNING: nvkm/subdev/clk/gf100.c:872 at gf100_clk_prog_1+0x4d3/0x650 [nouveau], CPU#3: kworker/3:1/31252
+Oct 25 07:11:56.192545 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard idx 00: попытка 1 — всё ещё на PLL (137100 00000183)
+Oct 25 07:11:56.212199 host kernel: nouveau 0000:01:00.0: timeout
+Oct 25 07:11:56.212241 host kernel: WARNING: nvkm/subdev/clk/gf100.c:872 at gf100_clk_prog_1+0x4d3/0x650 [nouveau], CPU#3: kworker/3:1/31252
+Oct 25 07:11:56.213495 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard idx 00: попытка 2 — всё ещё на PLL (137100 00000183)
+Oct 25 07:11:56.233294 host kernel: nouveau 0000:01:00.0: timeout
+Oct 25 07:11:56.233342 host kernel: WARNING: nvkm/subdev/clk/gf100.c:872 at gf100_clk_prog_1+0x4d3/0x650 [nouveau], CPU#3: kworker/3:1/31252
+Oct 25 07:11:56.236023 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard idx 00: попытка 3 — всё ещё на PLL (137100 00000183)
+Oct 25 07:11:56.236523 host kernel: nouveau 0000:01:00.0: clk: LAB mux ОСТАЛСЯ НА PLL после 3 повторов idx 00: 137100 00000183; PLL ctrl 00030005 coef 00012809; опора 00001003/81200606; делитель src 00000003 div 81200202 пост 81200000; FSRM статус GPC 0002000a hub06 0000ff00, FSRM2 000a008a/00000082; CTRL1 00110000; GR 400700 03000001 400500 00010001; 002640 80141001
+Oct 25 07:11:56.239724 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard idx 00: узел на PLL — PLL не выключаю (ctrl 00030005)
+Oct 25 07:11:56.241142 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard: узлы 00000001 остались на PLL — напряжение не снижаю (1075000 мкВ)
+Oct 25 08:04:46.576286 host kernel: nouveau 0000:01:00.0: timeout
+Oct 25 08:04:46.576354 host kernel: WARNING: nvkm/subdev/clk/gf100.c:858 at gf100_clk_prog_1+0x27f/0x650 [nouveau], CPU#5: kworker/5:1/67240
+Oct 25 08:04:46.577409 host kernel: nouveau 0000:01:00.0: clk: LAB mux ТАЙМ-АУТ PLL -> делитель idx 00: 137100 00000183; PLL ctrl 00030005 coef 00012809; опора 00001003/81200606; делитель src 00000003 div 81200202 пост 81200000; FSRM статус GPC 0002000a hub06 0000ff00, FSRM2 000a008a/00000082; CTRL1 00110000; GR 400700 03004001 400500 00010001; 002640 90011007
+Oct 25 08:04:46.597171 host kernel: nouveau 0000:01:00.0: timeout
+Oct 25 08:04:46.597213 host kernel: WARNING: nvkm/subdev/clk/gf100.c:872 at gf100_clk_prog_1+0x4d3/0x650 [nouveau], CPU#5: kworker/5:1/67240
+Oct 25 08:04:46.598485 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard idx 00: попытка 1 — всё ещё на PLL (137100 00000183)
+Oct 25 08:04:46.618259 host kernel: nouveau 0000:01:00.0: timeout
+Oct 25 08:04:46.618294 host kernel: WARNING: nvkm/subdev/clk/gf100.c:872 at gf100_clk_prog_1+0x4d3/0x650 [nouveau], CPU#5: kworker/5:1/67240
+Oct 25 08:04:46.619487 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard idx 00: попытка 2 — всё ещё на PLL (137100 00000183)
+Oct 25 08:04:46.640182 host kernel: nouveau 0000:01:00.0: timeout
+Oct 25 08:04:46.640215 host kernel: WARNING: nvkm/subdev/clk/gf100.c:872 at gf100_clk_prog_1+0x4d3/0x650 [nouveau], CPU#5: kworker/5:1/67240
+Oct 25 08:04:46.642300 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard idx 00: попытка 3 — всё ещё на PLL (137100 00000183)
+Oct 25 08:04:46.642956 host kernel: nouveau 0000:01:00.0: clk: LAB mux ОСТАЛСЯ НА PLL после 3 повторов idx 00: 137100 00000183; PLL ctrl 00030005 coef 00012809; опора 00001003/81200606; делитель src 00000003 div 81200202 пост 81200000; FSRM статус GPC 0002000a hub06 0000ff00, FSRM2 000a008a/00000082; CTRL1 00110000; GR 400700 03000801 400500 00010001; 002640 90111001
+Oct 25 08:04:46.646184 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard idx 00: узел на PLL — PLL не выключаю (ctrl 00030005)
+Oct 25 08:04:46.647235 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard: узлы 00000001 остались на PLL — напряжение не снижаю (1075000 мкВ)
