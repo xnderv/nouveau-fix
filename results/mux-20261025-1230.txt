@@ -1,0 +1,11 @@
+Oct 25 12:37:43.496126 host kernel: nouveau 0000:01:00.0: timeout
+Oct 25 12:37:43.497601 host kernel: nouveau 0000:01:00.0: clk: LAB mux ТАЙМ-АУТ PLL -> делитель idx 00: 137100 00000183; PLL ctrl 00030005 coef 00012809; опора 00001003/81200606; делитель src 00000003 div 81200202 пост 81200000; FSRM статус GPC 0002000a hub06 0000ff00, FSRM2 000a008a/00000082; CTRL1 00110000; GR 400700 03000801 400500 00010001; 002640 90011006
+Oct 25 12:37:43.517081 host kernel: nouveau 0000:01:00.0: timeout
+Oct 25 12:37:43.518368 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard idx 00: попытка 1 — всё ещё на PLL (137100 00000183)
+Oct 25 12:37:43.539056 host kernel: nouveau 0000:01:00.0: timeout
+Oct 25 12:37:43.539828 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard idx 00: попытка 2 — всё ещё на PLL (137100 00000183)
+Oct 25 12:37:43.560060 host kernel: nouveau 0000:01:00.0: timeout
+Oct 25 12:37:43.561548 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard idx 00: попытка 3 — всё ещё на PLL (137100 00000183)
+Oct 25 12:37:43.562398 host kernel: nouveau 0000:01:00.0: clk: LAB mux ОСТАЛСЯ НА PLL после 3 повторов idx 00: 137100 00000183; PLL ctrl 00030005 coef 00012809; опора 00001003/81200606; делитель src 00000003 div 81200202 пост 81200000; FSRM статус GPC 0002000a hub06 0000ff00, FSRM2 000a008a/00000082; CTRL1 00110000; GR 400700 03000801 400500 00010001; 002640 90011006
+Oct 25 12:37:43.566892 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard idx 00: узел на PLL — PLL не выключаю (ctrl 00030005)
+Oct 25 12:37:43.567811 host kernel: nouveau 0000:01:00.0: clk: LAB mux_guard: узлы 00000001 остались на PLL — напряжение не снижаю (1075000 мкВ)
