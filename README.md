@@ -85,6 +85,12 @@ driver tries other GF114 boards with `nouveau.gf114_board=1` (untested; watch fo
   clock fixes from the lab driver.
 - `lab/0002` — the instrumented reclocking with all switches.
 
+## License
+
+MIT (see `LICENSE`) for everything in this repository. The patches change files of the nouveau driver, which are
+themselves MIT-licensed; the patched files keep their license. NVIDIA binaries and VBIOS images are not part of the
+repository.
+
 ## Where things are
 
 | Path | Contents |
@@ -172,6 +178,11 @@ NVIDIA, — только открытыми методами — и старае
 можно попробовать на другой плате GF114 параметром `nouveau.gf114_board=1` (не проверено; следите за ошибками видеопамяти).
 
 Старый путь «только исправление 0001» (`rebuild.sh`, `check.sh`, `revert.sh`) сохранён для истории.
+
+## Лицензия
+
+MIT (файл `LICENSE`) на всё в репозитории. Патчи меняют файлы драйвера nouveau, которые сами под MIT; изменённые файлы
+сохраняют свою лицензию. Двоичных файлов NVIDIA и образов VBIOS в репозитории нет.
 
 ## Где что лежит
 
