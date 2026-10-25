@@ -1,16 +1,9 @@
 # nouveau-fix: full reclocking for GeForce GTX 560 Ti (Fermi, GF114) on Linux
 
-**English first; the same in Russian below. / Русская версия — ниже.**
+Open-source nouveau driver patches for NVIDIA Fermi GF114 (GeForce GTX 560 Ti) on Linux 7.0: core, shader and GDDR5
+memory reclocking, voltage and PCIe switching, a load governor, and a GPU hang fix.
 
-> **Если машина автора не загружается (на время тестов лабораторного драйвера, с 25.10.2026)**
-> 1. Экран чёрный или завис — нажми кнопку **Reset** (или подожди: при панике ядра машина сама перезагрузится через 10 с).
-> 2. При старте 5 с видно меню GRUB (после сбоя оно ждёт 30 с). Стрелками выбери **третью строку**
->    `Ubuntu - STABLE nouveau (if the lab driver fails)` и нажми **Enter**.
-> 3. Загрузится стабильный драйвер (копия от 19.10). Работай как обычно; лабораторный остаётся на диске, его разберём потом.
-> 4. Меню не появилось — при старте держи **Shift**. Совсем ничего не помогает — в меню «Advanced options» → «recovery mode».
->
-> *If the author's machine does not boot during lab-driver tests: Reset, then pick the 3rd GRUB line
-> “Ubuntu - STABLE nouveau (if the lab driver fails)”. Set up by `lab/bootmenu.sh`.*
+**English first; the same in Russian below. / Русская версия — ниже.**
 
 Upstream nouveau keeps Fermi cards at their boot clocks: a GTX 560 Ti stays at 50 MHz core and 135 MHz memory, so it
 is slow in 3D and video. This project makes the card switch between its performance levels the way the NVIDIA
@@ -97,6 +90,7 @@ driver tries other GF114 boards with `nouveau.gf114_board=1` (untested; watch fo
 | Path | Contents |
 |---|---|
 | `docs/2026-10-24/nvidia-logic.md` | how NVIDIA reclocks GF114 and why: rules, open questions, what we do the same way |
+| `docs/boot-recovery.md` | the author's machine does not boot during lab tests: the GRUB fallback line |
 | `docs/2026-10-24/nvidia-vs-lab-map.md` | register-level map: NVIDIA vs the lab driver, every recording |
 | `docs/2026-10-24/memory-scripts-vs-nouveau.md` | memory scripts: NVIDIA vs nouveau vs VBIOS tables |
 | `docs/2026-10-23/hang-20261023-1802.md` | the hang investigation, tests 1–24 |
@@ -184,6 +178,7 @@ NVIDIA, — только открытыми методами — и старае
 | Путь | Что там |
 |---|---|
 | `docs/2026-10-24/nvidia-logic.md` | как NVIDIA меняет частоты GF114 и почему: правила, белые пятна, что у нас так же |
+| `docs/boot-recovery.md` | машина автора не загружается во время лабораторных тестов: запасная строка GRUB |
 | `docs/2026-10-24/nvidia-vs-lab-map.md` | карта регистров: NVIDIA против лабораторного драйвера, все записи |
 | `docs/2026-10-24/memory-scripts-vs-nouveau.md` | скрипты памяти: NVIDIA, nouveau и таблицы VBIOS |
 | `docs/2026-10-23/hang-20261023-1802.md` | расследование зависаний, тесты 1–24 |
