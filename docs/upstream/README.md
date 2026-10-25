@@ -64,3 +64,5 @@ cd ~/Home/nouveau-fix && git send-email --to='Lyude Paul <lyude@redhat.com>' --t
 Кому: Lyude Paul, Danilo Krummrich; копии: dri-devel@, nouveau@, linux-kernel@, stable@, автор.
 **Ушло без строки `Signed-off-by` автора** (не была добавлена перед отправкой). Если попросят — ответ в ту же ветку
 со строкой подписи или v2 с подписью.
+**Подпись отправлена 25.10.2026 13:24 (MSK)** ответом в ту же ветку (`reply-0006-signoff.sh`, строку подписи напечатал
+автор): Message-ID `<20261025102413.51786-1-xnderv@yandex.com>`, In-Reply-To — письмо патча. Ждём ответа.
