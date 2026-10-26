@@ -5,6 +5,8 @@
 # выбирать (22.04 — стрелкой вверх). Параметры ядра — ровно как в первой удачной загрузке (earlyprintk=vga,keep
 # ignore_loglevel panic=0): во второй, без earlyprintk, заставка plymouth упала («killed by USR2») и экран застыл после
 # проверки диска. panic=0 — при панике не перезагружаться, а стоять. Меню показывается 5 с.
+# 26.10 22:15: первым и по умолчанию — тот же пункт с maxcpus=1: под записью 270.41.06 трижды вешал систему на запуске X
+# (1-я и 2-я загрузка драйвера, с MSI и без); с одним ядром с самой загрузки записи не нужно выключать остальные.
 # Пишется только в раздел 22.04 (/etc/grub.d, /etc/default/grub, grub.cfg);
 # раздел 10.04 только читается. Запуск в основной системе: sudo ~/Home/nouveau-fix/trace/lucid-boot-entries.sh
 set -euo pipefail
@@ -33,6 +35,14 @@ for d in dev dev/pts proc sys run; do mount --bind "/$d" "$M1/$d"; done
 cat > "$M1/etc/grub.d/41_lucid-stand" <<EOF
 #!/bin/sh
 exec tail -n +3 \$0
+menuentry 'Ubuntu 10.04 (NVIDIA 270 stand, 1 CPU)' {
+	insmod part_msdos
+	insmod ext2
+	search --no-floppy --fs-uuid --set=root $UUID2
+	set gfxpayload=text
+	linux16 /boot/vmlinuz-$KV root=UUID=$UUID2 ro earlyprintk=vga,keep ignore_loglevel panic=0 maxcpus=1
+	initrd16 /boot/initrd.img-$KV
+}
 menuentry 'Ubuntu 10.04 (NVIDIA 270 stand)' {
 	insmod part_msdos
 	insmod ext2
@@ -43,7 +53,7 @@ menuentry 'Ubuntu 10.04 (NVIDIA 270 stand)' {
 }
 EOF
 chmod 755 "$M1/etc/grub.d/41_lucid-stand"
-sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=5/; s/^GRUB_DEFAULT=.*/GRUB_DEFAULT="Ubuntu 10.04 (NVIDIA 270 stand)"/' "$M1/etc/default/grub"
+sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=5/; s/^GRUB_DEFAULT=.*/GRUB_DEFAULT="Ubuntu 10.04 (NVIDIA 270 stand, 1 CPU)"/' "$M1/etc/default/grub"
 grep -E '^GRUB_(DEFAULT|TIMEOUT)=' "$M1/etc/default/grub" | sed 's/^/   /'
 chroot "$M1" /usr/bin/env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin LC_ALL=C HOME=/root update-grub 2>&1 | tail -n 2
 echo "=== Меню загрузки диска (по порядку):"
