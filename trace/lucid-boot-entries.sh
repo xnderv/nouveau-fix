@@ -2,7 +2,9 @@
 # Пункт меню загрузки диска записи для Ubuntu 10.04 (ядро 2.6.32). Проба 26.10 ~21:00: GRUB 2.06 из 22.04 командой
 # linux (32-битный вход в ядро) даёт чёрный экран и сразу сброс в BIOS; командой linux16 (16-битный вход, как у загрузчиков
 # 2010 года) 10.04 грузится. Оставлен один пункт — linux16; он же по умолчанию, чтобы после F12 -> ST120FN0 ничего не
-# выбирать (22.04 — стрелкой вверх). panic=0 — при панике не перезагружаться, а стоять. Меню показывается 5 с.
+# выбирать (22.04 — стрелкой вверх). Параметры ядра — ровно как в первой удачной загрузке (earlyprintk=vga,keep
+# ignore_loglevel panic=0): во второй, без earlyprintk, заставка plymouth упала («killed by USR2») и экран застыл после
+# проверки диска. panic=0 — при панике не перезагружаться, а стоять. Меню показывается 5 с.
 # Пишется только в раздел 22.04 (/etc/grub.d, /etc/default/grub, grub.cfg);
 # раздел 10.04 только читается. Запуск в основной системе: sudo ~/Home/nouveau-fix/trace/lucid-boot-entries.sh
 set -euo pipefail
@@ -36,7 +38,7 @@ menuentry 'Ubuntu 10.04 (NVIDIA 270 stand)' {
 	insmod ext2
 	search --no-floppy --fs-uuid --set=root $UUID2
 	set gfxpayload=text
-	linux16 /boot/vmlinuz-$KV root=UUID=$UUID2 ro panic=0
+	linux16 /boot/vmlinuz-$KV root=UUID=$UUID2 ro earlyprintk=vga,keep ignore_loglevel panic=0
 	initrd16 /boot/initrd.img-$KV
 }
 EOF

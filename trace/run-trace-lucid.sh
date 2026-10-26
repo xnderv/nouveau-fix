@@ -24,7 +24,7 @@
 #   C  30 с                                        -> снова спуск под лёгкой нагрузкой
 #   D  «максимум» 10 с, «адаптивный» 25 с          -> 0f и спуск под лёгкой нагрузкой
 #   E  всплески большой: 4 x (4 с, пауза 8 с)      -> резкие переходы
-# Запуск: из меню стенда (цифра 3) или sudo ~/trace/run-trace-lucid.sh   (~9 минут, ничего не трогать)
+# Запуск: rec  (или sudo ~/trace/run-trace-lucid.sh)   (~9 минут, ничего не трогать)
 set -euo pipefail
 [ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -34,13 +34,13 @@ nvver() {   # версия установленного драйвера NVIDIA 
   [ -n "$f" ] && grep -ao 'Kernel Module  *[0-9][0-9.]*' "$f" | head -n 1 | awk '{print $NF}' || true
 }
 NV="$(nvver)"
-[ -n "$NV" ] || { show "STOP: no NVIDIA driver installed. Install it first (menu: 1 or 2)."; exit 1; }
+[ -n "$NV" ] || { show "STOP: no NVIDIA driver installed. Install it first (nv1 or nv2)."; exit 1; }
 if [ -e /tmp/stand-card-used ]; then
   show "STOP: the card was already used in this boot ($(cat /tmp/stand-card-used))."
-  show "Reboot first (menu: 4, then F12 -> ST120FN0), then record."
+  show "Reboot first (sudo reboot, F12 -> ST120FN0), then rec."
   exit 1
 fi
-lsmod | grep -q '^nvidia ' && { show "STOP: nvidia module is loaded. Reboot first (menu: 4)."; exit 1; }
+lsmod | grep -q '^nvidia ' && { show "STOP: nvidia module is loaded. Reboot first (sudo reboot, F12 -> ST120FN0)."; exit 1; }
 OUT="$HERE/out-$NV-$(date +%Y%m%d-%H%M%S)"; mkdir -p "$OUT"
 LOG="$OUT/steps.txt"
 say() { echo "$(date +%T) $*" >> "$LOG"; sync; }
@@ -161,7 +161,7 @@ done
 if [ "$ok" != 1 ]; then
   kill "$WDPID" 2>/dev/null || true
   say "СТОП: драйвер nvidia не выгрузился за 5 попыток — запись невозможна. Контроль сделан, результат: $OUT"
-  show "STOP: driver did not unload, recording impossible. Control pass saved. Reboot to main system (menu: 4)."
+  show "STOP: driver did not unload, recording impossible. Control pass saved. Reboot to main system (sudo reboot, no F12)."
   exit 1
 fi
 say "Контроль прошёл, драйвер выгружен"

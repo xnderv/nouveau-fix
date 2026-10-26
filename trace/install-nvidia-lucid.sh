@@ -6,7 +6,7 @@
 # Версию modinfo не знает (в модуле 2011 года нет MODULE_VERSION) — сверяем по строке «Kernel Module 270.xx» в nvidia.ko.
 # Установщик в конце пробно загружает модуль, поэтому после установки — перезагрузка, и запись начинается на чистой карте.
 # На экран — латиница (кириллица в консоли 10.04 может не отображаться).
-# Запуск: из меню стенда (цифры 1 и 2) или sudo ~/trace/install-nvidia-lucid.sh 270.26
+# Запуск: nv1 / nv2  (или sudo ~/trace/install-nvidia-lucid.sh 270.26)
 set -euo pipefail
 [ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -19,7 +19,7 @@ V="${1:-}"
 RUN="$HERE/nvidia/NVIDIA-Linux-x86_64-$V.run"
 [ -n "$V" ] && [ -f "$RUN" ] || { show "STOP: no installer for version '$V' in ~/trace/nvidia"; exit 1; }
 grep -q 'Ubuntu 10.04' /etc/issue || { show "STOP: this is not Ubuntu 10.04"; exit 1; }
-lsmod | grep -q '^nvidia ' && { show "STOP: nvidia module is loaded. Reboot first (menu: 4)."; exit 1; }
+lsmod | grep -q '^nvidia ' && { show "STOP: nvidia module is loaded. Reboot first (sudo reboot, F12 -> ST120FN0)."; exit 1; }
 lsmod | grep -q '^nouveau ' && { show "STOP: nouveau is loaded - should not be. Tell Claude."; exit 1; }
 
 want="$(sed -n 's/^MD5=//p' "$RUN" | head -n 1)"; got="$(tail -n +6 "$RUN" | md5sum | cut -b-32)"
@@ -50,4 +50,4 @@ grep -q '^blacklist nvidia' /etc/modprobe.d/stand-2011.conf || echo 'blacklist n
 { echo "### libGL после установки $V"; ldconfig -p | grep 'libGL.so.1 ' || true; ls -l /usr/lib/libGL.so.1 || true; } >> "$HERE/install-$V.log" 2>&1
 chown -R --reference="$HERE" "$HERE"
 show "DONE: NVIDIA driver $NV installed."
-show "Next: reboot for a clean card (menu: 4, then F12 -> ST120FN0), then record (menu: 3)."
+show "Next: sudo reboot, F12 -> ST120FN0, then type: rec"
