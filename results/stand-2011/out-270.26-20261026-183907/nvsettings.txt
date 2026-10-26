@@ -1,0 +1,4 @@
+### контроль: PowerMizer=1 18:40:04
+
+  Attribute 'GPUPowerMizerMode' (u1004-trace:0[gpu:0]) assigned value 1.
+

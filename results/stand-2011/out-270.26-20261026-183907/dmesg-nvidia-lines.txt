@@ -1,0 +1,9 @@
+[   23.461962] nvidia: module license 'NVIDIA' taints kernel.
+[   23.958134] nvidia 0000:01:00.0: PCI INT A -> GSI 16 (level, low) -> IRQ 16
+[   23.959553] nvidia 0000:01:00.0: setting latency timer to 64
+[   23.963559] NVRM: loading NVIDIA UNIX x86_64 Kernel Module  270.26  Sun Feb 13 22:30:06 PST 2011
+[   76.442297] NVRM: Xid (0000:01:00): 38, 0000 0be93800 00000001 00000000 00000100 0be93800
+[   76.678962] NVRM: Xid (0000:01:00): 32, Channel ID 00000000 intr 00800000
+[   77.255085] glxinfo[1103]: segfault at 0 ip 00007ffe6197c68a sp 00007fff1f41fdb0 error 4 in libGL.so.270.26[7ffe61902000+bd000]
+[   77.255085] glxinfo[1103]: segfault at 0 ip 00007ffe6197c68a sp 00007fff1f41fdb0 error 4 in libGL.so.270.26[7ffe61902000+bd000]
+[   82.368857] glxgears[1121]: segfault at 0 ip 00007f484847368a sp 00007fff1eac1b40 error 4 in libGL.so.270.26[7f48483f9000+bd000]

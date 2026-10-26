@@ -1,0 +1,4 @@
+direct rendering: Yes
+OpenGL vendor string: NVIDIA Corporation
+OpenGL renderer string: GeForce GTX 560 Ti/PCI/SSE2
+OpenGL version string: 4.1.0 NVIDIA 270.41.06
