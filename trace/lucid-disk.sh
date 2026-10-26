@@ -31,9 +31,10 @@ if [ "$MODE" = put ]; then
     printf '#!/bin/sh\nexec sudo %s/install-nvidia-lucid.sh 270.26\n' "${D#$MNT}" > "$MNT/usr/local/bin/nv1"
     printf '#!/bin/sh\nexec sudo %s/install-nvidia-lucid.sh 270.41.06\n' "${D#$MNT}" > "$MNT/usr/local/bin/nv2"
     printf '#!/bin/sh\nexec sudo %s/run-trace-lucid.sh\n' "${D#$MNT}" > "$MNT/usr/local/bin/rec"
-    chmod 755 "$MNT/usr/local/bin/nv1" "$MNT/usr/local/bin/nv2" "$MNT/usr/local/bin/rec"
+    printf '#!/bin/sh\nexec sudo %s/run-trace-lucid.sh only\n' "${D#$MNT}" > "$MNT/usr/local/bin/rec1"
+    chmod 755 "$MNT/usr/local/bin/nv1" "$MNT/usr/local/bin/nv2" "$MNT/usr/local/bin/rec" "$MNT/usr/local/bin/rec1"
     echo "=== Короткие команды в 10.04:"
-    for c in nv1 nv2 rec; do echo "   $c -> $(sed -n 2p "$MNT/usr/local/bin/$c")"; done
+    for c in nv1 nv2 rec rec1; do echo "   $c -> $(sed -n 2p "$MNT/usr/local/bin/$c")"; done
     install -m 0644 -o "${OWNER%%:*}" -g "${OWNER##*:}" "$HERE/regdump-lucid.py" "$HERE/ШАГИ-10.04.txt" "$D/"
     install -d -o "${OWNER%%:*}" -g "${OWNER##*:}" "$D/nvidia"
     (cd "$STAND/nvidia" && sha256sum -c SHA256-local.txt) | sed 's/^/   /'

@@ -24,10 +24,14 @@
 #   C  30 с                                        -> снова спуск под лёгкой нагрузкой
 #   D  «максимум» 10 с, «адаптивный» 25 с          -> 0f и спуск под лёгкой нагрузкой
 #   E  всплески большой: 4 x (4 с, пауза 8 с)      -> резкие переходы
-# Запуск: rec  (или sudo ~/trace/run-trace-lucid.sh)   (~9 минут, ничего не трогать)
+# Запуск: rec  (или sudo ~/trace/run-trace-lucid.sh)
+#         rec1 (или sudo ~/trace/run-trace-lucid.sh only) — только запись, без контрольного прохода: драйвер под записью
+#         грузится первый раз после включения. Проба 26.10 22:00: у 270.41.06 контроль прошёл, а запись (вторая загрузка
+#         драйвера в той же сессии) повесила систему на запуске X — разделяем «повторная загрузка» и «сама запись на 2.6.32».   (~9 минут, ничего не трогать)
 set -euo pipefail
 [ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+MODE="${1:-}"   # only — без контрольного прохода
 show() { echo ">>> $*"; }
 nvver() {   # версия установленного драйвера NVIDIA по строке в самом модуле; пусто — не установлен
   local f; f="$(find "/lib/modules/$(uname -r)" -name nvidia.ko 2>/dev/null | head -n 1 || true)"
@@ -48,7 +52,7 @@ SYSRQ=/proc/sysrq-trigger
 echo "запись $NV" > /tmp/stand-card-used
 
 show "RECORD: NVIDIA $NV, about 9 minutes. Do not touch anything until DONE."
-say "Ядро $(uname -r), драйвер NVIDIA $NV, сценарий 7 для 10.04 (без снимков, со сторожем; контроль, затем запись)"
+say "Ядро $(uname -r), драйвер NVIDIA $NV, сценарий 7 для 10.04 (без снимков, со сторожем; контроль, затем запись)${MODE:+; режим $MODE — только запись}"
 say "Время в 10.04 — UTC (в Москве +3 ч)"
 [ -e "$HERE/regdump-lucid.py" ] || { say "СТОП: нет regdump-lucid.py"; show "STOP: regdump-lucid.py missing"; exit 1; }
 command -v glxgears >/dev/null || { say "СТОП: нет glxgears"; show "STOP: glxgears missing"; exit 1; }
@@ -149,6 +153,7 @@ run_pass() {   # $1 — имя прохода
   sleep 2
 }
 
+if [ "$MODE" != only ]; then
 # Проход 1: контроль, без записи, все ядра работают.
 show "[1/2] control pass (no recording): X with gears, ~4 min"
 run_pass контроль
@@ -165,6 +170,7 @@ if [ "$ok" != 1 ]; then
   exit 1
 fi
 say "Контроль прошёл, драйвер выгружен"
+fi
 
 # Проход 2: запись.
 show "[2/2] recording pass: other CPU cores switch off for a while (normal), ~5 min"
