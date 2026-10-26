@@ -24,7 +24,14 @@ D="$(ls -d "$MNT"/home/*/trace 2>/dev/null | head -n 1)"
 OWNER="$(stat -c %u:%g "$D")"
 
 if [ "$MODE" = put ]; then
-    install -m 0755 -o "${OWNER%%:*}" -g "${OWNER##*:}" "$HERE/run-trace-lucid.sh" "$HERE/install-nvidia-lucid.sh" "$D/"
+    install -m 0755 -o "${OWNER%%:*}" -g "${OWNER##*:}" "$HERE/run-trace-lucid.sh" "$HERE/install-nvidia-lucid.sh" \
+        "$HERE/stand-menu-lucid.sh" "$D/"
+    # меню стенда — сразу при входе на первой консоли (выход в командную строку — цифра 0)
+    printf '%s\n' '[ -f ~/.profile ] && . ~/.profile' \
+        '# стенд NVIDIA 270: на первой консоли сразу меню (выход в командную строку — 0)' \
+        '[ "$(tty)" = /dev/tty1 ] && [ -x ~/trace/stand-menu-lucid.sh ] && ~/trace/stand-menu-lucid.sh' \
+        > "$(dirname "$D")/.bash_profile"
+    chown "$OWNER" "$(dirname "$D")/.bash_profile"
     install -m 0644 -o "${OWNER%%:*}" -g "${OWNER##*:}" "$HERE/regdump-lucid.py" "$HERE/ШАГИ-10.04.txt" "$D/"
     install -d -o "${OWNER%%:*}" -g "${OWNER##*:}" "$D/nvidia"
     (cd "$STAND/nvidia" && sha256sum -c SHA256-local.txt) | sed 's/^/   /'
@@ -33,7 +40,9 @@ if [ "$MODE" = put ]; then
     done
     echo "=== На диске 10.04 ($D):"
     ls -l "$D" "$D/nvidia" | sed 's/^/   /'
-    md5sum "$D"/*.sh "$D"/*.py "$HERE/run-trace-lucid.sh" "$HERE/install-nvidia-lucid.sh" "$HERE/regdump-lucid.py" | sed 's/^/   /'
+    for f in run-trace-lucid.sh install-nvidia-lucid.sh stand-menu-lucid.sh regdump-lucid.py; do
+        if cmp -s "$HERE/$f" "$D/$f"; then echo "   $f — совпадает с репозиторием"; else echo "   !!! $f не совпадает"; fi
+    done
     P1="$(blkid -L u2204-trace 2>/dev/null || true)"; M1=/mnt/u2204-trace
     if [ -n "$P1" ] && ! findmnt -rn -S "$P1" >/dev/null && mkdir -p "$M1" && mount -o ro "$P1" "$M1"; then
         echo "=== Меню загрузки диска (по порядку):"
@@ -53,6 +62,10 @@ else
     done
     L="$SAVE/lucid-logs-$(date +%Y%m%d-%H%M%S)"; mkdir -p "$L"
     cp -a "$D"/install-*.log "$L/" 2>/dev/null || true
+    ls -laR "$D" > "$L/trace-dir-listing.txt" 2>&1 || true
+    cp -a "$MNT/etc/default/console-setup" "$L/" 2>/dev/null || true
+    cp -a "$MNT/root/.bash_history" "$L/root.bash_history" 2>/dev/null || true
+    cp -a "$(dirname "$D")/.bash_history" "$L/user.bash_history" 2>/dev/null || true
     for f in syslog kern.log dmesg Xorg.0.log Xorg.0.log.old nvidia-installer.log boot.log; do
         cp -a "$MNT/var/log/$f" "$L/" 2>/dev/null || true
     done

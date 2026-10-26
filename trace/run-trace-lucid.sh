@@ -1,64 +1,66 @@
 #!/bin/bash
 # ЗАПИСЬ mmiotrace первых драйверов NVIDIA (270.x, 2011) на GTX 560 Ti в Ubuntu 10.04 (раздел u1004-trace, ядро 2.6.32).
 # Перенос run-trace.sh версии 7 (26.10): тот же сценарий, чтобы записи 270.x сравнивались с записью 390.157 (try7) один к одному.
-# Отличия от версии для 22.04: у драйвера 270 нет модулей nvidia_modeset/nvidia_drm; снимок регистров — regdump-lucid.py
-# (Python 2.6); в 10.04 нет systemd/journalctl; Scroll Lock не мигает (в ядре 2.6.32 нет светодиодов клавиатуры в sysfs);
-# запись не сжимается здесь (старый xz не умеет потоки) — сжатие в основной системе (lucid-disk.sh get); сторож при срабатывании
-# сохраняет ещё и журнал X — зависание 270.26 на запуске X само по себе результат.
+# Отличия от версии для 22.04:
+#  - у драйвера 270 нет модулей nvidia_modeset/nvidia_drm; версию драйвера modinfo не знает (в модуле 2011 года нет
+#    MODULE_VERSION) — берём строку «Kernel Module 270.xx» из самого nvidia.ko;
+#  - снимок регистров — regdump-lucid.py (Python 2.6); нет systemd/journalctl; нет Scroll Lock (в 2.6.32 светодиодов
+#    клавиатуры в sysfs нет — из-за этого первая версия сценария молча выходила на первой же строке);
+#  - на экран — короткие строки латиницей (кириллица в консоли 10.04 может не отображаться), подробно по-русски — в steps.txt;
+#  - запись не сжимается здесь (старый xz не умеет потоки) — сжатие в основной системе (lucid-disk.sh get);
+#  - сторож при срабатывании сохраняет ещё и журнал X — зависание 270.26 на запуске X само по себе результат;
+#  - запись — только на «чистой» карте: после установки драйвера или прошлой записи в этой загрузке нужна перезагрузка
+#    (как в try7: запись сразу после загрузки системы).
 # Два прохода одного сценария подряд, без перезагрузки и без ввода команд:
 #   1) КОНТРОЛЬ — драйвер и X без mmiotrace, все ядра процессора работают;
 #   2) ЗАПИСЬ — драйвер выгружается, включается mmiotrace (остаётся одно ядро), драйвер грузится заново, тот же сценарий.
-# Главное изменение: пока загружен драйвер NVIDIA, регистры карты НЕ читаются (снимков нет). Во всех шести прошлых прогонах
-# отказ начинался через 0,1–2 с после снимка regdump: try2 — зависание на запуске X, try3/4 — сброс записи 0x070000 не
-# завершается, try5 и контроль try6 (без записи!) — «Xid 79, GPU has fallen off the bus». Снимок читает блоки целиком —
-# видимо, с несуществующими адресами — и сбивает работающий драйвер. Состояние уровней видно в самой записи.
-# Индикатор: маленькие шестерёнки крутятся всё время — живы карта и система.
+# Пока загружен драйвер NVIDIA, регистры карты НЕ читаются (снимков нет): в прогонах 1–6 снимки regdump сбивали драйвер.
 # Сторож: Xid / «fallen off the bus» в журнале ядра или 120 с без новой отметки — сохранить журналы и ВЫКЛЮЧИТЬ машину
 # (не перезагрузить: дважды после зависшей карты тёплый сброс давал пустой список дисков в BIOS; выключение обесточивает карту).
-# Сценарий прохода (маленькая программа крутится всё время с синхронизацией кадров — лёгкая постоянная нагрузка, простоя нет;
-# большая программа без синхронизации запускается и снимается, без пауз SIGSTOP — от них в контроле try6 «nvLock: client timed out»):
+# Сценарий прохода (маленькая программа крутится всё время с синхронизацией кадров — лёгкая постоянная нагрузка, простоя нет):
 #   0  «максимум», запуск маленькой (60 кадров/с)
 #   A  адаптивный 45 с                             -> спуск под лёгкой нагрузкой
 #   B  большая 25 с                                -> подъём под нагрузкой; большая снимается
 #   C  30 с                                        -> снова спуск под лёгкой нагрузкой
 #   D  «максимум» 10 с, «адаптивный» 25 с          -> 0f и спуск под лёгкой нагрузкой
 #   E  всплески большой: 4 x (4 с, пауза 8 с)      -> резкие переходы
-# Запуск: sudo ~/trace/run-trace-lucid.sh   (~9 минут, ничего не трогать; конец — строка «ГОТОВО»)
+# Запуск: из меню стенда (цифра 3) или sudo ~/trace/run-trace-lucid.sh   (~9 минут, ничего не трогать)
 set -euo pipefail
-[ "$(id -u)" -eq 0 ] || [ "${TRACE_DRY:-0}" = 1 ] || exec sudo "$0" "$@"
+[ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
 HERE="$(cd "$(dirname "$0")" && pwd)"
-NV="$(modinfo -F version nvidia 2>/dev/null || true)"; NV="${NV:-нет}"
+show() { echo ">>> $*"; }
+nvver() {   # версия установленного драйвера NVIDIA по строке в самом модуле; пусто — не установлен
+  local f; f="$(find "/lib/modules/$(uname -r)" -name nvidia.ko 2>/dev/null | head -n 1 || true)"
+  [ -n "$f" ] && grep -ao 'Kernel Module  *[0-9][0-9.]*' "$f" | head -n 1 | awk '{print $NF}' || true
+}
+NV="$(nvver)"
+[ -n "$NV" ] || { show "STOP: no NVIDIA driver installed. Install it first (menu: 1 or 2)."; exit 1; }
+if [ -e /tmp/stand-card-used ]; then
+  show "STOP: the card was already used in this boot ($(cat /tmp/stand-card-used))."
+  show "Reboot first (menu: 4, then F12 -> ST120FN0), then record."
+  exit 1
+fi
+lsmod | grep -q '^nvidia ' && { show "STOP: nvidia module is loaded. Reboot first (menu: 4)."; exit 1; }
 OUT="$HERE/out-$NV-$(date +%Y%m%d-%H%M%S)"; mkdir -p "$OUT"
 LOG="$OUT/steps.txt"
-say() { echo "$(date +%T) $*" | tee -a "$LOG"; sync; }
-SYSRQ="${TRACE_SYSRQ:-/proc/sysrq-trigger}"
-LED="${TRACE_LED:-$(ls -d /sys/class/leds/input*::scrolllock 2>/dev/null | head -n 1)}"
+say() { echo "$(date +%T) $*" >> "$LOG"; sync; }
+SYSRQ=/proc/sysrq-trigger
+echo "запись $NV" > /tmp/stand-card-used
 
+show "RECORD: NVIDIA $NV, about 9 minutes. Do not touch anything until DONE."
 say "Ядро $(uname -r), драйвер NVIDIA $NV, сценарий 7 для 10.04 (без снимков, со сторожем; контроль, затем запись)"
-[ "$NV" != нет ] || { say "СТОП: драйвер NVIDIA не установлен (sudo ~/trace/install-nvidia-lucid.sh ВЕРСИЯ)"; exit 1; }
-lsmod | grep -q '^nvidia ' && { say "СТОП: драйвер nvidia уже загружен — перезагрузись."; exit 1; }
-[ -e "$HERE/regdump-lucid.py" ] || { say "СТОП: нет $HERE/regdump-lucid.py"; exit 1; }
-command -v glxgears >/dev/null || { say "СТОП: нет glxgears (пакет mesa-utils)"; exit 1; }
-T="${TRACE_DIR:-}"
-if [ -z "$T" ]; then
-  grep -q tracefs /proc/mounts || mount -t tracefs nodev /sys/kernel/tracing 2>/dev/null || true
-  T=/sys/kernel/tracing; [ -e "$T/current_tracer" ] || { mount -t debugfs nodev /sys/kernel/debug 2>/dev/null || true; T=/sys/kernel/debug/tracing; }
-fi
-grep -qw mmiotrace "$T/available_tracers" || { say "СТОП: в ядре нет mmiotrace"; exit 1; }
+say "Время в 10.04 — UTC (в Москве +3 ч)"
+[ -e "$HERE/regdump-lucid.py" ] || { say "СТОП: нет regdump-lucid.py"; show "STOP: regdump-lucid.py missing"; exit 1; }
+command -v glxgears >/dev/null || { say "СТОП: нет glxgears"; show "STOP: glxgears missing"; exit 1; }
+mount -t debugfs nodev /sys/kernel/debug 2>/dev/null || true
+T=/sys/kernel/debug/tracing
+grep -qw mmiotrace "$T/available_tracers" || { say "СТОП: в ядре нет mmiotrace"; show "STOP: no mmiotrace in kernel"; exit 1; }
 echo "$T" > /tmp/trace-dir
 mark() { echo "MARK: $*" > "$T/trace_marker" 2>/dev/null || true; say "MARK: $*"; }
 
 # Снимок только ДО загрузки драйвера: карту тогда никто не трогает.
 python "$HERE/regdump-lucid.py" "0 до драйвера (после BIOS)" "$OUT/regs.txt"
 say "Снимок регистров «до драйвера» сделан (дальше регистры не читаются)"
-
-# Индикатор «система жива»: Scroll Lock мигает от ядра. Если ядро встанет — мигание прекратится.
-LED_OLD=""
-if [ -n "$LED" ]; then
-  modprobe ledtrig-heartbeat 2>/dev/null || true
-  LED_OLD="$(sed -n 's/.*\[\(.*\)\].*/\1/p' "$LED/trigger" 2>/dev/null)"
-  echo heartbeat > "$LED/trigger" 2>/dev/null && say "Scroll Lock мигает — система жива" || say "Scroll Lock мигать не будет (нет триггера)"
-fi
 
 # Сторож: Xid / отвал от шины в журнале ядра или 120 с без новой отметки -> журналы на диск и выключение.
 watchdog() {
@@ -68,6 +70,7 @@ watchdog() {
     elif [ $(( $(date +%s) - $(stat -c %Y "$LOG") )) -gt 120 ]; then why="120 с без новой отметки сценария"
     else continue; fi
     say "СТОРОЖ: $why — сохраняю журналы и выключаю машину"
+    chvt 1 2>/dev/null; show "WATCHDOG: driver stuck — saving logs and POWERING OFF. Then power on, F12, continue."
     dmesg > "$OUT/dmesg-watchdog.txt" 2>/dev/null; cp /var/log/Xorg.0.log "$OUT/Xorg-watchdog.log" 2>/dev/null
     ps axww > "$OUT/ps-watchdog.txt" 2>/dev/null
     echo nop > "$T/current_tracer" 2>/dev/null; sync; sleep 3; sync
@@ -138,17 +141,14 @@ run_pass() {   # $1 — имя прохода
   mark "$1: драйвер загружен, запуск X11"
   make_session "$1"
   xinit /tmp/xsession.sh -- :0 vt2 >"$OUT/xinit-$1.txt" 2>&1 || true
+  chvt 1 2>/dev/null || true
   mark "$1: X11 закрыт"
   cp /var/log/Xorg.0.log "$OUT/Xorg-$1.log" 2>/dev/null || true
   sleep 2
 }
 
-finish() {   # сторож больше не нужен; Scroll Lock — как было
-  kill "$WDPID" 2>/dev/null || true
-  [ -n "$LED" ] && [ -n "$LED_OLD" ] && echo "$LED_OLD" > "$LED/trigger" 2>/dev/null || true
-}
-
 # Проход 1: контроль, без записи, все ядра работают.
+show "[1/2] control pass (no recording): X with gears, ~4 min"
 run_pass контроль
 # Драйвер выгружается: mmiotrace видит только отображения регистров, сделанные ПОСЛЕ его включения.
 ok=0
@@ -157,14 +157,15 @@ for i in 1 2 3 4 5; do
   sleep 2
 done
 if [ "$ok" != 1 ]; then
-  finish
+  kill "$WDPID" 2>/dev/null || true
   say "СТОП: драйвер nvidia не выгрузился за 5 попыток — запись невозможна. Контроль сделан, результат: $OUT"
-  say "Перезагрузись в основную систему: sudo reboot"
+  show "STOP: driver did not unload, recording impossible. Control pass saved. Reboot to main system (menu: 4)."
   exit 1
 fi
 say "Контроль прошёл, драйвер выгружен"
 
 # Проход 2: запись.
+show "[2/2] recording pass: other CPU cores switch off for a while (normal), ~5 min"
 say "Включаю запись (остальные ядра процессора на время записи выключатся — это нормально)"
 echo nop > "$T/current_tracer"
 echo 65536 > "$T/buffer_size_kb"     # размер записи задаёт нагрузка, а не буфер
@@ -174,13 +175,16 @@ CATPID=$!
 sleep 2
 run_pass запись
 mark "конец записи"
-finish   # сторож снимается ДО остановки mmiotrace: в прогоне 7 остановка шла > 2 мин, и сторож выключил машину
+kill "$WDPID" 2>/dev/null || true   # сторож снимается ДО остановки mmiotrace: в прогоне 7 остановка шла > 2 мин
+show "stopping the recording (can take 1-2 minutes)..."
 sleep 1
 echo nop > "$T/current_tracer"
 sleep 1; kill "$CATPID" 2>/dev/null || true
 dmesg > "$OUT/dmesg.txt"
-grep -q 'mmiotrace has lost events' "$OUT/dmesg.txt" && say "!!! Запись потеряла часть событий (буфер не успел)" || say "Потерь в записи нет"
+if grep -q 'mmiotrace has lost events' "$OUT/dmesg.txt"; then say "!!! Запись потеряла часть событий (буфер не успел)"; show "WARNING: the recording lost some events"
+else say "Потерь в записи нет"; fi
 [ -s "$OUT/mmiotrace.txt" ] && say "Записано строк: $(wc -l < "$OUT/mmiotrace.txt") (сжатие — в основной системе)"
-ls -lh "$OUT" | tee -a "$LOG"
+ls -lh "$OUT" >> "$LOG"
 sync
-say "ГОТОВО. Результат: $OUT. Перезагрузись в основную систему: sudo reboot"
+say "ГОТОВО. Результат: $OUT"
+show "DONE. Saved: $(basename "$OUT") ($(du -sh "$OUT" | cut -f1))"
