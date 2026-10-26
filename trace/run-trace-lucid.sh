@@ -56,6 +56,8 @@ mount -t debugfs nodev /sys/kernel/debug 2>/dev/null || true
 T=/sys/kernel/debug/tracing
 grep -qw mmiotrace "$T/available_tracers" || { say "СТОП: в ядре нет mmiotrace"; show "STOP: no mmiotrace in kernel"; exit 1; }
 echo "$T" > /tmp/trace-dir
+# Тот же xorg.conf, что в записи 390 (try7). Первая версия установщика (26.10) могла остановиться до него на проверке версии.
+printf 'Section "Device"\n    Identifier "nv"\n    Driver "nvidia"\n    Option "Coolbits" "8"\nEndSection\n' > /etc/X11/xorg.conf
 mark() { echo "MARK: $*" > "$T/trace_marker" 2>/dev/null || true; say "MARK: $*"; }
 
 # Снимок только ДО загрузки драйвера: карту тогда никто не трогает.
