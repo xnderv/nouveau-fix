@@ -54,6 +54,7 @@ echo "запись $NV" > /tmp/stand-card-used
 show "RECORD: NVIDIA $NV, about 9 minutes. Do not touch anything until DONE."
 say "Ядро $(uname -r), драйвер NVIDIA $NV, сценарий 7 для 10.04 (без снимков, со сторожем; контроль, затем запись)${MODE:+; режим $MODE — только запись}"
 say "Время в 10.04 — UTC (в Москве +3 ч)"
+say "Настройки модулей: $(grep -h -v '^#' /etc/modprobe.d/stand-2011.conf | tr '\n' ';')"
 [ -e "$HERE/regdump-lucid.py" ] || { say "СТОП: нет regdump-lucid.py"; show "STOP: regdump-lucid.py missing"; exit 1; }
 command -v glxgears >/dev/null || { say "СТОП: нет glxgears"; show "STOP: glxgears missing"; exit 1; }
 mount -t debugfs nodev /sys/kernel/debug 2>/dev/null || true
@@ -145,6 +146,7 @@ run_pass() {   # $1 — имя прохода
   modprobe nvidia
   sleep 3
   mark "$1: драйвер загружен, запуск X11"
+  ( sleep 20; grep -i nvidia /proc/interrupts >> "$LOG" 2>/dev/null; sync ) &   # MSI или общая линия — видно через 20 с
   make_session "$1"
   xinit /tmp/xsession.sh -- :0 vt2 >"$OUT/xinit-$1.txt" 2>&1 || true
   chvt 1 2>/dev/null || true
