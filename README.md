@@ -1,13 +1,19 @@
-# nouveau-fix: full reclocking for GeForce GTX 560 Ti (Fermi, GF114) on Linux
+# nouveau-fix: how NVIDIA drives a Fermi GPU — a model built by observation (GeForce GTX 560 Ti, GF114)
 
-Open-source nouveau driver patches for NVIDIA Fermi GF114 (GeForce GTX 560 Ti) on Linux 7.0: core, shader and GDDR5
-memory reclocking, voltage and PCIe switching, a load governor, and a GPU hang fix.
+A hobby research project. The goal is to understand the principles by which NVIDIA's driver manages clocks, voltage,
+memory and level switches on a Fermi GPU, and to write them down as a **model that predicts what the driver does**.
+The model is built only from observation and experiment (see *How we work*). A working reclocking driver for one GTX 560 Ti
+board on Linux 7.0 — core, shader and GDDR5 memory, voltage, PCIe, a load governor — is a special case of the model.
 
 **English first; the same in Russian below. / Русская версия — ниже.**
 
 Upstream nouveau keeps Fermi cards at their boot clocks: a GTX 560 Ti stays at 50 MHz core and 135 MHz memory, so it
-is slow in 3D and video. This project makes the card switch between its performance levels the way the NVIDIA
-driver does, using only open methods, and tries to turn what we learn into changes that can go upstream.
+is slow in 3D and video. On the reference board below, the card now switches between its performance levels the way
+the NVIDIA driver does. Only small, self-contained fixes are sent upstream; there are no support promises.
+
+**The model:** [`docs/model/`](docs/model/README.md) (version 0.1, in Russian). When it switches levels, NVIDIA writes
+167 registers that belong to the model. We reproduce 86 % of them, understand why for 40 %, and have tested 8 % by
+experiment ([coverage](docs/model/coverage.md), recomputed by `lab/coverage.py`).
 
 | Level | Core / shader | Memory | When |
 |---|---|---|---|
@@ -18,7 +24,7 @@ driver does, using only open methods, and tries to turn what we learn into chang
 The reference board is a Gigabyte GV-N560OC-1GI (PCI subsystem 1458:3515). Its 0f level is a factory overclock;
 03 and 07 are the chip's standard levels.
 
-## Status (25 Oct 2026) — beta
+## Results so far (26 Oct 2026)
 
 - **Reclocking works on the reference board** — core, shader, memory, voltage, PCIe 2.5/5 GT/s, and an automatic
   governor that uses load measured in the PMU firmware.
@@ -39,25 +45,29 @@ The reference board is a Gigabyte GV-N560OC-1GI (PCI subsystem 1458:3515). Its 0
 - **The author's daily driver** is the lab driver (`lab/`) with these settings, applied by `daily/gpu-autoclock.py`.
   Since 25 Oct the service also turns on the divider write before the switch and the guard, and shows a desktop
   notification on any switch timeout and on any nouveau warning or error except the known boot-time ones. The stable
-  patch (`patches/0010`) has none of the divider, PMU and divider-write fixes yet; a clean stable version with them is
-  next.
+  patch (`patches/0010`) has none of the divider, PMU and divider-write fixes; updating it is not planned now.
 - **Memory reclock is board-specific for now.** It replays the memory scripts recorded on the reference board,
   just as upstream nouveau replays a sequence recorded on another board. A generator from each card's own VBIOS
-  tables is in progress (`docs/2026-10-24/memory-scripts-vs-nouveau.md`). **Data from other cards is what it needs.**
+  tables would need data from other cards (`docs/2026-10-24/memory-scripts-vs-nouveau.md`); not active now.
 
 ## How we work
 
-- **Only open methods.** We observe how the NVIDIA 390 driver talks to the hardware (the kernel's built-in
-  mmiotrace), read the VBIOS data tables, and use open sources: nouveau, envytools, and NVIDIA's own open nvgpu
-  driver. We do not use decompiled or disassembled NVIDIA code, or anything derived from it.
+- **Observation and experiment only.** We record how the NVIDIA 390 driver talks to the hardware (the kernel's
+  built-in mmiotrace), read registers and the VBIOS, test every step on the hardware, and use open sources: nouveau,
+  envytools, NVIDIA's open nvgpu and Tegra code. Facts from others are hypotheses until our own traces or registers
+  confirm them, and every fact records its source. No conclusions from decompiled or disassembled NVIDIA code —
+  ours or anyone's ([`docs/provenance.md`](docs/provenance.md)).
+- **What happened before.** Until 24 Oct 2026 we also relied on notes and a decoder from the Twilight0 project.
+  Part of its findings come from decompiling NVIDIA's driver. We stopped, audited what we had taken, and on 26 Oct
+  removed what we had not verified ourselves (`docs/2026-10-26/provenance-and-research.md`, part 1).
 - **No NVIDIA binaries in this repository.** VBIOS images and raw traces stay private; only findings and register
   values are published.
 - **One change per test.** Every step is a separate switch, tested alone on the hardware, with the logs in `results/`.
 
-## Help wanted: data from other Fermi cards
+## Data from other Fermi cards (welcome, not required)
 
-Owners of other Fermi cards — GTX 460–590, GTS 450, GT 4xx/5xx and mobile parts — can help the most by sharing their
-card's VBIOS tables:
+This is a hobby project without support promises. If you own another Fermi card — GTX 460–590, GTS 450, GT 4xx/5xx
+or a mobile part — and want to share its VBIOS tables, the model can be checked against your card:
 
 1. `git clone https://github.com/xnderv/nouveau-fix && cd nouveau-fix && bash tools/card-report.sh`.
    It only reads. It prints a summary of your VBIOS tables, asks a few questions (vendor, cooling, factory
@@ -107,6 +117,8 @@ repository.
 
 | Path | Contents |
 |---|---|
+| `docs/model/` | the model (textbook), the register coverage table and its status file |
+| `docs/provenance.md` | where our knowledge may come from, and what happened with the Twilight0 notes |
 | `docs/2026-10-24/nvidia-logic.md` | how NVIDIA reclocks GF114 and why: rules, open questions, what we do the same way |
 | `docs/boot-recovery.md` | the author's machine does not boot during lab tests: the GRUB fallback line |
 | `docs/glossary.md` | glossary of abbreviations (Russian) |
@@ -120,11 +132,20 @@ repository.
 
 ---
 
-# nouveau-fix: полная смена частот для GeForce GTX 560 Ti (Fermi, GF114) в Linux
+# nouveau-fix: как NVIDIA управляет картой Fermi — модель, построенная наблюдением (GeForce GTX 560 Ti, GF114)
+
+Исследовательский проект для души. Цель — понять принципы, по которым драйвер NVIDIA управляет частотами, напряжением,
+памятью и переходами между уровнями на карте Fermi, и записать их как **модель, которая предсказывает, что делает
+драйвер**. Модель строится только наблюдением и опытом (см. «Как мы работаем»). Работающая смена частот для одной
+платы GTX 560 Ti в Linux 7.0 — ядро, шейдеры, память GDDR5, напряжение, PCIe, регулятор — частный случай модели.
 
 Штатный nouveau оставляет карты Fermi на частотах загрузки: GTX 560 Ti так и работает на 50 МГц ядра и 135 МГц памяти,
-в 3D и видео она медленная. Проект научил карту переключать уровни производительности так же, как это делает драйвер
-NVIDIA, — только открытыми методами — и старается превратить найденное в правки, пригодные для основного ядра.
+в 3D и видео она медленная. На эталонной плате ниже карта теперь переключает уровни так же, как драйвер NVIDIA.
+В основное ядро отправляются только небольшие отдельные исправления; поддержку мы не обещаем.
+
+**Модель:** [`docs/model/`](docs/model/README.md) (версия 0.1). При смене уровня NVIDIA пишет в 167 регистров, которые
+относятся к модели. Мы повторяем 86 % из них, понимаем, зачем они, — 40 %, проверили опытом — 8 %
+([покрытие](docs/model/coverage.md), пересчитывает `lab/coverage.py`).
 
 | Уровень | Ядро / шейдеры | Память | Когда |
 |---|---|---|---|
@@ -135,7 +156,7 @@ NVIDIA, — только открытыми методами — и старае
 Эталонная плата — Gigabyte GV-N560OC-1GI (подсистема PCI 1458:3515). Уровень 0f у неё — заводской разгон;
 03 и 07 — штатные уровни чипа.
 
-## Состояние (25.10.2026) — бета
+## Что уже получено (26.10.2026)
 
 - **Смена частот работает на эталонной плате**: ядро, шейдеры, память, напряжение, PCIe 2,5/5 ГТ/с и регулятор,
   который сам выбирает уровень по загрузке, измеренной в прошивке PMU.
@@ -157,25 +178,30 @@ NVIDIA, — только открытыми методами — и старае
   `daily/gpu-autoclock.py`. С 25.10 служба включает и запись делителя перед переключателем, и защиту, а о любом
   тайм-ауте переключателя и о любом предупреждении или ошибке nouveau, кроме известных при загрузке, показывает
   уведомление на рабочем столе.
-  В стабильном патче (`patches/0010`) исправлений делителя, PMU и записи делителя перед переключателем ещё нет; чистая
-  стабильная версия с ними — следующий шаг.
+  В стабильном патче (`patches/0010`) исправлений делителя, PMU и записи делителя перед переключателем нет; обновлять его
+  сейчас не планируем.
 - **Смена частоты памяти пока привязана к плате.** Она проигрывает скрипты памяти, записанные на эталонной плате, —
   так же, как штатный nouveau проигрывает последовательность, записанную когда-то на другой плате. Генератор по
-  таблицам VBIOS каждой карты в работе (`docs/2026-10-24/memory-scripts-vs-nouveau.md`). **Ему нужны данные других карт.**
+  таблицам VBIOS каждой карты нужны данные других карт (`docs/2026-10-24/memory-scripts-vs-nouveau.md`); сейчас не ведётся.
 
 ## Как мы работаем
 
-- **Только открытые методы.** Наблюдаем, как драйвер NVIDIA 390 обращается к железу (встроенный в ядро mmiotrace),
-  читаем таблицы данных VBIOS, опираемся на открытые источники: nouveau, envytools и открытый драйвер самой NVIDIA nvgpu.
-  Декомпилированный или дизассемблированный код NVIDIA и всё, что из него получено, не используем.
+- **Только наблюдение и опыт.** Записываем, как драйвер NVIDIA 390 обращается к железу (встроенный в ядро mmiotrace),
+  читаем регистры и VBIOS, проверяем каждый шаг на железе, опираемся на открытые источники: nouveau, envytools, открытый
+  код самой NVIDIA (nvgpu, Tegra). Чужие факты — гипотезы, пока их не подтвердили наши записи или регистры; у каждого
+  факта записан источник. Выводов из декомпиляции или дизассемблирования кода NVIDIA — ни своих, ни чужих — не
+  используем ([`docs/provenance.md`](docs/provenance.md)).
+- **Что было раньше.** До 24.10.2026 мы опирались и на заметки и декодер проекта Twilight0. Часть его находок получена
+  декомпиляцией драйвера NVIDIA. Мы остановились, сделали опись взятого и 26.10 убрали то, что сами не проверили
+  (`docs/2026-10-26/provenance-and-research.md`, часть 1).
 - **Никаких бинарных файлов NVIDIA в репозитории.** Образы VBIOS и сырые записи остаются у нас; публикуются только
   выводы и значения регистров.
 - **Одно изменение на опыт.** Каждый шаг — отдельный переключатель, проверенный отдельно на железе; журналы — в `results/`.
 
-## Нужна помощь: данные других карт Fermi
+## Данные других карт Fermi (будем рады, но не просим)
 
-Больше всего помогут владельцы других карт Fermi — GTX 460–590, GTS 450, GT 4xx/5xx и мобильных — если поделятся
-таблицами VBIOS своей карты:
+Это проект для души, поддержку мы не обещаем. Если у вас другая карта Fermi — GTX 460–590, GTS 450, GT 4xx/5xx или
+мобильная — и вы хотите поделиться таблицами её VBIOS, модель можно будет сверить с вашей картой:
 
 1. `git clone https://github.com/xnderv/nouveau-fix && cd nouveau-fix && bash tools/card-report.sh`.
    Скрипт только читает. Он печатает разбор таблиц VBIOS, задаёт несколько вопросов (производитель, охлаждение,
@@ -221,6 +247,8 @@ MIT (файл `LICENSE`) на всё в репозитории. Патчи ме�
 
 | Путь | Что там |
 |---|---|
+| `docs/model/` | модель (учебник), таблица покрытия регистров и файл их статусов |
+| `docs/provenance.md` | откуда могут браться наши знания и что было с заметками Twilight0 |
 | `docs/2026-10-24/nvidia-logic.md` | как NVIDIA меняет частоты GF114 и почему: правила, белые пятна, что у нас так же |
 | `docs/boot-recovery.md` | машина автора не загружается во время лабораторных тестов: запасная строка GRUB |
 | `docs/glossary.md` | словарь сокращений: GPC, PLL, FSRM, PMU и другие |

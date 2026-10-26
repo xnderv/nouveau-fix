@@ -1,0 +1,1160 @@
+{
+ "trace": "try7 (24.10.2026), запись драйвера NVIDIA 390 на GV-N560OC-1GI",
+ "transitions_s": [
+  277.02,
+  285.05,
+  296.05,
+  329.02,
+  337.05,
+  351.52,
+  363.02,
+  371.05,
+  386.99,
+  438.18
+ ],
+ "window_s": [
+  -0.03,
+  0.08
+ ],
+ "control_shift_s": 2.0,
+ "registers": {
+  "0x000140": {
+   "writes": 592,
+   "background": 352,
+   "transitions": 10,
+   "values": [
+    "0x0",
+    "0x1"
+   ]
+  },
+  "0x000144": {
+   "writes": 592,
+   "background": 352,
+   "transitions": 10,
+   "values": [
+    "0x0",
+    "0x1"
+   ]
+  },
+  "0x000200": {
+   "writes": 2,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0xe011313d",
+    "0xf81121bd"
+   ]
+  },
+  "0x000644": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x001140": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x001548": {
+   "writes": 237,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x101",
+    "0x102",
+    "0x104",
+    "0x80000101",
+    "0x80000102",
+    "0x80000104"
+   ]
+  },
+  "0x001700": {
+   "writes": 4,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x3ff0",
+    "0x3ffc"
+   ]
+  },
+  "0x001714": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x4003ffc2"
+   ]
+  },
+  "0x009140": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x009420": {
+   "writes": 3,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0xa4815f80"
+   ]
+  },
+  "0x00e050": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x00e054": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0xffffffff"
+   ]
+  },
+  "0x00e068": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x00e06c": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0xffffffff"
+   ]
+  },
+  "0x00e070": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x00e074": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0xffffffff"
+   ]
+  },
+  "0x00e104": {
+   "writes": 7,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x36300640",
+    "0x36340640",
+    "0x63600340",
+    "0x63640340"
+   ]
+  },
+  "0x00e280": {
+   "writes": 7,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x74000072",
+    "0x74000076"
+   ]
+  },
+  "0x00e9e0": {
+   "writes": 8,
+   "background": 0,
+   "transitions": 8,
+   "values": [
+    "0x81200a04",
+    "0x81200a06",
+    "0x81200a0a"
+   ]
+  },
+  "0x020004": {
+   "writes": 40,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x110000",
+    "0x110068"
+   ]
+  },
+  "0x020160": {
+   "writes": 20,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x0",
+    "0xa008a"
+   ]
+  },
+  "0x020164": {
+   "writes": 20,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x20082",
+    "0x82"
+   ]
+  },
+  "0x020180": {
+   "writes": 20,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x0",
+    "0xa"
+   ]
+  },
+  "0x020184": {
+   "writes": 20,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x0",
+    "0x2"
+   ]
+  },
+  "0x0201a0": {
+   "writes": 20,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x4040"
+   ]
+  },
+  "0x0201a4": {
+   "writes": 20,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x4040"
+   ]
+  },
+  "0x02241c": {
+   "writes": 7,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x1",
+    "0x81"
+   ]
+  },
+  "0x022680": {
+   "writes": 10,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x80000014",
+    "0x8000001c"
+   ]
+  },
+  "0x0400c0": {
+   "writes": 100,
+   "background": 116,
+   "transitions": 9,
+   "values": [
+    "0x80600008"
+   ]
+  },
+  "0x0400c4": {
+   "writes": 100,
+   "background": 116,
+   "transitions": 9,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x0400c8": {
+   "writes": 100,
+   "background": 116,
+   "transitions": 9,
+   "values": [
+    "0x80600008"
+   ]
+  },
+  "0x0400cc": {
+   "writes": 100,
+   "background": 116,
+   "transitions": 9,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x0400d0": {
+   "writes": 100,
+   "background": 116,
+   "transitions": 9,
+   "values": [
+    "0x80600008"
+   ]
+  },
+  "0x0400d4": {
+   "writes": 100,
+   "background": 116,
+   "transitions": 9,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x040108": {
+   "writes": 100,
+   "background": 116,
+   "transitions": 9,
+   "values": [
+    "0x800000"
+   ]
+  },
+  "0x070000": {
+   "writes": 44,
+   "background": 0,
+   "transitions": 3,
+   "values": [
+    "0x1"
+   ]
+  },
+  "0x088080": {
+   "writes": 7,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x12910"
+   ]
+  },
+  "0x08813c": {
+   "writes": 10,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x33ff0000",
+    "0x63ff0000"
+   ]
+  },
+  "0x088150": {
+   "writes": 68,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0xe000fe15",
+    "0xe000fe95",
+    "0xe000ff15",
+    "0xe000ff95"
+   ]
+  },
+  "0x08818c": {
+   "writes": 10,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0xd0000003"
+   ]
+  },
+  "0x088190": {
+   "writes": 56,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x10101011",
+    "0x10101110",
+    "0x10111010",
+    "0x11101010"
+   ]
+  },
+  "0x088460": {
+   "writes": 14,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0xb06c2210",
+    "0xb06c2211",
+    "0xb06c2220",
+    "0xb06c2221"
+   ]
+  },
+  "0x088484": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x0884b8": {
+   "writes": 14,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x40"
+   ]
+  },
+  "0x088624": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x08862c": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x088634": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x08863c": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x088644": {
+   "writes": 7,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x43a088e",
+    "0x877f88e"
+   ]
+  },
+  "0x088650": {
+   "writes": 7,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x7e90",
+    "0xfd20"
+   ]
+  },
+  "0x088704": {
+   "writes": 145,
+   "background": 174,
+   "transitions": 9,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x100b44": {
+   "writes": 7,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x10069",
+    "0x10112",
+    "0x10286"
+   ]
+  },
+  "0x100b48": {
+   "writes": 7,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x3e7",
+    "0x400",
+    "0x40e"
+   ]
+  },
+  "0x100b4c": {
+   "writes": 12,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x0",
+    "0x1"
+   ]
+  },
+  "0x100cb8": {
+   "writes": 18,
+   "background": 0,
+   "transitions": 3,
+   "values": [
+    "0x3fb7f0",
+    "0x3fe330",
+    "0x3ffc40",
+    "0xda00",
+    "0xdd00"
+   ]
+  },
+  "0x100cbc": {
+   "writes": 18,
+   "background": 0,
+   "transitions": 3,
+   "values": [
+    "0x80000001",
+    "0x80000005"
+   ]
+  },
+  "0x10a004": {
+   "writes": 36,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x40",
+    "0x8"
+   ]
+  },
+  "0x10a014": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x40"
+   ]
+  },
+  "0x10a050": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x10a058": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x1"
+   ]
+  },
+  "0x10a0a4": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x1"
+   ]
+  },
+  "0x10a1c0": {
+   "writes": 222,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x1005680",
+    "0x10056e0",
+    "0x1005800",
+    "0x20057ac",
+    "0x20057b0",
+    "0x20057b4",
+    "0x20057b8",
+    "0x2005ca0"
+   ]
+  },
+  "0x10a1c4": {
+   "writes": 4530,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x1",
+    "0x132100",
+    "0x137300",
+    "0x137310",
+    "0x20039",
+    "0x89200816",
+    "0xd",
+    "0xf0021"
+   ]
+  },
+  "0x10a48c": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x8"
+   ]
+  },
+  "0x10a4a0": {
+   "writes": 17,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x56b0",
+    "0x56b8",
+    "0x56e0"
+   ]
+  },
+  "0x10a4a4": {
+   "writes": 25,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x570c",
+    "0x571c",
+    "0x5728",
+    "0x5740",
+    "0x5744",
+    "0x575c",
+    "0x5768",
+    "0x5778"
+   ]
+  },
+  "0x10a4cc": {
+   "writes": 46,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x578c",
+    "0x5798",
+    "0x57b4",
+    "0x57c0",
+    "0x57cc",
+    "0x57d8",
+    "0x57e0",
+    "0x57f4"
+   ]
+  },
+  "0x10a598": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x10f000": {
+   "writes": 12,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x0",
+    "0x42"
+   ]
+  },
+  "0x10f050": {
+   "writes": 18,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0xff000490",
+    "0xff001090"
+   ]
+  },
+  "0x10f150": {
+   "writes": 12,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x10",
+    "0x1000"
+   ]
+  },
+  "0x10f254": {
+   "writes": 12,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x1e140a"
+   ]
+  },
+  "0x10f2f8": {
+   "writes": 7,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0xf030080"
+   ]
+  },
+  "0x10f2fc": {
+   "writes": 12,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x0",
+    "0x1"
+   ]
+  },
+  "0x10f400": {
+   "writes": 44,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x1707",
+    "0x171f"
+   ]
+  },
+  "0x10f410": {
+   "writes": 44,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x107",
+    "0x307"
+   ]
+  },
+  "0x10f420": {
+   "writes": 44,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x42",
+    "0x43"
+   ]
+  },
+  "0x10f430": {
+   "writes": 44,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x40",
+    "0x41"
+   ]
+  },
+  "0x10f444": {
+   "writes": 44,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x4cc001f",
+    "0x4cc883f"
+   ]
+  },
+  "0x10f468": {
+   "writes": 44,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x1005",
+    "0x20020"
+   ]
+  },
+  "0x10f808": {
+   "writes": 4,
+   "background": 0,
+   "transitions": 4,
+   "values": [
+    "0x8020050"
+   ]
+  },
+  "0x10f824": {
+   "writes": 17,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x79f7",
+    "0x7e77",
+    "0x7fd4"
+   ]
+  },
+  "0x132000": {
+   "writes": 14,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x18010000",
+    "0x18030000"
+   ]
+  },
+  "0x137000": {
+   "writes": 12,
+   "background": 0,
+   "transitions": 3,
+   "values": [
+    "0x10001",
+    "0x30000",
+    "0x30001",
+    "0x30005"
+   ]
+  },
+  "0x137020": {
+   "writes": 14,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x10001",
+    "0x10005",
+    "0x30000",
+    "0x30001"
+   ]
+  },
+  "0x137024": {
+   "writes": 3,
+   "background": 0,
+   "transitions": 3,
+   "values": [
+    "0x12107"
+   ]
+  },
+  "0x137040": {
+   "writes": 14,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x10001",
+    "0x10005",
+    "0x30000",
+    "0x30001"
+   ]
+  },
+  "0x137044": {
+   "writes": 3,
+   "background": 0,
+   "transitions": 3,
+   "values": [
+    "0x12107"
+   ]
+  },
+  "0x137100": {
+   "writes": 35,
+   "background": 0,
+   "transitions": 7,
+   "values": [
+    "0x0",
+    "0x180",
+    "0x181",
+    "0x183",
+    "0x187",
+    "0x80"
+   ]
+  },
+  "0x137124": {
+   "writes": 3,
+   "background": 0,
+   "transitions": 3,
+   "values": [
+    "0x3"
+   ]
+  },
+  "0x137128": {
+   "writes": 3,
+   "background": 0,
+   "transitions": 3,
+   "values": [
+    "0x3"
+   ]
+  },
+  "0x137144": {
+   "writes": 3,
+   "background": 0,
+   "transitions": 3,
+   "values": [
+    "0x81200606"
+   ]
+  },
+  "0x137148": {
+   "writes": 3,
+   "background": 0,
+   "transitions": 3,
+   "values": [
+    "0x81200606"
+   ]
+  },
+  "0x137164": {
+   "writes": 4,
+   "background": 0,
+   "transitions": 4,
+   "values": [
+    "0x3"
+   ]
+  },
+  "0x137168": {
+   "writes": 4,
+   "background": 0,
+   "transitions": 4,
+   "values": [
+    "0x3"
+   ]
+  },
+  "0x13717c": {
+   "writes": 4,
+   "background": 0,
+   "transitions": 4,
+   "values": [
+    "0x3"
+   ]
+  },
+  "0x137180": {
+   "writes": 4,
+   "background": 0,
+   "transitions": 4,
+   "values": [
+    "0x3"
+   ]
+  },
+  "0x1371d0": {
+   "writes": 2,
+   "background": 0,
+   "transitions": 2,
+   "values": [
+    "0x81201e02",
+    "0x81201e1e"
+   ]
+  },
+  "0x1371d4": {
+   "writes": 6,
+   "background": 0,
+   "transitions": 6,
+   "values": [
+    "0x81200a02",
+    "0x81200a0a"
+   ]
+  },
+  "0x1371d8": {
+   "writes": 4,
+   "background": 0,
+   "transitions": 4,
+   "values": [
+    "0x81200a02",
+    "0x81200a0a"
+   ]
+  },
+  "0x137250": {
+   "writes": 9,
+   "background": 0,
+   "transitions": 9,
+   "values": [
+    "0x81200000",
+    "0x81200002",
+    "0x8120000e"
+   ]
+  },
+  "0x13726c": {
+   "writes": 6,
+   "background": 0,
+   "transitions": 6,
+   "values": [
+    "0x81200002",
+    "0x8120000a"
+   ]
+  },
+  "0x137270": {
+   "writes": 6,
+   "background": 0,
+   "transitions": 6,
+   "values": [
+    "0x81200002",
+    "0x81200004"
+   ]
+  },
+  "0x137274": {
+   "writes": 10,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x81200004",
+    "0x81200006",
+    "0x81200016"
+   ]
+  },
+  "0x137288": {
+   "writes": 8,
+   "background": 0,
+   "transitions": 8,
+   "values": [
+    "0x81200004",
+    "0x81200006",
+    "0x81200016"
+   ]
+  },
+  "0x1373c0": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x1010000"
+   ]
+  },
+  "0x13b054": {
+   "writes": 8,
+   "background": 0,
+   "transitions": 8,
+   "values": [
+    "0x2"
+   ]
+  },
+  "0x13b0d4": {
+   "writes": 8,
+   "background": 0,
+   "transitions": 8,
+   "values": [
+    "0x2"
+   ]
+  },
+  "0x13c054": {
+   "writes": 18,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x2",
+    "0x3"
+   ]
+  },
+  "0x13c0d4": {
+   "writes": 18,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x2",
+    "0x3"
+   ]
+  },
+  "0x13c154": {
+   "writes": 18,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x2",
+    "0x3"
+   ]
+  },
+  "0x13c1d4": {
+   "writes": 18,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x2",
+    "0x3"
+   ]
+  },
+  "0x13c844": {
+   "writes": 11,
+   "background": 0,
+   "transitions": 8,
+   "values": [
+    "0x2",
+    "0x3"
+   ]
+  },
+  "0x13e014": {
+   "writes": 8,
+   "background": 0,
+   "transitions": 8,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x13e054": {
+   "writes": 8,
+   "background": 0,
+   "transitions": 8,
+   "values": [
+    "0x0"
+   ]
+  },
+  "0x13ec14": {
+   "writes": 11,
+   "background": 0,
+   "transitions": 8,
+   "values": [
+    "0x0",
+    "0x1"
+   ]
+  },
+  "0x17e8c8": {
+   "writes": 2,
+   "background": 0,
+   "transitions": 2,
+   "values": [
+    "0x4"
+   ]
+  },
+  "0x17e8cc": {
+   "writes": 2,
+   "background": 0,
+   "transitions": 2,
+   "values": [
+    "0x18"
+   ]
+  },
+  "0x17e8d0": {
+   "writes": 2,
+   "background": 0,
+   "transitions": 2,
+   "values": [
+    "0x24"
+   ]
+  },
+  "0x17e910": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x70000301"
+   ]
+  },
+  "0x17e914": {
+   "writes": 1,
+   "background": 0,
+   "transitions": 1,
+   "values": [
+    "0x70000301"
+   ]
+  },
+  "0x400100": {
+   "writes": 48,
+   "background": 58,
+   "transitions": 9,
+   "values": [
+    "0x1"
+   ]
+  },
+  "0x400500": {
+   "writes": 96,
+   "background": 116,
+   "transitions": 9,
+   "values": [
+    "0x0",
+    "0x10001"
+   ]
+  },
+  "0x610024": {
+   "writes": 194,
+   "background": 232,
+   "transitions": 9,
+   "values": [
+    "0x4"
+   ]
+  },
+  "0x61002c": {
+   "writes": 98,
+   "background": 116,
+   "transitions": 9,
+   "values": [
+    "0x370",
+    "0x374"
+   ]
+  },
+  "0x610300": {
+   "writes": 18,
+   "background": 0,
+   "transitions": 10,
+   "values": [
+    "0x640",
+    "0x641"
+   ]
+  },
+  "0x610740": {
+   "writes": 96,
+   "background": 116,
+   "transitions": 9,
+   "values": [
+    "0x4"
+   ]
+  }
+ }
+}

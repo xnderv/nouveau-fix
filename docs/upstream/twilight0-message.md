@@ -1,3 +1,6 @@
+> **Устарел (26.10.2026), не отправлять.** В нём заметки Twilight0 по декомпиляции названы «лучшими зацепками» — это
+> противоречит нашему правилу ([docs/provenance.md](../provenance.md)). Новый черновик — [twilight0-message-v2.md](twilight0-message-v2.md).
+
 # Draft: message to twilight0 (GitHub issue in Twilight0/nouveau-fermi-reclock-dkms)
 
 Suggested title: **GF114 / GDDR5 (GTX 560 Ti): full reclock working via stock memx — trace + results to share**
