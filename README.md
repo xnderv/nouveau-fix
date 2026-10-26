@@ -11,8 +11,8 @@ Upstream nouveau keeps Fermi cards at their boot clocks: a GTX 560 Ti stays at 5
 is slow in 3D and video. On the reference board below, the card now switches between its performance levels the way
 the NVIDIA driver does. Only small, self-contained fixes are sent upstream; there are no support promises.
 
-**The model:** [`docs/model/`](docs/model/README.md) (version 0.1, in Russian). When it switches levels, NVIDIA writes
-167 registers that belong to the model. We reproduce 86 % of them, understand why for 40 %, and have tested 8 % by
+**The model:** [`docs/model/`](docs/model/README.md) (version 0.2, in Russian). When it switches levels, NVIDIA writes
+155 registers that belong to the model. We reproduce 90 % of them, understand why for 43 %, and have tested 8 % by
 experiment ([coverage](docs/model/coverage.md), recomputed by `lab/coverage.py`).
 
 | Level | Core / shader | Memory | When |
@@ -143,8 +143,8 @@ repository.
 в 3D и видео она медленная. На эталонной плате ниже карта теперь переключает уровни так же, как драйвер NVIDIA.
 В основное ядро отправляются только небольшие отдельные исправления; поддержку мы не обещаем.
 
-**Модель:** [`docs/model/`](docs/model/README.md) (версия 0.1). При смене уровня NVIDIA пишет в 167 регистров, которые
-относятся к модели. Мы повторяем 86 % из них, понимаем, зачем они, — 40 %, проверили опытом — 8 %
+**Модель:** [`docs/model/`](docs/model/README.md) (версия 0.2). При смене уровня NVIDIA пишет в 155 регистров, которые
+относятся к модели. Мы повторяем 90 % из них, понимаем, зачем они, — 43 %, проверили опытом — 8 %
 ([покрытие](docs/model/coverage.md), пересчитывает `lab/coverage.py`).
 
 | Уровень | Ядро / шейдеры | Память | Когда |
