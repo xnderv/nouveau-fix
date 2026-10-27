@@ -68,9 +68,12 @@ S="$B/linux-source-2.6.32"
 patch -d "$MNT$S" -p1 < "$PATCH"
 grep -c scheduled_for_release "$MNT$S/arch/x86/mm/kmmio.c" | sed 's/^/   scheduled_for_release в kmmio.c: /'
 cp "$MNT/boot/config-$KV" "$MNT$S/.config"
+# суффикс -generic: в 2.6.32 LOCALVERSION из командной строки учитывается только при CONFIG_LOCALVERSION_AUTO (у Ubuntu
+# выключен); Makefile дописывает содержимое файлов localversion* из корня исходников — так и делаем
+echo "-generic" > "$MNT$S/localversion-flavour"
 
 echo "=== 3/4 Сборка образа ядра (gcc 10.04, $(nproc) потоков; 5–20 минут)"
-MK="make -C $S EXTRAVERSION=-74 LOCALVERSION=-generic"
+MK="make -C $S EXTRAVERSION=-74"
 CHB $MK silentoldconfig < /dev/null > /dev/null
 # в 2.6.32 «make kernelrelease» работает только после подготовки — генерируем файл версии и читаем его
 CHB $MK include/config/kernel.release > /dev/null
