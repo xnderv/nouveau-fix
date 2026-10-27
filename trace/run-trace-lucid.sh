@@ -58,7 +58,7 @@ nvver() {   # версия установленного драйвера NVIDIA 
 }
 NV="$(nvver)"
 [ -n "$NV" ] || { show "STOP: no NVIDIA driver installed. Install it first (nv1 or nv2)."; exit 1; }
-if [ -e /tmp/stand-card-used ]; then
+if [ -e /tmp/stand-card-used ] && ! { [ "$MODE" = muxc ] && [ "${STAND_CHAIN:-0}" = 1 ]; }; then   # ночная цепочка: muxc после mux
   show "STOP: the card was already used in this boot ($(cat /tmp/stand-card-used))."
   show "Reboot first (sudo reboot, F12 -> ST120FN0), then rec."
   exit 1
@@ -68,7 +68,7 @@ OUT="$HERE/out-$NV-$(date +%Y%m%d-%H%M%S)"; mkdir -p "$OUT"
 LOG="$OUT/steps.txt"
 say() { echo "$(date +%T) $*" >> "$LOG"; sync; }
 SYSRQ=/proc/sysrq-trigger
-echo "запись $NV" > /tmp/stand-card-used
+echo "${MODE:-запись} $NV" > /tmp/stand-card-used
 
 show "RECORD: NVIDIA $NV, about 9 minutes. Do not touch anything until DONE."
 say "Ядро $(uname -r), драйвер NVIDIA $NV, сценарий 7 для 10.04 (без снимков, со сторожем; контроль, затем запись)${MODE:+; режим $MODE}"

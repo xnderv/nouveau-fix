@@ -24,7 +24,8 @@ D="$(ls -d "$MNT"/home/*/trace 2>/dev/null | head -n 1)"
 OWNER="$(stat -c %u:%g "$D")"
 
 if [ "$MODE" = put ]; then
-    install -m 0755 -o "${OWNER%%:*}" -g "${OWNER##*:}" "$HERE/run-trace-lucid.sh" "$HERE/install-nvidia-lucid.sh" "$D/"
+    install -m 0755 -o "${OWNER%%:*}" -g "${OWNER##*:}" "$HERE/run-trace-lucid.sh" "$HERE/install-nvidia-lucid.sh" \
+        "$HERE/stand-night-lucid.sh" "$D/"
     # без автозапуска меню: как в первый удачный раз — обычная командная строка (меню 26.10 21:16 убрано)
     rm -f "$(dirname "$D")/.bash_profile" "$D/stand-menu-lucid.sh"
     # короткие команды для набора руками в 10.04: nv1 / nv2 — установить 270.26 / 270.41.06, rec — запись
@@ -35,14 +36,15 @@ if [ "$MODE" = put ]; then
     printf '#!/bin/sh\nexec sudo %s/run-trace-lucid.sh warm\n' "${D#$MNT}" > "$MNT/usr/local/bin/rec2"
     printf '#!/bin/sh\nexec sudo %s/run-trace-lucid.sh mux "$@"\n' "${D#$MNT}" > "$MNT/usr/local/bin/mux"
     printf '#!/bin/sh\nexec sudo %s/run-trace-lucid.sh muxc "$@"\n' "${D#$MNT}" > "$MNT/usr/local/bin/muxc"
+    printf '#!/bin/sh\nexec sudo %s/stand-night-lucid.sh "$@"\n' "${D#$MNT}" > "$MNT/usr/local/bin/night"
     chmod 755 "$MNT/usr/local/bin/nv1" "$MNT/usr/local/bin/nv2" "$MNT/usr/local/bin/rec" "$MNT/usr/local/bin/rec1" \
-        "$MNT/usr/local/bin/rec2" "$MNT/usr/local/bin/mux" "$MNT/usr/local/bin/muxc"
+        "$MNT/usr/local/bin/rec2" "$MNT/usr/local/bin/mux" "$MNT/usr/local/bin/muxc" "$MNT/usr/local/bin/night"
     # Настройки модулей put не меняет: 26.10 22:05 здесь добавлялся NVreg_EnableMSI=1 (запись всё равно вставала);
     # lucid-kernel.sh его убирает, чтобы новое ядро было единственным отличием от попытки 21:59. Только показываем.
     CONF="$MNT/etc/modprobe.d/stand-2011.conf"
     echo "=== Настройки модулей в 10.04 ($(basename "$CONF")):"; sed 's/^/   /' "$CONF"
     echo "=== Короткие команды в 10.04:"
-    for c in nv1 nv2 rec rec1 rec2 mux muxc; do echo "   $c -> $(sed -n 2p "$MNT/usr/local/bin/$c")"; done
+    for c in nv1 nv2 rec rec1 rec2 mux muxc night; do echo "   $c -> $(sed -n 2p "$MNT/usr/local/bin/$c")"; done
     install -m 0644 -o "${OWNER%%:*}" -g "${OWNER##*:}" "$HERE/regdump-lucid.py" "$HERE/ШАГИ-10.04.txt" "$D/"
     install -d -o "${OWNER%%:*}" -g "${OWNER##*:}" "$D/nvidia"
     (cd "$STAND/nvidia" && sha256sum -c SHA256-local.txt) | sed 's/^/   /'
@@ -51,7 +53,7 @@ if [ "$MODE" = put ]; then
     done
     echo "=== На диске 10.04 ($D):"
     ls -l "$D" "$D/nvidia" | sed 's/^/   /'
-    for f in run-trace-lucid.sh install-nvidia-lucid.sh regdump-lucid.py; do
+    for f in run-trace-lucid.sh install-nvidia-lucid.sh stand-night-lucid.sh regdump-lucid.py; do
         if cmp -s "$HERE/$f" "$D/$f"; then echo "   $f — совпадает с репозиторием"; else echo "   !!! $f не совпадает"; fi
     done
     P1="$(blkid -L u2204-trace 2>/dev/null || true)"; M1=/mnt/u2204-trace
@@ -72,7 +74,7 @@ else
         echo "   забрана: $n"
     done
     L="$SAVE/lucid-logs-$(date +%Y%m%d-%H%M%S)"; mkdir -p "$L"
-    cp -a "$D"/install-*.log "$L/" 2>/dev/null || true
+    cp -a "$D"/install-*.log "$D"/night-*.txt "$L/" 2>/dev/null || true
     ls -laR "$D" > "$L/trace-dir-listing.txt" 2>&1 || true
     cp -a "$MNT/etc/default/console-setup" "$L/" 2>/dev/null || true
     cp -a "$MNT/root/.bash_history" "$L/root.bash_history" 2>/dev/null || true
