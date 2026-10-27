@@ -27,11 +27,15 @@
 # Запуск: rec  (или sudo ~/trace/run-trace-lucid.sh)
 #         rec1 (или sudo ~/trace/run-trace-lucid.sh only) — только запись, без контрольного прохода: драйвер под записью
 #         грузится первый раз после включения. Проба 26.10 22:00: у 270.41.06 контроль прошёл, а запись (вторая загрузка
-#         драйвера в той же сессии) повесила систему на запуске X — разделяем «повторная загрузка» и «сама запись на 2.6.32».   (~9 минут, ничего не трогать)
+#         драйвера в той же сессии) повесила систему на запуске X — разделяем «повторная загрузка» и «сама запись на 2.6.32».
+#         rec2 (или sudo ~/trace/run-trace-lucid.sh warm) — прогрев без записи и без OpenGL (драйвер, X 8 с, выгрузка), затем
+#         полный проход под записью. 27.10: на ядре 2.6.32 + kmmio fix запись проходит, только если драйвер под ней грузится
+#         второй раз (rec прошёл целиком; rec1 — первая загрузка — встал в опросе сброса 0x070000 = 3). Для 270.26: он падает
+#         на первом контексте OpenGL (Xid 38, FECS) — прогрев без OpenGL, отказ попадает уже в запись.   (~9 минут, ничего не трогать)
 set -euo pipefail
 [ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
 HERE="$(cd "$(dirname "$0")" && pwd)"
-MODE="${1:-}"   # only — без контрольного прохода
+MODE="${1:-}"   # only — без контрольного прохода; warm — прогрев без OpenGL (драйвер + X, 8 с), затем запись
 show() { echo ">>> $*"; }
 nvver() {   # версия установленного драйвера NVIDIA по строке в самом модуле; пусто — не установлен
   local f; f="$(find "/lib/modules/$(uname -r)" -name nvidia.ko 2>/dev/null | head -n 1 || true)"
@@ -52,7 +56,7 @@ SYSRQ=/proc/sysrq-trigger
 echo "запись $NV" > /tmp/stand-card-used
 
 show "RECORD: NVIDIA $NV, about 9 minutes. Do not touch anything until DONE."
-say "Ядро $(uname -r), драйвер NVIDIA $NV, сценарий 7 для 10.04 (без снимков, со сторожем; контроль, затем запись)${MODE:+; режим $MODE — только запись}"
+say "Ядро $(uname -r), драйвер NVIDIA $NV, сценарий 7 для 10.04 (без снимков, со сторожем; контроль, затем запись)${MODE:+; режим $MODE}"
 say "Время в 10.04 — UTC (в Москве +3 ч)"
 say "Настройки модулей: $(grep -h -v '^#' /etc/modprobe.d/stand-2011.conf | tr '\n' ';')"
 [ -e "$HERE/regdump-lucid.py" ] || { say "СТОП: нет regdump-lucid.py"; show "STOP: regdump-lucid.py missing"; exit 1; }
@@ -80,7 +84,8 @@ watchdog() {
     chvt 1 2>/dev/null; show "WATCHDOG: driver stuck — saving logs and POWERING OFF. Then power on, F12, continue."
     dmesg > "$OUT/dmesg-watchdog.txt" 2>/dev/null; cp /var/log/Xorg.0.log "$OUT/Xorg-watchdog.log" 2>/dev/null
     ps axww > "$OUT/ps-watchdog.txt" 2>/dev/null
-    echo nop > "$T/current_tracer" 2>/dev/null; sync; sleep 3; sync
+    # остановить запись и дать программе записи 10 с дописать файл (отказ 270.26 — главное, что пишем), потом выключить
+    echo nop > "$T/current_tracer" 2>/dev/null; sleep 10; sync; sleep 2; sync
     echo s > "$SYSRQ"; sleep 3; echo u > "$SYSRQ"; sleep 2; echo o > "$SYSRQ"
     exit 0
   done
@@ -88,6 +93,10 @@ watchdog() {
 watchdog & WDPID=$!
 
 make_session() {   # $1 — имя прохода; подписи меток начинаются с него
+if [ "$1" = прогрев ]; then   # прогрев: X без программ OpenGL, 8 с
+  printf '#!/bin/bash\nT=$(cat /tmp/trace-dir); echo "$(date +%%T) MARK: прогрев: X запущен, без OpenGL 8 с" >> "%s/steps.txt"; sync; sleep 8\n' "$OUT" > /tmp/xsession.sh
+  chmod +x /tmp/xsession.sh; return
+fi
 cat > /tmp/xsession.sh <<EOF
 #!/bin/bash
 T=\$(cat /tmp/trace-dir); OUT="$OUT"; P="$1"
@@ -157,8 +166,13 @@ run_pass() {   # $1 — имя прохода
 
 if [ "$MODE" != only ]; then
 # Проход 1: контроль, без записи, все ядра работают.
-show "[1/2] control pass (no recording): X with gears, ~4 min"
-run_pass контроль
+if [ "$MODE" = warm ]; then
+  show "[1/2] warm-up (no recording, no OpenGL): driver + X for 8 s"
+  run_pass прогрев
+else
+  show "[1/2] control pass (no recording): X with gears, ~4 min"
+  run_pass контроль
+fi
 # Драйвер выгружается: mmiotrace видит только отображения регистров, сделанные ПОСЛЕ его включения.
 ok=0
 for i in 1 2 3 4 5; do
@@ -171,7 +185,7 @@ if [ "$ok" != 1 ]; then
   show "STOP: driver did not unload, recording impossible. Control pass saved. Reboot to main system (sudo reboot, no F12)."
   exit 1
 fi
-say "Контроль прошёл, драйвер выгружен"
+say "Первый проход ($([ "$MODE" = warm ] && echo прогрев || echo контроль)) прошёл, драйвер выгружен"
 fi
 
 # Проход 2: запись.
