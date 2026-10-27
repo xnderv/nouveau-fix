@@ -87,6 +87,16 @@ mark() { echo "MARK: $*" > "$T/trace_marker" 2>/dev/null || true; say "MARK: $*"
 # Снимок только ДО загрузки драйвера: карту тогда никто не трогает.
 python "$HERE/regdump-lucid.py" "0 до драйвера (после BIOS)" "$OUT/regs.txt"
 say "Снимок регистров «до драйвера» сделан (дальше регистры не читаются)"
+# 27.10: в обеих загрузках, где 270.x падал на старте X (Xid 38 FECS + Xid 32 через 52 с после загрузки модуля; 26.10 21:39 и
+# 27.10 22:01 MSK), блок 0x1320e8–0x132124 перед драйвером был «живой» (0x132124 = 1, слова не ffffffff); во всех 13 удачных —
+# 0 и ffffffff. След прошлой сессии, который тёплая перезагрузка не снимает; выключение питания снимало (26.10 21:43).
+MU="$(grep -m1 '^132124 ' "$OUT/regs.txt" | awk '{print $2}')"
+if [ -n "$MU" ] && [ "$MU" != "00000000" ]; then
+  say "СТОП: 0x132124=$MU — блок такта памяти не сброшен (след прошлой сессии; так было в обеих загрузках с Xid 38). Драйвер не гружу."
+  show "STOP: memory clock unit not reset (0x132124=$MU). POWER OFF (not reboot), power on, F12, run again."
+  exit 3
+fi
+say "0x132124=$MU — блок такта памяти чист, можно грузить драйвер"
 
 # Сторож: Xid / отвал от шины в журнале ядра или 120 с без новой отметки -> журналы на диск и выключение.
 watchdog() {
@@ -96,6 +106,10 @@ watchdog() {
     elif [ $(( $(date +%s) - $(stat -c %Y "$LOG") )) -gt 120 ]; then why="120 с без новой отметки сценария"
     else continue; fi
     say "СТОРОЖ: $why — сохраняю журналы и выключаю машину"
+    # 27.10: заморозить сценарий (и ночную цепочку, если она родитель): иначе за 15 с сохранения он успевал закрыть X,
+    # выгрузить драйвер и начать второй проход (загрузка 19:01 UTC) — журналы и снимки шли вразнобой
+    kill -STOP "$$" 2>/dev/null
+    PP="$(ps -o ppid= -p "$$" 2>/dev/null | tr -d ' ')"; ps -o args= -p "$PP" 2>/dev/null | grep -q stand-night && kill -STOP "$PP" 2>/dev/null
     chvt 1 2>/dev/null; show "WATCHDOG: driver stuck — saving logs and POWERING OFF. Then power on, F12, continue."
     dmesg > "$OUT/dmesg-watchdog.txt" 2>/dev/null; cp /var/log/Xorg.0.log "$OUT/Xorg-watchdog.log" 2>/dev/null
     ps axww > "$OUT/ps-watchdog.txt" 2>/dev/null

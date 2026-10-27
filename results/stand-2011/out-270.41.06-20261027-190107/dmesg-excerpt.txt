@@ -1,0 +1,5 @@
+[   39.823357] nvidia 0000:01:00.0: PCI INT A -> GSI 16 (level, low) -> IRQ 16
+[   39.824782] nvidia 0000:01:00.0: setting latency timer to 64
+[   39.828795] NVRM: loading NVIDIA UNIX x86_64 Kernel Module  270.41.06  Mon Apr 18 14:53:56 PDT 2011
+[   91.929841] NVRM: Xid (0000:01:00): 38, 0000 094c7000 00000001 00000000 00000100 094c7000
+[   92.558531] NVRM: Xid (0000:01:00): 32, Channel ID 00000000 intr 00800000
