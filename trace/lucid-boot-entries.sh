@@ -34,18 +34,24 @@ umount_retry "$M2"
 echo "=== Пункты меню в загрузчике 22.04 (по одному на ядро, новейшее — по умолчанию)"
 mount "$P1" "$M1"
 for d in dev dev/pts proc sys run; do mount --bind "/$d" "$M1/$d"; done
+# 27.10: 2.6.35 включает переназначение прерываний VT-d и x2APIC («Enabled Interrupt-remapping»), 2.6.32 — нет
+# («Intr-remapping init failed»); на 2.6.35 270.41.06 вис даже без записи. Первым и по умолчанию — новейшее ядро с
+# nointremap (прерывания как в 2.6.32, исправление kmmio остаётся), затем обычные пункты каждого ядра.
+entry() {   # $1 — ядро, $2 — добавка к параметрам, $3 — добавка к названию
+    printf "menuentry 'Ubuntu 10.04, kernel %s%s (NVIDIA 270 stand)' {\n" "$1" "$3"
+    printf '\tinsmod part_msdos\n\tinsmod ext2\n'
+    printf '\tsearch --no-floppy --fs-uuid --set=root %s\n' "$UUID2"
+    printf '\tset gfxpayload=text\n'
+    printf '\tlinux16 /boot/vmlinuz-%s root=UUID=%s ro earlyprintk=vga,keep ignore_loglevel panic=0%s\n' "$1" "$UUID2" "$2"
+    printf '\tinitrd16 /boot/initrd.img-%s\n}\n' "$1"
+}
+NEWEST="$(echo "$KVS" | head -n 1)"
 {
     printf '#!/bin/sh\nexec tail -n +3 $0\n'
-    for KV in $KVS; do
-        printf "menuentry 'Ubuntu 10.04, kernel %s (NVIDIA 270 stand)' {\n" "$KV"
-        printf '\tinsmod part_msdos\n\tinsmod ext2\n'
-        printf '\tsearch --no-floppy --fs-uuid --set=root %s\n' "$UUID2"
-        printf '\tset gfxpayload=text\n'
-        printf '\tlinux16 /boot/vmlinuz-%s root=UUID=%s ro earlyprintk=vga,keep ignore_loglevel panic=0\n' "$KV" "$UUID2"
-        printf '\tinitrd16 /boot/initrd.img-%s\n}\n' "$KV"
-    done
+    entry "$NEWEST" " nointremap" ", nointremap"
+    for KV in $KVS; do entry "$KV" "" ""; done
 } > "$M1/etc/grub.d/41_lucid-stand"
-DEF="Ubuntu 10.04, kernel $(echo "$KVS" | head -n 1) (NVIDIA 270 stand)"
+DEF="Ubuntu 10.04, kernel $NEWEST, nointremap (NVIDIA 270 stand)"
 chmod 755 "$M1/etc/grub.d/41_lucid-stand"
 sed -i "s/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=5/; s/^GRUB_DEFAULT=.*/GRUB_DEFAULT=\"$DEF\"/" "$M1/etc/default/grub"
 grep -E '^GRUB_(DEFAULT|TIMEOUT)=' "$M1/etc/default/grub" | sed 's/^/   /'

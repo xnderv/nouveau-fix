@@ -1,0 +1,20 @@
+(==) Oct 27 07:53:22 NVIDIA(0):     will be used as the requested mode.
+(==) Oct 27 07:53:22 NVIDIA(0): 
+(II) Oct 27 07:53:22 NVIDIA(0): Validated modes:
+(II) Oct 27 07:53:22 NVIDIA(0):     "nvidia-auto-select"
+(II) Oct 27 07:53:22 NVIDIA(0): Virtual screen size determined to be 1920 x 1080
+(--) Oct 27 07:53:22 NVIDIA(0): DPI set to (79, 80); computed from "UseEdidDpi" X config
+(--) Oct 27 07:53:22 NVIDIA(0):     option
+(--) Depth 24 pixmap format is 32 bpp
+(II) Oct 27 07:53:22 NVIDIA: Using 3072.00 MB of virtual memory for indirect memory
+(II) Oct 27 07:53:22 NVIDIA:     access.
+(II) Oct 27 07:53:22 NVIDIA(0): ACPI: failed to connect to the ACPI event daemon; the daemon
+(II) Oct 27 07:53:22 NVIDIA(0):     may not be running or the "AcpidSocketPath" X
+(II) Oct 27 07:53:22 NVIDIA(0):     configuration option may not be set correctly.  When the
+(II) Oct 27 07:53:22 NVIDIA(0):     ACPI event daemon is available, the NVIDIA X driver will
+(II) Oct 27 07:53:22 NVIDIA(0):     try to use it to receive ACPI event notifications.  For
+(II) Oct 27 07:53:22 NVIDIA(0):     details, please see the "ConnectToAcpid" and
+(II) Oct 27 07:53:22 NVIDIA(0):     "AcpidSocketPath" X configuration options in Appendix B: X
+(II) Oct 27 07:53:22 NVIDIA(0):     Config Options in the README.
+(II) Oct 27 07:53:22 NVIDIA(0): Setting mode "nvidia-auto-select"
+(II) Loading extension NV-GLX
