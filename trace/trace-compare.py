@@ -10,11 +10,11 @@
 #   init ЗАПИСЬ_А ЗАПИСЬ_Б            — что пишет драйвер от загрузки модуля до первой метки «0 максимум» (прохода записи):
 #                                       регистры BAR0 и значения, которые есть только в одной из записей (без массовых
 #                                       портов прошивок FECS/GPCCS и I2C — по ним только число записей)
-# ЗАПИСЬ — текст mmiotrace или .xz. Время — секунды записи.
+# ЗАПИСЬ — текст mmiotrace или .xz. Время — секунды записи. Окно регистров другой машины: BAR0=0xf6000000 python3 -I …
 # Запуск: python3 -I trace/trace-compare.py trans ~/Home/stand-2011/results/out-…/mmiotrace.txt.xz
-import collections, io, lzma, sys
+import collections, io, lzma, os, sys
 
-BAR0 = 0xf4000000
+BAR0 = int(os.environ.get('BAR0', '0xf4000000'), 16)   # окно регистров карты; у других машин иное (PCIDEV-строка записи)
 KEY = {0x137100: 'mux', 0x020160: 'fsrm160', 0x020180: 'fsrm180', 0x0201a0: 'fsrm1a0',
        0x1371d0: 'div1d0', 0x137250: 'div250', 0x137000: 'gpcpll'}
 BULK = {0x409184: 'FECS данные', 0x41a184: 'GPCCS данные', 0x409180: 'FECS адрес', 0x41a180: 'GPCCS адрес'}
