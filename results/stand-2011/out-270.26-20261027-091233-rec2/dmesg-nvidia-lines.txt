@@ -1,0 +1,11 @@
+[   22.228161] nvidia: module license 'NVIDIA' taints kernel.
+[   22.746511] nvidia 0000:01:00.0: PCI INT A -> GSI 16 (level, low) -> IRQ 16
+[   22.747933] nvidia 0000:01:00.0: setting latency timer to 64
+[   22.751923] NVRM: loading NVIDIA UNIX x86_64 Kernel Module  270.26  Sun Feb 13 22:30:06 PST 2011
+[   36.678554] NVRM: os_schedule: Attempted to yield the CPU while in atomic or interrupt context
+[   51.490638] nvidia 0000:01:00.0: PCI INT A disabled
+[   58.691119] nvidia 0000:01:00.0: PCI INT A -> GSI 16 (level, low) -> IRQ 16
+[   58.703511] nvidia 0000:01:00.0: setting latency timer to 64
+[   58.796373] NVRM: loading NVIDIA UNIX x86_64 Kernel Module  270.26  Sun Feb 13 22:30:06 PST 2011
+[  269.864710] Modules linked in: nvidia(P) snd_hda_codec_realtek psmouse fbcon uvcvideo tileblit videodev snd_hda_intel btusb font bitblit softcursor snd_usb_audio snd_usb_lib snd_rawmidi v4l1_compat snd_seq_device v4l2_compat_ioctl32 bluetooth snd_hda_codec serio_raw video output snd_hwdep snd_pcm joydev snd_timer snd soundcore snd_page_alloc xhci vga16fb vgastate hid_logitech ff_memless usb_storage usbhid hid ahci [last unloaded: nvidia]
+[  270.860174] Modules linked in: nvidia(P) snd_hda_codec_realtek psmouse fbcon uvcvideo tileblit videodev snd_hda_intel btusb font bitblit softcursor snd_usb_audio snd_usb_lib snd_rawmidi v4l1_compat snd_seq_device v4l2_compat_ioctl32 bluetooth snd_hda_codec serio_raw video output snd_hwdep snd_pcm joydev snd_timer snd soundcore snd_page_alloc xhci vga16fb vgastate hid_logitech ff_memless usb_storage usbhid hid ahci [last unloaded: nvidia]

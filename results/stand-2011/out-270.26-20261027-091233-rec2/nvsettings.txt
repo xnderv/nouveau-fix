@@ -1,0 +1,34 @@
+### запись: PowerMizer=1 09:13:24
+
+  Attribute 'GPUPowerMizerMode' (u1004-trace:0[gpu:0]) assigned value 1.
+
+### запись: PowerMizer=0 09:13:31
+
+  Attribute 'GPUPowerMizerMode' (u1004-trace:0[gpu:0]) assigned value 0.
+
+### запись: A 09:14:16
+1
+405,324
+### запись: B 09:14:41
+2
+900,2004
+### запись: C 09:15:11
+1
+405,324
+### запись: PowerMizer=1 09:15:11
+
+  Attribute 'GPUPowerMizerMode' (u1004-trace:0[gpu:0]) assigned value 1.
+
+### запись: D максимум 09:15:21
+2
+900,2004
+### запись: PowerMizer=0 09:15:22
+
+  Attribute 'GPUPowerMizerMode' (u1004-trace:0[gpu:0]) assigned value 0.
+
+### запись: D адаптивный 09:15:47
+1
+405,324
+### запись: E 09:16:35
+2
+900,2004

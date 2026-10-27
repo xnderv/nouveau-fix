@@ -1,0 +1,24 @@
+
+
+X.Org X Server 1.7.6
+Release Date: 2010-03-17
+X Protocol Version 11, Revision 0
+Build Operating System: Linux 2.6.42-37-generic x86_64 Ubuntu
+Current Operating System: Linux u1004-trace 2.6.32-74-generic #1 SMP Tue Oct 27 08:33:45 UTC 2026 x86_64
+Kernel command line: BOOT_IMAGE=/boot/vmlinuz-2.6.32-74-generic-kmmiofix root=UUID=be74737e-4512-460a-a6a5-2bdc9abb12c1 ro earlyprintk=vga,keep ignore_loglevel panic=0
+Build Date: 11 April 2013  01:20:21PM
+xorg-server 2:1.7.6-2ubuntu7.12 (For technical support please see http://www.ubuntu.com/support) 
+Current version of pixman: 0.16.4
+	Before reporting problems, check http://wiki.x.org
+	to make sure that you have the latest version.
+Markers: (--) probed, (**) from config file, (==) default setting,
+	(++) from command line, (!!) notice, (II) informational,
+	(WW) warning, (EE) error, (NI) not implemented, (??) unknown.
+(==) Log file: "/var/log/Xorg.0.log", Time: Tue Oct 27 09:12:37 2026
+(==) Using config file: "/etc/X11/xorg.conf"
+(==) Using config directory: "/usr/lib/X11/xorg.conf.d"
+(EE) Logitech G102 Prodigy Gaming Mouse: failed to initialize for relative axes.
+
+waiting for X server to shut down . ddxSigGiveUp: Closing log
+
+
