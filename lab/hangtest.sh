@@ -43,7 +43,8 @@ gr()     { cat "$PRM/lab_perf_gr" 2>/dev/null || echo 0; }
 # всё дольше и растягивала стоянку на 0f (тест 43: 6 → 12 с). Подпись зависания приходит через 35–45 с — окно подтверждения
 # (до 90 с) отсчитывается от того же $ES и её покрывает.
 errs()   { journalctl -k -b 0 --no-pager --since "${ES:-$T0}" 2>/dev/null | grep -cE 'failed to idle|SCHED_ERROR|runl|fifo:.*INTR|vmmgf100.c' || true; }
-bdur()   { journalctl -k -b 0 --no-pager --since "$T0" 2>/dev/null | grep -oE 'replay B 324->2004: выполнен за [0-9]+ мкс' | tail -n1 | grep -oE '[0-9]+ мкс'; }
+# 27.10: тоже по окну цикла ($ES) — с начала теста ($T0) журнал к 1400-му циклу читался 3,6 с и растягивал цикл с 2,5 до 5,5 с
+bdur()   { journalctl -k -b 0 --no-pager --since "${ES:-$T0}" 2>/dev/null | grep -oE 'replay B 324->2004: выполнен за [0-9]+ мкс' | tail -n1 | grep -oE '[0-9]+ мкс'; }
 GOV0="$(cat "$PRM/lab_gov")"; LP=""; HUNG=0
 MT0="$(cat "$PRM/lab_mux_timeouts" 2>/dev/null || echo 0)"   # 24.10: тайм-ауты переключателя источника такта за тест
 finish() {
