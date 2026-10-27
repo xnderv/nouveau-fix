@@ -1,4 +1,4 @@
-# Third reply in Twilight0/nouveau-dkms issue #9 (to rox4d) — draft 27.10, not sent
+# Third reply in Twilight0/nouveau-dkms issue #9 (to rox4d) — posted 27.10.2026 21:32 MSK as xnderv: https://github.com/Twilight0/nouveau-dkms/issues/9#issuecomment-6450414733
 
 Place: a comment in https://github.com/Twilight0/nouveau-dkms/issues/9 (public). Our own analysis of his trace; credit him.
 
