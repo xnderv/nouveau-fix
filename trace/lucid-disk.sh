@@ -33,10 +33,9 @@ if [ "$MODE" = put ]; then
     printf '#!/bin/sh\nexec sudo %s/run-trace-lucid.sh\n' "${D#$MNT}" > "$MNT/usr/local/bin/rec"
     printf '#!/bin/sh\nexec sudo %s/run-trace-lucid.sh only\n' "${D#$MNT}" > "$MNT/usr/local/bin/rec1"
     chmod 755 "$MNT/usr/local/bin/nv1" "$MNT/usr/local/bin/nv2" "$MNT/usr/local/bin/rec" "$MNT/usr/local/bin/rec1"
-    # 26.10 22:05: прерывание карты по MSI, а не по общей линии 16 (с ней — USB EHCI и Etron xHCI). Под записью (одно ядро)
-    # 270.41.06 вешал систему на запуске X и в первой, и во второй загрузке драйвера. У 390 (try7) MSI — по умолчанию.
+    # Настройки модулей put не меняет: 26.10 22:05 здесь добавлялся NVreg_EnableMSI=1 (запись всё равно вставала);
+    # lucid-kernel.sh его убирает, чтобы новое ядро было единственным отличием от попытки 21:59. Только показываем.
     CONF="$MNT/etc/modprobe.d/stand-2011.conf"
-    grep -q 'NVreg_EnableMSI' "$CONF" || echo 'options nvidia NVreg_EnableMSI=1' >> "$CONF"
     echo "=== Настройки модулей в 10.04 ($(basename "$CONF")):"; sed 's/^/   /' "$CONF"
     echo "=== Короткие команды в 10.04:"
     for c in nv1 nv2 rec rec1; do echo "   $c -> $(sed -n 2p "$MNT/usr/local/bin/$c")"; done
