@@ -72,7 +72,9 @@ cp "$MNT/boot/config-$KV" "$MNT$S/.config"
 echo "=== 3/4 Сборка образа ядра (gcc 10.04, $(nproc) потоков; 5–20 минут)"
 MK="make -C $S EXTRAVERSION=-74 LOCALVERSION=-generic"
 CHB $MK silentoldconfig < /dev/null > /dev/null
-REL="$(CHB $MK -s kernelrelease)"
+# в 2.6.32 «make kernelrelease» работает только после подготовки — генерируем файл версии и читаем его
+CHB $MK include/config/kernel.release > /dev/null
+REL="$(cat "$MNT$S/include/config/kernel.release")"
 [ "$REL" = "$KV" ] || { echo "СТОП: версия сборки «$REL», а нужна $KV"; exit 1; }
 cmp -s "$MNT/boot/config-$KV" "$MNT$S/.config" && echo "   конфиг совпадает с родным" || { echo "   !!! конфиг после silentoldconfig отличается:"; diff "$MNT/boot/config-$KV" "$MNT$S/.config" | head -20; }
 CHB $MK -j"$(nproc)" bzImage 2>&1 | grep -E "error|Error|warning: .*kmmio|Kernel: arch" || true
