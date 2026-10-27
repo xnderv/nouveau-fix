@@ -31,11 +31,18 @@
 #         rec2 (или sudo ~/trace/run-trace-lucid.sh warm) — прогрев без записи и без OpenGL (драйвер, X 8 с, выгрузка), затем
 #         полный проход под записью. 27.10: на ядре 2.6.32 + kmmio fix запись проходит, только если драйвер под ней грузится
 #         второй раз (rec прошёл целиком; rec1 — первая загрузка — встал в опросе сброса 0x070000 = 3). Для 270.26: он падает
-#         на первом контексте OpenGL (Xid 38, FECS) — прогрев без OpenGL, отказ попадает уже в запись.   (~9 минут, ничего не трогать)
+#         на первом контексте OpenGL (Xid 38, FECS) — прогрев без OpenGL, отказ попадает уже в запись.
+#         mux (или sudo ~/trace/run-trace-lucid.sh mux [МИНУТ]) — 27.10: застревает ли переключатель GPC у драйвера 2011 года.
+#         Прогрев, затем под записью 30 минут (~250) циклов «PowerMizer максимум 2 с (подъём на 0f) — адаптивный 5 с (спуск)»,
+#         X без OpenGL. 270.x после каждой записи в 0x137100 читает его обратно: застрявший GPC даст 0x181 вместо 0x180
+#         (разбор — trace/trace-compare.py mux). У нашего драйвера без «команды» застревание — ~1,2 % спусков в «плохих»
+#         загрузках (около 3 из 4), поэтому прогонов — три, в разных загрузках.   (~9 минут, ничего не трогать)
 set -euo pipefail
 [ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
 HERE="$(cd "$(dirname "$0")" && pwd)"
-MODE="${1:-}"   # only — без контрольного прохода; warm — прогрев без OpenGL (драйвер + X, 8 с), затем запись
+MODE="${1:-}"   # only — без контрольного прохода; warm — прогрев без OpenGL (драйвер + X, 8 с), затем запись;
+                # mux — прогрев, затем под записью MUX_MIN минут циклов «максимум 2 с — адаптивный 5 с» без OpenGL
+MUX_MIN="${2:-30}"
 show() { echo ">>> $*"; }
 nvver() {   # версия установленного драйвера NVIDIA по строке в самом модуле; пусто — не установлен
   local f; f="$(find "/lib/modules/$(uname -r)" -name nvidia.ko 2>/dev/null | head -n 1 || true)"
@@ -96,6 +103,32 @@ make_session() {   # $1 — имя прохода; подписи меток н�
 if [ "$1" = прогрев ]; then   # прогрев: X без программ OpenGL, 8 с
   printf '#!/bin/bash\nT=$(cat /tmp/trace-dir); echo "$(date +%%T) MARK: прогрев: X запущен, без OpenGL 8 с" >> "%s/steps.txt"; sync; sleep 8\n' "$OUT" > /tmp/xsession.sh
   chmod +x /tmp/xsession.sh; return
+fi
+if [ "$MODE" = mux ] && [ "$1" = запись ]; then   # циклы подъём/спуск без OpenGL
+cat > /tmp/xsession.sh <<EOF
+#!/bin/bash
+T=\$(cat /tmp/trace-dir); OUT="$OUT"; P="$1"
+mark() { echo "MARK: \$P: \$*" > "\$T/trace_marker" 2>/dev/null; echo "\$(date +%T) MARK: \$P: \$*" >> "\$OUT/steps.txt"; sync; }
+level() { { echo "### \$P: \$1 \$(date +%T)"; nvidia-settings -t -q GPUCurrentPerfLevel -q GPUCurrentClockFreqs 2>&1; } >> "\$OUT/nvsettings.txt"; }
+pm() { nvidia-settings -a "[gpu:0]/GPUPowerMizerMode=\$1" >/dev/null 2>&1 || true; }   # 0 адаптивный, 1 максимум
+big() { [ "\$(stat -c %s "\$OUT/mmiotrace.txt" 2>/dev/null || echo 0)" -gt 2000000000 ]; }
+export LD_LIBRARY_PATH=/usr/lib
+END=\$(( \$(date +%s) + $MUX_MIN * 60 ))
+sleep 3
+mark "циклы: $MUX_MIN мин «максимум 2 с — адаптивный 5 с», без OpenGL"
+level "до циклов"
+n=0
+while [ \$(date +%s) -lt \$END ]; do
+  n=\$((n + 1))
+  mark "цикл \$n: максимум"; pm 1; sleep 2
+  mark "цикл \$n: адаптивный"; pm 0; sleep 5
+  [ \$((n % 25)) -eq 0 ] && level "цикл \$n"
+  big && { mark "запись больше 2 ГБ — циклы остановлены на \$n"; break; }
+done
+level "после циклов"
+mark "конец прохода: \$n циклов"
+EOF
+chmod +x /tmp/xsession.sh; return
 fi
 cat > /tmp/xsession.sh <<EOF
 #!/bin/bash
@@ -166,7 +199,7 @@ run_pass() {   # $1 — имя прохода
 
 if [ "$MODE" != only ]; then
 # Проход 1: контроль, без записи, все ядра работают.
-if [ "$MODE" = warm ]; then
+if [ "$MODE" = warm ] || [ "$MODE" = mux ]; then
   show "[1/2] warm-up (no recording, no OpenGL): driver + X for 8 s"
   run_pass прогрев
 else
@@ -185,11 +218,15 @@ if [ "$ok" != 1 ]; then
   show "STOP: driver did not unload, recording impossible. Control pass saved. Reboot to main system (sudo reboot, no F12)."
   exit 1
 fi
-say "Первый проход ($([ "$MODE" = warm ] && echo прогрев || echo контроль)) прошёл, драйвер выгружен"
+say "Первый проход ($(case "$MODE" in warm|mux) echo прогрев;; *) echo контроль;; esac)) прошёл, драйвер выгружен"
 fi
 
 # Проход 2: запись.
-show "[2/2] recording pass: other CPU cores switch off for a while (normal), ~5 min"
+if [ "$MODE" = mux ]; then
+  show "[2/2] recording pass: $MUX_MIN min of max/adaptive cycles, black screen, do not touch"
+else
+  show "[2/2] recording pass: other CPU cores switch off for a while (normal), ~5 min"
+fi
 say "Включаю запись (остальные ядра процессора на время записи выключатся — это нормально)"
 echo nop > "$T/current_tracer"
 echo 65536 > "$T/buffer_size_kb"     # размер записи задаёт нагрузка, а не буфер
