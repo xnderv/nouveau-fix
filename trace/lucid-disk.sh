@@ -32,13 +32,14 @@ if [ "$MODE" = put ]; then
     printf '#!/bin/sh\nexec sudo %s/install-nvidia-lucid.sh 270.41.06\n' "${D#$MNT}" > "$MNT/usr/local/bin/nv2"
     printf '#!/bin/sh\nexec sudo %s/run-trace-lucid.sh\n' "${D#$MNT}" > "$MNT/usr/local/bin/rec"
     printf '#!/bin/sh\nexec sudo %s/run-trace-lucid.sh only\n' "${D#$MNT}" > "$MNT/usr/local/bin/rec1"
-    chmod 755 "$MNT/usr/local/bin/nv1" "$MNT/usr/local/bin/nv2" "$MNT/usr/local/bin/rec" "$MNT/usr/local/bin/rec1"
+    printf '#!/bin/sh\nexec sudo %s/run-trace-lucid.sh warm\n' "${D#$MNT}" > "$MNT/usr/local/bin/rec2"
+    chmod 755 "$MNT/usr/local/bin/nv1" "$MNT/usr/local/bin/nv2" "$MNT/usr/local/bin/rec" "$MNT/usr/local/bin/rec1" "$MNT/usr/local/bin/rec2"
     # Настройки модулей put не меняет: 26.10 22:05 здесь добавлялся NVreg_EnableMSI=1 (запись всё равно вставала);
     # lucid-kernel.sh его убирает, чтобы новое ядро было единственным отличием от попытки 21:59. Только показываем.
     CONF="$MNT/etc/modprobe.d/stand-2011.conf"
     echo "=== Настройки модулей в 10.04 ($(basename "$CONF")):"; sed 's/^/   /' "$CONF"
     echo "=== Короткие команды в 10.04:"
-    for c in nv1 nv2 rec rec1; do echo "   $c -> $(sed -n 2p "$MNT/usr/local/bin/$c")"; done
+    for c in nv1 nv2 rec rec1 rec2; do echo "   $c -> $(sed -n 2p "$MNT/usr/local/bin/$c")"; done
     install -m 0644 -o "${OWNER%%:*}" -g "${OWNER##*:}" "$HERE/regdump-lucid.py" "$HERE/ШАГИ-10.04.txt" "$D/"
     install -d -o "${OWNER%%:*}" -g "${OWNER##*:}" "$D/nvidia"
     (cd "$STAND/nvidia" && sha256sum -c SHA256-local.txt) | sed 's/^/   /'
