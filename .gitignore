@@ -11,3 +11,4 @@ results/.night-mark
 results/night-journal-*
 results/hang-*.txt
 results/**/mmiotrace.txt
+results/**/*.tar.xz
