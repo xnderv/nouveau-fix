@@ -33,7 +33,9 @@
 #         второй раз (rec прошёл целиком; rec1 — первая загрузка — встал в опросе сброса 0x070000 = 3). Для 270.26: он падает
 #         на первом контексте OpenGL (Xid 38, FECS) — прогрев без OpenGL, отказ попадает уже в запись.
 #         mux (или sudo ~/trace/run-trace-lucid.sh mux [МИНУТ]) — 27.10: застревает ли переключатель GPC у драйвера 2011 года.
-#         Прогрев, затем под записью 30 минут (~250) циклов «PowerMizer максимум 2 с (подъём на 0f) — адаптивный 5 с (спуск)»,
+#         Прогрев, затем под записью N минут циклов «PowerMizer максимум 2 с (подъём на 0f) — адаптивный 18 с (спуск)»,
+#         (27.10, прогон 1 с «адаптивный 5 с»: после подъёма регулятор держит 0f минимум 14,1 с, медиана 17,6 — спуск
+#         был лишь в каждом третьем цикле, 93 за 30 мин; с 18 с — по спуску в цикле, ~3 в минуту; прогоны — по 60 минут),
 #         X без OpenGL. 270.x после каждой записи в 0x137100 читает его обратно: застрявший GPC даст 0x181 вместо 0x180
 #         (разбор — trace/trace-compare.py mux). У нашего драйвера без «команды» застревание — ~1,2 % спусков в «плохих»
 #         загрузках (около 3 из 4), поэтому прогонов — три, в разных загрузках.   (~9 минут, ничего не трогать)
@@ -92,7 +94,7 @@ watchdog() {
     dmesg > "$OUT/dmesg-watchdog.txt" 2>/dev/null; cp /var/log/Xorg.0.log "$OUT/Xorg-watchdog.log" 2>/dev/null
     ps axww > "$OUT/ps-watchdog.txt" 2>/dev/null
     # остановить запись и дать программе записи 10 с дописать файл (отказ 270.26 — главное, что пишем), потом выключить
-    echo nop > "$T/current_tracer" 2>/dev/null; sleep 10; sync; sleep 2; sync
+    echo 0 > "$T/tracing_on" 2>/dev/null; sleep 10; sync; sleep 2; sync
     echo s > "$SYSRQ"; sleep 3; echo u > "$SYSRQ"; sleep 2; echo o > "$SYSRQ"
     exit 0
   done
@@ -115,13 +117,13 @@ big() { [ "\$(stat -c %s "\$OUT/mmiotrace.txt" 2>/dev/null || echo 0)" -gt 20000
 export LD_LIBRARY_PATH=/usr/lib
 END=\$(( \$(date +%s) + $MUX_MIN * 60 ))
 sleep 3
-mark "циклы: $MUX_MIN мин «максимум 2 с — адаптивный 5 с», без OpenGL"
+mark "циклы: $MUX_MIN мин «максимум 2 с — адаптивный 18 с», без OpenGL"
 level "до циклов"
 n=0
 while [ \$(date +%s) -lt \$END ]; do
   n=\$((n + 1))
   mark "цикл \$n: максимум"; pm 1; sleep 2
-  mark "цикл \$n: адаптивный"; pm 0; sleep 5
+  mark "цикл \$n: адаптивный"; pm 0; sleep 18
   [ \$((n % 25)) -eq 0 ] && level "цикл \$n"
   big && { mark "запись больше 2 ГБ — циклы остановлены на \$n"; break; }
 done
@@ -239,8 +241,13 @@ mark "конец записи"
 kill "$WDPID" 2>/dev/null || true   # сторож снимается ДО остановки mmiotrace: в прогоне 7 остановка шла > 2 мин
 show "stopping the recording (can take 1-2 minutes)..."
 sleep 1
+# Остановка (27.10): сначала выключить запись (tracing_on = 0), дать программе чтения дописать остаток, завершить её
+# и только потом сменить трассировщик. На новых ядрах (5.x, 6.x) «echo nop» при открытом trace_pipe даёт «Устройство
+# или ресурс занято» и сценарий обрывался здесь (rox4d, issue Twilight0/nouveau-dkms#9; так же, видимо, в try7).
+echo 0 > "$T/tracing_on" 2>/dev/null || true
+sleep 3; kill "$CATPID" 2>/dev/null || true; wait "$CATPID" 2>/dev/null || true
 echo nop > "$T/current_tracer"
-sleep 1; kill "$CATPID" 2>/dev/null || true
+echo 1 > "$T/tracing_on" 2>/dev/null || true
 dmesg > "$OUT/dmesg.txt"
 if grep -q 'mmiotrace has lost events' "$OUT/dmesg.txt"; then say "!!! Запись потеряла часть событий (буфер не успел)"; show "WARNING: the recording lost some events"
 else say "Потерь в записи нет"; fi

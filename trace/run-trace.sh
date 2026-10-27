@@ -166,8 +166,13 @@ run_pass запись
 mark "конец записи"
 finish   # сторож снимается ДО остановки mmiotrace: в прогоне 7 остановка шла > 2 мин, и сторож выключил машину
 sleep 1
+# Остановка (27.10): сначала выключить запись (tracing_on = 0), дать программе чтения дописать остаток, завершить её
+# и только потом сменить трассировщик. На новых ядрах (5.x, 6.x) «echo nop» при открытом trace_pipe даёт «Устройство
+# или ресурс занято» и сценарий обрывался здесь (rox4d, issue Twilight0/nouveau-dkms#9; так же, видимо, в try7).
+echo 0 > "$T/tracing_on" 2>/dev/null || true
+sleep 3; kill "$CATPID" 2>/dev/null || true; wait "$CATPID" 2>/dev/null || true
 echo nop > "$T/current_tracer"
-sleep 1; kill "$CATPID" 2>/dev/null || true
+echo 1 > "$T/tracing_on" 2>/dev/null || true
 dmesg > "$OUT/dmesg.txt"
 grep -q 'mmiotrace has lost events' "$OUT/dmesg.txt" && say "!!! Запись потеряла часть событий (буфер не успел)" || say "Потерь в записи нет"
 if [ -s "$OUT/mmiotrace.txt" ]; then
