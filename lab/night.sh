@@ -284,7 +284,7 @@ T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
 say "=== тест 57о (контроль, без ключей): тайм-аутов $T0C на $N0C подъёмов"
 if [ "$T0C" -eq 0 ]; then
     say "=== сессия сейчас ХОРОШАЯ (0 на $N0C без ключей) — 57а ничего не докажет; серия остановлена: перезагрузка и снова"
-    base; setp lab_gov="$GOV_START"; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
+    base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
     finish_night clean
 fi
 { $SUDO lspci -vvv -s 01:00.0; echo; $SUDO lspci -vvv -s 00:01.0; } > "$RES/lspci-$BOOT-bad.txt" 2>&1 && say "=== lspci плохой сессии: results/lspci-$BOOT-bad.txt (сравнить с lspci-1447-good.txt)"
@@ -319,7 +319,7 @@ T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
 say "=== тест 58о (контроль, без ключей): тайм-аутов $T0C на $N0C подъёмов"
 if [ "$T0C" -eq 0 ]; then
     say "=== сессия сейчас ХОРОШАЯ (0 на $N0C без ключей) — 58а ничего не докажет; серия остановлена: перезагрузка и снова"
-    base; setp lab_gov="$GOV_START"; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
+    base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
     finish_night clean
 fi
 RUNS=1500; MT0="$(mt)"; export STOPMUX=5
@@ -355,7 +355,7 @@ T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
 say "=== тест 56о (контроль, без ключей): тайм-аутов $T0C на $N0C подъёмов"
 if [ "$T0C" -eq 0 ]; then
     say "=== сессия сейчас ХОРОШАЯ (0 на $N0C без ключей) — 56б и 56в ничего не докажут; серия остановлена"
-    base; setp lab_gov="$GOV_START"; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
+    base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
     finish_night clean
 fi
 RUNS=300; MT0="$(mt)"; export STOPMUX=3
