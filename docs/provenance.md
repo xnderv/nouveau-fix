@@ -91,3 +91,6 @@ nouveau_abi16_ioctl_channel_free (загрузки 20:42 и 20:46). Собран
 (daily/grub-pin.sh current). Код по платам на нашей карте ведёт себя как раньше (та же плата, те же шаги).
 
 **28.10 21:31 — призыв владельцев Fermi с GDDR5**: issue https://github.com/xnderv/nouveau-fix/issues/2 (текст docs/upstream/call-for-fermi-testers-draft.md, проект назван хобби без обязательств) и одна строка Q0AL в Twilight0/nouveau-dkms#5 (https://github.com/Twilight0/nouveau-dkms/issues/5#issuecomment-6477307415). Рассылка nouveau и пять старых тем (Fedora Discussion, Arch BBS, GitLab 330/257, баг 58784) — не трогали.
+
+**28.10 ~22:00 — Q0AL ответил в Twilight0#5**: «Yea I'll be able to do that. Its the EVGA 1GB version as an FYI. I'll post the results
+there in about a day» — GTX 560 (GF114, наш чип; плата EVGA 1 GB), запись NVIDIA 390 нашим скриптом, результат обещал в нашем issue #2.
