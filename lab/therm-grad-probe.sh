@@ -6,7 +6,8 @@
 #   0x0202c8+4i grad_stepping_table (пять коэффициентов по 6 бит), 0x0203c0+4i clk_timing (бит 16 grad_slowdown),
 #   0x020200+4i gate_ctrl, 0x0201e0/e4 — статус (наш «признак»). Ни один из наших драйверов эти регистры не пишет (записи
 #   390, 270, GF106): значения — состояние после POST / по умолчанию. bash ~/Home/nouveau-fix/lab/therm-grad-probe.sh
-sudo python3 -I - <<'PY'
+OUT=~/Home/nouveau-fix/results/therm-grad-probe-$(date +%Y%m%d-%H%M%S).txt; echo "$(date +%T) $(uname -r) srcversion $(cat /sys/module/nouveau/srcversion 2>/dev/null)" | tee "$OUT"
+sudo python3 -I - <<'PY' | tee -a "$OUT"
 import mmap, os, glob
 d=[x for x in glob.glob('/sys/bus/pci/devices/*') if open(x+'/vendor').read().strip()=='0x10de' and open(x+'/class').read().startswith('0x03')][0]
 fd=os.open(d+'/resource0', os.O_RDONLY|os.O_SYNC); m=mmap.mmap(fd, 16<<20, mmap.MAP_SHARED, mmap.PROT_READ)
