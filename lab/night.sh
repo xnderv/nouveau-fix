@@ -321,9 +321,13 @@ run 61о 03-0f-07 $NV lab_mux_guard=1
 T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
 say "=== тест 61о (контроль, /6, без ключей): тайм-аутов $T0C на $N0C подъёмов"
 if [ "$T0C" -eq 0 ]; then
-    say "=== сессия сейчас ХОРОШАЯ (0 на $N0C без ключей) — 61а/61б ничего не докажут; серия остановлена: перезагрузка и снова"
-    base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
-    finish_night clean
+    if [ "${GOODRUN:-0}" = 1 ]; then
+        say "=== сессия сейчас ХОРОШАЯ (0 на $N0C без ключей); GOODRUN=1 — продолжаю 61а/61б/61в как проверку «не портит ли код /2 или /8 хорошую сессию»"
+    else
+        say "=== сессия сейчас ХОРОШАЯ (0 на $N0C без ключей) — 61а/61б ничего не докажут; серия остановлена: перезагрузка и снова (или GOODRUN=1)"
+        base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
+        finish_night clean
+    fi
 fi
 RUNS=1500; MT0="$(mt)"; export STOPMUX=5
 run 61а 03-0f-07 $NV lab_mux_guard=1 lab_therm_gpc_factor=2
@@ -338,7 +342,7 @@ run 61в 03-0f-07 $NV lab_mux_guard=1
 unset STOPMUX
 MT3="$(mt)"; T3=$((MT3 - MT2)); N3="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
 say "=== тест 61в (контроль, /6): тайм-аутов $T3 на $N3 подъёмов"
-say "=== ИТОГ Е14: /6 (контроль) $T0C/$N0C и $T3/$N3; /2 $T1/$N1; /8 $T2/$N2 — если /2 и /8 расходятся с /6, глубина замедления входит в условие; если все одинаковы — выдержка не зависит от коэффициента"
+say "=== ИТОГ Е14 ($([ "$T0C" -eq 0 ] && echo "хорошая сессия" || echo "плохая сессия")): /6 (контроль) $T0C/$N0C и $T3/$N3; /2 $T1/$N1; /8 $T2/$N2 — если /2 и /8 расходятся с /6, глубина замедления входит в условие; если все одинаковы — выдержка не зависит от коэффициента"
 base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
 finish_night clean
 elif [ "$TEST" = 58 ]; then
