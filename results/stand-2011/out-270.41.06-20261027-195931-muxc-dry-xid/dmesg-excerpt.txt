@@ -1,0 +1,20 @@
+[   19.478203] nvidia 0000:01:00.0: PCI INT A -> GSI 16 (level, low) -> IRQ 16
+[   19.479624] nvidia 0000:01:00.0: setting latency timer to 64
+[   19.483637] NVRM: loading NVIDIA UNIX x86_64 Kernel Module  270.41.06  Mon Apr 18 14:53:56 PDT 2011
+[   33.430889] NVRM: os_schedule: Attempted to yield the CPU while in atomic or interrupt context
+[   48.212519] nvidia 0000:01:00.0: PCI INT A disabled
+[   55.531553] nvidia 0000:01:00.0: PCI INT A -> GSI 16 (level, low) -> IRQ 16
+[   55.543479] nvidia 0000:01:00.0: setting latency timer to 64
+[   55.632692] NVRM: loading NVIDIA UNIX x86_64 Kernel Module  270.41.06  Mon Apr 18 14:53:56 PDT 2011
+[  270.339738] nvidia 0000:01:00.0: PCI INT A disabled
+[  271.128402] nvidia 0000:01:00.0: PCI INT A -> GSI 16 (level, low) -> IRQ 16
+[  271.146858] nvidia 0000:01:00.0: setting latency timer to 64
+[  271.203067] NVRM: loading NVIDIA UNIX x86_64 Kernel Module  270.41.06  Mon Apr 18 14:53:56 PDT 2011
+[  323.669005] NVRM: Xid (0000:01:00): 38, 0000 097f8000 00000001 00000000 00000100 097f8000
+[  323.828710] NVRM: Xid (0000:01:00): 32, Channel ID 00000000 intr 00800000
+[  332.826903] NVRM: Xid (0000:01:00): 32, Channel ID 00000000 intr 00800000
+[  341.825580] NVRM: Xid (0000:01:00): 32, Channel ID 00000000 intr 00800000
+[  349.824423] NVRM: Xid (0000:01:00): 32, Channel ID 00000000 intr 00800000
+[  357.823224] NVRM: Xid (0000:01:00): 32, Channel ID 00000000 intr 00800000
+[  365.821952] NVRM: Xid (0000:01:00): 32, Channel ID 00000000 intr 00800000
+[  373.820888] NVRM: Xid (0000:01:00): 32, Channel ID 00000000 intr 00800000

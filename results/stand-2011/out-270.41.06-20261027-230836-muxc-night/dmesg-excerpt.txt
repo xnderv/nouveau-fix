@@ -1,0 +1,13 @@
+[   25.936407] nvidia 0000:01:00.0: PCI INT A -> GSI 16 (level, low) -> IRQ 16
+[   25.937805] nvidia 0000:01:00.0: setting latency timer to 64
+[   25.941695] NVRM: loading NVIDIA UNIX x86_64 Kernel Module  270.41.06  Mon Apr 18 14:53:56 PDT 2011
+[   39.870226] NVRM: os_schedule: Attempted to yield the CPU while in atomic or interrupt context
+[   54.615989] nvidia 0000:01:00.0: PCI INT A disabled
+[   61.834548] nvidia 0000:01:00.0: PCI INT A -> GSI 16 (level, low) -> IRQ 16
+[   61.846886] nvidia 0000:01:00.0: setting latency timer to 64
+[   61.938725] NVRM: loading NVIDIA UNIX x86_64 Kernel Module  270.41.06  Mon Apr 18 14:53:56 PDT 2011
+[10938.829004] nvidia 0000:01:00.0: PCI INT A disabled
+[10939.611463] nvidia 0000:01:00.0: PCI INT A -> GSI 16 (level, low) -> IRQ 16
+[10939.629485] nvidia 0000:01:00.0: setting latency timer to 64
+[10939.684681] NVRM: loading NVIDIA UNIX x86_64 Kernel Module  270.41.06  Mon Apr 18 14:53:56 PDT 2011
+[10953.835768] NVRM: os_schedule: Attempted to yield the CPU while in atomic or interrupt context

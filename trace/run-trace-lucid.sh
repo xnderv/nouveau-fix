@@ -113,7 +113,7 @@ watchdog() {
     # выгрузить драйвер и начать второй проход (загрузка 19:01 UTC) — журналы и снимки шли вразнобой
     kill -STOP "$$" 2>/dev/null
     PP="$(ps -o ppid= -p "$$" 2>/dev/null | tr -d ' ')"; ps -o args= -p "$PP" 2>/dev/null | grep -q stand-night && kill -STOP "$PP" 2>/dev/null
-    chvt 1 2>/dev/null; show "WATCHDOG: driver stuck — saving logs and POWERING OFF. Then power on, F12, continue."
+    timeout 5 chvt 1 2>/dev/null; show "WATCHDOG: driver stuck — saving logs and POWERING OFF. Then power on, F12, continue."
     dmesg > "$OUT/dmesg-watchdog.txt" 2>/dev/null; cp /var/log/Xorg.0.log "$OUT/Xorg-watchdog.log" 2>/dev/null
     ps axww > "$OUT/ps-watchdog.txt" 2>/dev/null
     # остановить запись и дать программе записи 10 с дописать файл (отказ 270.26 — главное, что пишем), потом выключить
