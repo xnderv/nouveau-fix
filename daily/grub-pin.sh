@@ -38,5 +38,6 @@ off)
     [ -n "$ENTRY" ] || { echo "в /boot/grub/grub.cfg нет пункта для $K (нужен update-grub?)"; exit 1; }
     ID="${SUB:+$SUB>}$ENTRY"
     sudo grub-set-default "$ID" && echo "закреплено: $K ($d) — $ID"
+    sudo rm -f "/var/lib/nouveau-fix/pending-$K" 2>/dev/null || true   # драйвер собран и ядро закреплено — отметка «ждёт сборки» снята
     ;;
 esac
