@@ -1,4 +1,4 @@
-# Call for Fermi GDDR5 cards — DRAFT (nothing posted; venues and texts for approval)
+# Call for Fermi GDDR5 cards — posted 28.10.2026 21:31 MSK: issue https://github.com/xnderv/nouveau-fix/issues/2; line for Q0AL in Twilight0#5: https://github.com/Twilight0/nouveau-dkms/issues/5#issuecomment-6477307415
 
 ## Кандидаты (28.10)
 - **Q0AL** (Twilight0/nouveau-dkms#4, #5): Debian sid; NVS 5200M (GF108M, **GDDR5**) и **GTX 560 (GF114 — наш чип, GDDR5)**;
