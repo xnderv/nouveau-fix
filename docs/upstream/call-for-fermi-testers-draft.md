@@ -27,6 +27,9 @@ an experimental kernel module; hangs are possible, no warranty), and everything 
 Cards of interest: GTX 460/465/470/480/550 Ti/560/560 Ti/570/580, GTS 450, Quadro 2000/4000/5000/6000 — anything GF100–GF119
 with GDDR5. Mobile GF119M/GF108M with DDR3: Twilight0's project covers those.
 
+This is a hobby project: no support promises, no schedule. We answer when we can, and if we stop, we will say so here.
+Everything we learn is published in this repository regardless.
+
 Строка в Twilight0 #5 (после его «ill also post a report from a GTX 560»):
 > If the GTX 560 is still around: a recording of the NVIDIA 390 driver on it (one evening, script provided) would be
 > especially useful for us — it is the same chip as our card. Details and what you would get back are in
