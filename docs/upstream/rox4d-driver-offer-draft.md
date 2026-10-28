@@ -1,7 +1,10 @@
-# Offer of the lab driver build to rox4d (Twilight0/nouveau-dkms#9) — DRAFT, post only after approval
+# Issue in xnderv/nouveau-fix for rox4d — final text, awaiting approval (not posted)
 
-Since you asked earlier whether this could run on your card: I have prepared a build of the lab driver for it.
-Please read the whole thing before deciding — it is an experimental kernel driver, and there is no obligation at all.
+Title: GF106 GTS 450 (rox4d): lab driver build for testing — optional
+
+@rox4d — you wrote in Twilight0/nouveau-dkms#9 "let me know if it needed more info (or testing)". Here is something to
+test, only if you still want to. Please read the whole thing before deciding — it is an experimental kernel driver, and
+there is no obligation at all.
 
 **What it is.** The lab nouveau module (kernel 7.0 here, but the patches apply cleanly to the nouveau in 6.18) with
 your card added as a second board: core clocks are switched by nouveau's own gf100 code plus the PTHERM/FSRM bracket
@@ -28,18 +31,19 @@ greps the relevant ones.
 **How to build (Debian, your own 6.18 kernel tree, CONFIG_DRM_NOUVEAU=m):**
 ```
 cd linux-6.18.x/drivers/gpu/drm/nouveau
-patch -p1 < 0001-nouveau-abi16-idle-channel-before-engobj-del.patch
-patch -p1 < 0002-LAB-fermi-reclock-instrumented.patch
-patch -p1 < 0004-LAB-pmu-perf-load.patch
-patch -p1 < 0006-nouveau-therm-mask-pwm-update-bit-on-read.patch   # without it the fan reads 0 % and creeps up by 3 %
+patch -p1 < patches/0001-nouveau-abi16-idle-channel-before-engobj-del.patch
+patch -p1 < lab/0002-LAB-fermi-reclock-instrumented.patch
+patch -p1 < patches/0004-LAB-pmu-perf-load.patch
+patch -p1 < patches/0006-nouveau-therm-mask-pwm-update-bit-on-read.patch   # without it the fan reads 0 % and creeps up by 3 %
 cd ../../../..
 make -j$(nproc) M=drivers/gpu/drm/nouveau modules
 ```
-Back up the stock nouveau.ko, install the new one (depmod; update the initramfs if nouveau is in it), add
+(paths are from this repository's root). Back up the stock nouveau.ko, install the new one (depmod; update the initramfs
+if nouveau is in it), add
 `options nouveau lab_mem_replay=14 lab_volt_min_uv=1112500 lab_pcie=0 lab_clk_mmu_lock=0 lab_gpc_div=1 lab_pmu_div=1`
 to /etc/modprobe.d/, reboot, and check `dmesg | grep 'LAB:'` — it should name your board (GF106 GTS 450 …).
-The patches and the test script (`lab/rox4d-test.sh`, run as root: it sets 0f → 07 → 03 in cycles, logs the driver's
-dmesg lines and stops at the first error) are in the repository: https://github.com/xnderv/nouveau-fix
+The test script is `lab/rox4d-test.sh` (run as root: it sets 0f → 07 → 03 in cycles, logs the driver's dmesg lines and
+stops at the first error). What was changed and why is written up in `docs/2026-10-28/rox4d-build.md` (Russian).
 
 **What would help afterwards:** the script's log and dmesg, whatever the outcome. If it hangs, the last lines before
 the hang and which level change it was. No rush, and feel free to say no.
