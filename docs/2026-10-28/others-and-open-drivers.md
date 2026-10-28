@@ -78,3 +78,34 @@ PLL, поэтому ему нужны скобка и выдержка; есть
 ## 5. Что нужно
 Для Е14 — сборка драйвера с новыми ключами и плохая сессия (вечер). Для «вертикали» — ничего: открытый код заканчивается
 на Maxwell. Для памяти GF106 — образ VBIOS rox4d. Для второго GF114 — отчёт Q0AL (GTX 560), когда появится.
+
+## 6. Официальная документация NVIDIA: open-gpu-doc (28.10, класс Г, официальный источник)
+Репозиторий github.com/NVIDIA/open-gpu-doc (лицензия NVIDIA, публичный). Что в нём есть и что нам дало:
+- **Devinit — официальная спецификация опкодов** (`Devinit/devinit.xml`, 143 опкода с раскладкой операндов и историей по
+  поколениям «core»). Сверка `lab/vbios-devinit.py`: из 34 видов опкодов, которые встречаются в скриптах инициализации
+  наших 306 образов (GF114/GF106/GF116/GF110), **длины всех совпали со спецификацией**; пять расхождений таблицы nouveau
+  со спецификацией (0x34, 0x37, 0x59, 0xa9, 0xaa) относятся к опкодам, которых в образах Fermi нет (0x37/0xaa — только в
+  чужеродном образе «NVIDIA 512 МБ», версия 62.94). Официальные имена: 0x8f = INIT_XMEMSEL_ZM_NV_REG_ARRAY (наши группы «по
+  ремешку памяти»), 0x87 = INIT_XMEMSEL_PLLID, 0x91 = INIT_ZM_REG_REITERATE, 0x58 = INIT_REG_ARRAY, 0x97 = INIT_ADD_NV_REG,
+  0x6b = INIT_SUB (функция), 0x5f = INIT_NV_COPY. Разборщик devinit теперь проверен официальной спецификацией, а не только
+  кодом nouveau.
+- **BIOS Information Table** — официальные имена записей BIT и указателей 'P' версии 2 по порядку (по 32 бита): 0x00
+  Performance Table, 0x04 **Memory Clock Table** (у нас «rammap»), 0x08 **Memory Tweak Table** («тайминги»), 0x0c Power
+  Control Table (nouveau: таблица напряжений), 0x10/14/18 Thermal Control/Device/Coolers, **0x1c Performance Settings
+  Script — «скрипт devinit с настройками производительности»** (наш «сценарий 0x1c» с группами по ремешку), 0x20
+  **Continuous Virtual Binning (CVB) Table** (nouveau: «карта напряжений» vmap — это таблица зависимости напряжения от
+  частоты/температуры, что объясняет коэффициенты в её записях), 0x24 Ventura, 0x28 Power Sensors, 0x2c Power Policy…
+- **Memory Clock Table / Memory Tweak Table** — спецификации версий 0x11 и 0x20 (новее наших 0x10), но словарь полей
+  официальный: RC, RFC, RAS, RP, CL, WL, RD_RCD, WR_RCD, RPRE/WPRE, CDLR, WR, W2R_BUS/R2W_BUS, PDEX, PDEN2PDEX, FAW, AOND,
+  CCDL/CCDS, REFRESH, RRD, R2P, RFCSBA/RFCSBR; у записи ремешка — MemTweak Index, Alignment Mode, MRS7 GDDR5. Наши имена
+  байтов таймингов v0x10 (WR, WTR, CL, RC, RFC, RAS, RP, RCDRD, RCDWR, RRD, CWL…) совпадают с этим словарём; раскладку по
+  байтам для v0x10 документ не даёт.
+- **Регистровые руководства** есть только для Volta/Turing/Ampere, и в них **нет** блоков THERM и TRIM/CLOCK (bus, fifo,
+  graphics, mmu, timer, fault, display…): наш блок тактов NVIDIA не раскрывает и на новых поколениях.
+- Каталог `pascal/`: заметки по FBPA (контроллер памяти GP100) и MMU — к тактам отношения не имеют.
+
+## 7. Tesla
+Открытого драйвера NVIDIA с управлением тактами для Tesla (G80–GT21x) нет: xf86-video-nv от NVIDIA — только 2D, без
+частот; всё, что знает nouveau о тактах Tesla, — его собственная разработка (nv50.c, gt215.c, Сплит). Блок тактов Tesla —
+другой: PLL в 0x004000 (0x4008/0x4020/0x4028/0x4030, у gt215 0x4100/0x4120), а не 0x137000; общий с Fermi только опорный
+SPPLL 0x00e800/0x00e820. То есть «вертикаль» одинакового блока начинается с Fermi и тянется до Maxwell.

@@ -79,6 +79,8 @@ NAMES = {0x32: 'io_restrict_prog', 0x33: 'repeat', 0x34: 'io_restrict_pll', 0x36
          0x90: 'copy_zm_reg', 0x91: 'zm_reg_group', 0x92: 'reserved', 0x96: 'xlat', 0x97: 'zm_mask_add', 0x98: 'auxch',
          0x99: 'zm_auxch', 0x9a: 'i2c_long_if', 0xa9: 'gpio_ne', 0xaa: 'reserved'}
 
+OPSTAT = collections.Counter()   # статистика опкодов по всем проходам (сверка со спецификацией NVIDIA)
+
 def walk(rom, start, writes, visited, depth=0, script=0, cond=0):
     """Линейный проход одного скрипта от start (смещение в образе от начала файла уже с base)."""
     o = start
@@ -92,6 +94,7 @@ def walk(rom, start, writes, visited, depth=0, script=0, cond=0):
         if o in visited: return 'loop'
         visited.add(o)
         op = r8(o)
+        OPSTAT[op] += 1
         if op == 0x71: return 'done'
         elif op == 0x7a: W(op='zm_reg', reg=r32(o + 1), val=r32(o + 5)); o += 9
         elif op == 0x6e: W(op='nv_reg', reg=r32(o + 1), mask=r32(o + 5), val=r32(o + 9)); o += 13
