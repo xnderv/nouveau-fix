@@ -15,13 +15,18 @@ BASE = 'https://www.techpowerup.com'
 UA = ('Mozilla/5.0 (compatible; nouveau-fix-vbios-research/1.0; +https://github.com/xnderv/nouveau-fix; '
       'written permission of TechPowerUp editor-in-chief, 2026-10-28)')
 
-def get(url, delay, binary=False, tries=3):
+LAST = {}   # заголовки последнего ответа — для разбора отказов
+
+def get(url, delay, binary=False, tries=3, referer=None):
     for i in range(tries):
         time.sleep(delay)
-        req = urllib.request.Request(url, headers={'User-Agent': UA, 'Accept': '*/*'})
+        h = {'User-Agent': UA, 'Accept': '*/*'}
+        if referer: h['Referer'] = referer          # ссылка на .rom открывается со страницы образа — так и представляемся
+        req = urllib.request.Request(url, headers=h)
         try:
             with urllib.request.urlopen(req, timeout=60) as r:
                 data = r.read()
+                LAST.clear(); LAST.update({'status': r.status, 'url': r.geturl(), 'type': r.headers.get('Content-Type', '')})
                 return data if binary else data.decode('utf-8', 'replace')
         except urllib.error.HTTPError as e:
             if e.code in (403, 429):
@@ -80,9 +85,13 @@ def main():
         for n, (bid, slug, src) in enumerate(todo, 1):
             link = rom_link(bid, slug, a.delay)
             if not link: print(f'  {bid} {slug}: ссылки .rom не нашёл, пропуск'); continue
-            data = get(link, a.delay, binary=True)
+            data = get(link, a.delay, binary=True, referer=f'{BASE}/vgabios/{bid}/{slug}')
             if not data: print(f'  {bid}: не скачалось'); continue
-            if data[:2] != b'\x55\xaa': print(f'  {bid}: не образ ROM (нет 55 AA), пропуск'); continue
+            if data[:2] != b'\x55\xaa':
+                if b'bot check' in data[:4096].lower(): print('  сервер показал проверку на бота — её не обходим')
+                dbg = os.path.join(a.outdir, f'debug-{bid}.bin'); open(dbg, 'wb').write(data[:65536])
+                sys.exit(f'СТОП: {link} вернул не образ ROM (нет 55 AA): статус {LAST.get("status")}, тип {LAST.get("type")}, '
+                         f'конечный адрес {LAST.get("url")}, {len(data)} байт; начало сохранено в {dbg}. Дальше не ходим, разбираемся.')
             name = f'{bid}-{os.path.basename(urllib.parse.urlparse(link).path)}'
             with open(os.path.join(a.outdir, name), 'wb') as g: g.write(data)
             w.writerow([bid, slug, link, hashlib.sha256(data).hexdigest(), len(data), time.strftime('%Y-%m-%d %H:%M:%S'), src]); f.flush()
