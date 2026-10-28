@@ -115,6 +115,8 @@ install)
     fi
     sudo install -m 644 "$WORK/nouveau/nouveau.ko" "$SLOT"
     sudo depmod -a "$KVER"; sudo update-initramfs -u -k "$KVER"
+    sudo rm -f "/var/lib/nouveau-fix/pending-$KVER" 2>/dev/null || true
+    "$KIT/daily/grub-pin.sh" "$KVER" || echo "--- Закрепить ядро $KVER в GRUB не удалось: daily/grub-pin.sh status"   # 28.10
     echo "=== Готово. Перезагрузись. Вернуть стабильный: ~/Home/nouveau-fix/stable/stable.sh install (или lab.sh restore — только исправление гонки)"
     ;;
 pstate)

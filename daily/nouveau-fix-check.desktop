@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Драйвер видеокарты: проверка при входе
+Comment=Окно, если загружен штатный nouveau или пришло ядро без нашего драйвера (nouveau-fix)
+Exec=@HOME@/Home/nouveau-fix/daily/check-driver.sh --gui
+Icon=video-display
+Terminal=false
+X-GNOME-Autostart-Delay=15
+NoDisplay=true

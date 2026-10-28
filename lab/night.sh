@@ -25,6 +25,7 @@
 # Сухой прогон (без sudo, без карты): NIGHT_DRY=1 NIGHT_HT=заглушка NIGHT_RES=каталог NIGHT_STUCK=сек ... (см. ниже).
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; KIT="$(dirname "$HERE")"; PRM=/sys/module/nouveau/parameters
+"$KIT/daily/check-driver.sh" --banner 2>/dev/null   # 28.10: штатное ядро/новое ядро без драйвера
 POWEROFF="${POWEROFF:-1}"; WAITMIN="${WAITMIN:-60}"
 FLAG="${NIGHT_FLAG:-$HOME/Home/nouveau-archive/night-poweroff.ok}"
 RES="${NIGHT_RES:-$KIT/results}"          # куда пишут hangtest и серия

@@ -15,6 +15,7 @@
 # всего, уже замер: Alt+PrtSc, затем S, U, B. Лог теста пишется с sync после каждой строки.
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; KIT="$(dirname "$HERE")"; PRM=/sys/module/nouveau/parameters
+"$KIT/daily/check-driver.sh" --banner 2>/dev/null   # 28.10: штатное ядро/новое ядро без драйвера
 N="${1:-60}"; [[ "$N" =~ ^[0-9]+$ ]] || { echo "Число подъёмов"; exit 1; }
 LOAD="${LOAD:-browser}"
 # 24.10 вечер: FAST=1 — частые переходы (ловить редкий тайм-аут переключателя GPC быстрее): пауза перед подъёмом 0,1–0,5 с,
