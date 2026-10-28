@@ -1,4 +1,4 @@
-# Draft: fourth reply to rox4d in Twilight0/nouveau-dkms#9 (28.10.2026, not posted)
+# Fourth reply to rox4d in Twilight0/nouveau-dkms#9 — posted 28.10.2026 16:30 MSK as xnderv: https://github.com/Twilight0/nouveau-dkms/issues/9#issuecomment-6470298377
 
 Thanks for the second recording — it reproduces the first one exactly (same transition groups, same 21–23 µs waits in
 the PTHERM brackets), so both now count as confirmed on your card.
