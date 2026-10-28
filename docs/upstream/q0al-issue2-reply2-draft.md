@@ -1,4 +1,4 @@
-# Reply 2 to Q0AL in xnderv/nouveau-fix#2 — DRAFT, post after approval
+# Reply 2 to Q0AL in xnderv/nouveau-fix#2 — posted 28.10.2026 22:01 MSK: https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-6477968267
 
 @Q0AL — both are fine, with details:
 

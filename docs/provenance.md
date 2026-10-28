@@ -97,3 +97,4 @@ there in about a day» — GTX 560 (GF114, наш чип; плата EVGA 1 GB),
 **28.10 21:40 — ответ Q0AL с рецептом записи** в нашем issue #2: https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-6477508484 (текст docs/upstream/q0al-issue2-reply1-draft.md).
 **28.10 21:51 — письмо в рассылку nouveau** (RFC + призыв владельцев Fermi с GDDR5): git send-email через smtp.yandex.ru, Message-ID
 <20261028185052.54427-1-xnderv@yandex.com>, результат 250; подписка подтверждена в 21:28 (welcome-письмо). Текст — docs/upstream/nouveau-ml-2026-10-28.eml.
+**28.10 22:01 — ответ 2 Q0AL** (blacklist nvidia для записи; Debian: 390.157-16 только в sid, в trixie нет, bullseye 390.157-1; его NVS 5200M и GT 730 GDDR5 = GF108 — после GTX 560): https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-6477968267.
