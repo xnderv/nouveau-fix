@@ -77,3 +77,10 @@ Gigabyte.GTS450.1024.100923.rom (по нему генератор уже про�
 Образ лежит вне репозитория (~/Home/stand-2011/gf106-rox4d/round3/); в репозитории — выжимки results/other-cards/gf106-rox4d/round3/.
 
 **28.10 20:38 — предложение сборки rox4d**: issue https://github.com/xnderv/nouveau-fix/issues/1 (текст docs/upstream/rox4d-driver-offer-draft.md) и ответ 6 в Twilight0/nouveau-dkms#9 (https://github.com/Twilight0/nouveau-dkms/issues/9#issuecomment-6476179007, текст docs/upstream/rox4d-issue9-reply6-draft.md): его VBIOS = образ TechPowerUp, что объясняет; предложение драйвера вынесено в наш репозиторий, в чужом треде — одна строка со ссылкой. Коммиты до 4c99897 отправлены.
+
+**28.10 20:42–20:58 — два зависания после перезагрузки: не наши правки, а новое ядро.** Ubuntu в 16:50 поставила linux-image-7.0.0-42
+(основа Linux 7.0.14); GRUB_DEFAULT=0 загрузил его, а лабораторный драйвер стоял только под 7.0.0-38. Под штатным nouveau 7.0.0-42
+(srcversion A8B7F42A…) — ровно старая гонка без патча 0001: «yandex_browser … channel 7 killed», таймаут nv50_runl_wait,
+nouveau_abi16_ioctl_channel_free (загрузки 20:42 и 20:46). Собран лабораторный модуль под 7.0.0-42 из пропатченных исходников
+дерева -38 (без повторного клонирования; заголовки 7.0.14), srcversion 8ADDE209F7796ED051E00D8, предупреждений нет;
+установка — вручную. Урок: после любой перезагрузки проверять `uname -r` и `cat /sys/module/nouveau/srcversion`.
