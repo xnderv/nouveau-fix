@@ -1,4 +1,4 @@
-# Письмо в список рассылки nouveau — DRAFT (отправляет пользователь со своей почты; не отправлено)
+# Письмо в список рассылки nouveau — ОТПРАВЛЕНО 28.10.2026 21:5x MSK через git send-email, Message-ID <20261028185052.54427-1-xnderv@yandex.com>, ответ сервера 250 (файл docs/upstream/nouveau-ml-2026-10-28.eml)
 
 Список: nouveau@lists.freedesktop.org (Mailman 3, страница
 https://lists.freedesktop.org/postorius/lists/nouveau.lists.freedesktop.org/ — подписка по адресу без аккаунта,
