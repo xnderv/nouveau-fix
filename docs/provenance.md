@@ -94,3 +94,4 @@ nouveau_abi16_ioctl_channel_free (загрузки 20:42 и 20:46). Собран
 
 **28.10 ~22:00 — Q0AL ответил в Twilight0#5**: «Yea I'll be able to do that. Its the EVGA 1GB version as an FYI. I'll post the results
 there in about a day» — GTX 560 (GF114, наш чип; плата EVGA 1 GB), запись NVIDIA 390 нашим скриптом, результат обещал в нашем issue #2.
+**28.10 21:40 — ответ Q0AL с рецептом записи** в нашем issue #2: https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-6477508484 (текст docs/upstream/q0al-issue2-reply1-draft.md).

@@ -1,4 +1,4 @@
-# Reply to Q0AL in xnderv/nouveau-fix#2 — DRAFT, post after approval
+# Reply to Q0AL in xnderv/nouveau-fix#2 — posted 28.10.2026 21:40 MSK: https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-6477508484
 
 @Q0AL — great, thank you. An EVGA GTX 560 1 GB is exactly what we are missing: same chip (GF114) as our card, a
 different board, so it tests both the chip-level model and the "per board" part. The recipe, so that nothing is lost:
