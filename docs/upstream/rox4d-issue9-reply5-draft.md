@@ -1,4 +1,4 @@
-# Draft: fifth reply to rox4d in Twilight0/nouveau-dkms#9 (28.10.2026, not posted)
+# Fifth reply to rox4d in Twilight0/nouveau-dkms#9 — posted 28.10.2026 17:30 MSK as xnderv: https://github.com/Twilight0/nouveau-dkms/issues/9#issuecomment-6471750963
 
 Good question, and the difference is expected — it does not mean your BIOS is modified.
 
