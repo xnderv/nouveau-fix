@@ -98,7 +98,7 @@ def report():
         if l.startswith('#') or not l.strip():
             continue
         f = (l.rstrip('\n').split('\t') + [''] * 7)[:7]
-        rows[int(f[0], 16)] = dict(zip(('addr', 'name', 'what', 'why', 'src', 'note'), [f[0]] + f[1:6]))
+        rows[int(f[0], 16)] = dict(zip(('addr', 'name', 'what', 'why', 'src', 'note', 'origin'), [f[0]] + f[1:7]))
     univ = sorted(host | set(scr))
     miss = [a for a in univ if a not in rows]
     extra = [a for a in rows if a not in univ]
@@ -135,16 +135,40 @@ def report():
             out.append(f'| {b} | {m2} | {d2} | {y2} | {e2} |')
         else:
             out.append(f'| {b} | 0 (служебные: {byb[b]["всего"]}) | — | — | — |')
-    out += ['', '## Все регистры', '', '| Адрес | Блок | Где | Что | Почему | Источник | Имя и заметка |', '|---|---|---|---|---|---|---|']
+    # откуда берётся значение (колонка «значение» registers.tsv; корпус VBIOS 28.10 и карта покрытия memgen)
+    ORIG = ('таблица', 'формула', 'ремешок', 'семейство', 'чип', 'драйвер', 'неизвестно')
+    org = collections.Counter(); orgb = collections.defaultdict(collections.Counter)
     for a in univ:
-        r = rows.get(a, {'name': '', 'what': '?', 'why': '?', 'src': '', 'note': ''})
+        r = rows.get(a, {})
+        if r.get('what', '?') == 'вне': continue
+        o = r.get('origin') or 'неизвестно'
+        key = next((k for k in ORIG if k in o and k != 'неизвестно'), 'неизвестно') if '+' not in o else o.split('+')[0]
+        org[key] += 1; orgb[block(a)][key] += 1
+    mm = sum(org.values())
+    vb = org['таблица'] + org['формула'] + org['ремешок']; cst = org['семейство'] + org['чип']
+    out += ['', '## Откуда берётся значение (переносимость на другие платы семейства)', '',
+            'Колонка «значение» в registers.tsv: таблица — поле таблицы VBIOS; формула — считается из таблиц VBIOS; ремешок — devinit VBIOS по',
+            'ремешку памяти; семейство — одно у всех плат семейства (корпус 28.10, вторая карта); чип — одно у всех плат чипа; драйвер —',
+            'константа драйвера, в VBIOS нет (нужна таблица по чипам в драйвере); неизвестно — вывести пока не умеем.', '',
+            '| Откуда | Регистров | Доля |', '|---|---|---|']
+    for k in ORIG:
+        out.append(f'| {k} | {org[k]} | {100 * org[k] / mm:.0f} % |')
+    out += ['', f'**Итого:** из VBIOS данной платы (таблица + формула + ремешок) — {vb} ({100 * vb / mm:.0f} %); константы семейства и чипа — {cst} ({100 * cst / mm:.0f} %); '
+            f'константы драйвера — {org["драйвер"]} ({100 * org["драйвер"] / mm:.0f} %); неизвестно — {org["неизвестно"]} ({100 * org["неизвестно"] / mm:.0f} %). '
+            f'Переносимо без правок на любую плату семейства: {vb + cst} ({100 * (vb + cst) / mm:.0f} %).', '',
+            '| Блок | таблица | формула | ремешок | семейство | чип | драйвер | неизвестно |', '|---|---|---|---|---|---|---|---|']
+    for b in sorted(orgb, key=lambda x: -sum(orgb[x].values())):
+        out.append(f'| {b} | ' + ' | '.join(str(orgb[b][k]) for k in ORIG) + ' |')
+    out += ['', '## Все регистры', '', '| Адрес | Блок | Где | Что | Почему | Источник | Откуда | Имя и заметка |', '|---|---|---|---|---|---|---|---|']
+    for a in univ:
+        r = rows.get(a, {'name': '', 'what': '?', 'why': '?', 'src': '', 'note': '', 'origin': ''})
         where = []
         if a in host:
             where.append(f'хост ×{tr[f"{a:#08x}"]["writes"]}')
         if a in scr:
             where.append(','.join(sorted(scr[a]))[:30])
         note = (r['name'] + (' — ' if r['name'] and r['note'] else '') + r['note']).replace('|', '/')
-        out.append(f'| `{a:#08x}` | {block(a)} | {"; ".join(where)} | {r["what"]} | {r["why"]} | {r["src"]} | {note} |')
+        out.append(f'| `{a:#08x}` | {block(a)} | {"; ".join(where)} | {r["what"]} | {r["why"]} | {r["src"]} | {r.get("origin", "")} | {note} |')
     if miss or extra:
         out += ['', f'**Не размечены в registers.tsv:** {", ".join(f"{a:#08x}" for a in miss) or "—"}. '
                 f'**Лишние строки:** {", ".join(f"{a:#08x}" for a in extra) or "—"}.']

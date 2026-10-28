@@ -7,7 +7,7 @@
 #   ЧИСЛО    — пока известно только как число из нашей записи.
 # Формулы — docs/2026-10-24/two-cards-method.md (часть — по открытой работе Р. Сплита, 2017).
 #   python3 -I lab/memgen.py ПУТЬ/vbios.rom ПУТЬ/ramgf100.c(лабораторный, с массивами lab_nv_*) ПУТЬ/ramgf100.c(чистый nouveau) [ремешок]
-import sys, re, struct, collections
+import sys, os, re, struct, collections
 
 rom, lab_c, nv_c = sys.argv[1], sys.argv[2], sys.argv[3]
 STRAP = int(sys.argv[4]) if len(sys.argv) > 4 else 3
@@ -176,3 +176,26 @@ for a in sorted(x for x, vs in allvals.items() if len(vs) == 1 and not (vs & nv.
 print('\nчислом (регистр = значение: в каких скриптах):')
 for (a, v), ks in sorted(unknown.items()):
     print(f'  {a:06x} = {v:08x}: {"".join(ks)}')
+# --regs: по регистрам — какие метки он получил во всех скриптах (для docs/model/registers.tsv, колонка «значение»)
+if os.environ.get('MEMGEN_REGS'):
+    per = collections.defaultdict(collections.Counter)
+    for k, (n, f0, f1) in SCR.items():
+        FREQ = f1
+        T, R, M = tables(f1)
+        ops = decode(arr[n]); last = {}
+        for o in ops:
+            if o[0] == 'WR': last[o[1]] = o[2]
+        for o in ops:
+            if o[0] != 'WR': continue
+            a, v = o[1], o[2]; tag = None
+            if a in PLLCHK and abs(PLLCHK[a](v) - PLLWANT[a]) < 1: tag = 'Ф'
+            if tag is None and a in F and v == last[a]:
+                mask, fn = F[a]; tag = 'Ф' if (v & mask) == (fn(T, R, M) & mask) else 'Ф✘'
+                if tag == 'Ф' and a in CAND: tag = 'Фк'
+            if tag is None and v in nv.get(a, ()): tag = 'Ч'
+            if tag is None and len(allvals[a]) == 1: tag = 'Ч1'
+            if tag is None and a in CTRL and len({x & ~CTRL[a] for x in allvals[a]}) == 1: tag = 'П'
+            if tag is None: tag = 'N'
+            per[a][tag] += 1
+    print('\nПО РЕГИСТРАМ (адрес: метки×записей):')
+    for a in sorted(per): print(f'  {a:06x}: ' + ' '.join(f'{t}×{c}' for t, c in per[a].most_common()))
