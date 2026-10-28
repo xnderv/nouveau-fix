@@ -1,0 +1,46 @@
+# Письмо в список рассылки nouveau — DRAFT (отправляет пользователь со своей почты; не отправлено)
+
+Список: nouveau@lists.freedesktop.org (Mailman 3, страница
+https://lists.freedesktop.org/postorius/lists/nouveau.lists.freedesktop.org/ — подписка по адресу без аккаунта,
+подтверждение письмом; старый архив до декабря 2025 https://lists.freedesktop.org/archives/nouveau/, список живой:
+сотни КБ в месяц, в основном патчи). Письмо — только plain text, без HTML и вложений, ссылки в тексте.
+Перед отправкой подписаться (иначе письмо не-подписчика уходит на модерацию и может потеряться).
+
+---
+Subject: [RFC] Fermi (GF11x) reclocking: a model of the NVIDIA driver's clock management, a lab nouveau module, and a call for NVIDIA 390 traces from GDDR5 cards
+
+Hi,
+
+this is a hobby project, not a patch series yet, but it may interest people who still have Fermi cards.
+
+Since early October we have been recording the NVIDIA 390.157 driver with mmiotrace on a GTX 560 Ti (GF114)
+and on a second card (GTS 450, GF106, recorded by its owner), plus the last pre-390 drivers (270.x) on a 2011-era
+stand, and turning what the driver does into a written model: which registers it touches in which order, which
+waits it makes, and which of those steps are actually necessary (checked one change at a time, 60+ experiments).
+Everything is from our own traces, VBIOS tables and open code (nouveau, NVIDIA's open Tegra/nvgpu code, open-gpu-doc);
+no decompilation of the proprietary driver is used, so the results can go upstream if they are good enough.
+
+What we have so far:
+- Core reclocking on GF114 with nouveau's gf100 clock code plus the PTHERM/FSRM "bracket" the NVIDIA driver puts
+  around every domain mux switch (slowdown engaged before the switch, released after). Without the bracket the GPC
+  mux sticks occasionally on our card; with it and a dwell of ~4 us after the "engaged" flag, 0 stuck in thousands of
+  transitions. NVIDIA 390 waits 8 us by its own timer; 270.41.06 wraps only the mux write. Details, numbers and the
+  register-level map are in the repository.
+- Memory reclocking (GDDR5, 135/324/2004 MHz) by replaying the PMU memory scripts and host writes the NVIDIA driver ran
+  on the same card, through nouveau's memx. A generator that derives those scripts from any board's VBIOS reproduces
+  88 % of the registers on the second card; the rest is chip-level layout and driver-init bits.
+- A VBIOS corpus of 306 Fermi images (with TechPowerUp's permission) that shows what is per-family, per-chip and
+  per-board.
+
+What we are looking for: owners of Fermi cards with GDDR5 (GF100/GF104/GF106/GF110/GF114/GF116 — GTX 4xx/5xx,
+GTS 450, Quadro 2000-6000) willing to spend one evening recording the NVIDIA 390 driver with our script (needs a spare
+disk with 390.157 and a kernel with CONFIG_MMIOTRACE) and to send the trace plus their VBIOS image. In return they get a
+build of the lab module with their card's own sequences, and everything learned is published. It is a lab module:
+hangs are possible, no warranty, no support promises.
+
+Repository and the call with details: https://github.com/xnderv/nouveau-fix (issue #2).
+Comments on the approach are welcome too, especially on what would be needed for an upstreamable version.
+
+Thanks,
+Alex
+---
