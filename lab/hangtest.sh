@@ -43,6 +43,9 @@ gr()     { cat "$PRM/lab_perf_gr" 2>/dev/null || echo 0; }
 # всё дольше и растягивала стоянку на 0f (тест 43: 6 → 12 с). Подпись зависания приходит через 35–45 с — окно подтверждения
 # (до 90 с) отсчитывается от того же $ES и её покрывает.
 errs()   { journalctl -k -b 0 --no-pager --since "${ES:-$T0}" 2>/dev/null | grep -cE 'failed to idle|SCHED_ERROR|runl|fifo:.*INTR|vmmgf100.c' || true; }
+# 28.10: ошибки GPU, которые не зависание, но и не норма — неверные данные в 3D-командах, ошибки страниц, убитые каналы
+# (2 эпизода за 21 загрузку, оба рядом с переходами памяти под браузером); считаем за тест отдельно, вердикт не меняют
+gerrs()  { journalctl -k -b 0 --no-pager --since "$T0" 2>/dev/null | grep -cE 'DATA_ERROR|fifo: fault|channel [0-9]+ killed' || true; }
 # 27.10: тоже по окну цикла ($ES) — с начала теста ($T0) журнал к 1400-му циклу читался 3,6 с и растягивал цикл с 2,5 до 5,5 с
 bdur()   { journalctl -k -b 0 --no-pager --since "${ES:-$T0}" 2>/dev/null | grep -oE 'replay B 324->2004: выполнен за [0-9]+ мкс' | tail -n1 | grep -oE '[0-9]+ мкс'; }
 GOV0="$(cat "$PRM/lab_gov")"; LP=""; HUNG=0
@@ -140,7 +143,7 @@ for c in $(seq 1 "$N"); do
         STOPPED=1; break
     fi
 done
-echo "$(date +%T) тайм-аутов переключателя источника такта за тест: $(( $(cat "$PRM/lab_mux_timeouts" 2>/dev/null || echo 0) - MT0 )) (journalctl -k: «LAB mux»)" | tee -a "$LOG"
+echo "$(date +%T) тайм-аутов переключателя источника такта за тест: $(( $(cat "$PRM/lab_mux_timeouts" 2>/dev/null || echo 0) - MT0 )) (journalctl -k: «LAB mux»); ошибок GPU (DATA_ERROR/fault/killed) за тест: $(gerrs)" | tee -a "$LOG"
 if [ "$DONE" -eq "$N" ]; then echo "=== $N подъёмов без зависания (нагрузка $LOAD). Лог: $LOG" | tee -a "$LOG"
 elif [ "$STOPPED" = 1 ]; then echo "=== $DONE подъёмов без зависания, остановлен досрочно по STOPMUX=$STOPMUX (нагрузка $LOAD). Лог: $LOG" | tee -a "$LOG"
 else echo "=== Тест прерван после $DONE из $N подъёмов (см. причину выше). Лог: $LOG" | tee -a "$LOG"; fi
