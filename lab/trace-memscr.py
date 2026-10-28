@@ -36,7 +36,7 @@ scripts = []
 for b in bursts:
     ops = decode(b['words'])
     if ops and sum(1 for o in ops if o[0] == 'WR') >= 5:
-        scripts.append(dict(t=b['t'], dmem=b['dmem'], nwords=len(b['words']), ops=[list(o) for o in ops],
+        scripts.append(dict(t=b['t'], dmem=b['dmem'], nwords=len(b['words']), words=b['words'], ops=[list(o) for o in ops],
                             regs=[o[1] for o in ops if o[0] == 'WR']))
 print(f'загрузок в PMU: {len(bursts)}, из них похожих на скрипт памяти: {len(scripts)}')
 for s in scripts:
