@@ -1,5 +1,5 @@
---- a/nvkm/subdev/clk/base.c	2026-10-27 17:31:02.643960395 +0300
-+++ b/nvkm/subdev/clk/base.c	2026-10-27 17:31:02.975665460 +0300
+--- a/nvkm/subdev/clk/base.c
++++ b/nvkm/subdev/clk/base.c
 @@ -33,6 +33,57 @@
  #include <subdev/volt.h>
  
@@ -269,8 +269,8 @@
  
  	if (clk->func->init)
  		return clk->func->init(clk);
---- a/nvkm/subdev/clk/gf100.c	2026-10-27 17:31:02.644273509 +0300
-+++ b/nvkm/subdev/clk/gf100.c	2026-10-27 17:32:26.072629277 +0300
+--- a/nvkm/subdev/clk/gf100.c
++++ b/nvkm/subdev/clk/gf100.c
 @@ -23,11 +23,18 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
@@ -663,7 +663,7 @@
  	return 0;
  }
  
-@@ -346,20 +668,418 @@
+@@ -346,20 +668,429 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -737,6 +737,16 @@
 +module_param(lab_therm_div, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_div, "LAB: PTHERM bracket around GPC/hubk06 post-divider writes (stage 4): 0 off, 1 when it changes, 2 always");
 +
++/* LAB 28.10, опыт Е14: коэффициент замедления в скобке — поле 16–21 FSRM_2 (у NVIDIA для Tegra: therm_clk_slowdown
++ * idle_factor, код = 2·делитель − 2: 1 = /1.5, 2 = /2, 6 = /4, 0xa = /6, 0xe = /8). NVIDIA 390 на GF114 ставит GPC 0xa (/6),
++ * hubk06 0x2 (/2); на GF106 — GPC 0x2. Ключи меняют только код, остальные биты скобки (0x8a / 0x82, FSRM_3, FSRM_4) как были. */
++static uint lab_therm_gpc_factor = 0xa;
++module_param(lab_therm_gpc_factor, uint, 0644);
++MODULE_PARM_DESC(lab_therm_gpc_factor, "LAB: FSRM slowdown factor code for GPC bracket (bits 16-21; 0xa = /6 as NVIDIA GF114, 2 = /2 as GF106, 0xe = /8)");
++static uint lab_therm_hub_factor = 0x2;
++module_param(lab_therm_hub_factor, uint, 0644);
++MODULE_PARM_DESC(lab_therm_hub_factor, "LAB: FSRM slowdown factor code for hubk06 bracket (bits 16-21; 2 = /2 as NVIDIA)");
++
 +struct lab_therm_save {
 +	bool on; int i; u32 ctrl1, f2, f3, f4;
 +	uint us; int np; u32 st0; u32 pv[8]; u32 pt[8]; u32 nrd;
@@ -753,8 +763,9 @@
 +	if (!lab_therm || (idx != 0 && idx != 7))
 +		return;
 +	sv->i = (idx == 0) ? 0 : 1;
-+	e2 = (idx == 0) ? 0x000a008a : 0x00020082;
-+	e3 = (idx == 0) ? 0x0000000a : 0x00000002;
++	e2 = (idx == 0) ? (((lab_therm_gpc_factor & 0x3f) << 16) | 0x0000008a)
++			: (((lab_therm_hub_factor & 0x3f) << 16) | 0x00000082);
++	e3 = (idx == 0) ? (lab_therm_gpc_factor & 0x3f) : (lab_therm_hub_factor & 0x3f);
 +	sv->ctrl1 = nvkm_rd32(device, 0x020004);
 +	sv->f2 = nvkm_rd32(device, 0x020160 + sv->i * 4);
 +	sv->f3 = nvkm_rd32(device, 0x020180 + sv->i * 4);
@@ -1085,7 +1096,7 @@
  }
  
  static void
-@@ -368,20 +1088,58 @@
+@@ -368,20 +1099,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -1147,7 +1158,7 @@
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +1148,66 @@
+@@ -390,17 +1159,66 @@
  }
  
  static void
@@ -1216,7 +1227,7 @@
  	}
  }
  
-@@ -409,7 +1216,17 @@
+@@ -409,7 +1227,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -1234,7 +1245,7 @@
  }
  
  static int
-@@ -426,15 +1243,138 @@
+@@ -426,15 +1254,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1375,15 +1386,15 @@
  	return 0;
  }
  
-@@ -477,5 +1417,5 @@
+@@ -477,5 +1428,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
 -	return nvkm_clk_ctor(&gf100_clk, device, type, inst, false, &clk->base);
 +	return nvkm_clk_ctor(&gf100_clk, device, type, inst, true, &clk->base);
  }
---- a/nvkm/subdev/fb/ramgf100.c	2026-10-27 17:31:02.659988791 +0300
-+++ b/nvkm/subdev/fb/ramgf100.c	2026-10-27 17:31:02.975966042 +0300
+--- a/nvkm/subdev/fb/ramgf100.c
++++ b/nvkm/subdev/fb/ramgf100.c
 @@ -25,6 +25,16 @@
  #include "ram.h"
  #include "ramfuc.h"
@@ -2237,8 +2248,8 @@
  	ram_exec(&ram->fuc, false);
  }
  
---- a/nvkm/subdev/volt/base.c	2026-10-27 17:31:02.715549404 +0300
-+++ b/nvkm/subdev/volt/base.c	2026-10-27 17:31:02.976063662 +0300
+--- a/nvkm/subdev/volt/base.c
++++ b/nvkm/subdev/volt/base.c
 @@ -28,6 +28,8 @@
  #include <subdev/bios/volt.h>
  #include <subdev/therm.h>

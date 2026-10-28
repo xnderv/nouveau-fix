@@ -69,7 +69,8 @@ base() { setp lab_gov=0 lab_mem=1 lab_pcie=1 lab_volt_min_uv=0 lab_therm=1 lab_t
               lab_gpc_pre405=0 lab_nv_hubpost=0 lab_nv_pcie_late=0 lab_nv_hub07mem=0 lab_gov_nv=0 lab_perf_ms=1000 lab_perf_log=0 \
               lab_volt_wait_us=0 lab_nv_22680=0 lab_nv_divb=0 lab_nv_disphold=0 lab_e9e0=0 lab_order=0 lab_pll_keep=0 lab_mux_guard=0 lab_nv_mux_release=0 lab_nv_div_late=0
         [ -e "$PRM/lab_divb_force" ] && setp lab_divb_force=0
-        [ -e "$PRM/lab_nv_div_same" ] && setp lab_nv_div_same=0 lab_pll_off_in_bracket=0; true; }   # в старых сборках этих ключей нет
+        [ -e "$PRM/lab_nv_div_same" ] && setp lab_nv_div_same=0 lab_pll_off_in_bracket=0
+        [ -e "$PRM/lab_therm_gpc_factor" ] && setp lab_therm_gpc_factor=10 lab_therm_hub_factor=2; true; }   # в старых сборках этих ключей нет
 MTF="${NIGHT_MTF:-$PRM/lab_mux_timeouts}"   # счётчик тайм-аутов переключателя (сухой прогон подставляет свой файл)
 mt() { cat "$MTF" 2>/dev/null || echo 0; }
 GOV_START="$(cat $PRM/lab_gov 2>/dev/null || echo 0)"; NT0="$(date '+%Y-%m-%d %H:%M:%S')"
@@ -306,6 +307,39 @@ else
     say "=== выдержка +$WAITUS мкс НЕ лечит ($T1 на $N1; контроль $T0C/$N0C, $T2/$N2) — дальше тест 58 (то же значение в скобке)"
 fi
 KIND=bad
+elif [ "$TEST" = 61 ]; then
+# Тест 61 (28.10, опыт Е14) — коэффициент замедления GPC в скобке: NVIDIA на GF114 ставит /6 (код 0xa), на GF106 — /2 (код 2).
+# Имена и кодировка — из открытого кода NVIDIA для Tegra (therm_clk_slowdown idle_factor, код = 2·делитель − 2).
+# Вопрос: зависит ли застревание переключателя (и нужная выдержка) от глубины замедления. База — как у NVIDIA: /6, ожидание
+# по признаку, запас 0 мкс (lab_therm_wait_us=0), без команды. 61о — контроль (до 2 тайм-аутов, не больше 600: плохая ли
+# сессия); 61а — GPC /2 (код 2), 1500 (стоп на 5); 61б — GPC /8 (код 0xe = 14), 1500 (стоп на 5); 61в — контроль, 300 (стоп на 3).
+# Сторож и чёрный ящик обязательны: при /2 ядро в скобке идёт быстрее (900 вместо 300 МГц на спуске с 0f).
+[ -e "$PRM/lab_therm_gpc_factor" ] || { say "СТОП: в этой сборке нет ключа lab_therm_gpc_factor — нужна сборка 28.10 (lab.sh install)"; finish_night clean; }
+RUNS=600; MT00="$(mt)"; export STOPMUX=2
+run 61о 03-0f-07 $NV lab_mux_guard=1
+T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 61о (контроль, /6, без ключей): тайм-аутов $T0C на $N0C подъёмов"
+if [ "$T0C" -eq 0 ]; then
+    say "=== сессия сейчас ХОРОШАЯ (0 на $N0C без ключей) — 61а/61б ничего не докажут; серия остановлена: перезагрузка и снова"
+    base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
+    finish_night clean
+fi
+RUNS=1500; MT0="$(mt)"; export STOPMUX=5
+run 61а 03-0f-07 $NV lab_mux_guard=1 lab_therm_gpc_factor=2
+MT1="$(mt)"; T1=$((MT1 - MT0)); N1="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 61а (GPC /2 в скобке, код 2): тайм-аутов $T1 на $N1 подъёмов"
+RUNS=1500; export STOPMUX=5
+run 61б 03-0f-07 $NV lab_mux_guard=1 lab_therm_gpc_factor=14
+MT2="$(mt)"; T2=$((MT2 - MT1)); N2="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 61б (GPC /8 в скобке, код 0xe): тайм-аутов $T2 на $N2 подъёмов"
+RUNS=300; export STOPMUX=3
+run 61в 03-0f-07 $NV lab_mux_guard=1
+unset STOPMUX
+MT3="$(mt)"; T3=$((MT3 - MT2)); N3="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 61в (контроль, /6): тайм-аутов $T3 на $N3 подъёмов"
+say "=== ИТОГ Е14: /6 (контроль) $T0C/$N0C и $T3/$N3; /2 $T1/$N1; /8 $T2/$N2 — если /2 и /8 расходятся с /6, глубина замедления входит в условие; если все одинаковы — выдержка не зависит от коэффициента"
+base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
+finish_night clean
 elif [ "$TEST" = 58 ]; then
 # Тест 58 (27.10, переоценка, опыт Е1) — то же значение делителя ядра внутри скобки прямо перед переключателем, без 06 на 0f
 # (ключ lab_nv_div_same, сборка 27.10). Команда пишет 06 -> 02 и лечит; этот ключ пишет 02 -> 02: та же запись и те же
