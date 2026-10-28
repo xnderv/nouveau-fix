@@ -1,0 +1,36 @@
+file:      GTS450.ROM (59904 bytes, sha256 a5988291745f4da5…)
+device:    10de:0dc4   subsystem: 1458:3500   VBIOS: 70.06.13.00.01
+strings:   rN09/23/10 | sDPMIDl | 3GV-N450OC-1GI/F3 | Version 70.06.13.00.01 | Copyright (C) 1996-2010 NVIDIA Corp. | GF106 Board - 10600011
+modified:  no marks found
+
+performance levels (table 40; MHz/flag, flag = bits 14-15):
+  lvl  b1 b2 b0b b0c      hubk06     hubk01       copy        gpc        rop        mem       vdec       host        pmu     hubk07
+  03   40 00 09  1c        270/2      540/2      135/0      101/2      270/2      135/2      135/0      270/0      203/0      270/2
+  07   40 01 01  14        810/0      810/0      405/0      810/0      810/0      324/0      405/0      405/0      203/0      810/0
+  0f   00 02 06  14       1566/1     1566/1      540/0     1660/1     1742/1     1804/1      540/0      540/0      203/0     1742/1
+
+memory map (rammap 10, 8 straps):
+     0- 162 MHz  entry 0000a20002050270024400000003  straps with data: [2, 3, 6, 7]
+      ramcfg[2] 00027f30300000100000000f0000
+      ramcfg[3] 00027f703b9f8a000000050f0000
+      ramcfg[6] 00026830030000100000000f0000
+      ramcfg[7] 00027f703b9f8a000000050f0000
+   165- 540 MHz  entry a5001c0202050270024400000001  straps with data: [2, 3, 6, 7]
+      ramcfg[2] 00016830000000100000000f0000
+      ramcfg[3] 00016f703087000c0000000f000a
+      ramcfg[6] 00016830030000100000000f0000
+      ramcfg[7] 00016f703087000c0000000f000a
+     0-   0 MHz  entry 0000000000000000000000000000  straps with data: []
+  1000-3000 MHz  entry e803b80b422040fc058888000000  straps with data: [2, 3, 6, 7]
+      ramcfg[2] 0000680000000000000000000000
+      ramcfg[3] 0003680000000000000000030000
+      ramcfg[6] 0000680003000000000000000000
+      ramcfg[7] 0003680000000000000000030000
+
+memory timings (table 10):
+   0: 0e060e2a0036001e000c0e09040c010000000200100a090006
+   1: 0504070a0012000700040303030c0000000003000c0a0f0003
+   2: 050407050005000300020202020c000000000300080a0f0002
+   3: 0d060d260031001b000b0d08040c010000000200100a090006
+
+thermal table: {'fan_min': 40, 'fan_max': 100, 'ver': '24'}

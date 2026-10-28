@@ -70,3 +70,8 @@ PCI id (lab/vbios-survey.py): 135 × 10de:1200 (GF114, GTX 560 Ti), 5 × 10de:10
 трёх моделей одного семейства; дальнейших выгрузок не планируется без нового вопроса. Разбор — docs/2026-10-28/vbios-corpus.md, часть 3.
 
 **28.10, обзор чужих работ.** Источники: issues Twilight0/nouveau-dkms (только отчёты пользователей и его ответы-наблюдения; заметки по RE не читались), архив списка nouveau 2016–2017 (lists.freedesktop.org), ветка RSpliet/kernel-nouveau-nv50-pm (GPL-код nouveau, коммиты Сплита 2016–2017), LKML 2018 (Lyude Paul, клокгейтинг), nouveau v7.0 gk20a/gm20b/gp10b и nvgpu L4T (код NVIDIA, GPL). Итог — docs/2026-10-28/others-and-open-drivers.md.
+
+**28.10 19:39 — дамп VBIOS rox4d (класс Д)**: архив gigabyte-gts450-bios.zip из его сообщения в issue 9 (скачал пользователь
+вручную), GTS450.ROM 59 904 байта, md5 280757c9… из архива совпал. Образ побайтово равен TechPowerUp
+Gigabyte.GTS450.1024.100923.rom (по нему генератор уже проверялся) — то есть дамп TechPowerUp для этой карты достоверен.
+Образ лежит вне репозитория (~/Home/stand-2011/gf106-rox4d/round3/); в репозитории — выжимки results/other-cards/gf106-rox4d/round3/.
