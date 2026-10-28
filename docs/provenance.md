@@ -68,3 +68,5 @@ PCI id (lab/vbios-survey.py): 135 × 10de:1200 (GF114, GTX 560 Ti), 5 × 10de:10
 сигнатура 55 AA, SHA256 в manifest.csv; архив `~/Home/nouveau-archive/tpu-vbios/2026-10-28-gts450/` и `…-gtx550ti/`.
 Состав: 71 GF106 (10de:0dc4), 23 GF116 Rev. 2 (10de:1245), 65 GF116 (10de:1244). Итого по разрешению взято 306 образов
 трёх моделей одного семейства; дальнейших выгрузок не планируется без нового вопроса. Разбор — docs/2026-10-28/vbios-corpus.md, часть 3.
+
+**28.10, обзор чужих работ.** Источники: issues Twilight0/nouveau-dkms (только отчёты пользователей и его ответы-наблюдения; заметки по RE не читались), архив списка nouveau 2016–2017 (lists.freedesktop.org), ветка RSpliet/kernel-nouveau-nv50-pm (GPL-код nouveau, коммиты Сплита 2016–2017), LKML 2018 (Lyude Paul, клокгейтинг), nouveau v7.0 gk20a/gm20b/gp10b и nvgpu L4T (код NVIDIA, GPL). Итог — docs/2026-10-28/others-and-open-drivers.md.
