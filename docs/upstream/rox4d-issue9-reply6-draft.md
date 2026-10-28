@@ -1,4 +1,4 @@
-# Sixth reply to rox4d in Twilight0/nouveau-dkms#9 — final text, awaiting approval (not posted)
+# Sixth reply to rox4d in Twilight0/nouveau-dkms#9 — posted 28.10.2026 20:38 MSK as xnderv: https://github.com/Twilight0/nouveau-dkms/issues/9#issuecomment-6476179007
 
 Thanks for the BIOS dump — received, md5 matches, and I can confirm what you expected: your GTS450.ROM is byte-for-byte
 identical (sha256 a5988291…) to the TechPowerUp image `Gigabyte.GTS450.1024.100923.rom`, so it was not modified. That
@@ -15,4 +15,4 @@ A few things your VBIOS explains directly:
 
 You offered testing earlier. So as not to fill this thread (which is about the trace) with my driver, I have opened an
 issue in my own repository with a build of the lab driver for your card and everything you would need to know before
-deciding: __ISSUE_URL__ — entirely optional.
+deciding: https://github.com/xnderv/nouveau-fix/issues/1 — entirely optional.

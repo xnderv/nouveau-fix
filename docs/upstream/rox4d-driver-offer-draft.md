@@ -1,4 +1,4 @@
-# Issue in xnderv/nouveau-fix for rox4d — final text, awaiting approval (not posted)
+# Issue xnderv/nouveau-fix#1 for rox4d — opened 28.10.2026 20:38 MSK: https://github.com/xnderv/nouveau-fix/issues/1
 
 Title: GF106 GTS 450 (rox4d): lab driver build for testing — optional
 

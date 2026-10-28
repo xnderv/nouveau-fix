@@ -75,3 +75,5 @@ PCI id (lab/vbios-survey.py): 135 × 10de:1200 (GF114, GTX 560 Ti), 5 × 10de:10
 вручную), GTS450.ROM 59 904 байта, md5 280757c9… из архива совпал. Образ побайтово равен TechPowerUp
 Gigabyte.GTS450.1024.100923.rom (по нему генератор уже проверялся) — то есть дамп TechPowerUp для этой карты достоверен.
 Образ лежит вне репозитория (~/Home/stand-2011/gf106-rox4d/round3/); в репозитории — выжимки results/other-cards/gf106-rox4d/round3/.
+
+**28.10 20:38 — предложение сборки rox4d**: issue https://github.com/xnderv/nouveau-fix/issues/1 (текст docs/upstream/rox4d-driver-offer-draft.md) и ответ 6 в Twilight0/nouveau-dkms#9 (https://github.com/Twilight0/nouveau-dkms/issues/9#issuecomment-6476179007, текст docs/upstream/rox4d-issue9-reply6-draft.md): его VBIOS = образ TechPowerUp, что объясняет; предложение драйвера вынесено в наш репозиторий, в чужом треде — одна строка со ссылкой. Коммиты до 4c99897 отправлены.
