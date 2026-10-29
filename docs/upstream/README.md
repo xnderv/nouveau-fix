@@ -78,3 +78,6 @@ cd ~/Home/nouveau-fix && git send-email --to='Lyude Paul <lyude@redhat.com>' --t
   <608521793252115@mail.yandex.ru>: рад, будет очень благодарен за доступ к базе. Черновик
   `nouveau-ml-reply-martin-2026-10-29.eml` устарел и не отправляется. Когда Мартин даст доступ — уточнить условия
   (что можно публиковать из выводов; сырые данные держим у себя).
+- **v2 0006 отправлен 29.10.2026 16:00 (MSK)** через `send-0006-v2.sh` (подпись напечатал автор), Message-ID
+  `<20261029130012.21738-1-xnderv@yandex.com>`, результат 250. Кому: Lyude Paul, Danilo Krummrich; копии: Martin Roukala,
+  dri-devel@, nouveau@, linux-kernel@, stable@, автор. Новая ветка (не ответом в v1); ссылка на v1 — под чертой.
