@@ -4,7 +4,8 @@
 # делают newkernel.sh и lab/lab.sh install после удачной сборки. Повод: 28.10 `apt upgrade` ради Клода притянул ядро
 # 7.0.0-42, GRUB_DEFAULT=0 загрузил его со штатным nouveau — два зависания Chromium (гонка без патча 0001).
 #   daily/grub-pin.sh status      — что закреплено, какие ядра стоят и под какие собран драйвер (без пароля)
-#   daily/grub-pin.sh <ядро>      — закрепить ядро (пароль): один раз GRUB_DEFAULT=saved + update-grub, затем grub-set-default
+#   daily/grub-pin.sh <ядро>      — закрепить ядро (пароль): GRUB_DEFAULT=saved и меню без подменю (каждое ядро своей
+#                                   строкой), update-grub, затем grub-set-default на строку этого ядра
 #   daily/grub-pin.sh current     — закрепить работающее ядро
 #   daily/grub-pin.sh off         — снять закрепление (GRUB_DEFAULT=0: грузится самое новое, как в Ubuntu по умолчанию)
 set -uo pipefail
@@ -18,20 +19,29 @@ status)
     echo "работает: $(uname -r)"
     SAVED="$(grub-editenv list 2>/dev/null | sed -n 's/^saved_entry=//p')"
     echo "закреплено: ${SAVED:-— ($(grep -E '^GRUB_DEFAULT=' /etc/default/grub): грузится самое новое ядро)}"
+    echo "меню: $(grep -qE '^GRUB_DISABLE_SUBMENU=y' /etc/default/grub && echo 'каждое ядро отдельной строкой' || echo 'с подменю «Advanced options»')"
     for k in $(ls -1 /lib/modules | sort -V); do d="$(drv "$k")"; printf '  %-22s %s\n' "$k" "${d:-БЕЗ НАШЕГО ДРАЙВЕРА (штатный nouveau: гонка в Chromium)}"; done
-    ls /var/lib/nouveau-fix/pending-* 2>/dev/null | sed 's|.*/pending-|ждёт сборки драйвера: |'
+    ls /var/lib/nouveau-fix/pending-* 2>/dev/null | sed 's|.*/pending-|ждёт сборки драйвера: |' || true
     ;;
 off)
-    sudo sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=0/' /etc/default/grub && sudo update-grub && echo "закрепление снято: грузится самое новое ядро"
+    sudo sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=0/; /^GRUB_DISABLE_SUBMENU=/d' /etc/default/grub && sudo update-grub && echo "закрепление снято: меню как в Ubuntu по умолчанию, грузится самое новое ядро"
     ;;
 *)
     K="$1"; [ "$K" = current ] && K="$(uname -r)"
     [ -d "/lib/modules/$K" ] || { echo "ядра $K нет в /lib/modules"; exit 1; }
     d="$(drv "$K")"
     [ -n "$d" ] || { echo "под $K наш драйвер не собран — закреплять нечего (сначала newkernel.sh или lab/lab.sh install)"; exit 1; }
+    # 29.10: меню без подменю «Advanced options» — каждое ядро отдельной строкой верхнего уровня, закреплённое ядро
+    # подсвечивается своей строкой «Ubuntu, with Linux <ядро>» (по просьбе пользователя: явно видно, что грузится)
+    CHANGED=0
     if ! grep -qE '^GRUB_DEFAULT=saved' /etc/default/grub; then
-        sudo sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /etc/default/grub && sudo update-grub || exit 1
+        sudo sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /etc/default/grub || exit 1; CHANGED=1
     fi
+    if ! grep -qE '^GRUB_DISABLE_SUBMENU=y' /etc/default/grub; then
+        sudo sed -i '/^#\?GRUB_DISABLE_SUBMENU=/d' /etc/default/grub && echo 'GRUB_DISABLE_SUBMENU=y' | sudo tee -a /etc/default/grub >/dev/null || exit 1
+        CHANGED=1
+    fi
+    [ "$CHANGED" = 1 ] && { sudo update-grub || exit 1; }
     # идентификаторы пунктов берём из самого grub.cfg, а не угадываем по UUID
     ENTRY="$(sudo grep -oE "gnulinux-$K-advanced-[0-9A-Za-z-]+" /boot/grub/grub.cfg | head -n 1)"
     SUB="$(sudo grep -oE "gnulinux-advanced-[0-9A-Za-z-]+" /boot/grub/grub.cfg | head -n 1)"
