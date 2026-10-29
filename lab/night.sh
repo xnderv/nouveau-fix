@@ -73,7 +73,8 @@ base() { setp lab_gov=0 lab_mem=1 lab_pcie=1 lab_volt_min_uv=0 lab_therm=1 lab_t
         [ -e "$PRM/lab_nv_div_same" ] && setp lab_nv_div_same=0 lab_pll_off_in_bracket=0
         [ -e "$PRM/lab_therm_gpc_factor" ] && setp lab_therm_gpc_factor=0 lab_therm_hub_factor=2
         [ -e "$PRM/lab_therm_fixed_ns" ] && setp lab_therm_fixed_ns=0 lab_therm_fixed_hub_ns=0
-        [ -e "$PRM/lab_therm_fixed_floor_ns" ] && setp lab_therm_fixed_floor_ns=2000; true; }   # в старых сборках этих ключей нет
+        [ -e "$PRM/lab_therm_fixed_floor_ns" ] && setp lab_therm_fixed_floor_ns=2000
+        setp lab_therm_us=24 lab_therm_us_gpc=0 lab_therm_us_hub=0; true; }   # в старых сборках части ключей нет
 MTF="${NIGHT_MTF:-$PRM/lab_mux_timeouts}"   # счётчик тайм-аутов переключателя (сухой прогон подставляет свой файл)
 mt() { cat "$MTF" 2>/dev/null || echo 0; }
 GOV_START="$(cat $PRM/lab_gov 2>/dev/null || echo 0)"; NT0="$(date '+%Y-%m-%d %H:%M:%S')"
@@ -330,7 +331,23 @@ T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
 say "=== тест 62о (контроль по признаку): тайм-аутов $T0C на $N0C подъёмов — сессия $([ "$T0C" -gt 0 ] && echo ПЛОХАЯ || echo хорошая)"
 fi
 PREV=""; S_LO=""; S_HI=""; SCAN=""
-for D in ${SCANSTEPS:-8000 6000 4500 3500 3000 2500}; do
+if [ "${SCANBISECT:-0}" = 1 ]; then
+    # 29.10 вечер: деление пополам между LO (по умолчанию 1500 — ниже реальное ожидание не опускается: первое чтение статуса
+    # ждёт, пока дойдут записи скобки, ~1,5 мкс) и HI (8000 — как NVIDIA, считаем чистым); стоп, когда промежуток <= SCANRES (400)
+    LO="${SCANLO:-1500}"; HI="${SCANHI:-8000}"
+    while [ $((HI - LO)) -gt "${SCANRES:-400}" ]; do
+        D=$(( (LO + HI) / 200 * 100 ))
+        RUNS="${SCANRUNS:-200}"; MTD="$(mt)"; export STOPMUX=1
+        run "62-$D" 03-0f-07 $NV lab_mux_guard=1 lab_therm_fixed_ns=$D ${SCANFLOOR:+lab_therm_fixed_floor_ns=$SCANFLOOR}
+        TD=$(( $(mt) - MTD )); ND="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+        say "=== проба $D нс от входа: тайм-аутов $TD на $ND подъёмов (промежуток был $LO–$HI)"
+        SCAN="$SCAN $D:$TD/$ND"
+        if [ "$TD" -gt 0 ]; then LO="$D"; else HI="$D"; fi
+    done
+    unset STOPMUX
+    S_LO="$LO"; S_HI="$HI"; SCANSTEPS_DONE=1
+fi
+for D in $([ "${SCANSTEPS_DONE:-0}" = 1 ] || echo ${SCANSTEPS:-8000 6000 4500 3500 3000 2500}); do
     RUNS="${SCANRUNS:-200}"; MTD="$(mt)"; export STOPMUX=1
     run "62-$D" 03-0f-07 $NV lab_mux_guard=1 lab_therm_fixed_ns=$D ${SCANFLOOR:+lab_therm_fixed_floor_ns=$SCANFLOOR}
     TD=$(( $(mt) - MTD )); ND="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
@@ -340,9 +357,36 @@ for D in ${SCANSTEPS:-8000 6000 4500 3500 3000 2500}; do
     PREV="$D"
 done
 unset STOPMUX
-if [ -n "$S_LO" ]; then VERD="S между $S_LO и $S_HI нс от входа"; else VERD="S не больше ${PREV} нс (застреваний не было до нижней ступени)"; fi
+if [ "${SCANSTEPS_DONE:-0}" = 1 ]; then VERD="деление пополам: S между $S_LO и $S_HI нс от входа (при $S_LO застревания были$([ "$S_LO" = "${SCANLO:-1500}" ] && echo ' — не проверялось, нижняя граница поиска'))"
+elif [ -n "$S_LO" ]; then VERD="S между $S_LO и $S_HI нс от входа"; else VERD="S не больше ${PREV} нс (застреваний не было до нижней ступени)"; fi
 say "=== ИТОГ 62: контроль $T0C/$N0C; скан:$SCAN; $VERD"
 echo "$(date '+%Y-%m-%d %H:%M') загрузка $BOOT ядро $(uname -r) | контроль $T0C/$N0C | скан:$SCAN | $VERD" >> "$TALLY"
+base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
+finish_night clean
+elif [ "$TEST" = 63 ]; then
+# Тест 63 (29.10 вечер) — ниже нуля: в хорошей сессии тест 62 не нашёл застреваний до «ожидания 1 нс» (на деле ~1,5 мкс: первое
+# чтение статуса ждёт записи скобки). 63а — скобка есть, ожидания нет совсем (lab_therm_wait=0, lab_therm_us=0: переключатель
+# сразу за записями скобки; hub — 5 мкс). 63б — без скобки вовсе (lab_therm=0), как до 24.10, когда были зависания GR под
+# нагрузкой (тогда хороших и плохих сессий ещё не различали). Стоп на первом тайм-ауте; сторож и чёрный ящик — как обычно.
+TALLY="$RES/test63-sessions.txt"; BOOT="$(journalctl --list-boots --no-pager 2>/dev/null | awk '$1=="0"{print $2}')"
+if [ "${SKIPCONTROL:-0}" = 1 ]; then T0C="-"; N0C="-"; say "=== контроль пропущен (SKIPCONTROL=1)"
+else RUNS=300; MT00="$(mt)"; export STOPMUX=2; run 63о 03-0f-07 $NV lab_mux_guard=1
+     T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+     say "=== тест 63о (контроль по признаку): тайм-аутов $T0C на $N0C — сессия $([ "$T0C" -gt 0 ] && echo ПЛОХАЯ || echo хорошая)"; fi
+RUNS="${SCANRUNS:-200}"; MTA="$(mt)"; export STOPMUX=1
+run 63а 03-0f-07 $NV lab_mux_guard=1 lab_therm_wait=0 lab_therm_us=0 lab_therm_us_hub=5
+TA=$(( $(mt) - MTA )); NA="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 63а (скобка без ожидания): тайм-аутов $TA на $NA подъёмов"
+TB="-"; NB="-"
+if [ "$TA" -eq 0 ]; then
+    RUNS="${SCANRUNS:-200}"; MTB="$(mt)"; export STOPMUX=1
+    run 63б 03-0f-07 $NV lab_mux_guard=1 lab_therm=0
+    TB=$(( $(mt) - MTB )); NB="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+    say "=== тест 63б (без скобки): тайм-аутов $TB на $NB подъёмов"
+fi
+unset STOPMUX
+say "=== ИТОГ 63: контроль $T0C/$N0C; скобка без ожидания $TA/$NA; без скобки $TB/$NB"
+echo "$(date '+%Y-%m-%d %H:%M') загрузка $BOOT | контроль $T0C/$N0C | скобка без ожидания $TA/$NA | без скобки $TB/$NB" >> "$TALLY"
 base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
 finish_night clean
 elif [ "$TEST" = 61 ]; then

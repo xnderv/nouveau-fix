@@ -1,0 +1,52 @@
+19:01:48 серия: драйвер /lib/modules/7.0.0-42-generic/updates/nouveau-fix/nouveau.ko, ядро 7.0.0-42-generic, POWEROFF=0 WAITMIN=60 DRY=0
+19:01:48 снимок этой загрузки (2026-10-29 19:00:45) против bootsnap-20261027-1942-bad.txt: сравнено 126 регистров: различаются 3, без живых сигналов (температура, вентилятор) — 1
+19:01:48 снимок этой загрузки (2026-10-29 19:00:45) против bootsnap-20261025-1840-bad.txt: сравнено 126 регистров: различаются 5, без живых сигналов (температура, вентилятор) — 1
+19:01:48 снимок этой загрузки (2026-10-29 19:00:45) против bootsnap-20261025-1245-bad.txt: сравнено 119 регистров: различаются 4, без живых сигналов (температура, вентилятор) — 1
+19:01:48 снимок этой загрузки (2026-10-29 19:00:45) против bootsnap-20261025-1230-bad.txt: сравнено 119 регистров: различаются 3, без живых сигналов (температура, вентилятор) — 1
+    020008  0: c0083653  /home/alex/Home/nouveau-fix/results/bootsnap-20261027-1942-bad.txt: c0083679  (живой сигнал: датчик температуры)
+    020400  0: 00000028  /home/alex/Home/nouveau-fix/results/bootsnap-20261027-1942-bad.txt: 0000002a  (живой сигнал: датчик температуры)
+    137028  0: a0000000  /home/alex/Home/nouveau-fix/results/bootsnap-20261027-1942-bad.txt: 80000000
+19:01:53 === тест 62о: уровни 03-0f-07, подъёмов 300; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_mux_guard=1
+19:01:55 тест 62о: журнал hangtest-20261029-190154.txt
+19:13:53 тест 62о: закончился, код 0
+19:13:43 тайм-аутов переключателя источника такта за тест: 0 (journalctl -k: «LAB mux»); ошибок GPU (DATA_ERROR/fault/killed) за тест: 0
+=== 300 подъёмов без зависания (нагрузка browser). Лог: /home/alex/Home/nouveau-fix/results/hangtest-20261029-190154.txt
+19:13:44 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+19:13:53 === тест 62о (контроль по признаку): тайм-аутов 0 на 300 подъёмов — сессия хорошая
+19:13:54 === тест 62-2000: уровни 03-0f-07, подъёмов 200; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_mux_guard=1 lab_therm_fixed_ns=2000 lab_therm_fixed_floor_ns=0
+19:13:56 тест 62-2000: журнал hangtest-20261029-191355.txt
+19:22:09 тест 62-2000: закончился, код 0
+19:21:59 тайм-аутов переключателя источника такта за тест: 0 (journalctl -k: «LAB mux»); ошибок GPU (DATA_ERROR/fault/killed) за тест: 0
+=== 200 подъёмов без зависания (нагрузка browser). Лог: /home/alex/Home/nouveau-fix/results/hangtest-20261029-191355.txt
+19:22:00 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+19:22:09 === ступень 2000 нс от входа: тайм-аутов 0 на 200 подъёмов
+19:22:10 === тест 62-1500: уровни 03-0f-07, подъёмов 200; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_mux_guard=1 lab_therm_fixed_ns=1500 lab_therm_fixed_floor_ns=0
+19:22:12 тест 62-1500: журнал hangtest-20261029-192211.txt
+19:30:15 тест 62-1500: закончился, код 0
+19:30:14 тайм-аутов переключателя источника такта за тест: 0 (journalctl -k: «LAB mux»); ошибок GPU (DATA_ERROR/fault/killed) за тест: 0
+=== 200 подъёмов без зависания (нагрузка browser). Лог: /home/alex/Home/nouveau-fix/results/hangtest-20261029-192211.txt
+19:30:14 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+19:30:15 === ступень 1500 нс от входа: тайм-аутов 0 на 200 подъёмов
+19:30:16 === тест 62-1000: уровни 03-0f-07, подъёмов 200; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_mux_guard=1 lab_therm_fixed_ns=1000 lab_therm_fixed_floor_ns=0
+19:30:18 тест 62-1000: журнал hangtest-20261029-193017.txt
+19:38:31 тест 62-1000: закончился, код 0
+19:38:20 тайм-аутов переключателя источника такта за тест: 0 (journalctl -k: «LAB mux»); ошибок GPU (DATA_ERROR/fault/killed) за тест: 0
+=== 200 подъёмов без зависания (нагрузка browser). Лог: /home/alex/Home/nouveau-fix/results/hangtest-20261029-193017.txt
+19:38:21 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+19:38:31 === ступень 1000 нс от входа: тайм-аутов 0 на 200 подъёмов
+19:38:32 === тест 62-500: уровни 03-0f-07, подъёмов 200; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_mux_guard=1 lab_therm_fixed_ns=500 lab_therm_fixed_floor_ns=0
+19:38:34 тест 62-500: журнал hangtest-20261029-193833.txt
+19:46:36 тест 62-500: закончился, код 0
+19:46:34 тайм-аутов переключателя источника такта за тест: 0 (journalctl -k: «LAB mux»); ошибок GPU (DATA_ERROR/fault/killed) за тест: 0
+=== 200 подъёмов без зависания (нагрузка browser). Лог: /home/alex/Home/nouveau-fix/results/hangtest-20261029-193833.txt
+19:46:34 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+19:46:36 === ступень 500 нс от входа: тайм-аутов 0 на 200 подъёмов
+19:46:37 === тест 62-1: уровни 03-0f-07, подъёмов 200; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_mux_guard=1 lab_therm_fixed_ns=1 lab_therm_fixed_floor_ns=0
+19:46:39 тест 62-1: журнал hangtest-20261029-194638.txt
+19:54:42 тест 62-1: закончился, код 0
+19:54:39 тайм-аутов переключателя источника такта за тест: 0 (journalctl -k: «LAB mux»); ошибок GPU (DATA_ERROR/fault/killed) за тест: 0
+=== 200 подъёмов без зависания (нагрузка browser). Лог: /home/alex/Home/nouveau-fix/results/hangtest-20261029-194638.txt
+19:54:40 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+19:54:42 === ступень 1 нс от входа: тайм-аутов 0 на 200 подъёмов
+19:54:42 === ИТОГ 62: контроль 0/300; скан: 2000:0/200 1500:0/200 1000:0/200 500:0/200 1:0/200; S не больше 1 нс (застреваний не было до нижней ступени)
+19:54:43 POWEROFF=0 — машину не выключаю
