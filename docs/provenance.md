@@ -125,3 +125,5 @@ nvc3 (GF106), nvc4 (GF104), nvc8 (GF110), nvce (GF114), nvcf (GF116), nvd7, nvd9
 
 **29.10 20:17 — ответ rox4d в issue #1** (первая попытка: модуль собрался, плата узнана, параметры не применились из-за порядка
 шагов с initramfs; параметры через sysfs, добавлены lab_mux_guard=1 и lab_therm_wait_us=16): https://github.com/xnderv/nouveau-fix/issues/1#issuecomment-6503490914.
+**29.10 21:42 — ответ 2 rox4d** (вторая попытка: 0f прошёл, спуск отказал из-за проверки 0x132000; при отказе памяти ядро и напряжение
+ушли вниз — просьба перезагрузиться; исправления в патче, проверен на nouveau из 6.18): https://github.com/xnderv/nouveau-fix/issues/1#issuecomment-6505342711.

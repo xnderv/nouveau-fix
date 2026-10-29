@@ -1,4 +1,4 @@
-# Ответ 2 rox4d в xnderv/nouveau-fix#1 — черновик (не опубликован)
+# Ответ 2 rox4d в xnderv/nouveau-fix#1 — опубликован 29.10.2026 21:42 MSK: https://github.com/xnderv/nouveau-fix/issues/1#issuecomment-6505342711
 
 Спасибо за логи! Это первый настоящий запуск на твоей карте, и он почти удался:
 
