@@ -364,6 +364,32 @@ say "=== ИТОГ 62: контроль $T0C/$N0C; скан:$SCAN; $VERD"
 echo "$(date '+%Y-%m-%d %H:%M') загрузка $BOOT ядро $(uname -r) | контроль $T0C/$N0C | скан:$SCAN | $VERD" >> "$TALLY"
 base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
 finish_night clean
+elif [ "$TEST" = 65 ]; then
+# Тест 65 (29.10, ночь). 65о — контроль (по признаку, до 2 тайм-аутов, не больше 300): хорошая или плохая сессия.
+# 65а — кандидат для ядра Linux: скобка с замедлением и фиксированное ожидание от входа, как NVIDIA 390 на GF114
+# (GPC 8000 нс, hub 4500 нс), длинный прогон LONGRUNS (3000) подъёмов, стоп на 5 тайм-аутах.
+# 65б — опыт Е20: скобка снимается сразу после записи переключателя (lab_nv_mux_release=1, как NVIDIA), ожидания нет:
+# нужно ли замедление на время после переключения (при 64б без замедления GR зависал). Риск зависания — поэтому последним.
+[ -e "$PRM/lab_therm_fixed_ns" ] || { say "СТОП: нет ключа lab_therm_fixed_ns"; finish_night clean; }
+TALLY="$RES/test65-sessions.txt"; BOOT="$(journalctl --list-boots --no-pager 2>/dev/null | awk '$1=="0"{print $2}')"
+RUNS=300; MT00="$(mt)"; export STOPMUX=2; run 65о 03-0f-07 $NV lab_mux_guard=1
+T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 65о (контроль по признаку): тайм-аутов $T0C на $N0C — сессия $([ "$T0C" -gt 0 ] && echo ПЛОХАЯ || echo хорошая)"
+echo "$(date '+%Y-%m-%d %H:%M') загрузка $BOOT | контроль $T0C/$N0C | (65а, 65б — ниже)" >> "$TALLY"
+RUNS="${LONGRUNS:-3000}"; MTA="$(mt)"; export STOPMUX=5
+run 65а 03-0f-07 $NV lab_mux_guard=1 lab_therm_fixed_ns=8000 lab_therm_fixed_hub_ns=4500
+TA=$(( $(mt) - MTA )); NA="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 65а (кандидат: замедление + ожидание 8000/4500 нс от входа): тайм-аутов $TA на $NA подъёмов"
+echo "$(date '+%Y-%m-%d %H:%M')   65а кандидат 8000/4500 нс: $TA/$NA" >> "$TALLY"
+RUNS="${SCANRUNS:-200}"; MTB="$(mt)"; export STOPMUX=1
+run 65б 03-0f-07 $NV lab_mux_guard=1 lab_therm_wait=0 lab_therm_us=0 lab_therm_us_hub=5 lab_nv_mux_release=1
+TB=$(( $(mt) - MTB )); NB="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+unset STOPMUX
+say "=== тест 65б (Е20: скобка снята сразу после переключателя, без ожидания): тайм-аутов $TB на $NB подъёмов"
+echo "$(date '+%Y-%m-%d %H:%M')   65б Е20 снятие скобки после переключателя: $TB/$NB" >> "$TALLY"
+say "=== ИТОГ 65: контроль $T0C/$N0C; кандидат 8000/4500 $TA/$NA; Е20 $TB/$NB"
+base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
+finish_night clean
 elif [ "$TEST" = 64 ]; then
 # Тест 64 (29.10, опыт Е18) — что в скобке спасает GR. База — как 63а (скобка без ожидания: чисто в хорошей сессии), меняется одно:
 # 64а — замедление есть, биты CTRL_1 НЕ снимаются (lab_therm_ctrl1_clr=0); 64б — замедления нет, только снятие битов 0x68 в CTRL_1
