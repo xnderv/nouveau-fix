@@ -51,13 +51,23 @@ for raw, human in names:
     if not any(k in human.lower() for k in ('inbox', 'spam', 'спам', 'входящ', 'sent', 'отправ')): continue
     if M.select(f'"{raw}"', readonly=True)[0] != 'OK': continue
     ids = set()
+    # 29.10: один запрос SEARCH вместо 20 — Яндекс рвал соединение («problems with connection») на серии запросов
     if words == ['ALL']:
-        typ, data = M.search(None, f'(SINCE {since})')
-        if data and data[0]: ids.update(data[0].split())
-    for w in (words if words != ['ALL'] else []):
-        for fld in ('FROM', 'TO', 'CC', 'SUBJECT'):
-            typ, data = M.search(None, f'(SINCE {since})', fld, f'"{w}"')
-            if data and data[0]: ids.update(data[0].split())
+        crit = f'(SINCE {since})'
+    else:
+        keys = [f'({fld} "{w}")' for w in words for fld in ('FROM', 'TO', 'CC', 'SUBJECT')]
+        expr = keys[-1]
+        for k in reversed(keys[:-1]): expr = f'(OR {k} {expr})'
+        crit = f'(SINCE {since} {expr})'
+    for attempt in range(3):
+        try:
+            typ, data = M.search(None, crit); break
+        except (imaplib.IMAP4.abort, OSError) as ex:
+            print(f'    соединение оборвалось ({ex}), переподключаюсь…')
+            M = imaplib.IMAP4_SSL('imap.yandex.ru', 993); M.login(user, pw); M.select(f'"{raw}"', readonly=True)
+    else:
+        print('    поиск не удался трижды — пропускаю папку'); continue
+    if data and data[0]: ids.update(data[0].split())
     ids = sorted(ids, key=int)
     print(f'\n=== {human}: писем со словами {words} за {days} дн.: {len(ids)}')
     for i in ids[-60:]:
