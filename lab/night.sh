@@ -71,7 +71,8 @@ base() { setp lab_gov=0 lab_mem=1 lab_pcie=1 lab_volt_min_uv=0 lab_therm=1 lab_t
               lab_volt_wait_us=0 lab_nv_22680=0 lab_nv_divb=0 lab_nv_disphold=0 lab_e9e0=0 lab_order=0 lab_pll_keep=0 lab_mux_guard=0 lab_nv_mux_release=0 lab_nv_div_late=0
         [ -e "$PRM/lab_divb_force" ] && setp lab_divb_force=0
         [ -e "$PRM/lab_nv_div_same" ] && setp lab_nv_div_same=0 lab_pll_off_in_bracket=0
-        [ -e "$PRM/lab_therm_gpc_factor" ] && setp lab_therm_gpc_factor=10 lab_therm_hub_factor=2; true; }   # в старых сборках этих ключей нет
+        [ -e "$PRM/lab_therm_gpc_factor" ] && setp lab_therm_gpc_factor=0 lab_therm_hub_factor=2
+        [ -e "$PRM/lab_therm_fixed_ns" ] && setp lab_therm_fixed_ns=0 lab_therm_fixed_hub_ns=0; true; }   # в старых сборках этих ключей нет
 MTF="${NIGHT_MTF:-$PRM/lab_mux_timeouts}"   # счётчик тайм-аутов переключателя (сухой прогон подставляет свой файл)
 mt() { cat "$MTF" 2>/dev/null || echo 0; }
 GOV_START="$(cat $PRM/lab_gov 2>/dev/null || echo 0)"; NT0="$(date '+%Y-%m-%d %H:%M:%S')"
@@ -308,6 +309,35 @@ else
     say "=== выдержка +$WAITUS мкс НЕ лечит ($T1 на $N1; контроль $T0C/$N0C, $T2/$N2) — дальше тест 58 (то же значение в скобке)"
 fi
 KIND=bad
+elif [ "$TEST" = 62 ]; then
+# Тест 62 (29.10) — «степень плохости» сессии (гипотеза пользователя: плохи все сессии, но по-разному; нужное время
+# успокоения S после входа в скобку своё в каждой). Признак «вступило» одинаков в хороших и плохих (~2,3 мкс), значит S
+# снаружи не видно — меряем активно. 62о — обычный контроль, как 61о (по признаку, без запаса, до 2 тайм-аутов, не больше
+# 300): хорошая или плохая по-старому. Затем скан: GPC ждёт фиксированное время от входа, как NVIDIA (lab_therm_fixed_ns),
+# сверху вниз 8000 → 6000 → 4500 → 3500 → 3000 → 2500 нс по SCANRUNS (200) подъёмов, стоп на первом тайм-ауте. Ступень,
+# где застряло, — нижняя граница S, предыдущая чистая — верхняя. Одна загрузка — одна строка в results/test62-sessions.txt.
+[ -e "$PRM/lab_therm_fixed_ns" ] || { say "СТОП: в этой сборке нет ключа lab_therm_fixed_ns — нужна сборка 29.10"; finish_night clean; }
+TALLY="$RES/test62-sessions.txt"; BOOT="$(journalctl --list-boots --no-pager 2>/dev/null | awk '$1=="0"{print $2}')"
+RUNS=300; MT00="$(mt)"; export STOPMUX=2
+run 62о 03-0f-07 $NV lab_mux_guard=1
+T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 62о (контроль по признаку): тайм-аутов $T0C на $N0C подъёмов — сессия $([ "$T0C" -gt 0 ] && echo ПЛОХАЯ || echo хорошая)"
+PREV=""; S_LO=""; S_HI=""; SCAN=""
+for D in ${SCANSTEPS:-8000 6000 4500 3500 3000 2500}; do
+    RUNS="${SCANRUNS:-200}"; MTD="$(mt)"; export STOPMUX=1
+    run "62-$D" 03-0f-07 $NV lab_mux_guard=1 lab_therm_fixed_ns=$D
+    TD=$(( $(mt) - MTD )); ND="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+    say "=== ступень $D нс от входа: тайм-аутов $TD на $ND подъёмов"
+    SCAN="$SCAN $D:$TD/$ND"
+    if [ "$TD" -gt 0 ]; then S_LO="$D"; S_HI="${PREV:-больше 8000}"; break; fi
+    PREV="$D"
+done
+unset STOPMUX
+if [ -n "$S_LO" ]; then VERD="S между $S_LO и $S_HI нс от входа"; else VERD="S не больше ${PREV} нс (застреваний не было до нижней ступени)"; fi
+say "=== ИТОГ 62: контроль $T0C/$N0C; скан:$SCAN; $VERD"
+echo "$(date '+%Y-%m-%d %H:%M') загрузка $BOOT ядро $(uname -r) | контроль $T0C/$N0C | скан:$SCAN | $VERD" >> "$TALLY"
+base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
+finish_night clean
 elif [ "$TEST" = 61 ]; then
 # Тест 61 (28.10, опыт Е14) — коэффициент замедления GPC в скобке: NVIDIA на GF114 ставит /6 (код 0xa), на GF106 — /2 (код 2).
 # Имена и кодировка — из открытого кода NVIDIA для Tegra (therm_clk_slowdown idle_factor, код = 2·делитель − 2).

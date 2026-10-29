@@ -663,7 +663,7 @@
  	return 0;
  }
  
-@@ -346,20 +668,436 @@
+@@ -346,20 +668,471 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -719,6 +719,17 @@
 +static uint lab_therm_wait_us;
 +module_param(lab_therm_wait_us, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_wait_us, "LAB: extra margin after the FSRM engaged flag, us (0 = none)");
++/* LAB 29.10, «степень плохости» сессии: ждать, как NVIDIA 390, фиксированное время ОТ ВХОДА в скобку, не опрашивая признак
++ * для решения (по показаниям таймера в записях: GF114 GPC 8 мкс, hub 4–5 мкс; GF106 ~18–19 мкс; docs/2026-10-29/nvidia-wait.md).
++ * Признак при этом читается и пишется в журнал — когда он поднялся относительно переключения. Отдельно для GPC и hubk06;
++ * 0 = выключено (как раньше: по признаку, lab_therm_wait). Пол 2000 нс — ниже признака (~2,2 мкс) не опускаемся (тест 14:
++ * зависание при 0); потолок 50000 нс. Ключ выше lab_therm_wait: если задан, признак для решения не используется. */
++static uint lab_therm_fixed_ns;
++module_param(lab_therm_fixed_ns, uint, 0644);
++MODULE_PARM_DESC(lab_therm_fixed_ns, "LAB: GPC bracket: fixed wait from bracket entry, ns, as NVIDIA 390 (no flag-based decision; 0 = off; clamped to 2000..50000)");
++static uint lab_therm_fixed_hub_ns;
++module_param(lab_therm_fixed_hub_ns, uint, 0644);
++MODULE_PARM_DESC(lab_therm_fixed_hub_ns, "LAB: hubk06 bracket: fixed wait from bracket entry, ns (0 = off; clamped to 2000..50000)");
 +/* LAB 24.10, зависания 01:32 и 01:38 на 03->07: сброс TLB (gf100_vmm_invalidate) запущен ровно во время скобки стадии 1,
 + * в т. ч. «пустой» скобки hubk06 (бит мультиплексора не меняется). Два отдельных изменения, проверять по одному:
 + * lab_therm_real=1 — скобка только если бит 0x137100 этого домена реально меняется (как у NVIDIA);
@@ -758,6 +769,7 @@
 +	bool on; int i; u32 ctrl1, f2, f3, f4;
 +	uint us; int np; u32 st0; u32 pv[8]; u32 pt[8]; u32 nrd;
 +	bool w; bool wok; u32 wns, wv, wrd;
++	bool fx; bool fxok; u32 fxset, fxns, fxflag;	/* 29.10: фиксированное ожидание от входа */
 +};
 +
 +static void
@@ -787,7 +799,27 @@
 +	sv->np = 0;
 +	sv->nrd = 0;
 +	sv->w = false;
-+	if (lab_therm_wait) {
++	sv->fx = false;
++	if ((idx == 0 && lab_therm_fixed_ns) || (idx == 7 && lab_therm_fixed_hub_ns)) {
++		u32 want = 0x00020000 | (e3 & 0x3f);
++		u32 set = clamp_t(u32, idx == 0 ? READ_ONCE(lab_therm_fixed_ns) : READ_ONCE(lab_therm_fixed_hub_ns), 2000, 50000);
++		u64 t0 = ktime_get_ns(), dt;
++		u32 v;
++
++		sv->fx = true;
++		sv->fxok = false;
++		sv->fxset = set;
++		sv->fxflag = 0;
++		do {
++			v = nvkm_rd32(device, 0x0201e0 + sv->i * 4);
++			dt = ktime_get_ns() - t0;
++			if (!sv->fxok && (v & 0x0002003f) == want) {
++				sv->fxok = true;
++				sv->fxflag = (u32)dt;
++			}
++		} while (dt < set);
++		sv->fxns = (u32)dt;
++	} else if (lab_therm_wait) {
 +		u32 want = 0x00020000 | (e3 & 0x3f);
 +		u64 t0 = ktime_get_ns(), dt;
 +		u32 v;
@@ -849,6 +881,9 @@
 +	if (sv->w)
 +		nvkm_info(&clk->base.subdev, "LAB therm wait idx %02x: %s через %u нс (чтений %u, статус %08x), запас %u мкс\n",
 +			  idx, sv->wok ? "признак" : "ТАЙМАУТ 100 мкс, признака нет,", sv->wns, sv->wrd, sv->wv, lab_therm_wait_us);
++	if (sv->fx)
++		nvkm_info(&clk->base.subdev, "LAB therm fixed idx %02x: ждал %u нс от входа (задано %u), признак %s%u нс\n",
++			  idx, sv->fxns, sv->fxset, sv->fxok ? "через " : "НЕ поднялся до переключения, ждали ", sv->fxok ? sv->fxflag : sv->fxns);
 +	if (lab_therm_probe && !sv->w) {
 +		char buf[200];
 +		int k, o = 0;
@@ -1103,7 +1138,7 @@
  }
  
  static void
-@@ -368,20 +1106,58 @@
+@@ -368,20 +1141,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -1165,7 +1200,7 @@
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +1166,66 @@
+@@ -390,17 +1201,66 @@
  }
  
  static void
@@ -1234,7 +1269,7 @@
  	}
  }
  
-@@ -409,7 +1234,17 @@
+@@ -409,7 +1269,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -1252,7 +1287,7 @@
  }
  
  static int
-@@ -426,15 +1261,138 @@
+@@ -426,15 +1296,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1393,7 +1428,7 @@
  	return 0;
  }
  
-@@ -477,5 +1435,5 @@
+@@ -477,5 +1470,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
