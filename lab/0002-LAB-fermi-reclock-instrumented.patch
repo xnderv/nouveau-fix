@@ -54,7 +54,7 @@
 +static struct nvkm_pstate *lab_h07_pstate;	/* задан только на время вызова из nvkm_pstate_prog с lab_nv_hub07mem */
 +static int lab_h07_pstatei;
 +static bool lab_h07_up;
-+static void lab_pstate_mem(struct nvkm_clk *clk, struct nvkm_pstate *pstate, int pstatei);
++static int lab_pstate_mem(struct nvkm_clk *clk, struct nvkm_pstate *pstate, int pstatei);
  
  /******************************************************************************
   * misc
@@ -106,16 +106,16 @@
  	}
  
  	if (therm) {
-@@ -263,14 +337,67 @@
- /******************************************************************************
+@@ -264,13 +338,67 @@
   * P-States
   *****************************************************************************/
-+static void
+ static int
+-nvkm_pstate_prog(struct nvkm_clk *clk, int pstatei)
 +lab_pstate_mem(struct nvkm_clk *clk, struct nvkm_pstate *pstate, int pstatei)
-+{
-+	struct nvkm_subdev *subdev = &clk->subdev;
-+	struct nvkm_fb *fb = subdev->device->fb;
-+	int ret;
+ {
+ 	struct nvkm_subdev *subdev = &clk->subdev;
+ 	struct nvkm_fb *fb = subdev->device->fb;
++	int ret = 0;
 +
 +	if (!lab_mem) {
 +		nvkm_info(subdev, "LAB pstate %d: memory SKIPPED (lab_mem=0)\n", pstatei);
@@ -135,6 +135,7 @@
 +	} else {
 +		nvkm_info(subdev, "LAB pstate %d: no memory reclock support\n", pstatei);
 +	}
++	return ret < 0 ? ret : 0;
 +}
 +
 +static void
@@ -163,23 +164,24 @@
 +	}
 +}
 +
- static int
- nvkm_pstate_prog(struct nvkm_clk *clk, int pstatei)
- {
- 	struct nvkm_subdev *subdev = &clk->subdev;
--	struct nvkm_fb *fb = subdev->device->fb;
++static int
++nvkm_pstate_prog(struct nvkm_clk *clk, int pstatei)
++{
++	struct nvkm_subdev *subdev = &clk->subdev;
  	struct nvkm_pci *pci = subdev->device->pci;
  	struct nvkm_pstate *pstate;
- 	int ret, idx = 0;
+-	int ret, idx = 0;
++	int ret, idx = 0, was, mret = 0;
 +	bool up;
  
  	list_for_each_entry(pstate, &clk->states, head) {
  		if (idx++ == pstatei)
-@@ -278,22 +405,72 @@
+@@ -278,22 +406,82 @@
  	}
  
  	nvkm_debug(subdev, "setting performance state %d\n", pstatei);
 +	up = pstatei > clk->pstate;
++	was = clk->pstate;
  	clk->pstate = pstatei;
  
 -	nvkm_pcie_set_link(pci, pstate->pcie_speed, pstate->pcie_width);
@@ -235,16 +237,25 @@
 +		lab_h07_pstate = NULL;
 +	} else {
 +		if (!(lab_mem_order && up))
-+			lab_pstate_mem(clk, pstate, pstatei);
++			mret = lab_pstate_mem(clk, pstate, pstatei);
 +		else
 +			nvkm_info(subdev, "LAB pstate %d: подъём — память ПОСЛЕ ядра (lab_mem_order=1, как NVIDIA)\n", pstatei);
 +
-+		nvkm_info(subdev, "LAB pstate %d: programming core clocks/voltage\n", pstatei);
-+		ret = nvkm_cstate_prog(clk, pstate, NVKM_CLK_CSTATE_HIGHEST);
-+		if (lab_mem_order && up)
-+			lab_pstate_mem(clk, pstate, pstatei);
++		if (mret < 0) {
++			/* LAB 29.10 (rox4d, GF106): память не переключилась — ядро и напряжение не трогаем, уровень остаётся прежним;
++			 * раньше ядро уходило на 07 с 0,9625 В при памяти на 1804 МГц. */
++			nvkm_error(subdev, "LAB pstate %d: память не переключилась (%d) — частоты ядра и напряжение не меняю, остаюсь на уровне %d\n",
++				   pstatei, mret, was);
++			clk->pstate = was;
++			ret = mret;
++		} else {
++			nvkm_info(subdev, "LAB pstate %d: programming core clocks/voltage\n", pstatei);
++			ret = nvkm_cstate_prog(clk, pstate, NVKM_CLK_CSTATE_HIGHEST);
++			if (lab_mem_order && up)
++				lab_pstate_mem(clk, pstate, pstatei);
++		}
 +	}
-+	if (lab_pcie == 1 && lab_nv_pcie_late && !up) {
++	if (lab_pcie == 1 && lab_nv_pcie_late && !up && mret >= 0) {
 +		nvkm_info(subdev, "LAB pstate %d: pcie speed %d width %d (в конце спуска)\n", pstatei, pstate->pcie_speed, pstate->pcie_width);
 +		nvkm_pcie_set_link(pci, pstate->pcie_speed, pstate->pcie_width);
 +		nvkm_info(subdev, "LAB pstate %d: pcie done\n", pstatei);
@@ -260,7 +271,7 @@
  }
  
  static void
-@@ -608,6 +785,8 @@
+@@ -608,6 +796,8 @@
  	}
  
  	nvkm_pstate_info(clk, &clk->bstate);
@@ -1482,7 +1493,7 @@
  #include <subdev/bios/rammap.h>
  #include <subdev/bios/timing.h>
  #include <subdev/clk.h>
-@@ -123,6 +135,1333 @@
+@@ -123,6 +135,1341 @@
  	}
  }
  
@@ -2491,56 +2502,60 @@
 +	return n;
 +}
 +
-+/* план шагов GF106 (запись rox4d): состояние памяти различаем по 0x132000 — значения из записи:
-+ *   18010002 после POST (324 МГц; в записи отсюда только подъём Bboot на 1804),
-+ *   18000101 после Bboot и 18010101 после B (1804; первый спуск после Bboot — C1, иначе C),
-+ *   18030000 после C/C1 (324; дальше в записи только E1+E2 на 135), 18010000 после E2 (135; дальше B).
-+ * Переходов 324 -> 1804 (кроме Bboot) и 135 -> 324 в записи нет: идём известными шагами через 135 / через 1804. */
++/* план шагов GF106 (запись rox4d). 29.10 (первая попытка rox4d): 0x132000 при чтении на 1804 МГц = 0x18030101 и после Bboot,
++ * и после B (биты 16–17 ставит железо), — по нему шаги не различить. Поэтому состояние памяти драйвер помнит сам: какой шаг
++ * из записи выполнен последним. После загрузки модуля — «после POST» (324 МГц). Неизвестное состояние — память не трогаем. */
++enum { G6_UNKNOWN, G6_POST, G6_HI_BBOOT, G6_HI_B, G6_MID_C, G6_MID_E1, G6_LO };
++static int lab_g6_state = G6_POST;
++static void
++lab_g6_after(int step)
++{
++	switch (step) {
++	case LAB_G6_BBOOT: lab_g6_state = G6_HI_BBOOT; break;
++	case LAB_G6_B:     lab_g6_state = G6_HI_B; break;
++	case LAB_G6_C1:
++	case LAB_G6_C:     lab_g6_state = G6_MID_C; break;
++	case LAB_G6_E1:    lab_g6_state = G6_MID_E1; break;
++	case LAB_G6_E2:    lab_g6_state = G6_LO; break;
++	default:           lab_g6_state = G6_UNKNOWN; break;
++	}
++}
 +static int
 +lab_plan_gf106(struct nvkm_subdev *subdev, const struct lab_board *b, int cur, int tgt, int *p)
 +{
-+	u32 st = nvkm_rd32(subdev->device, 0x132000);
-+	int n = 0;
++	int n = 0, st = lab_g6_state;
 +
 +	if (cur == tgt)
 +		return 0;
-+	if (cur == b->hi) {
-+		if (st == 0x18000101)
-+			p[n++] = LAB_G6_C1;
-+		else if (st == 0x18010101)
-+			p[n++] = LAB_G6_C;
-+		else
-+			goto unknown;
-+		if (tgt == b->lo) {
-+			p[n++] = LAB_G6_E1;
-+			p[n++] = LAB_G6_E2;
-+		}
-+	} else if (cur == b->mid) {
-+		if (st == 0x18010002) {
-+			if (tgt != b->hi) {
-+				nvkm_error(subdev, "LAB replay: из состояния после POST (0x132000=%08x) в записи есть только переход на 0f\n", st);
-+				return -EINVAL;
-+			}
-+			p[n++] = LAB_G6_BBOOT;
-+		} else if (st == 0x18030000) {
-+			p[n++] = LAB_G6_E1;
-+			p[n++] = LAB_G6_E2;
-+			if (tgt == b->hi)
-+				p[n++] = LAB_G6_B;
-+		} else {
-+			goto unknown;
-+		}
-+	} else {
-+		if (st != 0x18010000)
-+			goto unknown;
++	/* сверка памяти драйвера с частотой по регистрам */
++	if ((st == G6_POST || st == G6_MID_C) && cur != b->mid) st = G6_UNKNOWN;
++	if ((st == G6_HI_BBOOT || st == G6_HI_B) && cur != b->hi) st = G6_UNKNOWN;
++	if (st == G6_LO && cur != b->lo) st = G6_UNKNOWN;
++	switch (st) {
++	case G6_POST:
++		p[n++] = LAB_G6_BBOOT;
++		if (tgt != b->hi) p[n++] = LAB_G6_C1;
++		if (tgt == b->lo) { p[n++] = LAB_G6_E1; p[n++] = LAB_G6_E2; }
++		break;
++	case G6_HI_BBOOT:
++	case G6_HI_B:
++		p[n++] = (st == G6_HI_BBOOT) ? LAB_G6_C1 : LAB_G6_C;
++		if (tgt == b->lo) { p[n++] = LAB_G6_E1; p[n++] = LAB_G6_E2; }
++		break;
++	case G6_MID_C:
++		p[n++] = LAB_G6_E1; p[n++] = LAB_G6_E2;
++		if (tgt == b->hi) p[n++] = LAB_G6_B;
++		break;
++	case G6_LO:
 +		p[n++] = LAB_G6_B;
-+		if (tgt == b->mid)
-+			p[n++] = LAB_G6_C;
++		if (tgt == b->mid) p[n++] = LAB_G6_C;
++		break;
++	default:
++		nvkm_error(subdev, "LAB replay: память %d МГц, состояние после шагов неизвестно (0x132000=%08x) — память не трогаю\n",
++			   cur, nvkm_rd32(subdev->device, 0x132000));
++		return -EINVAL;
 +	}
 +	return n;
-+unknown:
-+	nvkm_error(subdev, "LAB replay: память %d МГц при 0x132000=%08x — состояние не из записи, память не трогаю\n", cur, st);
-+	return -EINVAL;
 +}
 +
 +static const struct lab_board *
@@ -2803,9 +2818,13 @@
 +		  nvkm_rd32(device, 0x10f300), nvkm_rd32(device, 0x611200));
 +	lab_host_writes(subdev, "после скрипта", st->post, st->npost);
 +	if (ret < 0) {
++		if (lab_board && lab_board->plan == lab_plan_gf106)
++			lab_g6_state = G6_UNKNOWN;	/* шаг не прошёл — где память, не знаем */
 +		lab_plan_n = lab_plan_i = 0;
 +		return ret;
 +	}
++	if (lab_board && lab_board->plan == lab_plan_gf106)
++		lab_g6_after(lab_plan[lab_plan_i]);	/* 29.10: GF106 помнит, какой шаг выполнен */
 +	if (++lab_plan_i < lab_plan_n)
 +		return 1;	/* ещё шаг: nouveau снова вызовет calc/prog */
 +	lab_plan_n = lab_plan_i = 0;
@@ -2816,7 +2835,7 @@
  int
  gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  {
-@@ -142,6 +1481,16 @@
+@@ -142,6 +1489,16 @@
  	int from, mode;
  	int N1, M1, P;
  	int ret;
@@ -2833,7 +2852,7 @@
  
  	/* lookup memory config data relevant to the target frequency */
  	rammap.data = nvbios_rammapEm(bios, freq / 1000, &ver, &rammap.size,
-@@ -268,7 +1617,10 @@
+@@ -268,7 +1625,10 @@
  	ram_wr32(fuc, 0x100b0c, 0x00080012);
  // 0x00030014 // 0x00000000 // 0x02b5f070
  // 0x00030014 // 0x00010000 // 0x02b5f070
@@ -2845,7 +2864,7 @@
  // 0x00020034 // 0x0000000a
  // 0x00030020 // 0x00000001 // 0x00000000
  
-@@ -322,7 +1674,7 @@
+@@ -322,7 +1682,7 @@
  		ram_wr32(fuc, 0x10f344, 0x00600009);
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700008);
@@ -2854,7 +2873,7 @@
  		ram_wr32(fuc, 0x10f830, 0x00300017);
  		gf100_ram_train(fuc, 0x80021001);
  		gf100_ram_train(fuc, 0x80081001);
-@@ -333,7 +1685,8 @@
+@@ -333,7 +1693,8 @@
  // 0x00030020 // 0x00000000 // 0x00000000
  // 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -2864,7 +2883,7 @@
  	} else {
  		ram_wr32(fuc, 0x10f800, 0x00001800);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
-@@ -376,7 +1729,7 @@
+@@ -376,7 +1737,7 @@
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700000);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
@@ -2873,7 +2892,7 @@
  
  		gf100_ram_train(fuc, 0x800e1008);
  
-@@ -386,7 +1739,8 @@
+@@ -386,7 +1747,8 @@
  	// 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -2883,7 +2902,7 @@
  		ram_nsec(fuc, 100000);
  		ram_wr32(fuc, 0x10f9b0, 0x05313f41);
  		ram_wr32(fuc, 0x10f9b4, 0x00002f50);
-@@ -408,6 +1762,8 @@
+@@ -408,6 +1770,8 @@
  {
  	struct gf100_ram *ram = gf100_ram(base);
  	struct nvkm_device *device = ram->base.fb->subdev.device;
@@ -2892,7 +2911,7 @@
  	ram_exec(&ram->fuc, nvkm_boolopt(device->cfgopt, "NvMemExec", true));
  	return 0;
  }
-@@ -416,6 +1772,10 @@
+@@ -416,6 +1780,10 @@
  gf100_ram_tidy(struct nvkm_ram *base)
  {
  	struct gf100_ram *ram = gf100_ram(base);
@@ -2903,7 +2922,7 @@
  	ram_exec(&ram->fuc, false);
  }
  
-@@ -580,6 +1940,10 @@
+@@ -580,6 +1948,10 @@
  	if (ret)
  		return ret;
  
