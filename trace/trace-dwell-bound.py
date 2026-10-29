@@ -4,11 +4,11 @@
 # он вышел на последнем чтении серии, значит порог T лежит в (предпоследнее − первое, последнее − первое].
 # По всем скобкам: T > max(предпоследних), T <= min(последних). Дальнейшие чтения таймера (ожидания PLL и т. п.) не берём.
 # Попутно: что драйвер читал/писал в скобке (адреса), значение 0x020130. Только чтение записи.
-#   python3 -I trace/trace-dwell-bound.py ЗАПИСЬ(.txt|.xz) BAR0 [--show N]  (N — показать N первых скобок целиком)
+#   python3 -I trace/trace-dwell-bound.py ЗАПИСЬ(.txt|.xz|- для stdin) BAR0 [--show N]  (N — показать N первых скобок целиком)
 import sys, lzma, io, collections
 path, bar0 = sys.argv[1], int(sys.argv[2], 16)
 show = int(sys.argv[sys.argv.index('--show') + 1]) if '--show' in sys.argv else 0
-op = (lambda p: io.TextIOWrapper(lzma.open(p), encoding='utf-8', errors='replace')) if path.endswith('.xz') else (lambda p: open(p, errors='replace'))
+op = (lambda p: io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8', errors='replace')) if path == '-' else (lambda p: io.TextIOWrapper(lzma.open(p), encoding='utf-8', errors='replace')) if path.endswith('.xz') else (lambda p: open(p, errors='replace'))
 pend, rows, shown, cfg2 = None, [], 0, collections.Counter()
 for line in op(path):
     s = line.split()
