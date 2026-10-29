@@ -663,7 +663,7 @@
  	return 0;
  }
  
-@@ -346,20 +668,478 @@
+@@ -346,20 +668,494 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -733,6 +733,16 @@
 +/* LAB 29.10, тест 62 ниже признака: пол фиксированного ожидания (по умолчанию 2000 нс — не раньше признака). 0 — без пола:
 + * переключение может идти, когда замедление ещё не вступило (риск зависания GR, как в тесте 14). lab_therm_fixed_ns=1 при полу 0 —
 + * «без ожидания» (одно чтение статуса, ~0,4 мкс). Возвращать 2000 после опыта (night.sh base() делает это сам). */
++/* LAB 29.10, опыт Е18 (тест 64): что в скобке спасает GR от зависания (тест 63б: без скобки — зависание GR с первых переходов
++ * даже в хорошей сессии; 63а: скобка без ожидания — чисто). Две части скобки по отдельности:
++ * lab_therm_ctrl1_clr — какие биты CTRL_1 (0x020004) снимать на время скобки (по умолчанию 0x68, как NVIDIA; 0 — не трогать);
++ * lab_therm_noslow=1 — не включать замедление (FSRM_2/3/4 не пишутся и не восстанавливаются), оставить только смену CTRL_1. */
++static uint lab_therm_ctrl1_clr = 0x68;
++module_param(lab_therm_ctrl1_clr, uint, 0644);
++MODULE_PARM_DESC(lab_therm_ctrl1_clr, "LAB: bits of PTHERM CTRL_1 (0x020004) cleared during the FSRM bracket (default 0x68 as NVIDIA; 0 = leave CTRL_1)");
++static uint lab_therm_noslow;
++module_param(lab_therm_noslow, uint, 0644);
++MODULE_PARM_DESC(lab_therm_noslow, "LAB: bracket without the slowdown itself: do not write FSRM_2/3/4, only the CTRL_1 change (0 off, 1 on)");
 +static uint lab_therm_fixed_floor_ns = 2000;
 +module_param(lab_therm_fixed_floor_ns, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_fixed_floor_ns, "LAB: lower clamp for lab_therm_fixed_ns / lab_therm_fixed_hub_ns, ns (default 2000 = not before the engaged flag; 0 = no floor, risky)");
@@ -776,6 +786,7 @@
 +	uint us; int np; u32 st0; u32 pv[8]; u32 pt[8]; u32 nrd;
 +	bool w; bool wok; u32 wns, wv, wrd;
 +	bool fx; bool fxok; u32 fxset, fxns, fxflag;	/* 29.10: фиксированное ожидание от входа */
++	u32 ns;						/* 29.10 Е18: скобка без замедления */
 +};
 +
 +static void
@@ -795,10 +806,13 @@
 +	sv->f2 = nvkm_rd32(device, 0x020160 + sv->i * 4);
 +	sv->f3 = nvkm_rd32(device, 0x020180 + sv->i * 4);
 +	sv->f4 = nvkm_rd32(device, 0x0201a0 + sv->i * 4);
-+	nvkm_wr32(device, 0x020160 + sv->i * 4, e2);
-+	nvkm_wr32(device, 0x020180 + sv->i * 4, e3);
-+	nvkm_wr32(device, 0x0201a0 + sv->i * 4, 0x00004040);
-+	nvkm_wr32(device, 0x020004, sv->ctrl1 & ~0x00000068);
++	sv->ns = READ_ONCE(lab_therm_noslow);
++	if (!sv->ns) {
++		nvkm_wr32(device, 0x020160 + sv->i * 4, e2);
++		nvkm_wr32(device, 0x020180 + sv->i * 4, e3);
++		nvkm_wr32(device, 0x0201a0 + sv->i * 4, 0x00004040);
++	}
++	nvkm_wr32(device, 0x020004, sv->ctrl1 & ~READ_ONCE(lab_therm_ctrl1_clr));
 +	sv->on = true;
 +	sv->us = (idx == 0 && lab_therm_us_gpc) ? lab_therm_us_gpc :
 +		 (idx == 7 && lab_therm_us_hub) ? lab_therm_us_hub : lab_therm_us;
@@ -876,9 +890,11 @@
 +
 +	if (!sv->on)
 +		return;
-+	nvkm_wr32(device, 0x020160 + sv->i * 4, lab_therm >= 2 ? sv->f2 : x2);
-+	nvkm_wr32(device, 0x020180 + sv->i * 4, lab_therm >= 2 ? sv->f3 : 0);
-+	nvkm_wr32(device, 0x0201a0 + sv->i * 4, lab_therm >= 2 ? sv->f4 : 0x00004040);
++	if (!sv->ns) {
++		nvkm_wr32(device, 0x020160 + sv->i * 4, lab_therm >= 2 ? sv->f2 : x2);
++		nvkm_wr32(device, 0x020180 + sv->i * 4, lab_therm >= 2 ? sv->f3 : 0);
++		nvkm_wr32(device, 0x0201a0 + sv->i * 4, lab_therm >= 2 ? sv->f4 : 0x00004040);
++	}
 +	nvkm_wr32(device, 0x020004, sv->ctrl1);
 +	nvkm_info(&clk->base.subdev, "LAB therm idx %02x (FSRM %d): %s%u мкс; до FSRM2 %08x FSRM3 %08x FSRM4 %08x CTRL1 %08x; после %08x %08x %08x %08x; статус %08x\n",
 +		  idx, sv->i, sv->w ? "по признаку, запас " : "выдержка ", sv->w ? lab_therm_wait_us : sv->us,
@@ -1145,7 +1161,7 @@
  }
  
  static void
-@@ -368,20 +1148,58 @@
+@@ -368,20 +1164,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -1207,7 +1223,7 @@
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +1208,66 @@
+@@ -390,17 +1224,66 @@
  }
  
  static void
@@ -1276,7 +1292,7 @@
  	}
  }
  
-@@ -409,7 +1276,17 @@
+@@ -409,7 +1292,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -1294,7 +1310,7 @@
  }
  
  static int
-@@ -426,15 +1303,138 @@
+@@ -426,15 +1319,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1435,7 +1451,7 @@
  	return 0;
  }
  
-@@ -477,5 +1477,5 @@
+@@ -477,5 +1493,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  

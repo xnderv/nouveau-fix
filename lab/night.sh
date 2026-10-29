@@ -74,7 +74,8 @@ base() { setp lab_gov=0 lab_mem=1 lab_pcie=1 lab_volt_min_uv=0 lab_therm=1 lab_t
         [ -e "$PRM/lab_therm_gpc_factor" ] && setp lab_therm_gpc_factor=0 lab_therm_hub_factor=2
         [ -e "$PRM/lab_therm_fixed_ns" ] && setp lab_therm_fixed_ns=0 lab_therm_fixed_hub_ns=0
         [ -e "$PRM/lab_therm_fixed_floor_ns" ] && setp lab_therm_fixed_floor_ns=2000
-        setp lab_therm_us=24 lab_therm_us_gpc=0 lab_therm_us_hub=0; true; }   # в старых сборках части ключей нет
+        setp lab_therm_us=24 lab_therm_us_gpc=0 lab_therm_us_hub=0
+        [ -e "$PRM/lab_therm_noslow" ] && setp lab_therm_noslow=0 lab_therm_ctrl1_clr=104; true; }   # в старых сборках части ключей нет
 MTF="${NIGHT_MTF:-$PRM/lab_mux_timeouts}"   # счётчик тайм-аутов переключателя (сухой прогон подставляет свой файл)
 mt() { cat "$MTF" 2>/dev/null || echo 0; }
 GOV_START="$(cat $PRM/lab_gov 2>/dev/null || echo 0)"; NT0="$(date '+%Y-%m-%d %H:%M:%S')"
@@ -361,6 +362,35 @@ if [ "${SCANSTEPS_DONE:-0}" = 1 ]; then VERD="деление пополам: S �
 elif [ -n "$S_LO" ]; then VERD="S между $S_LO и $S_HI нс от входа"; else VERD="S не больше ${PREV} нс (застреваний не было до нижней ступени)"; fi
 say "=== ИТОГ 62: контроль $T0C/$N0C; скан:$SCAN; $VERD"
 echo "$(date '+%Y-%m-%d %H:%M') загрузка $BOOT ядро $(uname -r) | контроль $T0C/$N0C | скан:$SCAN | $VERD" >> "$TALLY"
+base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
+finish_night clean
+elif [ "$TEST" = 64 ]; then
+# Тест 64 (29.10, опыт Е18) — что в скобке спасает GR. База — как 63а (скобка без ожидания: чисто в хорошей сессии), меняется одно:
+# 64а — замедление есть, биты CTRL_1 НЕ снимаются (lab_therm_ctrl1_clr=0); 64б — замедления нет, только снятие битов 0x68 в CTRL_1
+# (lab_therm_noslow=1). Зависание GR в одном из вариантов покажет, какая часть скобки нужна. ONLY=а|б — один вариант.
+[ -e "$PRM/lab_therm_noslow" ] || { say "СТОП: нет ключа lab_therm_noslow — нужна сборка 29.10 (Е18)"; finish_night clean; }
+TALLY="$RES/test64-sessions.txt"; BOOT="$(journalctl --list-boots --no-pager 2>/dev/null | awk '$1=="0"{print $2}')"
+NOWAIT="lab_therm_wait=0 lab_therm_us=0 lab_therm_us_hub=5"
+if [ "${SKIPCONTROL:-0}" = 1 ]; then T0C="-"; N0C="-"; say "=== контроль пропущен (SKIPCONTROL=1)"
+else RUNS=300; MT00="$(mt)"; export STOPMUX=2; run 64о 03-0f-07 $NV lab_mux_guard=1
+     T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+     say "=== тест 64о (контроль по признаку): тайм-аутов $T0C на $N0C — сессия $([ "$T0C" -gt 0 ] && echo ПЛОХАЯ || echo хорошая)"; fi
+TA="-"; NA="-"; TB="-"; NB="-"
+if [ "${ONLY:-}" != б ]; then
+    RUNS="${SCANRUNS:-200}"; MTA="$(mt)"; export STOPMUX=1
+    run 64а 03-0f-07 $NV lab_mux_guard=1 $NOWAIT lab_therm_ctrl1_clr=0
+    TA=$(( $(mt) - MTA )); NA="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+    say "=== тест 64а (замедление без снятия битов CTRL_1): тайм-аутов $TA на $NA подъёмов"
+fi
+if [ "${ONLY:-}" != а ]; then
+    RUNS="${SCANRUNS:-200}"; MTB="$(mt)"; export STOPMUX=1
+    run 64б 03-0f-07 $NV lab_mux_guard=1 $NOWAIT lab_therm_noslow=1
+    TB=$(( $(mt) - MTB )); NB="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+    say "=== тест 64б (только снятие битов CTRL_1, без замедления): тайм-аутов $TB на $NB подъёмов"
+fi
+unset STOPMUX
+say "=== ИТОГ 64: контроль $T0C/$N0C; замедление без CTRL_1 $TA/$NA; CTRL_1 без замедления $TB/$NB"
+echo "$(date '+%Y-%m-%d %H:%M') загрузка $BOOT | контроль $T0C/$N0C | замедление без CTRL_1 $TA/$NA | CTRL_1 без замедления $TB/$NB" >> "$TALLY"
 base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
 finish_night clean
 elif [ "$TEST" = 63 ]; then
