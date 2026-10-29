@@ -74,4 +74,7 @@ cd ~/Home/nouveau-fix && git send-email --to='Lyude Paul <lyude@redhat.com>' --t
   отправка `send-0006-v2.sh` (подпись печатает автор).
 - на RFC (07:24, <8abb7b92-c16a-47a9-8caf-49773845c246@free.fr>): FSRM вокруг реклокинга у NVIDIA не видел (занимался Tesla и
   раньше); есть закрытая база VBIOS + mmiotrace, может дать доступ; исторический контекст — почта martin.roukala@mupuf.org
-  или IRC #nouveau (OFTC, mupuf). Ответ: `nouveau-ml-reply-martin-2026-10-29.eml` (условия использования базы; честно про ИИ).
+  или IRC #nouveau (OFTC, mupuf). **Пользователь ответил сам 29.10 08:40 (MSK)**, лично Мартину, Message-ID
+  <608521793252115@mail.yandex.ru>: рад, будет очень благодарен за доступ к базе. Черновик
+  `nouveau-ml-reply-martin-2026-10-29.eml` устарел и не отправляется. Когда Мартин даст доступ — уточнить условия
+  (что можно публиковать из выводов; сырые данные держим у себя).
