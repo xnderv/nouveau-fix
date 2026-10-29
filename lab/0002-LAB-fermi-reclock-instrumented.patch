@@ -663,7 +663,7 @@
  	return 0;
  }
  
-@@ -346,20 +668,471 @@
+@@ -346,20 +668,478 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -730,6 +730,12 @@
 +static uint lab_therm_fixed_hub_ns;
 +module_param(lab_therm_fixed_hub_ns, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_fixed_hub_ns, "LAB: hubk06 bracket: fixed wait from bracket entry, ns (0 = off; clamped to 2000..50000)");
++/* LAB 29.10, тест 62 ниже признака: пол фиксированного ожидания (по умолчанию 2000 нс — не раньше признака). 0 — без пола:
++ * переключение может идти, когда замедление ещё не вступило (риск зависания GR, как в тесте 14). lab_therm_fixed_ns=1 при полу 0 —
++ * «без ожидания» (одно чтение статуса, ~0,4 мкс). Возвращать 2000 после опыта (night.sh base() делает это сам). */
++static uint lab_therm_fixed_floor_ns = 2000;
++module_param(lab_therm_fixed_floor_ns, uint, 0644);
++MODULE_PARM_DESC(lab_therm_fixed_floor_ns, "LAB: lower clamp for lab_therm_fixed_ns / lab_therm_fixed_hub_ns, ns (default 2000 = not before the engaged flag; 0 = no floor, risky)");
 +/* LAB 24.10, зависания 01:32 и 01:38 на 03->07: сброс TLB (gf100_vmm_invalidate) запущен ровно во время скобки стадии 1,
 + * в т. ч. «пустой» скобки hubk06 (бит мультиплексора не меняется). Два отдельных изменения, проверять по одному:
 + * lab_therm_real=1 — скобка только если бит 0x137100 этого домена реально меняется (как у NVIDIA);
@@ -802,7 +808,8 @@
 +	sv->fx = false;
 +	if ((idx == 0 && lab_therm_fixed_ns) || (idx == 7 && lab_therm_fixed_hub_ns)) {
 +		u32 want = 0x00020000 | (e3 & 0x3f);
-+		u32 set = clamp_t(u32, idx == 0 ? READ_ONCE(lab_therm_fixed_ns) : READ_ONCE(lab_therm_fixed_hub_ns), 2000, 50000);
++		u32 set = clamp_t(u32, idx == 0 ? READ_ONCE(lab_therm_fixed_ns) : READ_ONCE(lab_therm_fixed_hub_ns),
++				  min_t(u32, READ_ONCE(lab_therm_fixed_floor_ns), 50000), 50000);
 +		u64 t0 = ktime_get_ns(), dt;
 +		u32 v;
 +
@@ -1138,7 +1145,7 @@
  }
  
  static void
-@@ -368,20 +1141,58 @@
+@@ -368,20 +1148,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -1200,7 +1207,7 @@
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +1201,66 @@
+@@ -390,17 +1208,66 @@
  }
  
  static void
@@ -1269,7 +1276,7 @@
  	}
  }
  
-@@ -409,7 +1269,17 @@
+@@ -409,7 +1276,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -1287,7 +1294,7 @@
  }
  
  static int
-@@ -426,15 +1296,138 @@
+@@ -426,15 +1303,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1428,7 +1435,7 @@
  	return 0;
  }
  
-@@ -477,5 +1470,5 @@
+@@ -477,5 +1477,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  

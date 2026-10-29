@@ -72,7 +72,8 @@ base() { setp lab_gov=0 lab_mem=1 lab_pcie=1 lab_volt_min_uv=0 lab_therm=1 lab_t
         [ -e "$PRM/lab_divb_force" ] && setp lab_divb_force=0
         [ -e "$PRM/lab_nv_div_same" ] && setp lab_nv_div_same=0 lab_pll_off_in_bracket=0
         [ -e "$PRM/lab_therm_gpc_factor" ] && setp lab_therm_gpc_factor=0 lab_therm_hub_factor=2
-        [ -e "$PRM/lab_therm_fixed_ns" ] && setp lab_therm_fixed_ns=0 lab_therm_fixed_hub_ns=0; true; }   # в старых сборках этих ключей нет
+        [ -e "$PRM/lab_therm_fixed_ns" ] && setp lab_therm_fixed_ns=0 lab_therm_fixed_hub_ns=0
+        [ -e "$PRM/lab_therm_fixed_floor_ns" ] && setp lab_therm_fixed_floor_ns=2000; true; }   # в старых сборках этих ключей нет
 MTF="${NIGHT_MTF:-$PRM/lab_mux_timeouts}"   # счётчик тайм-аутов переключателя (сухой прогон подставляет свой файл)
 mt() { cat "$MTF" 2>/dev/null || echo 0; }
 GOV_START="$(cat $PRM/lab_gov 2>/dev/null || echo 0)"; NT0="$(date '+%Y-%m-%d %H:%M:%S')"
@@ -317,6 +318,8 @@ elif [ "$TEST" = 62 ]; then
 # сверху вниз 8000 → 6000 → 4500 → 3500 → 3000 → 2500 нс по SCANRUNS (200) подъёмов, стоп на первом тайм-ауте. Ступень,
 # где застряло, — нижняя граница S, предыдущая чистая — верхняя. Одна загрузка — одна строка в results/test62-sessions.txt.
 [ -e "$PRM/lab_therm_fixed_ns" ] || { say "СТОП: в этой сборке нет ключа lab_therm_fixed_ns — нужна сборка 29.10"; finish_night clean; }
+# 29.10 вечер: SCANFLOOR=0 — снять пол 2000 нс (ступени ниже признака; «0» задаётся как 1 нс — одно чтение статуса, ~0,4 мкс)
+[ -n "${SCANFLOOR:-}" ] && { [ -e "$PRM/lab_therm_fixed_floor_ns" ] || { say "СТОП: SCANFLOOR задан, а ключа lab_therm_fixed_floor_ns в сборке нет — нужна сборка 29.10 вечер"; finish_night clean; }; }
 TALLY="$RES/test62-sessions.txt"; BOOT="$(journalctl --list-boots --no-pager 2>/dev/null | awk '$1=="0"{print $2}')"
 RUNS=300; MT00="$(mt)"; export STOPMUX=2
 run 62о 03-0f-07 $NV lab_mux_guard=1
@@ -325,7 +328,7 @@ say "=== тест 62о (контроль по признаку): тайм-аут
 PREV=""; S_LO=""; S_HI=""; SCAN=""
 for D in ${SCANSTEPS:-8000 6000 4500 3500 3000 2500}; do
     RUNS="${SCANRUNS:-200}"; MTD="$(mt)"; export STOPMUX=1
-    run "62-$D" 03-0f-07 $NV lab_mux_guard=1 lab_therm_fixed_ns=$D
+    run "62-$D" 03-0f-07 $NV lab_mux_guard=1 lab_therm_fixed_ns=$D ${SCANFLOOR:+lab_therm_fixed_floor_ns=$SCANFLOOR}
     TD=$(( $(mt) - MTD )); ND="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
     say "=== ступень $D нс от входа: тайм-аутов $TD на $ND подъёмов"
     SCAN="$SCAN $D:$TD/$ND"
