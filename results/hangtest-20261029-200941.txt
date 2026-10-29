@@ -1,0 +1,15 @@
+hangtest 2026-10-29 20:09:41: БЫСТРЫЙ режим, уровни 03↔0f (спуск через 07), подъёмов 200, нагрузка browser, удержание 0f 1с, lab_gov был 0, ядро 7.0.0-42-generic
+параметры: lab_mem_order=Y lab_mem_op13=1 lab_mem_op34=1 lab_mem_replay=15 lab_pcie=1 lab_gpc_seq=13 
+20:09:44 старт: core 50 MHz memory 135 MHz; lab_mem=Y lab_core=Y lab_volt_min_uv=0 lab_gr_pause=0 lab_gr_gate=0 lab_gr_wait=0 lab_xbar=0 lab_e9e0=0 lab_pll_keep=0 lab_order=0 lab_order_us=0 lab_therm=0 lab_therm_us=24 lab_therm_us_gpc=0 lab_therm_us_hub=0 lab_therm_probe=0 lab_therm_wait=1 lab_therm_wait_us=0 lab_therm_real=0 lab_clk_mmu_lock=0 lab_therm_div=1 lab_gpc_div=1 lab_pmu_div=1 lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_pcie=1 lab_volt_wait_us=0 lab_nv_22680=0 lab_nv_divb=0 lab_nv_disphold=0 lab_mux_guard=1 lab_nv_mux_release=0 lab_nv_div_late=0 lab_pll_keep=0 тайм-аутов переключателя с загрузки: 0 khz: gpc=0 rop=0 hub07=0 hub06=0 hub01=0
+20:09:44 нагрузка: /usr/bin/yandex-browser (pid 111963, профиль /home/alex/.cache/nouveau-hangtest-profile), страница hangload.html; прогрев 10 с
+20:09:54 загрузка GR перед циклами: 995‰
+20:09:56 подъём 1/200 в 20:09:55.404: gr до 995‰, скрипт B 16288 мкс, после: core 900 MHz memory 2004 MHz, gr 995‰
+20:09:58 подъём 2/200 в 20:09:57.489: gr до 1000‰, скрипт B 16759 мкс, после: core 900 MHz memory 2004 MHz, gr 1000‰
+20:10:01 подъём 3/200 в 20:09:59.991: gr до 1000‰, скрипт B 16627 мкс, после: core 900 MHz memory 2004 MHz, gr 1000‰
+20:10:03 подъём 4/200 в 20:10:02.210: gr до 1000‰, скрипт B 16625 мкс, после: core 900 MHz memory 2004 MHz, gr 1000‰
+20:10:05 подъём 5/200 в 20:10:04.612: gr до 1000‰, скрипт B 16707 мкс, после: core 900 MHz memory 2004 MHz, gr 1000‰ — ЗАВИСАНИЕ: gr=1000‰ 4с подряд, ошибок журнала 0
+20:10:05 подозрение на зависание (gr=1000‰ 4с подряд, ошибок журнала 0) — жду подтверждения ядра до 90 с, не перезагружайте
+=== ЗАВИСАНИЕ ВОСПРОИЗВЕДЕНО на подъёме 5 (нагрузка browser): gr=1000‰ 4с подряд, ошибок журнала 0; подпись ящика подтвердила: eng0/gr700 застыли (gr700=03000801 eng0=80141001) 15 с
+    Нагрузка оставлена, lab_gov=0.
+    Снимок регистров: /var/log/gpu-blackbox/hang-*.txt (чёрный ящик). Журнал: journalctl -k -b 0 --since '2026-10-29 20:09:41'
+    Если экран замер: Alt+PrtSc, затем S, U, B. После перезагрузки: bash ~/Home/nouveau-fix/lab/blackbox.sh show
