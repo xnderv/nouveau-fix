@@ -66,3 +66,12 @@ cd ~/Home/nouveau-fix && git send-email --to='Lyude Paul <lyude@redhat.com>' --t
 со строкой подписи или v2 с подписью.
 **Подпись отправлена 25.10.2026 13:24 (MSK)** ответом в ту же ветку (`reply-0006-signoff.sh`, строку подписи напечатал
 автор): Message-ID `<20261025102413.51786-1-xnderv@yandex.com>`, In-Reply-To — письмо патча. Ждём ответа.
+
+**29.10 — ответы Martin Roukala (бывший Martin Peres, автор therm/fan в nouveau):**
+- на 0006 (07:03, Message-ID <1c76eb81-feac-419c-bcb8-bb505788e549@mupuf.org>): «Acked-by: Martin Roukala <martin.roukala@mupuf.org>»;
+  просит сократить описание коммита до первого абзаца, остальное — в письмо под ---. Подготовлен v2:
+  `v2-0006-drm-nouveau-therm-mask-pwm-update-bit.patch` (+ одна строка про ИИ-ассистента в описании — generated-content.rst),
+  отправка `send-0006-v2.sh` (подпись печатает автор).
+- на RFC (07:24, <8abb7b92-c16a-47a9-8caf-49773845c246@free.fr>): FSRM вокруг реклокинга у NVIDIA не видел (занимался Tesla и
+  раньше); есть закрытая база VBIOS + mmiotrace, может дать доступ; исторический контекст — почта martin.roukala@mupuf.org
+  или IRC #nouveau (OFTC, mupuf). Ответ: `nouveau-ml-reply-martin-2026-10-29.eml` (условия использования базы; честно про ИИ).
