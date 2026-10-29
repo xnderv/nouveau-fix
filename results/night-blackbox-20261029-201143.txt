@@ -1,0 +1,400 @@
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:23 | core 900 MHz memory 2004 MHz | gr 782‰ vid 0‰ | 56C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=7/7 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2 memx 81 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:24 | core 405 MHz memory 324 MHz | gr 444‰ vid 0‰ | 56C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=03000001 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2 memx 76 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:25 | core 900 MHz memory 2004 MHz | gr 564‰ vid 0‰ | 55C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=5/5 | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2 memx 81 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:26 | core 900 MHz memory 2004 MHz | gr 674‰ vid 0‰ | 58C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=6/6 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=49C
+20:09:27 | core 50 MHz memory 135 MHz | gr 360‰ vid 0‰ | 54C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2 memx 76 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:28 | core 900 MHz memory 2004 MHz | gr 881‰ vid 0‰ | 57C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=4/4 | gr700=00000000 eng0=80011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2 memx 81 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:29 | core 50 MHz memory 135 MHz | gr 218‰ vid 0‰ | 55C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=01000901 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2 memx 76 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:30 | core 900 MHz memory 2004 MHz | gr 862‰ vid 0‰ | 57C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=2/2 | gr700=03000801 eng0=90111007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2 memx 81 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:31 | core 50 MHz memory 135 MHz | gr 218‰ vid 0‰ | 54C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=03004001 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2 memx 76 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:32 | core 900 MHz memory 2004 MHz | gr 825‰ vid 0‰ | 56C/41 | 611200=00000030 137100=00000187 1373f0=00000002 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2 memx 81 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:33 | core 405 MHz memory 324 MHz | gr 402‰ vid 0‰ | 56C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=03000801 eng0=90011007 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=45C | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2 memx 76 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:34 | core 50 MHz memory 135 MHz | gr 608‰ vid 0‰ | 53C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=03004001 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=52C | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:35 | core 50 MHz memory 135 MHz | gr 918‰ vid 0‰ | 51C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:09:36 | core 50 MHz memory 135 MHz | gr 0‰ vid 0‰ | 51C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:09:37 | core 50 MHz memory 135 MHz | gr 0‰ vid 0‰ | 51C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:09:38 | core 50 MHz memory 135 MHz | gr 0‰ vid 0‰ | 50C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:09:39 | core 50 MHz memory 135 MHz | gr 0‰ vid 0‰ | 50C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=f/f | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=55C
+20:09:40 | core 50 MHz memory 135 MHz | gr 0‰ vid 0‰ | 50C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=0/0 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=49C
+20:09:41 | core 50 MHz memory 135 MHz | gr 0‰ vid 0‰ | 50C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=1/1 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=45C
+20:09:42 | core 50 MHz memory 135 MHz | gr 0‰ vid 0‰ | 49C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=2/2 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:09:43 | core 50 MHz memory 135 MHz | gr 0‰ vid 0‰ | 49C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=3/3 | gr700=00000000 eng0=80011001 fifo=80000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=48C
+20:09:44 | core 50 MHz memory 135 MHz | gr 69‰ vid 0‰ | 49C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=4/4 | gr700=00000000 eng0=80011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=51C
+20:09:45 | core 50 MHz memory 135 MHz | gr 56‰ vid 0‰ | 49C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=5/5 | gr700=03000801 eng0=90011001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=61C
+20:09:46 | core 50 MHz memory 135 MHz | gr 657‰ vid 0‰ | 50C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=00000081 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=45C
+20:09:47 | core 50 MHz memory 135 MHz | gr 996‰ vid 0‰ | 50C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=49C
+20:09:48 | core 50 MHz memory 135 MHz | gr 996‰ vid 0‰ | 50C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=46C
+20:09:49 | core 50 MHz memory 135 MHz | gr 995‰ vid 0‰ | 49C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=90111007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=46C
+20:09:50 | core 50 MHz memory 135 MHz | gr 995‰ vid 0‰ | 49C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=a/a | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=45C
+20:09:51 | core 50 MHz memory 135 MHz | gr 996‰ vid 0‰ | 50C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=03000801 eng0=90111001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C
+20:09:52 | core 50 MHz memory 135 MHz | gr 996‰ vid 0‰ | 49C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=c/c | gr700=03000801 eng0=90111007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=45C
+20:09:53 | core 50 MHz memory 135 MHz | gr 996‰ vid 0‰ | 48C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=d/d | gr700=03000001 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=56C
+20:09:54 | core 50 MHz memory 135 MHz | gr 995‰ vid 0‰ | 49C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=e/e | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=45C
+20:09:55 | core 900 MHz memory 2004 MHz | gr 995‰ vid 0‰ | 51C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=3/3 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2 memx 81 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:56 | core 405 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 51C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=8/8 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2 memx 76 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:57 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 52C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=1/1 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2 memx 81 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:58 | core 405 MHz memory 324 MHz | gr 1000‰ vid 0‰ | 52C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=6/6 | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2 memx 76 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:09:59 | core 50 MHz memory 135 MHz | gr 1000‰ vid 0‰ | 49C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=b/b | gr700=03000801 eng0=90011007 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C | nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:10:00 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 53C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=0/0 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2 memx 81 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:10:00 | СНИМОК /var/log/gpu-blackbox/hang-20261029-201000.txt
+20:10:01 | core 50 MHz memory 135 MHz | gr 1000‰ vid 0‰ | 50C/41 | 611200=00000030 137100=00000000 1373f0=00000001 pmuq=9/9 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2 memx 76 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:10:02 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 53C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=e/e | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=54C | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2 memx 81 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:10:03 | core 50 MHz memory 135 MHz | gr 1000‰ vid 0‰ | 51C/41 | 611200=00000031 137100=00000000 1373f0=00000001 pmuq=7/7 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C | nouveau 0000:01:00.0: clk: LAB pstate 1: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 1: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 1: memory -> 324000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2 memx 76 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay C 2004->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain (after C): \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 1: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 1: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: \xd1\x81\xd0\xbf\xd1\x83\xd1\x81\xd0\xba \xe2\x80\x94 PCIe \xd0\xb2 \xd0\xba\xd ;; nouveau 0000:01:00.0: clk: LAB pstate 0: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: memory -> 135000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2 memx 37 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd ;; nouveau 0000:01:00.0: fb: LAB replay D 324 retrain: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2 memx 58 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay E 324->135: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie speed 0 width 255 (\xd0\xb2 \xd0\xba\xd0\xbe\xd0\xbd\xd1\x86\xd0\xb5 \xd1\ ;; nouveau 0000:01:00.0: clk: LAB pstate 0: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 0: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:10:04 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 52C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=c/c | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C | nouveau 0000:01:00.0: clk: LAB pstate 2: flags pcie=1 mem=1 core=1 volt_first=1
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie speed 2 width 255
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: pcie done
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: clk: LAB pstate 2: programming core clocks/voltage (\xd0\xbf\xd0\xb0\xd0\xbc\xd1\x8f\xd1\x82\xd1\x ;; nouveau 0000:01:00.0: clk: LAB pstate 2: memory -> 2004000 kHz
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0 ;; nouveau 0000:01:00.0: fb: LAB replay [GF114 GTX 560 Ti (Gigabyte 1458:3515, \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd1 ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2 memx 62 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay A 135->324: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\x ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2 memx 81 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\xd1\x81\xd0\xb5\xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: fb: LAB replay B 324->2004: \xd0\xb2\xd1\x8b\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd \xd0\ ;; nouveau 0000:01:00.0: fb: LAB replay: \xd0\xbf\xd1\x80\xd1\x8f\xd0\xbc\xd1\x8b\xd1\x85 \xd0\xb7\xd0\xb0\xd0\xbf\xd0\xb8\ ;; nouveau 0000:01:00.0: clk: LAB pstate 2: done ret 0
+ SUBSYSTEM=pci
+ DEVICE=+pci:0000:01:00.0
+20:10:05 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 54C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=d/d | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=47C
+20:10:06 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 55C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=e/e | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:07 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 55C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=f/f | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:10:08 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 55C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=0/0 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:10:09 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 55C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=1/1 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:10 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 56C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=1/1 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:10:11 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 56C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=2/2 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C
+20:10:12 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 56C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=3/3 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:13 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 56C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=4/4 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:14 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 56C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=5/5 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:10:15 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 57C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=6/6 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:10:16 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 57C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=7/7 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C
+20:10:17 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 57C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=8/8 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:10:19 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 57C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=9/9 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:20 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 57C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=a/a | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:21 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 57C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=b/b | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:10:22 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 57C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=c/c | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:23 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 57C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=d/d | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C
+20:10:24 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 58C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=e/e | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:10:25 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 58C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=f/f | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=40C
+20:10:26 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 58C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=0/0 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=40C
+20:10:27 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 58C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=1/1 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=39C
+20:10:28 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 58C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=2/2 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:29 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 58C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=3/3 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:30 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 58C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=4/4 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=40C
+20:10:31 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 58C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=5/5 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=40C
+20:10:32 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 59C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=6/6 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=38C
+20:10:33 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 59C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=7/7 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:34 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 58C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=8/8 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:10:35 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 59C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=9/9 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:36 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 59C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=a/a | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:37 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 59C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=b/b | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C
+20:10:38 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 59C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=c/c | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:39 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 59C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=d/d | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:40 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 59C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=e/e | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:41 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 59C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=f/f | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:10:42 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 59C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=0/0 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:43 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 59C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=1/1 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:10:44 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 59C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=2/2 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:10:45 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=3/3 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:10:46 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=4/4 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:10:47 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=5/5 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:48 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=6/6 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:10:49 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=7/7 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=47C
+20:10:50 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=8/8 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C
+20:10:51 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=9/9 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:10:52 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=a/a | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:10:53 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=b/b | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:10:54 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=c/c | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:10:55 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=d/d | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:10:56 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=e/e | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=46C
+20:10:57 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=f/f | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:58 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=0/0 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:10:59 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=1/1 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:00 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=2/2 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:01 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=3/3 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:02 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=4/4 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:11:03 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 60C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=5/5 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=50C
+20:11:04 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=6/6 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:11:05 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=7/7 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C
+20:11:06 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=8/8 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=46C
+20:11:07 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=9/9 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:08 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=a/a | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:09 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=b/b | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:11:10 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=c/c | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:11 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=c/c | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C
+20:11:12 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=d/d | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:13 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=e/e | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:14 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=f/f | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:15 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=0/0 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:16 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=1/1 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=45C
+20:11:17 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=2/2 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:18 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=3/3 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=40C
+20:11:19 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=4/4 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:11:20 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=5/5 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:21 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=6/6 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C
+20:11:22 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=7/7 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:23 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=8/8 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:24 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=9/9 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:25 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=a/a | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C
+20:11:26 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=b/b | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C
+20:11:27 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 61C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=c/c | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=40C
+20:11:28 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=d/d | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:29 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=e/e | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:30 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=f/f | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=40C
+20:11:31 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=0/0 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:32 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=1/1 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=42C
+20:11:33 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=2/2 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:34 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=3/3 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=44C
+20:11:35 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=4/4 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:36 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=5/5 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:37 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=6/6 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:38 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=7/7 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:39 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=8/8 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=41C
+20:11:40 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=9/9 | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:41 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000030 137100=00000187 1373f0=00000002 pmuq=a/a | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:42 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=b/b | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=43C
+20:11:43 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=c/c | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=52C
+20:11:44 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=d/d | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=54C
+20:11:45 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=e/e | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=54C
+20:11:46 | core 900 MHz memory 2004 MHz | gr 1000‰ vid 0‰ | 62C/41 | 611200=00000031 137100=00000187 1373f0=00000002 pmuq=f/f | gr700=03000801 eng0=80141001 fifo=00000000 xbar=2/2/0 e9e0=81200a0a 1548=00000000 cpu=56C
