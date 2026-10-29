@@ -321,10 +321,14 @@ elif [ "$TEST" = 62 ]; then
 # 29.10 вечер: SCANFLOOR=0 — снять пол 2000 нс (ступени ниже признака; «0» задаётся как 1 нс — одно чтение статуса, ~0,4 мкс)
 [ -n "${SCANFLOOR:-}" ] && { [ -e "$PRM/lab_therm_fixed_floor_ns" ] || { say "СТОП: SCANFLOOR задан, а ключа lab_therm_fixed_floor_ns в сборке нет — нужна сборка 29.10 вечер"; finish_night clean; }; }
 TALLY="$RES/test62-sessions.txt"; BOOT="$(journalctl --list-boots --no-pager 2>/dev/null | awk '$1=="0"{print $2}')"
+if [ "${SKIPCONTROL:-0}" = 1 ]; then   # 29.10: контроль уже был в этой загрузке — сразу скан
+    T0C="-"; N0C="-"; say "=== тест 62о пропущен (SKIPCONTROL=1): сессия уже проверена ранее в этой загрузке"
+else
 RUNS=300; MT00="$(mt)"; export STOPMUX=2
 run 62о 03-0f-07 $NV lab_mux_guard=1
 T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
 say "=== тест 62о (контроль по признаку): тайм-аутов $T0C на $N0C подъёмов — сессия $([ "$T0C" -gt 0 ] && echo ПЛОХАЯ || echo хорошая)"
+fi
 PREV=""; S_LO=""; S_HI=""; SCAN=""
 for D in ${SCANSTEPS:-8000 6000 4500 3500 3000 2500}; do
     RUNS="${SCANRUNS:-200}"; MTD="$(mt)"; export STOPMUX=1
