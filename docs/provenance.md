@@ -127,3 +127,6 @@ nvc3 (GF106), nvc4 (GF104), nvc8 (GF110), nvce (GF114), nvcf (GF116), nvd7, nvd9
 шагов с initramfs; параметры через sysfs, добавлены lab_mux_guard=1 и lab_therm_wait_us=16): https://github.com/xnderv/nouveau-fix/issues/1#issuecomment-6503490914.
 **29.10 21:42 — ответ 2 rox4d** (вторая попытка: 0f прошёл, спуск отказал из-за проверки 0x132000; при отказе памяти ядро и напряжение
 ушли вниз — просьба перезагрузиться; исправления в патче, проверен на nouveau из 6.18): https://github.com/xnderv/nouveau-fix/issues/1#issuecomment-6505342711.
+
+**30.10 09:42 — ответ 3 Q0AL** (итоги записи EVGA GTX 560: ожидание 8,000/4,000 мкс, скрипты памяти; просьба о полном VBIOS — sysfs
+основной видеокарты дал теневую копию): https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-6516697911.

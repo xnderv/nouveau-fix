@@ -1,4 +1,4 @@
-# Reply 3 to Q0AL in xnderv/nouveau-fix#2 — DRAFT, post after approval
+# Reply 3 to Q0AL in xnderv/nouveau-fix#2 — posted 30.10.2026 09:42 MSK: https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-6516697911
 
 @Q0AL — thank you, this is a complete recording: 3.96 M lines, both passes, no losses (it is about the same size as
 ours; 7 MB is just the compression). It already answered something we could not pin down on our own card:
