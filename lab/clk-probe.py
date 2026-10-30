@@ -19,6 +19,12 @@ bar = mmap.mmap(fd, 16 << 20, mmap.MAP_SHARED, mmap.PROT_READ)
 rd = lambda a: struct.unpack_from('<I', bar, a)[0]
 
 print('Метка:', sys.argv[1] if len(sys.argv) > 1 else '-')
+# 30.10: что за карта и какой модуль — чтобы снимок нельзя было спутать (только чтение sysfs; файл pstate НЕ читаем)
+try:
+    sv = open('/sys/module/nouveau/srcversion').read().strip()
+except OSError:
+    sv = '—'
+print(f'  карта {os.path.basename(dev)} {open(dev + "/device").read().strip()}, ядро {os.uname().release}, nouveau srcversion {sv}')
 for a in (0x00e800, 0x00e804, 0x00e820, 0x00e824):
     print(f'  SPPLL R[{a:06x}] = {rd(a):08x}')
 ssel = rd(0x137100)
@@ -39,3 +45,13 @@ print(f'--- PTHERM: CTRL_1 R[020004]={rd(0x020004):08x}')
 for i, nm in ((0, 'GPC'), (1, 'hubk06')):
     print(f'    FSRM {i} {nm}: статус R[{0x0201e0+i*4:06x}]={rd(0x0201e0+i*4):08x}  FSRM2={rd(0x020160+i*4):08x} '
           f'FSRM3={rd(0x020180+i*4):08x} FSRM4={rd(0x0201a0+i*4):08x}')
+# 30.10: такт памяти (только чтение): MPLL 0x132000 и опорный REFPLL 0x132020 — управление и коэффициенты (N, M, P), опоры
+# и делители памяти 0x137300–0x137334, выбор источника 0x1373e0–0x1373fc (бит 1 0x1373f0: память на MPLL)
+print('--- такт памяти')
+for pll, nm in ((0x132000, 'MPLL'), (0x132020, 'REFPLL')):
+    ctrl, coef = rd(pll), rd(pll + 4)
+    P, N, M = (coef >> 16) & 0x3f, (coef >> 8) & 0xff, coef & 0xff
+    print(f'    {nm} R[{pll:06x}] ctrl={ctrl:08x} coef={coef:08x}  (N={N} M={M} P={P}; включён={ctrl & 1})  '
+          + ' '.join(f'+{o:02x}={rd(pll + o):08x}' for o in (0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c)))
+print('    ' + ' '.join(f'R[{a:06x}]={rd(a):08x}' for a in range(0x137300, 0x137338, 4)))
+print('    ' + ' '.join(f'R[{a:06x}]={rd(a):08x}' for a in range(0x1373e0, 0x137400, 4)))

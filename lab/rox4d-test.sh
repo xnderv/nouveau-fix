@@ -8,6 +8,9 @@
 # RULE: the first level change after boot must be 0f (the only transition recorded from the POST memory state).
 #       If the card is not in its boot state (you already changed levels), reboot before running this.
 # Note: the driver's own log lines are in Russian (it is a lab build); the numbers in them are what matters.
+# 30.10: after every step a read-only register snapshot (lab/clk-probe.py: clock and memory PLLs) goes into the log; the
+#        pstate file is not read at 0f (nouveau's read_pll divides by zero there on this card); any kernel oops stops the
+#        test; it refuses to start without lab_gpc_seq=13 and lab_mux_guard=1 (both were missing in the 30.10 run).
 set -u
 CYCLES="${1:-3}"; PAUSE="${2:-20}"
 LOG="rox4d-test-$(date +%Y%m%d-%H%M%S).log"
@@ -25,8 +28,11 @@ say "lab parameters:"; for p in "$PRM"/lab_*; do printf '  %s=%s\n' "$(basename 
 say "board recognised by the driver (dmesg):"; dmesg | grep -E 'LAB: (плата|board)' | tail -n 3 | tee -a "$LOG"
 dmesg | grep -qE 'LAB: плата (GF106|GF114)' || die "the driver did not recognise the board (no 'LAB: плата ...' line); memory replay would be refused"
 [ "$(cat $PRM/lab_mem_replay)" != 0 ] || die "lab_mem_replay is 0: memory steps are not enabled (expected 14 for GF106)"
+[ "$(cat $PRM/lab_gpc_seq)" = 13 ] || die "lab_gpc_seq is $(cat $PRM/lab_gpc_seq), expected 13: add lab_gpc_seq=13 to the options line in /etc/modprobe.d/nouveau-lab.conf, then update-initramfs -u and reboot"
+[ "$(cat $PRM/lab_mux_guard)" = 1 ] || die "lab_mux_guard is $(cat $PRM/lab_mux_guard), expected 1: add lab_mux_guard=1 to the options line in /etc/modprobe.d/nouveau-lab.conf, then update-initramfs -u and reboot"
+HERE="$(cd "$(dirname "$0")" && pwd)"
 say "pstate file $PST:"; cat "$PST" | tee -a "$LOG"
-ERR='DATA_ERROR|fifo: fault|killed|Xid|timeout|тайм-аут|не из записи|не трогаю|ret -[0-9]|не годится|не разрешён|плата не описана|failed'
+ERR='DATA_ERROR|fifo: fault|killed|Xid|timeout|тайм-аут|не из записи|не трогаю|ret -[0-9]|не годится|не разрешён|плата не описана|failed|Oops|BUG:|divide error|Call Trace'
 step() {   # $1 = level
     local n0 n1 new
     n0=$(dmesg | wc -l)
@@ -36,7 +42,9 @@ step() {   # $1 = level
     n1=$(dmesg | wc -l); new=$(dmesg | tail -n +$((n0 + 1)))
     echo "$new" | grep -E 'LAB|nouveau' | tee -a "$LOG" >/dev/null
     echo "$new" | grep -E 'LAB replay|LAB volt|LAB therm|LAB: ' | tail -n 12 | tee -a "$LOG"
-    say "now: $(grep -E '^AC:' "$PST")"
+    if [ "$1" = 0f ]; then say "now: (pstate file not read at 0f: nouveau's read_pll divides by zero there; fixed in the next build)"
+    else say "now: $(grep -E '^AC:' "$PST")"; fi
+    python3 -I "$HERE/clk-probe.py" "level $1" >> "$LOG" 2>&1 || say "clk-probe failed (see $LOG)"
     if echo "$new" | grep -qE "$ERR"; then say "error lines:"; echo "$new" | grep -E "$ERR" | tee -a "$LOG"; die "error after setting level $1"; fi
     sleep "$PAUSE"
 }
