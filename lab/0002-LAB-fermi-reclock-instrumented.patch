@@ -1,7 +1,6 @@
 --- a/nvkm/subdev/clk/base.c
 +++ b/nvkm/subdev/clk/base.c
-@@ -33,6 +33,57 @@
- #include <subdev/volt.h>
+@@ -34,4 +34,55 @@
  
  #include <core/option.h>
 +#include <subdev/pci.h>
@@ -57,19 +56,13 @@
 +static int lab_pstate_mem(struct nvkm_clk *clk, struct nvkm_pstate *pstate, int pstatei);
  
  /******************************************************************************
-  * misc
-@@ -190,19 +241,42 @@
- 			nvkm_error(subdev, "failed to raise voltage: %d\n", ret);
+@@ -191,10 +242,36 @@
  			return ret;
  		}
 +		nvkm_info(subdev, "LAB voltage after raise: %d uV (cstate voltage id %d)\n",
 +			  nvkm_volt_get(volt), cstate->voltage);
- 	}
- 
--	ret = clk->func->calc(clk, cstate);
--	if (ret == 0) {
--		ret = clk->func->prog(clk);
--		clk->func->tidy(clk);
++	}
++
 +	lab_mux_stuck = 0;
 +	if (lab_core) {
 +		ret = clk->func->calc(clk, cstate);
@@ -93,21 +86,25 @@
 +		ret = 0;
  	}
  
--	if (volt) {
+-	ret = clk->func->calc(clk, cstate);
+-	if (ret == 0) {
+-		ret = clk->func->prog(clk);
+-		clk->func->tidy(clk);
++	/* LAB 31.10: блоки снижения напряжения и вентилятора ниже — без правок (в стабильных 6.12/6.18 они другие: ошибка в err) */
 +	if (volt && lab_mux_stuck) {
 +		nvkm_error(subdev, "LAB mux_guard: узлы %08x остались на PLL — напряжение не снижаю (%d мкВ)\n",
 +			   lab_mux_stuck, nvkm_volt_get(volt));
-+	} else if (volt) {
- 		ret = nvkm_volt_set_id(volt, cstate->voltage,
- 				       pstate->base.voltage, clk->temp, -1);
- 		if (ret && ret != -ENODEV)
- 			nvkm_error(subdev, "failed to lower voltage: %d\n", ret);
-+		nvkm_info(subdev, "LAB voltage final: %d uV\n", nvkm_volt_get(volt));
++		volt = NULL;
  	}
  
- 	if (therm) {
-@@ -264,13 +338,67 @@
-  * P-States
+@@ -212,4 +289,6 @@
+ 	}
+ 
++	if (volt)
++		nvkm_info(subdev, "LAB voltage final: %d uV\n", nvkm_volt_get(volt));
+ 	return ret;
+ }
+@@ -265,11 +344,65 @@
   *****************************************************************************/
  static int
 -nvkm_pstate_prog(struct nvkm_clk *clk, int pstatei)
@@ -175,9 +172,7 @@
 +	bool up;
  
  	list_for_each_entry(pstate, &clk->states, head) {
- 		if (idx++ == pstatei)
-@@ -278,22 +406,82 @@
- 	}
+@@ -279,20 +412,80 @@
  
  	nvkm_debug(subdev, "setting performance state %d\n", pstatei);
 +	up = pstatei > clk->pstate;
@@ -270,19 +265,16 @@
 +	return ret;
  }
  
- static void
-@@ -608,6 +796,8 @@
- 	}
+@@ -609,4 +802,6 @@
  
  	nvkm_pstate_info(clk, &clk->bstate);
 +	if (subdev->device->card_type == NV_C0)
 +		lab_boot_snapshot(clk);
  
  	if (clk->func->init)
- 		return clk->func->init(clk);
 --- a/nvkm/subdev/clk/gf100.c
 +++ b/nvkm/subdev/clk/gf100.c
-@@ -23,11 +23,18 @@
+@@ -23,11 +23,19 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
  #include "priv.h"
@@ -292,6 +284,7 @@
  
  #include <subdev/bios.h>
  #include <subdev/bios/pll.h>
++#include <subdev/bios/perf.h>
  #include <subdev/timer.h>
 +#include <core/device.h>
 +#include <engine/fifo.h>
@@ -301,7 +294,7 @@
  
  struct gf100_clk_info {
  	u32 freq;
-@@ -45,6 +52,15 @@
+@@ -45,6 +53,15 @@
  
  static u32 read_div(struct gf100_clk *, int, u32, u32);
  
@@ -317,7 +310,7 @@
  static u32
  read_vco(struct gf100_clk *clk, u32 dsrc)
  {
-@@ -55,6 +71,25 @@
+@@ -55,6 +72,25 @@
  	return nvkm_clk_read(&clk->base, nv_clk_src_sppll1);
  }
  
@@ -343,7 +336,7 @@
  static u32
  read_pll(struct gf100_clk *clk, u32 pll)
  {
-@@ -86,6 +121,8 @@
+@@ -86,11 +122,18 @@
  	case 0x137040:
  	case 0x1370e0:
  		sclk = read_div(clk, (pll & 0xff) / 0x20, 0x137120, 0x137140);
@@ -352,7 +345,17 @@
  		break;
  	default:
  		return 0;
-@@ -259,6 +296,13 @@
+ 	}
+ 
++	/* LAB 30.10 (rox4d, GF106): на 0f опорный PLL памяти 0x132020 включён, а коэффициенты нулевые — без проверки деление
++	 * на ноль (oops при чтении pstate). Как для выключенного PLL: частота 0. */
++	if (!M || !P)
++		return 0;
++
+ 	return sclk * N / M / P;
+ }
+ 
+@@ -259,6 +302,13 @@
  		return 0;
  
  	limits.refclk = read_div(clk, idx, 0x137120, 0x137140);
@@ -366,7 +369,7 @@
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +314,205 @@
+@@ -270,6 +320,444 @@
  	return ret;
  }
  
@@ -569,10 +572,249 @@
 +	nvkm_info(&clk->base.subdev, "LAB divb_force idx 00: поле B -> %02x (÷%u), ddiv %08x\n", b, b + 2, info->ddiv);
 +}
 +
++/* LAB 30.10 (сверка по базе: 32 платы, 9 чипов Fermi, docs/2026-10-30/db-core-check.md): источник узла — по флагу частоты
++ * в записи уровня VBIOS (биты 14–15 подзаписи; nouveau их отбрасывает): 1 → PLL, 2 → делитель, 0 → делитель, если он в окне
++ * −2…+3 МГц от таблицы (правило nouveau gt215), иначе PLL. Только GPC, ROP, hubk07, hubk06 и hubk01 (он — на PLL hubk06,
++ * если hubk06 на этом уровне на PLL). Основной делитель GPC — на частоту самого высокого уровня на делителях (у нас
++ * 07 = 810, у GF108 405, у GF119 540), ниже — пост-делителем от него; если так не попасть в окно — обычный путь nouveau.
++ * Коэффициенты PLL GPC — из равноценных решений наибольшее M, как NVIDIA 304+ / 390 (у ROP, hubk07, hubk06 — как nouveau).
++ * На нашей плате значения те же, что с lab_gpc_div=1; lab_gpc_div при включённом ключе не действует. */
++static uint lab_vbios_src;
++module_param(lab_vbios_src, uint, 0644);
++MODULE_PARM_DESC(lab_vbios_src, "LAB: node source from the VBIOS perf-entry flag (bits 14-15: 1 PLL, 2 divider, 0 divider within -2..+3 MHz else PLL), GPC main divider on the highest divider level (0 off, 1 on)");
++
++static struct nvkm_pstate *
++lab_cstate_pstate(struct gf100_clk *clk, struct nvkm_cstate *cstate)
++{
++	struct nvkm_pstate *pstate;
++	struct nvkm_cstate *c;
++
++	list_for_each_entry(pstate, &clk->base.states, head) {
++		if (&pstate->base == cstate)
++			return pstate;
++		list_for_each_entry(c, &pstate->list, head) {
++			if (c == cstate)
++				return pstate;
++		}
++	}
++	return NULL;
++}
++
++/* флаг частоты узла dom на уровне level (биты 14–15 подзаписи); -1 — нет таблицы, уровня или подзаписи */
++static int
++lab_perf_flag(struct gf100_clk *clk, u8 level, int dom)
++{
++	struct nvkm_bios *bios = clk->base.subdev.device->bios;
++	const struct nvkm_domain *d;
++	struct nvbios_perfE perfE;
++	u8 ver, hdr, cnt, len, sver, shdr;
++	u32 data, sdata;
++	int i = 0;
++
++	for (d = clk->base.domains; d->name != nv_clk_src_max; d++) {
++		if (d->name == dom)
++			break;
++	}
++	if (d->name == nv_clk_src_max || d->bios == 0xff)
++		return -1;
++	while ((data = nvbios_perfEp(bios, i++, &ver, &hdr, &cnt, &len, &perfE))) {
++		if (perfE.pstate != level)
++			continue;
++		sver = ver;
++		shdr = hdr;
++		sdata = nvbios_perfSe(bios, data, d->bios, &sver, &shdr, cnt, len);
++		if (ver != 0x40 || !sdata)
++			return -1;
++		return nvbios_rd16(bios, sdata) >> 14;
++	}
++	return -1;
++}
++
++static bool
++lab_in_window(u32 want, u32 got)
++{
++	int diff = (int)want - (int)got;
++
++	return diff >= -2000 && diff < 3000;
++}
++
++/* частота GPC самого высокого уровня, который идёт на делителе (флаг 2, или 0 и делитель в окне) — на неё ставится
++ * основной делитель GPC; 0 — такого уровня нет */
++static u32
++lab_gpc_base(struct gf100_clk *clk, int dom, u32 vco)
++{
++	struct nvkm_pstate *pstate;
++	u32 base = 0, div;
++
++	list_for_each_entry(pstate, &clk->base.states, head) {
++		u32 f = pstate->base.domain[dom];
++		int flag;
++
++		if (!f || f > vco || f <= base)
++			continue;
++		flag = lab_perf_flag(clk, pstate->pstate, dom);
++		if (flag == 2 || (flag == 0 && lab_in_window(f, calc_div(clk, 0, vco, f, &div))))
++			base = f;
++	}
++	return base;
++}
++
++/* LAB 30.10: как gt215_pll_calc, но из равноценных решений берёт наибольшее M — так PLL GPC считает NVIDIA 304+ / 390
++ * (сверка по базе с эпохой по независимым признакам: 18 из 18 записей 304+; в 270.x и у ROP/hubk07 — наименьшее M, как
++ * nouveau). Частота у обоих вариантов одна. */
++static int
++lab_pll_calc_maxm(struct nvbios_pll *info, u32 freq, int *pN, int *pM, int *pP)
++{
++	u32 best_err = ~0, err;
++	int M, lM, hM, N, P;
++
++	P = info->vco1.max_freq / freq;
++	if (P > info->max_p)
++		P = info->max_p;
++	if (P < info->min_p)
++		P = info->min_p;
++
++	lM = (info->refclk + info->vco1.max_inputfreq) / info->vco1.max_inputfreq;
++	lM = max(lM, (int)info->vco1.min_m);
++	hM = (info->refclk + info->vco1.min_inputfreq) / info->vco1.min_inputfreq;
++	hM = min(hM, (int)info->vco1.max_m);
++	lM = min(lM, hM);
++
++	for (M = lM; M <= hM; M++) {
++		u32 tmp = freq * P * M;
++
++		N = tmp / info->refclk;
++		if (tmp % info->refclk >= info->refclk / 2)
++			N++;
++		if (N < info->vco1.min_n)
++			continue;
++		if (N > info->vco1.max_n)
++			break;
++
++		err = abs(freq - (info->refclk * N / M / P));
++		if (err <= best_err) {		/* <=: из равных остаётся последнее, то есть наибольшее M */
++			best_err = err;
++			*pN = N;
++			*pM = M;
++		}
++	}
++
++	if (best_err == ~0)
++		return -EINVAL;
++	*pP = P;
++	return info->refclk * *pN / *pM / P;
++}
++
++static u32
++lab_calc_pll_gpc(struct gf100_clk *clk, u32 freq, u32 *coef)
++{
++	struct nvkm_bios *bios = clk->base.subdev.device->bios;
++	struct nvbios_pll limits;
++	int N, M, P, ret;
++
++	if (nvbios_pll_parse(bios, 0x137000, &limits))
++		return 0;
++	limits.refclk = read_div(clk, 0, 0x137120, 0x137140);
++	if (!limits.refclk)
++		return 0;
++	ret = lab_pll_calc_maxm(&limits, freq, &N, &M, &P);
++	if (ret <= 0)
++		return 0;
++	*coef = (P << 16) | (N << 8) | M;
++	return ret;
++}
++
++/* идёт ли hubk06 на этом уровне на PLL по тому же правилу (флаг 1, или 0 и делитель не в окне) — тогда hubk01 может ехать
++ * на его PLL (GF117 у4: у hubk06 флаг 0, 1100 делителем не достать — NVIDIA ставит обоих на PLL) */
++static bool
++lab_hub06_pll(struct gf100_clk *clk, struct nvkm_cstate *cstate, u8 level)
++{
++	int flag = lab_perf_flag(clk, level, nv_clk_src_hubk06);
++	u32 f = cstate->domain[nv_clk_src_hubk06], div;
++
++	if (flag == 1)
++		return true;
++	return flag == 0 && f && !lab_in_window(f, calc_div(clk, 7, read_vco(clk, 0x137160 + (7 * 4)), f, &div));
++}
++
++static int
++lab_calc_vbios(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom, u32 freq, u8 level, int flag)
++{
++	struct gf100_clk_info *info = &clk->eng[idx];
++	u32 vco = read_vco(clk, 0x137160 + (idx * 4));
++	u32 src0 = 0, div0 = 0, div1D = 0, div1P = 0, clk0 = 0, clk1 = 0, coef = 0, base = 0;
++	bool pll, use_pll;
++
++	/* путь делителя: у GPC основной делитель — на частоту самого высокого уровня на делителях, остаток — пост-делителем */
++	if (idx == 0x00 && vco)
++		base = lab_gpc_base(clk, dom, vco);
++	if (base) {
++		src0 = 0x00000003;
++		clk0 = calc_div(clk, idx, vco, base, &div0);
++		clk0 = calc_div(clk, idx, clk0, freq, &div1D);
++		if (!lab_in_window(freq, clk0))
++			base = 0;
++	}
++	if (!base) {
++		div0 = div1D = 0;
++		clk0 = calc_src(clk, idx, freq, &src0, &div0);
++		clk0 = calc_div(clk, idx, clk0, freq, &div1D);
++	}
++
++	/* путь PLL: свой PLL у GPC, ROP, hubk07, hubk06; hubk01 — на PLL hubk06, только если hubk06 на этом уровне на PLL */
++	pll = idx <= 0x02 || idx == 0x07 || (idx == 0x08 && lab_hub06_pll(clk, cstate, level));
++	if (pll) {
++		if (idx == 0x00)
++			clk1 = lab_calc_pll_gpc(clk, freq, &coef);	/* GPC: наибольшее M, как NVIDIA 304+ / 390 */
++		else if (idx <= 0x07)
++			clk1 = calc_pll(clk, idx, freq, &coef);
++		else
++			clk1 = (lab_eng_mask & (1u << 0x07)) ?
++			       lab_override(0x07, cstate->domain[nv_clk_src_hubk06]) :
++			       read_clk(clk, 0x07);
++		if (clk1)
++			clk1 = calc_div(clk, idx, clk1, freq, &div1P);
++	}
++
++	switch (flag) {
++	case 1:
++		use_pll = clk1 != 0;
++		break;
++	case 2:
++		use_pll = false;
++		break;
++	default:
++		use_pll = clk1 && !lab_in_window(freq, clk0);
++		break;
++	}
++
++	if (use_pll) {
++		info->dsrc = info->ddiv = 0;
++		info->mdiv = div1P ? (0x80000000 | (div1P << 8)) : 0;
++		info->coef = coef;
++		info->ssel = 1 << idx;
++		info->freq = clk1;
++	} else {
++		info->dsrc = src0;
++		info->ddiv = div0 ? (0x80000000 | (div0 << 8) | div0) : 0;
++		info->mdiv = div1D ? (0x80000000 | div1D) : 0;
++		info->ssel = info->coef = 0;
++		info->freq = clk0;
++	}
++
++	if (lab_nv_divb && idx <= 0x02 && (info->ddiv & 0x80000000))
++		lab_divb(clk, idx, dom);
++	lab_divb_force_apply(clk, idx);
++	nvkm_info(&clk->base.subdev, "LAB calc idx %02x dom %d: want %u got %u ssel %08x coef %08x dsrc %08x ddiv %08x mdiv %08x (lab_vbios_src: уровень %02x, флаг %d%s%s)\n",
++		  idx, dom, freq, info->freq, info->ssel, info->coef, info->dsrc, info->ddiv, info->mdiv, level, flag,
++		  base ? ", основной делитель от уровня на делителях" : "", (flag == 1 && !use_pll) ? ", PLL не рассчитан — делитель" : "");
++	return 0;
++}
++
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +525,78 @@
+@@ -282,6 +770,87 @@
  	if (!freq)
  		return 0;
  
@@ -609,6 +851,15 @@
 +		nvkm_info(&clk->base.subdev, "LAB calc idx %02x dom %d: SKIPPED by lab_eng_mask, stays %u kHz (wanted %u)\n",
 +			  idx, dom, read_clk(clk, idx), freq);
 +		return 0;
++	}
++
++	if (lab_vbios_src && (idx <= 0x02 || idx == 0x07 || idx == 0x08)) {
++		struct nvkm_pstate *pstate = lab_cstate_pstate(clk, cstate);
++		int flag = pstate ? lab_perf_flag(clk, pstate->pstate, dom) : -1;
++
++		if (flag >= 0)
++			return lab_calc_vbios(clk, cstate, idx, dom, freq, pstate->pstate, flag);
++		nvkm_info(&clk->base.subdev, "LAB calc idx %02x: lab_vbios_src — флага в VBIOS нет, обычный путь\n", idx);
 +	}
 +
 +	if (idx == 0x00 && lab_gpc_div) {
@@ -651,7 +902,7 @@
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +606,9 @@
+@@ -291,7 +860,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -662,7 +913,7 @@
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +635,11 @@
+@@ -318,6 +889,11 @@
  		info->freq = clk1;
  	}
  
@@ -674,7 +925,7 @@
  	return 0;
  }
  
-@@ -346,20 +668,494 @@
+@@ -346,20 +922,494 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -1172,7 +1423,7 @@
  }
  
  static void
-@@ -368,20 +1164,58 @@
+@@ -368,20 +1418,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -1234,7 +1485,7 @@
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +1224,66 @@
+@@ -390,17 +1478,66 @@
  }
  
  static void
@@ -1303,7 +1554,7 @@
  	}
  }
  
-@@ -409,7 +1292,17 @@
+@@ -409,7 +1546,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -1321,7 +1572,7 @@
  }
  
  static int
-@@ -426,15 +1319,138 @@
+@@ -426,15 +1573,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1462,7 +1713,7 @@
  	return 0;
  }
  
-@@ -477,5 +1493,5 @@
+@@ -477,5 +1747,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  

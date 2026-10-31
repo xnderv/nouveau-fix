@@ -1,0 +1,31 @@
+hangtest 2026-10-30 19:14:22: БЫСТРЫЙ режим, уровни 03↔0f (спуск через 07), подъёмов 200, нагрузка browser, удержание 0f 1с, lab_gov был 0, ядро 7.0.0-38-generic
+параметры: lab_mem_order=Y lab_mem_op13=1 lab_mem_op34=1 lab_mem_replay=15 lab_pcie=1 lab_gpc_seq=13 
+19:14:25 старт: core 50 MHz memory 135 MHz; lab_mem=Y lab_core=Y lab_volt_min_uv=0 lab_gr_pause=0 lab_gr_gate=0 lab_gr_wait=0 lab_xbar=0 lab_e9e0=0 lab_pll_keep=0 lab_order=0 lab_order_us=0 lab_therm=1 lab_therm_us=24 lab_therm_us_gpc=0 lab_therm_us_hub=0 lab_therm_probe=0 lab_therm_wait=1 lab_therm_wait_us=0 lab_therm_real=0 lab_clk_mmu_lock=0 lab_therm_div=1 lab_gpc_div=1 lab_pmu_div=1 lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_pcie=1 lab_volt_wait_us=0 lab_nv_22680=0 lab_nv_divb=0 lab_nv_disphold=0 lab_mux_guard=1 lab_nv_mux_release=0 lab_nv_div_late=0 lab_pll_keep=0 тайм-аутов переключателя с загрузки: 4 khz: gpc=0 rop=0 hub07=0 hub06=0 hub01=0
+19:14:26 нагрузка: /usr/bin/yandex-browser (pid 70519, профиль ~/.cache/nouveau-hangtest-profile), страница hangload.html; прогрев 10 с
+19:14:36 загрузка GR перед циклами: 990‰
+19:14:37 подъём 1/200 в 19:14:36.814: gr до 990‰, скрипт B 16718 мкс, после: core 900 MHz memory 2004 MHz, gr 686‰
+19:14:40 подъём 2/200 в 19:14:39.100: gr до 383‰, скрипт B 16664 мкс, после: core 900 MHz memory 2004 MHz, gr 855‰
+19:14:42 подъём 3/200 в 19:14:41.318: gr до 219‰, скрипт B 16649 мкс, после: core 900 MHz memory 2004 MHz, gr 223‰
+19:14:44 подъём 4/200 в 19:14:43.420: gr до 223‰, скрипт B 16685 мкс, после: core 900 MHz memory 2004 MHz, gr 262‰
+19:14:46 подъём 5/200 в 19:14:45.506: gr до 774‰, скрипт B 16634 мкс, после: core 900 MHz memory 2004 MHz, gr 292‰
+19:14:48 подъём 6/200 в 19:14:47.757: gr до 731‰, скрипт B 16685 мкс, после: core 900 MHz memory 2004 MHz, gr 447‰
+19:14:50 подъём 7/200 в 19:14:49.875: gr до 612‰, скрипт B 16706 мкс, после: core 900 MHz memory 2004 MHz, gr 497‰
+19:14:53 подъём 8/200 в 19:14:52.094: gr до 526‰, скрипт B 16691 мкс, после: core 900 MHz memory 2004 MHz, gr 630‰
+19:14:55 подъём 9/200 в 19:14:54.212: gr до 395‰, скрипт B 16663 мкс, после: core 900 MHz memory 2004 MHz, gr 674‰
+19:14:57 подъём 10/200 в 19:14:56.731: gr до 341‰, скрипт B 16718 мкс, после: core 900 MHz memory 2004 MHz, gr 262‰
+19:15:00 подъём 11/200 в 19:14:59.152: gr до 749‰, скрипт B 16696 мкс, после: core 900 MHz memory 2004 MHz, gr 544‰
+19:15:02 подъём 12/200 в 19:15:01.584: gr до 457‰, скрипт B 16669 мкс, после: core 900 MHz memory 2004 MHz, gr 835‰
+19:15:05 подъём 13/200 в 19:15:04.020: gr до 950‰, скрипт B 16655 мкс, после: core 900 MHz memory 2004 MHz, gr 353‰
+19:15:07 подъём 14/200 в 19:15:06.456: gr до 675‰, скрипт B 16718 мкс, после: core 900 MHz memory 2004 MHz, gr 648‰
+19:15:10 подъём 15/200 в 19:15:08.909: gr до 363‰, скрипт B 16698 мкс, после: core 900 MHz memory 2004 MHz, gr 218‰
+19:15:12 подъём 16/200 в 19:15:11.294: gr до 807‰, скрипт B 16670 мкс, после: core 900 MHz memory 2004 MHz, gr 435‰
+19:15:14 подъём 17/200 в 19:15:13.828: gr до 582‰, скрипт B 16822 мкс, после: core 900 MHz memory 2004 MHz, gr 801‰
+19:15:17 подъём 18/200 в 19:15:16.181: gr до 231‰, скрипт B 16667 мкс, после: core 900 MHz memory 2004 MHz, gr 259‰
+19:15:19 подъём 19/200 в 19:15:18.717: gr до 743‰, скрипт B 16479 мкс, после: core 900 MHz memory 2004 MHz, gr 622‰
+19:15:22 подъём 20/200 в 19:15:20.951: gr до 398‰, скрипт B 16620 мкс, после: core 900 MHz memory 2004 MHz, gr 744‰
+19:15:24 подъём 21/200 в 19:15:23.288: gr до 279‰, скрипт B 16714 мкс, после: core 900 MHz memory 2004 MHz, gr 217‰
+19:15:26 подъём 22/200 в 19:15:25.639: gr до 774‰, скрипт B 16721 мкс, после: core 900 MHz memory 2004 MHz, gr 444‰
+19:15:29 набрано 1 тайм-аутов переключателя за 22 подъёмов — останавливаю досрочно (STOPMUX=1)
+19:15:29 тайм-аутов переключателя источника такта за тест: 1 (journalctl -k: «LAB mux»); ошибок GPU (DATA_ERROR/fault/killed) за тест: 0
+=== 22 подъёмов без зависания, остановлен досрочно по STOPMUX=1 (нагрузка browser). Лог: ~/Home/nouveau-fix/results/hangtest-20261030-191422.txt
+19:15:29 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz

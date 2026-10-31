@@ -10,6 +10,7 @@
 # TEST=56 — что держит починку: команда + ÷32 → без команды и без смены поля B → команда с обычным полем B (02).
 # TEST=57 (27.10) — выдержка после входа в скобку как у NVIDIA 390 (lab_therm_wait_us, WAITUS=6|2), без команды; lspci плохой
 # сессии. TEST=58 — то же значение делителя внутри скобки (lab_nv_div_same, сборка 27.10). Прежние серии — в git.
+# TEST=66 (30.10) — генератор ядра по VBIOS (lab_vbios_src): контроль, генератор, пакет «только ядро» для rox4d и Q0AL.
 # Запуск из терминала в графическом сеансе, окно браузера с нагрузкой будет на экране:
 #   POWEROFF=0 bash ~/Home/nouveau-fix/lab/night.sh       (днём: машину в конце не выключать)
 # Один раз пароль sudo (дальше его держит сам hangtest: sudo вызывается каждые несколько секунд).
@@ -70,6 +71,7 @@ base() { setp lab_gov=0 lab_mem=1 lab_pcie=1 lab_volt_min_uv=0 lab_therm=1 lab_t
               lab_gpc_pre405=0 lab_nv_hubpost=0 lab_nv_pcie_late=0 lab_nv_hub07mem=0 lab_gov_nv=0 lab_perf_ms=1000 lab_perf_log=0 \
               lab_volt_wait_us=0 lab_nv_22680=0 lab_nv_divb=0 lab_nv_disphold=0 lab_e9e0=0 lab_order=0 lab_pll_keep=0 lab_mux_guard=0 lab_nv_mux_release=0 lab_nv_div_late=0
         [ -e "$PRM/lab_divb_force" ] && setp lab_divb_force=0
+        [ -e "$PRM/lab_vbios_src" ] && setp lab_vbios_src=0
         [ -e "$PRM/lab_nv_div_same" ] && setp lab_nv_div_same=0 lab_pll_off_in_bracket=0
         [ -e "$PRM/lab_therm_gpc_factor" ] && setp lab_therm_gpc_factor=0 lab_therm_hub_factor=2
         [ -e "$PRM/lab_therm_fixed_ns" ] && setp lab_therm_fixed_ns=0 lab_therm_fixed_hub_ns=0
@@ -332,6 +334,11 @@ T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
 say "=== тест 62о (контроль по признаку): тайм-аутов $T0C на $N0C подъёмов — сессия $([ "$T0C" -gt 0 ] && echo ПЛОХАЯ || echo хорошая)"
 fi
 PREV=""; S_LO=""; S_HI=""; SCAN=""
+# 30.10 (Е19): SCANAUTO=1 — порог S ищется делением пополам только в плохой сессии (контроль дал застревания); в хорошей —
+# ступени SCANSTEPS как проверка. Так каждая плохая загрузка даёт свой порог (гипотеза: в разных плохих сессиях он разный).
+if [ "${SCANAUTO:-0}" = 1 ] && [ "${T0C:--}" != "-" ] && [ "$T0C" -gt 0 ]; then
+    SCANBISECT=1; say "=== сессия плохая — ищу порог делением пополам (SCANAUTO=1)"
+fi
 if [ "${SCANBISECT:-0}" = 1 ]; then
     # 29.10 вечер: деление пополам между LO (по умолчанию 1500 — ниже реальное ожидание не опускается: первое чтение статуса
     # ждёт, пока дойдут записи скобки, ~1,5 мкс) и HI (8000 — как NVIDIA, считаем чистым); стоп, когда промежуток <= SCANRES (400)
@@ -362,6 +369,44 @@ if [ "${SCANSTEPS_DONE:-0}" = 1 ]; then VERD="деление пополам: S �
 elif [ -n "$S_LO" ]; then VERD="S между $S_LO и $S_HI нс от входа"; else VERD="S не больше ${PREV} нс (застреваний не было до нижней ступени)"; fi
 say "=== ИТОГ 62: контроль $T0C/$N0C; скан:$SCAN; $VERD"
 echo "$(date '+%Y-%m-%d %H:%M') загрузка $BOOT ядро $(uname -r) | контроль $T0C/$N0C | скан:$SCAN | $VERD" >> "$TALLY"
+base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
+finish_night clean
+elif [ "$TEST" = 66 ]; then
+# Тест 66 (30.10, ночь) — генератор ядра по VBIOS (lab_vbios_src, сборка B2CAE106). 66о — контроль, как 62о/65о (база $NV,
+# по признаку, до 2 тайм-аутов, не больше 300): хорошая или плохая сессия. 66а — то же плюс lab_vbios_src=1 (одно отличие),
+# LONGRUNS (2000) подъёмов, стоп на 5 тайм-аутах; строки LAB calc генератора сверяются с контролем (lab/vbios-src-compare.py).
+# 66б — пакет для rox4d и Q0AL как есть: только ядро (lab_mem=0, память держится на 324), генератор, lab_nv_div_late=1,
+# lab_mux_guard=1, без ключей $NV (их нет в рабочей конфигурации службы). Это проверка пакета, а не опыт с одним отличием.
+[ -e "$PRM/lab_vbios_src" ] || { say "СТОП: в этой сборке нет ключа lab_vbios_src — нужна сборка генератора (B2CAE106)"; finish_night clean; }
+TALLY="$RES/test66-sessions.txt"; BOOT="$(journalctl --list-boots --no-pager 2>/dev/null | awk '$1=="0"{print $2}')"
+now() { date '+%Y-%m-%d %H:%M:%S'; }
+cmp66() {   # cmp66 ИМЯ С ПО (контроль) С ПО (генератор) — сверка строк LAB calc; итог одной строкой
+    local f="$RES/test66-$1-calc-$(date +%Y%m%d-%H%M%S).txt" fb
+    { journalctl -k -b 0 --no-pager --since "$2" --until "$3"; journalctl -k -b 0 --no-pager --since "$4" --until "$5"; } 2>/dev/null \
+        | python3 -I "$HERE/vbios-src-compare.py" > "$f" 2>&1
+    fb="$(journalctl -k -b 0 --no-pager --since "$4" --until "$5" 2>/dev/null | grep -c 'флага в VBIOS нет' || true)"
+    echo "$(tail -n 1 "$f"); без флага VBIOS (обычный путь) ${fb:-0} строк; подробно — $(basename "$f")"
+}
+RUNS=300; MT00="$(mt)"; export STOPMUX=2; TO0="$(now)"
+run 66о 03-0f-07 $NV lab_mux_guard=1
+TO1="$(now)"; T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 66о (контроль по признаку): тайм-аутов $T0C на $N0C — сессия $([ "$T0C" -gt 0 ] && echo ПЛОХАЯ || echo хорошая)"
+echo "$(date '+%Y-%m-%d %H:%M') загрузка $BOOT ядро $(uname -r) модуль $(cat $PRM/../srcversion 2>/dev/null) | контроль $T0C/$N0C" >> "$TALLY"
+RUNS="${LONGRUNS:-2000}"; MTA="$(mt)"; export STOPMUX=5; TA0="$(now)"
+run 66а 03-0f-07 $NV lab_mux_guard=1 lab_vbios_src=1
+TA1="$(now)"; TA=$(( $(mt) - MTA )); NA="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+CA="$(cmp66 66а "$TO0" "$TO1" "$TA0" "$TA1")"
+say "=== тест 66а (генератор, одно отличие от контроля): тайм-аутов $TA на $NA подъёмов; сверка: $CA"
+echo "$(date '+%Y-%m-%d %H:%M')   66а генератор: $TA/$NA; сверка: $CA" >> "$TALLY"
+RUNS="${LONGRUNS:-2000}"; MTB="$(mt)"; export STOPMUX=5 MEMHOLD=324; TB0="$(now)"
+run 66б 03-0f-07 lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1
+TB1="$(now)"; unset STOPMUX MEMHOLD; TB=$(( $(mt) - MTB )); NB="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+# память стоит на 324 — это память уровня 07: ядро на 07 при выключенной памяти, затем память включается (состояние совпадает)
+$SUDO sh -c 'echo 07 > "$(ls /sys/kernel/debug/dri/*/pstate | head -n 1)"'; sleep 3
+CB="$(cmp66 66б "$TO0" "$TO1" "$TB0" "$TB1")"
+say "=== тест 66б (пакет «только ядро»: lab_mem=0, генератор, lab_nv_div_late=1): тайм-аутов $TB на $NB подъёмов; сверка: $CB"
+echo "$(date '+%Y-%m-%d %H:%M')   66б пакет только ядро: $TB/$NB; сверка: $CB" >> "$TALLY"
+say "=== ИТОГ 66: контроль $T0C/$N0C; генератор $TA/$NA; пакет $TB/$NB"
 base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
 finish_night clean
 elif [ "$TEST" = 65 ]; then

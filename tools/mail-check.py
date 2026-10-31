@@ -48,7 +48,8 @@ for b in boxes:
     nm = raw.decode('latin1'); names.append((nm, utf7(raw)))
 print('папки:', ', '.join(h for _, h in names))
 for raw, human in names:
-    if not any(k in human.lower() for k in ('inbox', 'spam', 'спам', 'входящ', 'sent', 'отправ')): continue
+    # 30.10: и «Архив» — туда уходят прочитанные письма (ответ TechPowerUp во входящих не нашёлся)
+    if not any(k in human.lower() for k in ('inbox', 'spam', 'спам', 'входящ', 'sent', 'отправ', 'archive', 'архив')): continue
     if M.select(f'"{raw}"', readonly=True)[0] != 'OK': continue
     ids = set()
     # 29.10: один запрос SEARCH вместо 20 — Яндекс рвал соединение («problems with connection») на серии запросов
