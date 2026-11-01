@@ -28,8 +28,12 @@ a hardware status flag (about 2.3 µs). No rebuild is needed, only the options:
 About the crash: what did it look like — a freeze, a reboot, a black screen? If your journal is kept on disk, then after
 the next crash `journalctl -k -b -1 > prev-boot.txt` (run right after the following boot) would show us what happened.
 
-For the GT 730 (GF108): please don't run the lab build on it yet. On GF108 boards there is a case our computation does not
-handle the way the NVIDIA driver does (one hub clock asks for a frequency its divider cannot make). What would help most there
-is a recording of the NVIDIA 390 driver, the same way you did for the GTX 560, and its VBIOS comes with it.
+Thanks for the bonus run on the GT 730 too — it is useful, more than you'd think. It went through cleanly, and it shows
+exactly the one case our computation does not handle yet: at the top level the card's VBIOS asks for 1400 MHz on one hub
+clock (hubk01) and says "divider only", but that divider can only make 1620 or 1080 MHz. Our build picked 1620, about 16 %
+above what the board asks for; on three other GF108 boards the NVIDIA driver handles this differently (it switches that
+clock to another source we can't identify from registers alone). It survived the short test, but please don't keep the GT
+730 at the top level with this build for long. If you ever feel like recording the NVIDIA 390 driver on the GT 730, the same
+way you did for the GTX 560, that recording would answer exactly this question.
 
 No rush, and thanks again.
