@@ -11,6 +11,7 @@
 # TEST=57 (27.10) — выдержка после входа в скобку как у NVIDIA 390 (lab_therm_wait_us, WAITUS=6|2), без команды; lspci плохой
 # сессии. TEST=58 — то же значение делителя внутри скобки (lab_nv_div_same, сборка 27.10). Прежние серии — в git.
 # TEST=66 (30.10) — генератор ядра по VBIOS (lab_vbios_src): контроль, генератор, пакет «только ядро» для rox4d и Q0AL.
+# TEST=67 (01.11) — застревание на подъёме «делитель → PLL» в пакете «только ядро»: ожидание как NVIDIA (для Q0AL) и путь 405.
 # Запуск из терминала в графическом сеансе, окно браузера с нагрузкой будет на экране:
 #   POWEROFF=0 bash ~/Home/nouveau-fix/lab/night.sh       (днём: машину в конце не выключать)
 # Один раз пароль sudo (дальше его держит сам hangtest: sudo вызывается каждые несколько секунд).
@@ -407,6 +408,34 @@ CB="$(cmp66 66б "$TO0" "$TO1" "$TB0" "$TB1")"
 say "=== тест 66б (пакет «только ядро»: lab_mem=0, генератор, lab_nv_div_late=1): тайм-аутов $TB на $NB подъёмов; сверка: $CB"
 echo "$(date '+%Y-%m-%d %H:%M')   66б пакет только ядро: $TB/$NB; сверка: $CB" >> "$TALLY"
 say "=== ИТОГ 66: контроль $T0C/$N0C; генератор $TA/$NA; пакет $TB/$NB"
+base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
+finish_night clean
+elif [ "$TEST" = 67 ]; then
+# Тест 67 (01.11). В пакете «только ядро» (66б) остались редкие застревания на подъёме делитель → PLL (у нас 2 на 2000, у Q0AL —
+# первый подъём после загрузки). Два кандидата делим: один проверяет Q0AL, другой — мы. 67о — контроль сессии (как 66о).
+# 67а — пакет Q0AL: 66б + фиксированное ожидание от входа в скобку, как NVIDIA 390 на GF114 (8000 / 4500 нс), 300 подъёмов —
+# проверка «не хуже» перед отправкой. 67б — наш кандидат: 66б + lab_gpc_pre405=1 (перед PLL путь делителя ставится на 405, как
+# NVIDIA), LONGRUNS. 67в — 66б как есть, LONGRUNS — отсчёт в той же сессии. Память держится на 324 (MEMHOLD).
+[ -e "$PRM/lab_vbios_src" ] && [ -e "$PRM/lab_therm_fixed_ns" ] || { say "СТОП: нужна сборка генератора с lab_therm_fixed_ns"; finish_night clean; }
+TALLY="$RES/test67-sessions.txt"; BOOT="$(journalctl --list-boots --no-pager 2>/dev/null | awk '$1=="0"{print $2}')"
+PKG="lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1"
+RUNS=300; MT00="$(mt)"; export STOPMUX=2
+run 67о 03-0f-07 $NV lab_mux_guard=1
+T0C=$(( $(mt) - MT00 )); N0C="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+say "=== тест 67о (контроль): тайм-аутов $T0C на $N0C — сессия $([ "$T0C" -gt 0 ] && echo ПЛОХАЯ || echo хорошая)"
+echo "$(date '+%Y-%m-%d %H:%M') загрузка $BOOT ядро $(uname -r) модуль $(cat $PRM/../srcversion 2>/dev/null) | контроль $T0C/$N0C" >> "$TALLY"
+export MEMHOLD=324
+for part in "а 300 $PKG lab_therm_fixed_ns=8000 lab_therm_fixed_hub_ns=4500" "б ${LONGRUNS:-2000} $PKG lab_gpc_pre405=1" "в ${LONGRUNS:-2000} $PKG"; do
+    set -- $part; name="67$1"; RUNS="$2"; shift 2
+    MTX="$(mt)"; export STOPMUX=5
+    run "$name" 03-0f-07 "$@"
+    TX=$(( $(mt) - MTX )); NX="$(grep -c 'подъём [0-9]*/' "$HTLOG")"
+    say "=== тест $name ($*): тайм-аутов $TX на $NX подъёмов"
+    echo "$(date '+%Y-%m-%d %H:%M')   $name: $TX/$NX ($*)" >> "$TALLY"
+    $SUDO sh -c 'echo 07 > "$(ls /sys/kernel/debug/dri/*/pstate | head -n 1)"'; sleep 3
+done
+unset STOPMUX MEMHOLD
+say "=== ИТОГ 67: результаты — $TALLY"
 base; setp lab_gov="$GOV_START"; setp lab_nv_div_late=1 lab_mux_guard=1; [ -e /etc/gpu-autoclock.divb ] && setp lab_nv_divb=1
 finish_night clean
 elif [ "$TEST" = 65 ]; then

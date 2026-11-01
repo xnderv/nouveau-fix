@@ -175,3 +175,43 @@ targeted subsets of our database for more research, i.e. not everything.»), о�
 **31.10 11:25 — В8, продолжение:** новая вкладка встроенного браузера при первом открытии получила «403 - Access Denied»
 (и на главной). По правилу — стоп, обходов не делаем; автор открывает страницу сам. Сохранённый на странице список моделей
 (38 из 170) пропал: localStorage пуст. Образов из В8 пока скачано 0.
+
+**31.10 — ветка Бена Скеггса devel-clk от Ильи Миркина** (рассылка nouveau, ветка RFC, 31.10 03:02 UTC; публичный архив
+lore.kernel.org/nouveau): https://github.com/imirkin/nouveau/commits/devel-clk — открытый код nouveau 2017 года (класс Г).
+Прочитаны через GitHub API: список коммитов и диффы clk/bios/perf/pll. Разбор — docs/2026-10-31/ben-devel-clk.md.
+
+**31.10 — открытые источники для атласа узлов** (решение автора: все поколения, все открытые источники NVIDIA и сообщества;
+утёкший код NVIDIA и декомпиляция — никогда). Скачано в ~/Home/nouveau-archive/open-src (вне репозитория, неглубокие клоны):
+envytools (github.com/envytools/envytools, MIT, f102b82 от 2023-10-26), NVIDIA open-gpu-doc (github.com/NVIDIA/open-gpu-doc,
+9fdf5c4 от 2026-06-09), NVIDIA open-gpu-kernel-modules (github.com/NVIDIA/open-gpu-kernel-modules, 615.78.08, ca2d03e от
+2026-10-07). nvgpu с официального nv-tegra.nvidia.com не скачан: сервер не отвечает (соединение висит до таймаута). Взамен — официальные архивы исходников Jetson
+Linux с developer.download.nvidia.com (открыты, без входа): R32.7.5 T210 public_sources.tbz2 (sha256 c34fe01e…a98e52) и
+R35.5 public_sources.tbz2 (sha256 89368d70…ab523e); из них извлечён только kernel/nvgpu → ~/Home/nouveau-archive/open-src/
+nvgpu-r32.7.5 (чипы gk20a, gm20b, gp106, gp10b, gv100, gv11b) и nvgpu-r35.5 (плюс ga100, ga10b, tu104); архивы удалены,
+суммы — open-src/nvgpu-sources.sha256. Код NVIDIA под MIT/GPL, класс Г.
+Класс Г. Разбор — docs/2026-10-31/node-atlas.md, hubk01-source2.md.
+
+**31.10 вечер — все доступные выпуски nvgpu (эволюция кода NVIDIA по Tegra).** Список выпусков — страница NVIDIA Jetson
+Download Center Archive (developer.nvidia.com/embedded/downloads/archive; нашёл автор в браузере; данные страницы —
+archive.json). Скачано с developer.download.nvidia.com / developer.nvidia.com/embedded/dlc (без входа): R21.5 и R21.8 (Tegra K1,
+Kepler gk20a), R23.1 (TX1, Maxwell gm20b, ноябрь 2015 — самый ранний в архиве), R27.1 и R28.4 T186/T210 (TX2 Pascal, TX1),
+R31.1 и R32.7.5 T186 (Xavier, Volta), R36.4 (Orin, Ampere); вместе с прежними R32.7.5 T210 и R35.5 — 11 выпусков. Из каждого
+извлечено только дерево nvgpu → ~/Home/nouveau-archive/open-src/nvgpu-<выпуск>; архивы удалены, суммы SHA256 —
+open-src/nvgpu-sources.sha256. R24.2.3 (kernel-sources-r2423) не скачался — ссылка без размера (возможно, нужен вход).
+Ранние Tegra 2/3/4: исходников в архиве нет; их тактовый код — в основном ядре Linux (drivers/clk/tegra, добавлен в клон
+v6.12.115). Технические справочники SoC (Tegra 2/3/4/K1/X1/X2/Xavier/Orin/Thor) есть в Download Center, но требуют входа
+в аккаунт разработчика NVIDIA — скачивает автор сам. Класс Г.
+
+**31.10 — технические справочники SoC Tegra (TRM) и R24.2.3.** Скачал автор в браузере, войдя в свой аккаунт NVIDIA Developer
+(Jetson Download Center): TRM Tegra 2, Tegra 3, Tegra 4, Tegra K1 (v03p), Tegra X1 (v1.3p), Tegra X2/Parker, Xavier (v1.4p),
+Orin (v1.2p), Thor (v1.2p) — 9 PDF, 706…8783 страниц, → ~/Home/nouveau-archive/open-src/tegra-trm, суммы SHA256 —
+tegra-trm/trm.sha256. Исходники ядра R24.2.3 (TX1, ядро 3.10.96, nvgpu gk20a + gm20b) — из них извлечено дерево nvgpu →
+open-src/nvgpu-r24.2.3, архив удалён, сумма — open-src/nvgpu-sources.sha256. Официальная документация и код NVIDIA, класс Г;
+справочники в репозиторий не кладём (условия NVIDIA), только выводы со ссылкой на раздел.
+
+**31.10 — результаты тестировщиков (скачаны 01.11 из вложений issue, логи вне репозитория):** rox4d, раунд 7 (issue #1,
+31.10 15:33 UTC, nouveau-fix_3.zip → ~/Home/stand-2011/gf106-rox4d/round7) — 3 цикла только ядра без ошибок; разбор —
+docs/2026-10-28/rox4d-build.md, раздел 12. Q0AL, два прогона на GTX 560 (issue #2, 31.10 20:30 и 20:37 UTC → ~/Home/stand-2011/
+q0al-gtx560/round2) — один тайм-аут переключателя на первом подъёме, затем 9 переходов чисто; после тестов система падала (логов
+нет); разбор — docs/2026-11-01/q0al-round2.md.
+

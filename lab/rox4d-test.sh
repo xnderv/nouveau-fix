@@ -15,6 +15,7 @@
 #        stays at its boot clock, any level may come first. Kernel errors are now also checked before every step (round 6:
 #        the errors began during the pause and the test went on), FAULT and WARNING lines stop it too. The register
 #        snapshot (clk-probe) runs only with PROBE=1:  sudo PROBE=1 bash rox4d-test.sh
+# 01.11: in core-only mode the test ends at 03 instead of a final 0f.
 set -u
 CYCLES="${1:-3}"; PAUSE="${2:-20}"; PROBE="${PROBE:-0}"
 LOG="rox4d-test-$(date +%Y%m%d-%H%M%S).log"
@@ -70,7 +71,8 @@ for ((c = 1; c <= CYCLES; c++)); do
     say "=== cycle $c of $CYCLES"
     step 0f; step 07; step 03
 done
-step 0f
+# 01.11: core only — finish at 03 (memory stays at its boot clock; core at 0f with boot memory is not a state NVIDIA uses)
+if [ "$(cat $PRM/lab_mem)" = N ]; then say "core only: the card stays at level 03"; else step 0f; fi
 all=$(dmesg); new=$(echo "$all" | tail -n +$((LAST + 1))); echo "$new" | grep -E 'LAB|nouveau' >> "$LOG"
 check "during the last pause"
 say "=== done: $CYCLES cycles without error lines. Please send $LOG and $LOG.dmesg"
