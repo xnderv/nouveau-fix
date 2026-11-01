@@ -220,4 +220,7 @@ q0al-gtx560/round2) — один тайм-аут переключателя на
 таблице 1400 (флаг 2) — не как NVIDIA; разбор — docs/2026-11-01/q0al-round2.md.
 **01.11 13:57 — ответ 5 rox4d** (раунд 8: ядро на генераторе + память, `lab_volt_first=1 lab_mem_order=1` — порядок NVIDIA;
 без пересборки; коммит d52f78e): https://github.com/xnderv/nouveau-fix/issues/1#issuecomment-6557010339.
+**01.11 14:35 — ответ Q0AL в issue #2** (итоги GTX 560 и GT 730; его кандидат — ожидание как NVIDIA 8000/4500 нс, проверено у
+нас в плохой сессии: 67а 0/300; три прогона после перезагрузки; вопрос о падении; GT 730 — не держать на 0f, просьба о записи
+NVIDIA 390): https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-6557395290.
 

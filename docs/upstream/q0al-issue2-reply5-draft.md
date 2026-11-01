@@ -12,7 +12,8 @@ card (2 in 2000 switches), and we have two candidate fixes. We'd like to split t
 
 **Yours: the NVIDIA driver's own wait.** Around every mux switch the driver slows the clock down for a moment; the NVIDIA
 driver then waits a fixed time (8 µs for the core, 4.5 µs for the hub on GF114) before switching, while our build waits for
-a hardware status flag (about 2.3 µs). No rebuild is needed, only the options:
+a hardware status flag (about 2.3 µs). We ran the same core settings on our GTX 560 Ti today in a "bad" session (one where
+the mux sticks now and then without it): 300 switches, no stuck mux, no errors. No rebuild is needed, only the options:
 
 1. `git pull` in nouveau-fix (the test script now ends at the lowest level instead of leaving the core at the top while the
    memory stays at its boot clock of 135 MHz — that combination never happens with the NVIDIA driver, and it may be what
