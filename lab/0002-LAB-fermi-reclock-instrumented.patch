@@ -925,7 +925,7 @@
  	return 0;
  }
  
-@@ -346,20 +922,494 @@
+@@ -346,20 +922,556 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -1032,16 +1032,77 @@
 +static uint lab_therm_gpc_factor;	/* 0 = по чипу: GF114 0xa (/6, наша запись), GF106 0x2 (/2, запись rox4d) */
 +module_param(lab_therm_gpc_factor, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_gpc_factor, "LAB: FSRM slowdown factor code for GPC bracket (bits 16-21): 0 = by chip (GF114 0xa = /6, GF106 2 = /2 as NVIDIA), 0xe = /8");
++/* LAB 02.11: коды замедления в скобке, как их ставит NVIDIA 390, — по чипу, из записей базы (docs/2026-10-29/db-fermi-waits.md,
++ * lab/db-bracket-codes.py). От VBIOS (0x020130, 0x020144) не зависят — проверено подменой 02.11. GF110: 1080/1081 — /2,
++ * остальные — /6. GF108: в записях 2016–2017 GPC /8 (в 2010–2011 было /2). lab_therm_code_nv=0 — прежнее (GF106 /2, иначе /6). */
++static uint lab_therm_code_nv;
++module_param(lab_therm_code_nv, uint, 0644);
++MODULE_PARM_DESC(lab_therm_code_nv, "LAB: bracket slowdown codes per chip as NVIDIA 390 (0 = old: GF106 /2, else /6; 1 = table from NVIDIA traces)");
++static u32
++lab_therm_code_tab(struct nvkm_device *device, int gpc)
++{
++	switch (device->chipset) {
++	case 0xc0: return 0xe;					/* GF100: /8 и GPC, и hub */
++	case 0xc1: return gpc ? 0xe : 0x2;			/* GF108: GPC /8, hub /2 */
++	case 0xc3: case 0xc4: case 0xd9: case 0xd7: return 0x2;	/* GF106, GF104, GF119, GF117: /2 */
++	case 0xc8:						/* GF110: 1080/1081 — /2, иначе GPC /6 */
++		if (!gpc)
++			return 0x2;
++		return (device->pci && (device->pci->pdev->device == 0x1080 ||
++					device->pci->pdev->device == 0x1081)) ? 0x2 : 0xa;
++	default: return gpc ? 0xa : 0x2;			/* GF114, GF116: GPC /6, hub /2 */
++	}
++}
 +static u32
 +lab_therm_gpc_code(struct nvkm_device *device)
 +{
 +	if (lab_therm_gpc_factor)
 +		return lab_therm_gpc_factor & 0x3f;
++	if (READ_ONCE(lab_therm_code_nv))
++		return lab_therm_code_tab(device, 1);
 +	return (device->chipset == 0xc3) ? 0x2 : 0xa;
 +}
 +static uint lab_therm_hub_factor = 0x2;
 +module_param(lab_therm_hub_factor, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_hub_factor, "LAB: FSRM slowdown factor code for hubk06 bracket (bits 16-21; 2 = /2 as NVIDIA)");
++static u32
++lab_therm_hub_code(struct nvkm_device *device)
++{
++	if (READ_ONCE(lab_therm_code_nv) && lab_therm_hub_factor == 0x2)
++		return lab_therm_code_tab(device, 0);
++	return lab_therm_hub_factor & 0x3f;
++}
++
++/* LAB 02.11, Е17: ожидание в скобке, как его СЧИТАЕТ NVIDIA 390, — из 0x020130 (пишет init-скрипт VBIOS) и 0x020144
++ * (docs/2026-11-01/didt-evolution.md, §6). Два пути кода у NVIDIA:
++ *   GF100/GF104/GF106/GF108 (0x020144 не читает): T = 2^(b1 + 6) тактов 27 МГц (GF106 030a — 18,96 мкс, GF108M 060c — 151,7);
++ *   GF110/GF114/GF116/GF117/GF119: T = код · 2^b1 тактов 27 МГц + C, C = 2,5 мкс при бите 7 в 0x020144, иначе 1,0 мкс
++ *   (наша GF114 040a: GPC 8,2, hub 3,7; измерено 7,3–8,5 и 3,6–5,1);
++ * b1 — байт 1 (биты 8–11) 0x020130, код — код замедления домена. GF104 в разных записях шёл обоими путями — берётся больший.
++ * Сверху запас lab_therm_wait_nv_margin_ns. Ожидание — от входа в скобку, признак только пишется в журнал (как lab_therm_fixed_ns).
++ * lab_therm_wait_nv=1 действует, если lab_therm_fixed_ns / lab_therm_fixed_hub_ns не заданы. */
++static uint lab_therm_wait_nv;
++module_param(lab_therm_wait_nv, uint, 0644);
++MODULE_PARM_DESC(lab_therm_wait_nv, "LAB: bracket wait computed as NVIDIA 390 from 0x020130/0x020144 (0 off, 1 on)");
++static uint lab_therm_wait_nv_margin_ns = 500;
++module_param(lab_therm_wait_nv_margin_ns, uint, 0644);
++MODULE_PARM_DESC(lab_therm_wait_nv_margin_ns, "LAB: margin added to the computed NVIDIA wait, ns (default 500)");
++static u32
++lab_therm_nv_ns(struct nvkm_device *device, u32 code)
++{
++	u32 b1 = (nvkm_rd32(device, 0x020130) >> 8) & 0xf;
++	u32 c = (nvkm_rd32(device, 0x020144) & 0x80) ? 2500 : 1000;
++	u32 t10 = (u32)(((1ULL << (b1 + 6)) * 1000) / 27);		/* GF10x */
++	u32 t11 = (u32)(((u64)code * (1ULL << b1) * 1000) / 27) + c;	/* GF11x */
++	u32 t;
++
++	switch (device->chipset) {
++	case 0xc0: case 0xc1: case 0xc3: t = t10; break;
++	case 0xc4: t = max(t10, t11); break;
++	default: t = t11; break;
++	}
++	return min_t(u32, t + READ_ONCE(lab_therm_wait_nv_margin_ns), 300000);
++}
 +
 +struct lab_therm_save {
 +	bool on; int i; u32 ctrl1, f2, f3, f4;
@@ -1062,8 +1123,8 @@
 +		return;
 +	sv->i = (idx == 0) ? 0 : 1;
 +	e2 = (idx == 0) ? ((lab_therm_gpc_code(device) << 16) | 0x0000008a)
-+			: (((lab_therm_hub_factor & 0x3f) << 16) | 0x00000082);
-+	e3 = (idx == 0) ? lab_therm_gpc_code(device) : (lab_therm_hub_factor & 0x3f);
++			: ((lab_therm_hub_code(device) << 16) | 0x00000082);
++	e3 = (idx == 0) ? lab_therm_gpc_code(device) : lab_therm_hub_code(device);
 +	sv->ctrl1 = nvkm_rd32(device, 0x020004);
 +	sv->f2 = nvkm_rd32(device, 0x020160 + sv->i * 4);
 +	sv->f3 = nvkm_rd32(device, 0x020180 + sv->i * 4);
@@ -1082,10 +1143,11 @@
 +	sv->nrd = 0;
 +	sv->w = false;
 +	sv->fx = false;
-+	if ((idx == 0 && lab_therm_fixed_ns) || (idx == 7 && lab_therm_fixed_hub_ns)) {
++	if ((idx == 0 && lab_therm_fixed_ns) || (idx == 7 && lab_therm_fixed_hub_ns) || READ_ONCE(lab_therm_wait_nv)) {
 +		u32 want = 0x00020000 | (e3 & 0x3f);
-+		u32 set = clamp_t(u32, idx == 0 ? READ_ONCE(lab_therm_fixed_ns) : READ_ONCE(lab_therm_fixed_hub_ns),
-+				  min_t(u32, READ_ONCE(lab_therm_fixed_floor_ns), 50000), 50000);
++		u32 fixed = idx == 0 ? READ_ONCE(lab_therm_fixed_ns) : READ_ONCE(lab_therm_fixed_hub_ns);
++		u32 set = fixed ? clamp_t(u32, fixed, min_t(u32, READ_ONCE(lab_therm_fixed_floor_ns), 50000), 50000)
++				: max_t(u32, lab_therm_nv_ns(device, e3 & 0x3f), 2000);
 +		u64 t0 = ktime_get_ns(), dt;
 +		u32 v;
 +
@@ -1423,7 +1485,7 @@
  }
  
  static void
-@@ -368,20 +1418,58 @@
+@@ -368,20 +1480,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -1485,7 +1547,7 @@
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +1478,66 @@
+@@ -390,17 +1540,66 @@
  }
  
  static void
@@ -1554,7 +1616,7 @@
  	}
  }
  
-@@ -409,7 +1546,17 @@
+@@ -409,7 +1608,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -1572,7 +1634,7 @@
  }
  
  static int
-@@ -426,15 +1573,138 @@
+@@ -426,15 +1635,138 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1713,7 +1775,7 @@
  	return 0;
  }
  
-@@ -477,5 +1747,5 @@
+@@ -477,5 +1809,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  

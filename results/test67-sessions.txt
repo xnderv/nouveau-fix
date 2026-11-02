@@ -1,0 +1,4 @@
+2026-11-01 14:06 загрузка e1f2320bae2347f58c96427ab6f5e611 ядро 7.0.0-42-generic модуль 6F1D59304D44EC160F75CBA | контроль 1/300
+2026-11-01 14:18   67а: 0/300 (lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1 lab_therm_fixed_ns=8000 lab_therm_fixed_hub_ns=4500)
+2026-11-01 15:34   67б: 0/2000 (lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1 lab_gpc_pre405=1)
+2026-11-01 16:50   67в: 1/2000 (lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1)

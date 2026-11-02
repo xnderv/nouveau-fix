@@ -14,6 +14,12 @@
 # нагрузка НЕ убивается (чёрному ящику нужно состояние «как есть» для снимка hang-*.txt), экран, скорее
 # всего, уже замер: Alt+PrtSc, затем S, U, B. Лог теста пишется с sync после каждой строки.
 set -uo pipefail
+# 02.11: при отдельном запуске (не из night.sh) экран блокировался посреди теста, и переходы вставали —
+# на время теста запрещаем простой и сон, как night.sh. Настройки системы не меняются; запрет снимается с концом теста.
+if [ -z "${NIGHT_INHIBITED:-}${HANG_INHIBITED:-}" ] && command -v gnome-session-inhibit >/dev/null; then
+    exec env HANG_INHIBITED=1 gnome-session-inhibit --inhibit idle --inhibit suspend --inhibit logout \
+         --reason "nouveau hangtest" bash "$0" "$@"
+fi
 HERE="$(cd "$(dirname "$0")" && pwd)"; KIT="$(dirname "$HERE")"; PRM=/sys/module/nouveau/parameters
 "$KIT/daily/check-driver.sh" --banner 2>/dev/null   # 28.10: штатное ядро/новое ядро без драйвера
 N="${1:-60}"; [[ "$N" =~ ^[0-9]+$ ]] || { echo "Число подъёмов"; exit 1; }

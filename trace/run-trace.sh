@@ -28,7 +28,7 @@ say() { echo "$(date +%T) $*" | tee -a "$LOG"; sync; }
 SYSRQ="${TRACE_SYSRQ:-/proc/sysrq-trigger}"
 LED="${TRACE_LED:-$(ls -d /sys/class/leds/input*::scrolllock 2>/dev/null | head -n 1)}"
 
-say "Ядро $(uname -r), версия сценария 7 (без снимков, со сторожем; контроль, затем запись)"
+say "Ядро $(uname -r), версия сценария 7 (без снимков, со сторожем; контроль, затем запись); Е17: 0x020130=${E17:-нет} 0x020144=${E17_144:-нет}"
 lsmod | grep -q '^nvidia ' && { say "СТОП: драйвер nvidia уже загружен — перезагрузись."; exit 1; }
 [ -e "$HERE/regdump4.py" ] || { say "СТОП: нет $HERE/regdump4.py"; exit 1; }
 command -v glxgears >/dev/null || { say "СТОП: нет glxgears (пакет mesa-utils)"; exit 1; }
@@ -75,7 +75,7 @@ T=\$(cat /tmp/trace-dir); OUT="$OUT"; P="$1"
 mark() { echo "MARK: \$P: \$*" > "\$T/trace_marker" 2>/dev/null; echo "\$(date +%T) MARK: \$P: \$*" >> "\$OUT/steps.txt"; sync; }
 level() { { echo "### \$P: \$1 \$(date +%T)"; nvidia-settings -t -q GPUCurrentPerfLevel -q GPUCurrentClockFreqs 2>&1; } >> "\$OUT/nvsettings.txt"; }
 pm() { nvidia-settings -a "[gpu:0]/GPUPowerMizerMode=\$1" >/dev/null 2>&1 || true; }   # 0 адаптивный, 1 максимум
-LIMIT=2000000000
+LIMIT=4000000000   # 02.11: 4 ГБ — в Е17_SEQ несколько проходов записи (~0,4 ГБ каждый)
 big() { [ "\$(stat -c %s "\$OUT/mmiotrace.txt" 2>/dev/null || echo 0)" -gt "\$LIMIT" ]; }
 guard() { big && { mark "запись больше 2 ГБ — фаза \$1 и дальше пропущены"; stop_all; exit 0; }; }
 G1=""; G2=""
@@ -118,8 +118,24 @@ EOF
 chmod +x /tmp/xsession.sh
 }
 
+e17_set() {   # Е17 (02.11): перед каждой загрузкой nvidia записать 0x020130 = $E17 (therm_config2), читать до и после
+  [ -n "${E17:-}${E17_144:-}" ] || return 0
+  python3 - "${E17:-}" "${E17_144:-}" >>"$LOG" 2>&1 <<'PY' || say "Е17: запись не удалась"
+import mmap, os, glob, struct, sys, time
+d = [x for x in glob.glob('/sys/bus/pci/devices/*') if open(x + '/vendor').read().strip() == '0x10de'
+     and open(x + '/class').read().startswith('0x03')][0]
+fd = os.open(d + '/resource0', os.O_RDWR | os.O_SYNC); m = mmap.mmap(fd, 1 << 20, mmap.MAP_SHARED)
+for reg, arg in ((0x020130, sys.argv[1]), (0x020144, sys.argv[2])):
+    if not arg: continue
+    v = int(arg, 16); r = lambda: struct.unpack_from('<I', m, reg)[0]
+    before = r(); struct.pack_into('<I', m, reg, v); after = r()
+    print(f'{time.strftime("%T")} Е17: {reg:#08x} было {before:08x}, записано {v:08x}, прочитано {after:08x}')
+PY
+}
+
 run_pass() {   # $1 — имя прохода
   mark "== проход «$1»: загрузка драйвера nvidia"
+  e17_set
   modprobe nvidia
   modprobe nvidia_modeset
   modprobe nvidia_drm
@@ -137,15 +153,19 @@ finish() {   # сторож больше не нужен; Scroll Lock — как
   [ -n "$LED" ] && [ -n "$LED_OLD" ] && echo "$LED_OLD" > "$LED/trigger" 2>/dev/null || true
 }
 
+unload_nv() {   # 0 — выгружен
+  systemctl stop nvidia-persistenced 2>/dev/null || true
+  for i in 1 2 3 4 5; do
+    modprobe -r nvidia_drm nvidia_modeset nvidia 2>>"$LOG" && return 0
+    sleep 2
+  done
+  return 1
+}
+
 # Проход 1: контроль, без записи, все ядра работают.
 run_pass контроль
 # Драйвер выгружается: mmiotrace видит только отображения регистров, сделанные ПОСЛЕ его включения.
-systemctl stop nvidia-persistenced 2>/dev/null || true
-ok=0
-for i in 1 2 3 4 5; do
-  modprobe -r nvidia_drm nvidia_modeset nvidia 2>>"$LOG" && { ok=1; break; }
-  sleep 2
-done
+ok=0; unload_nv && ok=1
 if [ "$ok" != 1 ]; then
   finish
   say "СТОП: драйвер nvidia не выгрузился за 5 попыток — запись невозможна. Контроль сделан, результат: $OUT"
@@ -163,6 +183,15 @@ nice -n -20 cat "$T/trace_pipe" > "$OUT/mmiotrace.txt" &
 CATPID=$!
 sleep 2
 run_pass запись
+# Е17_SEQ (02.11): ещё проходы в той же записи, перед каждым — свои значения: «0x020130[/0x020144]» через пробел,
+# например E17_SEQ="8107070a 8107040a/00010000". Регистры пишутся только между выгрузкой и загрузкой драйвера.
+n=1
+for item in ${E17_SEQ:-}; do
+  n=$((n + 1))
+  unload_nv || { mark "СТОП: драйвер не выгрузился перед проходом $n — остальные пропущены"; break; }
+  E17="${item%%/*}"; E17_144=""; [ "$item" != "${item#*/}" ] && E17_144="${item#*/}"
+  run_pass "запись-$n"
+done
 mark "конец записи"
 finish   # сторож снимается ДО остановки mmiotrace: в прогоне 7 остановка шла > 2 мин, и сторож выключил машину
 sleep 1

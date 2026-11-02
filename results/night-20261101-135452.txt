@@ -1,0 +1,39 @@
+13:54:52 серия: драйвер /lib/modules/7.0.0-42-generic/updates/nouveau-fix/nouveau.ko, ядро 7.0.0-42-generic, POWEROFF=0 WAITMIN=60 DRY=0
+13:54:53 снимок этой загрузки (2026-11-01 13:46:59) против bootsnap-20261027-1942-bad.txt: сравнено 126 регистров: различаются 4, без живых сигналов (температура, вентилятор) — 0
+13:54:53 снимок этой загрузки (2026-11-01 13:46:59) против bootsnap-20261025-1840-bad.txt: сравнено 126 регистров: различаются 2, без живых сигналов (температура, вентилятор) — 0
+13:54:53 снимок этой загрузки (2026-11-01 13:46:59) против bootsnap-20261025-1245-bad.txt: сравнено 119 регистров: различаются 3, без живых сигналов (температура, вентилятор) — 0
+13:54:53 снимок этой загрузки (2026-11-01 13:46:59) против bootsnap-20261025-1230-bad.txt: сравнено 119 регистров: различаются 3, без живых сигналов (температура, вентилятор) — 0
+    00e104  0: 72740240  ~/Home/nouveau-fix/results/bootsnap-20261027-1942-bad.txt: 72700240  (живой сигнал: тахометр вентилятора (GPIO 4))
+    00e280  0: 24000072  ~/Home/nouveau-fix/results/bootsnap-20261027-1942-bad.txt: 24000076  (живой сигнал: выход ШИМ вентилятора (GPIO 16))
+    020008  0: c00835a9  ~/Home/nouveau-fix/results/bootsnap-20261027-1942-bad.txt: c0083679  (живой сигнал: датчик температуры)
+    020400  0: 0000001e  ~/Home/nouveau-fix/results/bootsnap-20261027-1942-bad.txt: 0000002a  (живой сигнал: датчик температуры)
+13:54:59 === тест 67о: уровни 03-0f-07, подъёмов 300; отличия от базы: lab_gpc_pre405=1 lab_nv_hubpost=1 lab_nv_pcie_late=1 lab_nv_hub07mem=1 lab_gov_nv=1 lab_mux_guard=1
+13:55:01 тест 67о: журнал hangtest-20261101-135500.txt
+14:06:59 тест 67о: закончился, код 0
+14:06:53 тайм-аутов переключателя источника такта за тест: 1 (journalctl -k: «LAB mux»); ошибок GPU (DATA_ERROR/fault/killed) за тест: 0
+=== 300 подъёмов без зависания (нагрузка browser). Лог: ~/Home/nouveau-fix/results/hangtest-20261101-135500.txt
+14:06:54 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 135 MHz
+14:06:59 === тест 67о (контроль): тайм-аутов 1 на 300 — сессия ПЛОХАЯ
+14:07:00 === тест 67а: уровни 03-0f-07, подъёмов 300; отличия от базы: lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1 lab_therm_fixed_ns=8000 lab_therm_fixed_hub_ns=4500
+14:07:02 тест 67а: журнал hangtest-20261101-140701.txt
+14:18:32 тест 67а: закончился, код 0
+14:18:31 тайм-аутов переключателя источника такта за тест: 0 (journalctl -k: «LAB mux»); ошибок GPU (DATA_ERROR/fault/killed) за тест: 0
+=== 300 подъёмов без зависания (нагрузка browser). Лог: ~/Home/nouveau-fix/results/hangtest-20261101-140701.txt
+14:18:32 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 324 MHz
+14:18:32 === тест 67а (lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1 lab_therm_fixed_ns=8000 lab_therm_fixed_hub_ns=4500): тайм-аутов 0 на 300 подъёмов
+14:18:36 === тест 67б: уровни 03-0f-07, подъёмов 2000; отличия от базы: lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1 lab_gpc_pre405=1
+14:18:38 тест 67б: журнал hangtest-20261101-141837.txt
+15:34:29 тест 67б: закончился, код 0
+15:34:19 тайм-аутов переключателя источника такта за тест: 0 (journalctl -k: «LAB mux»); ошибок GPU (DATA_ERROR/fault/killed) за тест: 0
+=== 2000 подъёмов без зависания (нагрузка browser). Лог: ~/Home/nouveau-fix/results/hangtest-20261101-141837.txt
+15:34:22 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 324 MHz
+15:34:29 === тест 67б (lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1 lab_gpc_pre405=1): тайм-аутов 0 на 2000 подъёмов
+15:34:33 === тест 67в: уровни 03-0f-07, подъёмов 2000; отличия от базы: lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1
+15:34:35 тест 67в: журнал hangtest-20261101-153434.txt
+16:50:09 тест 67в: закончился, код 0
+16:50:03 тайм-аутов переключателя источника такта за тест: 1 (journalctl -k: «LAB mux»); ошибок GPU (DATA_ERROR/fault/killed) за тест: 0
+=== 2000 подъёмов без зависания (нагрузка browser). Лог: ~/Home/nouveau-fix/results/hangtest-20261101-153434.txt
+16:50:07 регулятор возвращён (lab_gov=0), режим: core 50 MHz memory 324 MHz
+16:50:09 === тест 67в (lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1): тайм-аутов 1 на 2000 подъёмов
+16:50:12 === ИТОГ 67: результаты — ~/Home/nouveau-fix/results/test67-sessions.txt
+16:50:13 POWEROFF=0 — машину не выключаю
