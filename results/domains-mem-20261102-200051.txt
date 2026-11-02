@@ -1,0 +1,235 @@
+Опыт по доменам 2026-11-02 20:00:55, 7.0.0-42-generic, модуль C0CBDD50B5D81503985FE6C
+  MEM=1 (база между вариантами — 07)
+  lab_mem = Y
+  lab_mem_replay = 15
+  lab_mem_order = Y
+  lab_pcie = 1
+  lab_core = Y
+  lab_vbios_src = 0
+  lab_mux_guard = 1
+  lab_gpc_seq = 13
+  lab_therm = 1
+  lab_therm_wait_us = 0
+20:00:55 прогрев glmark2 (не учитывается; в первом прогоне первый запуск был на 20–30 % медленнее остальных)
+20:01:14 === эталон: GPC 810, ROP 810, hubk07 810, hubk06 810, hubk01 810 МГц
+20:01:19    pstate: AC: core 405 MHz memory 2004 MHz
+   LAB calc idx 00 got 810000
+   LAB calc idx 01 got 810000
+   LAB calc idx 02 got 810000
+   LAB calc idx 07 got 810000
+   LAB calc idx 08 got 810000
+=======================================================
+    glmark2 2023.01
+=======================================================
+    OpenGL Information
+    GL_VENDOR:      Mesa
+    GL_RENDERER:    NVCE
+    GL_VERSION:     4.3 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+    Surface Config: buf=32 r=8 g=8 b=8 a=8 depth=24 stencil=0 samples=0
+    Surface Size:   1600x900 windowed
+=======================================================
+[texture] duration=6: FPS: 3043 FrameTime: 0.329 ms
+[shading] duration=6:shading=phong: FPS: 2597 FrameTime: 0.385 ms
+[loop] duration=6:fragment-steps=20: FPS: 1114 FrameTime: 0.898 ms
+[effect2d] duration=6:kernel=0,1,0;1,-4,1;0,1,0;: FPS: 1366 FrameTime: 0.732 ms
+[clear] duration=6: FPS: 5132 FrameTime: 0.195 ms
+[desktop] duration=6: FPS: 627 FrameTime: 1.597 ms
+[refract] duration=6: FPS: 400 FrameTime: 2.501 ms
+[buffer] duration=6:interleave=false:update-method=map: FPS: 906 FrameTime: 1.104 ms
+[buffer] duration=6:interleave=false:update-method=subdata: FPS: 958 FrameTime: 1.044 ms
+=======================================================
+                                  glmark2 Score: 1792 
+=======================================================
+20:02:15    уровень во время замера не менялся
+20:02:15 === GPC 270: GPC 270, ROP 810, hubk07 810, hubk06 810, hubk01 810 МГц
+20:02:20    pstate: AC: core 135 MHz memory 2004 MHz
+   LAB calc idx 00 got 270000
+   LAB calc idx 01 got 810000
+   LAB calc idx 02 got 810000
+   LAB calc idx 07 got 810000
+   LAB calc idx 08 got 810000
+=======================================================
+    glmark2 2023.01
+=======================================================
+    OpenGL Information
+    GL_VENDOR:      Mesa
+    GL_RENDERER:    NVCE
+    GL_VERSION:     4.3 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+    Surface Config: buf=32 r=8 g=8 b=8 a=8 depth=24 stencil=0 samples=0
+    Surface Size:   1600x900 windowed
+=======================================================
+[texture] duration=6: FPS: 2104 FrameTime: 0.475 ms
+[shading] duration=6:shading=phong: FPS: 1392 FrameTime: 0.719 ms
+[loop] duration=6:fragment-steps=20: FPS: 419 FrameTime: 2.390 ms
+[effect2d] duration=6:kernel=0,1,0;1,-4,1;0,1,0;: FPS: 504 FrameTime: 1.985 ms
+[clear] duration=6: FPS: 3489 FrameTime: 0.287 ms
+[desktop] duration=6: FPS: 168 FrameTime: 5.957 ms
+[refract] duration=6: FPS: 127 FrameTime: 7.923 ms
+[buffer] duration=6:interleave=false:update-method=map: FPS: 753 FrameTime: 1.329 ms
+[buffer] duration=6:interleave=false:update-method=subdata: FPS: 867 FrameTime: 1.154 ms
+=======================================================
+                                  glmark2 Score: 1090 
+=======================================================
+20:03:15    уровень во время замера не менялся
+20:03:15 === ROP (LTC2CLK) 270: GPC 810, ROP 270, hubk07 810, hubk06 810, hubk01 810 МГц
+20:03:20    pstate: AC: core 405 MHz memory 2004 MHz
+   LAB calc idx 00 got 810000
+   LAB calc idx 01 got 270000
+   LAB calc idx 02 got 810000
+   LAB calc idx 07 got 810000
+   LAB calc idx 08 got 810000
+=======================================================
+    glmark2 2023.01
+=======================================================
+    OpenGL Information
+    GL_VENDOR:      Mesa
+    GL_RENDERER:    NVCE
+    GL_VERSION:     4.3 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+    Surface Config: buf=32 r=8 g=8 b=8 a=8 depth=24 stencil=0 samples=0
+    Surface Size:   1600x900 windowed
+=======================================================
+[texture] duration=6: FPS: 1454 FrameTime: 0.688 ms
+[shading] duration=6:shading=phong: FPS: 1442 FrameTime: 0.694 ms
+[loop] duration=6:fragment-steps=20: FPS: 831 FrameTime: 1.204 ms
+[effect2d] duration=6:kernel=0,1,0;1,-4,1;0,1,0;: FPS: 854 FrameTime: 1.172 ms
+[clear] duration=6: FPS: 2345 FrameTime: 0.427 ms
+[desktop] duration=6: FPS: 282 FrameTime: 3.555 ms
+[refract] duration=6: FPS: 146 FrameTime: 6.854 ms
+[buffer] duration=6:interleave=false:update-method=map: FPS: 719 FrameTime: 1.392 ms
+[buffer] duration=6:interleave=false:update-method=subdata: FPS: 825 FrameTime: 1.212 ms
+=======================================================
+                                  glmark2 Score: 987 
+=======================================================
+20:04:15    уровень во время замера не менялся
+20:04:15 === hubk07 (XBAR2CLK) 270: GPC 810, ROP 810, hubk07 270, hubk06 810, hubk01 810 МГц
+20:04:20    pstate: AC: core 405 MHz memory 2004 MHz
+   LAB calc idx 00 got 810000
+   LAB calc idx 01 got 810000
+   LAB calc idx 02 got 270000
+   LAB calc idx 07 got 810000
+   LAB calc idx 08 got 810000
+=======================================================
+    glmark2 2023.01
+=======================================================
+    OpenGL Information
+    GL_VENDOR:      Mesa
+    GL_RENDERER:    NVCE
+    GL_VERSION:     4.3 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+    Surface Config: buf=32 r=8 g=8 b=8 a=8 depth=24 stencil=0 samples=0
+    Surface Size:   1600x900 windowed
+=======================================================
+[texture] duration=6: FPS: 2514 FrameTime: 0.398 ms
+[shading] duration=6:shading=phong: FPS: 2449 FrameTime: 0.408 ms
+[loop] duration=6:fragment-steps=20: FPS: 1153 FrameTime: 0.867 ms
+[effect2d] duration=6:kernel=0,1,0;1,-4,1;0,1,0;: FPS: 1257 FrameTime: 0.796 ms
+[clear] duration=6: FPS: 5622 FrameTime: 0.178 ms
+[desktop] duration=6: FPS: 417 FrameTime: 2.403 ms
+[refract] duration=6: FPS: 226 FrameTime: 4.436 ms
+[buffer] duration=6:interleave=false:update-method=map: FPS: 887 FrameTime: 1.128 ms
+[buffer] duration=6:interleave=false:update-method=subdata: FPS: 936 FrameTime: 1.069 ms
+=======================================================
+                                  glmark2 Score: 1716 
+=======================================================
+20:05:15    уровень во время замера не менялся
+20:05:15 === hubk06 (SYS2CLK) 270: GPC 810, ROP 810, hubk07 810, hubk06 270, hubk01 810 МГц
+20:05:20    pstate: AC: core 405 MHz memory 2004 MHz
+   LAB calc idx 00 got 810000
+   LAB calc idx 01 got 810000
+   LAB calc idx 02 got 810000
+   LAB calc idx 07 got 270000
+   LAB calc idx 08 got 810000
+=======================================================
+    glmark2 2023.01
+=======================================================
+    OpenGL Information
+    GL_VENDOR:      Mesa
+    GL_RENDERER:    NVCE
+    GL_VERSION:     4.3 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+    Surface Config: buf=32 r=8 g=8 b=8 a=8 depth=24 stencil=0 samples=0
+    Surface Size:   1600x900 windowed
+=======================================================
+[texture] duration=6: FPS: 3169 FrameTime: 0.316 ms
+[shading] duration=6:shading=phong: FPS: 2672 FrameTime: 0.374 ms
+[loop] duration=6:fragment-steps=20: FPS: 1153 FrameTime: 0.868 ms
+[effect2d] duration=6:kernel=0,1,0;1,-4,1;0,1,0;: FPS: 1373 FrameTime: 0.729 ms
+[clear] duration=6: FPS: 5598 FrameTime: 0.179 ms
+[desktop] duration=6: FPS: 615 FrameTime: 1.627 ms
+[refract] duration=6: FPS: 371 FrameTime: 2.696 ms
+[buffer] duration=6:interleave=false:update-method=map: FPS: 764 FrameTime: 1.310 ms
+[buffer] duration=6:interleave=false:update-method=subdata: FPS: 723 FrameTime: 1.383 ms
+=======================================================
+                                  glmark2 Score: 1825 
+=======================================================
+20:06:15    уровень во время замера не менялся
+20:06:15 === hubk01 (HUB2CLK) 540: GPC 810, ROP 810, hubk07 810, hubk06 810, hubk01 540 МГц
+20:06:20    pstate: AC: core 405 MHz memory 2004 MHz
+   LAB calc idx 00 got 810000
+   LAB calc idx 01 got 810000
+   LAB calc idx 02 got 810000
+   LAB calc idx 07 got 810000
+   LAB calc idx 08 got 540000
+=======================================================
+    glmark2 2023.01
+=======================================================
+    OpenGL Information
+    GL_VENDOR:      Mesa
+    GL_RENDERER:    NVCE
+    GL_VERSION:     4.3 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+    Surface Config: buf=32 r=8 g=8 b=8 a=8 depth=24 stencil=0 samples=0
+    Surface Size:   1600x900 windowed
+=======================================================
+[texture] duration=6: FPS: 2994 FrameTime: 0.334 ms
+[shading] duration=6:shading=phong: FPS: 2110 FrameTime: 0.474 ms
+[loop] duration=6:fragment-steps=20: FPS: 866 FrameTime: 1.156 ms
+[effect2d] duration=6:kernel=0,1,0;1,-4,1;0,1,0;: FPS: 901 FrameTime: 1.111 ms
+[clear] duration=6: FPS: 5005 FrameTime: 0.200 ms
+[desktop] duration=6: FPS: 580 FrameTime: 1.725 ms
+[refract] duration=6: FPS: 366 FrameTime: 2.733 ms
+[buffer] duration=6:interleave=false:update-method=map: FPS: 834 FrameTime: 1.200 ms
+[buffer] duration=6:interleave=false:update-method=subdata: FPS: 863 FrameTime: 1.160 ms
+=======================================================
+                                  glmark2 Score: 1612 
+=======================================================
+20:07:15    уровень во время замера не менялся
+20:07:15 === эталон повтор: GPC 810, ROP 810, hubk07 810, hubk06 810, hubk01 810 МГц
+20:07:20    pstate: AC: core 405 MHz memory 2004 MHz
+   LAB calc idx 00 got 810000
+   LAB calc idx 01 got 810000
+   LAB calc idx 02 got 810000
+   LAB calc idx 07 got 810000
+   LAB calc idx 08 got 810000
+=======================================================
+    glmark2 2023.01
+=======================================================
+    OpenGL Information
+    GL_VENDOR:      Mesa
+    GL_RENDERER:    NVCE
+    GL_VERSION:     4.3 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+    Surface Config: buf=32 r=8 g=8 b=8 a=8 depth=24 stencil=0 samples=0
+    Surface Size:   1600x900 windowed
+=======================================================
+[texture] duration=6: FPS: 2671 FrameTime: 0.374 ms
+[shading] duration=6:shading=phong: FPS: 2424 FrameTime: 0.413 ms
+[loop] duration=6:fragment-steps=20: FPS: 969 FrameTime: 1.032 ms
+[effect2d] duration=6:kernel=0,1,0;1,-4,1;0,1,0;: FPS: 1292 FrameTime: 0.774 ms
+[clear] duration=6: FPS: 5547 FrameTime: 0.180 ms
+[desktop] duration=6: FPS: 596 FrameTime: 1.679 ms
+[refract] duration=6: FPS: 399 FrameTime: 2.507 ms
+[buffer] duration=6:interleave=false:update-method=map: FPS: 917 FrameTime: 1.091 ms
+[buffer] duration=6:interleave=false:update-method=subdata: FPS: 956 FrameTime: 1.047 ms
+=======================================================
+                                  glmark2 Score: 1751 
+=======================================================
+20:08:15    уровень во время замера не менялся
+20:08:19 === возвращено: AC: core 405 MHz memory 324 MHz
+СВОДКА (кадры/с; в скобках — доля от эталона)
+сцена                                                     эталон         GPC 270  ROP (LTC2CLK)   hubk07 (XBAR2C  hubk06 (SYS2CL  hubk01 (HUB2CL   эталон повтор
+texture                                              3043 (1.00)     2104 (0.69)     1454 (0.48)     2514 (0.83)     3169 (1.04)     2994 (0.98)     2671 (0.88)
+shading                                              2597 (1.00)     1392 (0.54)     1442 (0.56)     2449 (0.94)     2672 (1.03)     2110 (0.81)     2424 (0.93)
+loop                                                 1114 (1.00)      419 (0.38)      831 (0.75)     1153 (1.04)     1153 (1.04)      866 (0.78)      969 (0.87)
+effect2d                                             1366 (1.00)      504 (0.37)      854 (0.63)     1257 (0.92)     1373 (1.01)      901 (0.66)     1292 (0.95)
+clear                                                5132 (1.00)     3489 (0.68)     2345 (0.46)     5622 (1.10)     5598 (1.09)     5005 (0.98)     5547 (1.08)
+desktop                                               627 (1.00)      168 (0.27)      282 (0.45)      417 (0.67)      615 (0.98)      580 (0.93)      596 (0.95)
+refract                                               400 (1.00)      127 (0.32)      146 (0.36)      226 (0.56)      371 (0.93)      366 (0.92)      399 (1.00)
+buffer map                                            906 (1.00)      753 (0.83)      719 (0.79)      887 (0.98)      764 (0.84)      834 (0.92)      917 (1.01)
+buffer subdata                                        958 (1.00)      867 (0.91)      825 (0.86)      936 (0.98)      723 (0.75)      863 (0.90)      956 (1.00)
