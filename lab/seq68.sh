@@ -10,6 +10,17 @@ PRM=/sys/module/nouveau/parameters; HERE="$(cd "$(dirname "$0")" && pwd)"
 N="${1:-150}"; FROM="${2:-0}"
 [ -e $PRM/lab_therm_wait_nv ] || { echo "Нет lab_therm_wait_nv — нужен модуль от 13.11"; exit 1; }
 modinfo -p "/lib/modules/$(uname -r)/updates/nouveau-fix/nouveau.ko" 2>/dev/null | grep -q "whole-microsecond" || { echo "Установлен модуль без модели 13.11 (lab_therm_wait_nv=2)"; exit 1; }
+# MEM=1 (тест 69, 14.11): то же вместе со сменой памяти 324 <-> 2004 МГц. База — весь набор ядра, прошедший тест 68,
+# плюс lab_mem=1; шаги — два оставшихся, завязанных на память.
+MEM="${MEM:-0}"
+CORE68="lab_order=1 lab_gpc_pre405=1 lab_nv_hubpost=1 lab_pll_keep=1 lab_xbar=1 lab_volt_wait_us=195 lab_e9e0=1"
+if [ "$MEM" = 1 ]; then
+STEPS=(
+  "0|база: набор ядра теста 68 + смена памяти|"
+  "1|hubk07 рядом с памятью (вверх: ядро, память, hubk07; вниз: наоборот)|lab_nv_hub07mem=1"
+  "2|PCIe в конце спуска|lab_nv_pcie_late=1"
+)
+else
 STEPS=(
   "0|база: коды по чипам + ожидание 8/4 мкс по модели|"
   "1|порядок узлов как у NVIDIA (хабы первыми вверх, последними вниз)|lab_order=1"
@@ -20,19 +31,22 @@ STEPS=(
   "6|пауза 195 мкс после смены напряжения|lab_volt_wait_us=195"
   "7|делитель 0x00e9e0 по уровню|lab_e9e0=1"
 )
-OUT=~/Home/nouveau-fix/results/test68-$(date +%Y%m%d-%H%M%S).txt
+fi
+OUT=~/Home/nouveau-fix/results/test$([ "$MEM" = 1 ] && echo 69 || echo 68)-$(date +%Y%m%d-%H%M%S).txt
 say() { echo "$(date +%T) $*" | tee -a "$OUT"; }
 w() { sudo sh -c "echo $2 > $PRM/$1"; }
 sudo -v || exit 1
 ( while sleep 50; do sudo -n -v 2>/dev/null || exit; done ) & KEEP=$!
 trap 'kill $KEEP 2>/dev/null' EXIT
-say "тест 68: N=$N, с шага $FROM; $(uname -r), модуль $(cat /sys/module/nouveau/srcversion), загрузка $(uptime -s)"
+say "тест $([ "$MEM" = 1 ] && echo 69 || echo 68): MEM=$MEM N=$N, с шага $FROM; $(uname -r), модуль $(cat /sys/module/nouveau/srcversion), загрузка $(uptime -s)"
 # сохранить исходные значения ключей шагов, в конце вернуть
 declare -A ORIG
 for s in "${STEPS[@]}"; do kv="${s##*|}"; [ -n "$kv" ] && ORIG[${kv%%=*}]="$(cat $PRM/${kv%%=*})"; done
 for k in lab_therm_code_nv lab_therm_wait_nv lab_mem lab_vbios_src lab_nv_div_late lab_mux_guard; do ORIG[$k]="$(cat $PRM/$k)"; done
-w lab_mem 0; w lab_vbios_src 1; w lab_nv_div_late 1; w lab_mux_guard 1; w lab_therm_code_nv 1; w lab_therm_wait_nv 2
+[ "$MEM" = 1 ] && for kv in $CORE68; do ORIG[${kv%%=*}]="$(cat $PRM/${kv%%=*})"; done
+w lab_mem "$MEM"; w lab_vbios_src 1; w lab_nv_div_late 1; w lab_mux_guard 1; w lab_therm_code_nv 1; w lab_therm_wait_nv 2
 for s in "${STEPS[@]}"; do kv="${s##*|}"; [ -n "$kv" ] && w "${kv%%=*}" 0; done
+[ "$MEM" = 1 ] && for kv in $CORE68; do w "${kv%%=*}" "${kv#*=}"; done
 KEPT=""
 for s in "${STEPS[@]}"; do
   i="${s%%|*}"; rest="${s#*|}"; name="${rest%%|*}"; kv="${s##*|}"
@@ -40,9 +54,9 @@ for s in "${STEPS[@]}"; do
   [ "$i" -lt "$FROM" ] && continue
   [ -n "$kv" ] && w "${kv%%=*}" "${kv#*=}"
   say "=== шаг $i: $name${kv:+ ($kv)}; уже включено:${KEPT:- ничего}"
-  M0=$(journalctl -k -b 0 --no-pager | grep -c "LAB mux ТАЙМ-АУТ"); E0=$(journalctl -k -b 0 --no-pager | grep -cE "DATA_ERROR|FAULT at|Xid|killed")
+  M0=$(journalctl -k -b 0 --no-pager | grep -c "LAB mux ТАЙМ-АУТ"); E0=$(journalctl -k -b 0 --no-pager | grep -cE "DATA_ERROR|FAULT at|Xid|killed|LAB replay.*ret -|g84_bar_flush")
   bash "$HERE/hangtest.sh" "$N" >> "$OUT" 2>&1; RC=$?
-  M1=$(journalctl -k -b 0 --no-pager | grep -c "LAB mux ТАЙМ-АУТ"); E1=$(journalctl -k -b 0 --no-pager | grep -cE "DATA_ERROR|FAULT at|Xid|killed")
+  M1=$(journalctl -k -b 0 --no-pager | grep -c "LAB mux ТАЙМ-АУТ"); E1=$(journalctl -k -b 0 --no-pager | grep -cE "DATA_ERROR|FAULT at|Xid|killed|LAB replay.*ret -|g84_bar_flush")
   say "=== шаг $i итог: код $RC, тайм-аутов $((M1 - M0)), ошибок GPU $((E1 - E0)) на $N подъёмов"
   if [ "$RC" != 0 ] || [ "$M1" != "$M0" ] || [ "$E1" != "$E0" ]; then
     say "!!! шаг $i не чистый${kv:+ — ключ ${kv%%=*} снят, дальше без него}"
