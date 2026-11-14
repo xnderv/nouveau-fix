@@ -227,3 +227,10 @@ NVIDIA 390): https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-6557395
 **01.11 — rox4d, раунд 8** (issue #1, 01.11 13:30 UTC, вложение nouveau-fix_4.zip, 29 281 байт, SHA256
 1e58e26a0fb91fef7e29411ea325ecbbcb8c26465c560c01d8408edea9ae2c22 → ~/Home/stand-2011/gf106-rox4d/round8, вне репозитория):
 ядро из VBIOS вместе с памятью, 3 цикла и финальный 0f без ошибок; разбор — docs/2026-10-28/rox4d-build.md, раздел 13.
+**14.11 — открытые источники, добавлено** (вне репозитория, ~/Home/nouveau-archive/open-src):
+- `xf86-video-nv` — открытый X-драйвер NVIDIA, gitlab.freedesktop.org/xorg/driver/xf86-video-nv, 355 коммитов, HEAD 8234bce;
+- `envytools-full` — envytools с полной историей, github.com/envytools/envytools, 5330 коммитов, HEAD f102b823.
+
+**14.11 — TechPowerUp, план целевых выборок** (tools/tpu-subsets.sh; запускает автор, не ассистент): Kepler 315, Maxwell 203,
+Pascal 298, Volta 10, Turing 252, Ampere 64 — 1142 образа; с 403 образами Fermi — около 10 % коллекции (15 374 на 14.11).
+Полные поколения (~4000) — только после ответа W1zzard; черновик письма docs/upstream/w1zzard-mail-2026-11-14-draft.md (не в git).
