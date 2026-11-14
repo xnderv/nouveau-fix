@@ -234,3 +234,7 @@ NVIDIA 390): https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-6557395
 **14.11 — TechPowerUp, план целевых выборок** (tools/tpu-subsets.sh; запускает автор, не ассистент): Kepler 315, Maxwell 203,
 Pascal 298, Volta 10, Turing 252, Ampere 64 — 1142 образа; с 403 образами Fermi — около 10 % коллекции (15 374 на 14.11).
 Полные поколения (~4000) — только после ответа W1zzard; черновик письма docs/upstream/w1zzard-mail-2026-11-14-draft.md (не в git).
+**14.11 — TechPowerUp, Volta, 10 образов** (скачаны автором вручную в браузере; скрипт сайт остановил проверкой на роботов, она
+не обходилась): Titan V ×6, Quadro GV100 ×1, Tesla V100 ×3 → ~/Home/nouveau-archive/tpu-vbios/2026-11-14-volta (manifest.csv с
+SHA256). Таблица Clocks во всех десяти: версия 0x10, 10 записей, clocks_hal = 3 — тот самый набор Volta из кода NVIDIA (nvgpu:
+gpcclk, xbarclk, mclk, sysclk, hubclk, nvdclk, pwrclk, dispclk, pciegenclk, hostclk).
