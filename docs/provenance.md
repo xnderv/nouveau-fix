@@ -238,3 +238,6 @@ Pascal 298, Volta 10, Turing 252, Ampere 64 — 1142 образа; с 403 обр
 не обходилась): Titan V ×6, Quadro GV100 ×1, Tesla V100 ×3 → ~/Home/nouveau-archive/tpu-vbios/2026-11-14-volta (manifest.csv с
 SHA256). Таблица Clocks во всех десяти: версия 0x10, 10 записей, clocks_hal = 3 — тот самый набор Volta из кода NVIDIA (nvgpu:
 gpcclk, xbarclk, mclk, sysclk, hubclk, nvdclk, pwrclk, dispclk, pciegenclk, hostclk).
+**14.11 — письмо W1zzard отправлено автором** (ответом в переписке о разрешении): что взято (403 Fermi, 10 Volta вручную), просьба
+о выборке ~1130 образов Kepler…Ampere и вопрос, как её забрать (скрипт сайт останавливает проверкой на роботов, не обходим);
+три находки для страницы разбора VBIOS. Ответа пока нет. Попытка выгрузки сторонним инструментом остановлена автором, файлов нет.
