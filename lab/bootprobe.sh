@@ -58,5 +58,5 @@ for W in 2000 1500; do
 done
 restore
 say "=== конец; ключи возвращены"
-echo "СВОДКА:" | tee -a "$OUT"; grep -E "GPCCLK .* МГц: n|итог ступени|зависание" "$OUT" | tee "$OUT.sum"
+echo "СВОДКА:" | tee -a "$OUT"; grep -E "GPCCLK .* МГц: n|итог ступени|зависание" "$OUT" | tee "$OUT.sum" | tee -a "$OUT" >/dev/null; cat "$OUT.sum"
 echo "Результат: $OUT"
