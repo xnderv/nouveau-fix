@@ -6,10 +6,11 @@
 # Ожидание хаба держится на NVIDIA-значении 4000 нс. Порядок: для каждой ступени ожидания сверху вниз — все три глубины подряд,
 # чтобы глубины сравнивались в одно время. На каждую клетку N подъёмов 07 -> 0f -> 07 под нагрузкой браузера.
 # Застревание переключателя (защита на месте) — данные, тест идёт дальше; зависание графики — тест останавливается.
-#   bash ~/Home/nouveau-fix/lab/ladder70.sh [N=150]     — в терминале рабочего стола, не по ssh
+#   bash ~/Home/nouveau-fix/lab/ladder70.sh [N=150] [начать со ступени, нс]     — в терминале рабочего стола, не по ssh
+# 16.11: второй аргумент — продолжить лестницу с этой ступени ожидания (например 2500), более длинные пропускаются.
 set -uo pipefail
 PRM=/sys/module/nouveau/parameters; HERE="$(cd "$(dirname "$0")" && pwd)"
-N="${1:-150}"
+N="${1:-150}"; FROMW="${2:-}"
 for k in lab_therm_fixed_ns lab_therm_fixed_hub_ns lab_therm_fixed_floor_ns lab_therm_gpc_factor lab_therm_wait_nv; do
   [ -e $PRM/$k ] || { echo "Нет $k — нужен модуль от 13.11"; exit 1; }
 done
@@ -27,11 +28,12 @@ for kv in $BASE; do ORIG[${kv%%=*}]="$(cat $PRM/${kv%%=*})"; done
 for k in $STEP; do ORIG[$k]="$(cat $PRM/$k)"; done
 restore() { for k in "${!ORIG[@]}"; do w "$k" "${ORIG[$k]}"; done; kill $KEEP 2>/dev/null; }
 trap 'say "прервано — ключи возвращаю"; restore; exit 1' INT TERM
-say "тест 70: N=$N на клетку, ${#WAITS[@]} ступеней × ${#DEPTHS[@]} глубины; $(uname -r), модуль $(cat /sys/module/nouveau/srcversion), загрузка $(uptime -s)"
+say "тест 70: N=$N на клетку${FROMW:+, со ступени $FROMW нс}, ${#WAITS[@]} ступеней × ${#DEPTHS[@]} глубины; $(uname -r), модуль $(cat /sys/module/nouveau/srcversion), загрузка $(uptime -s)"
 for kv in $BASE; do w "${kv%%=*}" "${kv#*=}"; done
 w lab_therm_fixed_floor_ns 1000; w lab_therm_fixed_hub_ns 4000
 STOP=0
 for W in "${WAITS[@]}"; do
+  [ -n "$FROMW" ] && [ "$W" -gt "$FROMW" ] && continue
   for d in "${DEPTHS[@]}"; do
     code="${d%%|*}"; name="${d#*|}"
     w lab_therm_gpc_factor "$code"; w lab_therm_fixed_ns "$W"
