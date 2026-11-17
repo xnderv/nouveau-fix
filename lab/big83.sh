@@ -1,9 +1,10 @@
 #!/bin/bash
-# ТЕСТ 83 (17.11), модуль build-1117 (глубина в оба поля, ключ lab_pmu_up_flag). Большой прогон «на час» — части от безопасных к
+# ТЕСТ 83 (17.11), модуль build-1117b (глубина в оба поля, ключи lab_pmu_up_flag, lab_pmu_slow_val, lab_pmu_slow_rel=2). Большой прогон «на час» — части от безопасных к
 # рискованным, каждая отличается от опорной ОДНИМ. Опорная: скобка GPC в PMU, тепловые биты после запроса, глубина /6 (как
 # NVIDIA), подъём 8000, спуск 8000. Быстрый hangtest по N подъёмов на ступень. Стоп на зависании графики или на вечном
 # застревании (дальше данные недействительны). Перед стартом: регулятор выключается ДО ключей, карта проводится 03 -> 07.
 #   0. время включения замедления в этой загрузке (25 PMU-сценариев без переключателя)
+#   0б. какое поле глубины действует при бите 7 = 1 и = 0 (устоявшееся замедление, счётчик; без переключателя) — версия автора
 #   1. опорная 8000 / 8000
 #   2. спуск: 4000, 2000, 1000, 500, «сразу» (подъём 8000)
 #   3. спуск по флагу на карте, без запаса (подъём 8000)
@@ -14,10 +15,10 @@
 set -uo pipefail
 PRM=/sys/module/nouveau/parameters; HERE="$(cd "$(dirname "$0")" && pwd)"
 N="${1:-100}"
-for k in lab_pmu_up_flag lab_pmu_dn_flag lab_pmu_up_ns lab_pmu_dn_ns lab_pmu_slow; do [ -e "$PRM/$k" ] || { echo "Нет $k — нужен модуль build-1117"; exit 1; }; done
+for k in lab_pmu_up_flag lab_pmu_dn_flag lab_pmu_up_ns lab_pmu_dn_ns lab_pmu_slow lab_pmu_slow_val lab_pmu_slow_rel; do [ -e "$PRM/$k" ] || { echo "Нет $k — нужен модуль build-1117b"; exit 1; }; done
 pgrep -f "ladder70|seq68|xfer71|cntr7[23]|srcclk7|bootprobe|pmubr|domains.sh|hangtest" >/dev/null && { echo "Идёт другой тест — дождитесь конца"; exit 1; }
 BASE="lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1 lab_therm_code_nv=1 lab_therm_wait_nv=2 lab_therm_wait_nv_margin_ns=0 lab_order=1 lab_gpc_pre405=1 lab_nv_hubpost=1 lab_pll_keep=1 lab_xbar=1 lab_volt_wait_us=195 lab_e9e0=1"
-STEP="lab_gov lab_pmu_slow lab_pmu_ctrl1_first lab_pmu_bracket_ns lab_pmu_up_ns lab_pmu_dn_ns lab_pmu_up_flag lab_pmu_dn_flag lab_mux_recover lab_therm_fixed_hub_ns lab_therm_fixed_floor_ns lab_therm_gpc_factor"
+STEP="lab_gov lab_pmu_slow lab_pmu_slow_val lab_pmu_slow_rel lab_pmu_ctrl1_first lab_pmu_bracket_ns lab_pmu_up_ns lab_pmu_dn_ns lab_pmu_up_flag lab_pmu_dn_flag lab_mux_recover lab_therm_fixed_hub_ns lab_therm_fixed_floor_ns lab_therm_gpc_factor"
 OUT=~/Home/nouveau-fix/results/test83-$(date +%Y%m%d-%H%M%S).txt
 say() { echo "$(date +%T) $*" | tee -a "$OUT"; }
 w() { sudo sh -c "echo $2 > $PRM/$1"; }
@@ -61,6 +62,17 @@ for k in sorted(g, reverse=True):
     v = g[k]; print("    GPCCLK %4d МГц: медиана %d нс, разброс %d–%d, n %d" % (k, s.median(v), min(v), max(v), len(v)))' | tee -a "$OUT"
 sudo sh -c "echo 03 > $PS"; sleep 2; sudo sh -c "echo 07 > $PS"; sleep 2
 
+say "--- 0б. какое поле глубины действует (GPC на 07, 405 МГц; A — биты 16–21, B — биты 0–5, бит 7)"
+w lab_pmu_slow_rel 2
+for v in "0|как обычно: A=/6 B=/6 бит7=1" "0x0002008e|A=/2 B=/8 бит7=1" "0x0002000e|A=/2 B=/8 бит7=0" "0x000e0082|A=/8 B=/2 бит7=1" "0x000e0002|A=/8 B=/2 бит7=0"; do
+  val="${v%%|*}"; name="${v#*|}"
+  w lab_pmu_slow_val "$val"; sudo sh -c "echo 03 > $PS"; sleep 2
+  T0=$(date "+%F %T"); w lab_pmu_slow 3; sudo sh -c "echo 07 > $PS"; sleep 2; w lab_pmu_slow 0
+  R=$(journalctl -k -b 0 --no-pager --since "$T0" | grep "LAB PMU-устоявшееся" | sed -E 's/.*в ([0-9.]+) раза.*/\1/' | tr '\n' ' ')
+  say "    $name: такт замедлен в [$R] раза"
+done
+w lab_pmu_slow_val 0; w lab_pmu_slow_rel 0
+
 for kv in $BASE; do w "${kv%%=*}" "${kv#*=}"; done
 w lab_therm_fixed_floor_ns 1000; w lab_therm_fixed_hub_ns 4000; w lab_pmu_bracket_ns 8000; w lab_mux_recover 0
 base
@@ -81,5 +93,5 @@ if [ $STOP = 0 ]; then
 fi
 restore
 say "=== конец; ключи возвращены"
-echo "СВОДКА:" | tee -a "$OUT"; grep -E "=== итог|^.{8} ---|GPCCLK .* МГц|подготовка" "$OUT" > "$OUT.sum"; tee -a "$OUT" < "$OUT.sum"
+echo "СВОДКА:" | tee -a "$OUT"; grep -E "=== итог|^.{8} ---|GPCCLK .* МГц|подготовка|замедлен в" "$OUT" > "$OUT.sum"; tee -a "$OUT" < "$OUT.sum"
 echo "Результат: $OUT"
