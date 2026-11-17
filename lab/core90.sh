@@ -38,9 +38,8 @@ run() {
 }
 PS="$(sudo sh -c 'ls /sys/kernel/debug/dri/*/pstate | head -n 1')"
 say "тест 90: N=$N; $(uname -r), модуль $(cat /sys/module/nouveau/srcversion), загрузка $(uptime -s)"
-w lab_gov 0; sudo sh -c "echo 03 > $PS"; sleep 2
+w lab_gov 0; sudo sh -c "echo 03 > $PS"; sleep 2; sudo sh -c "echo 07 > $PS"; sleep 2   # память — на уровне 07 (324), как в тестах 68, 83
 for kv in $FULL; do w "${kv%%=*}" "${kv#*=}"; done
-sudo sh -c "echo 07 > $PS"; sleep 2
 say "подготовка: $(sudo grep '^AC' "$PS")"
 say "--- А. полный набор без кросс-бара (lab_xbar=0)"; w lab_xbar 0; w lab_e9e0 1; run "без кросс-бара"
 if [ $STOP = 0 ]; then say "--- Б. полный набор без 0x00e9e0 (lab_e9e0=0)"; w lab_xbar 1; w lab_e9e0 0; run "без 0x00e9e0"; fi
