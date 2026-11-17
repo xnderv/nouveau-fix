@@ -1,5 +1,5 @@
 #!/bin/bash
-# ТЕСТ 82б (17.11): продолжение теста 82, прерванного на 4000 ради теста 85 (8000, 6000, 5000 — чисто, загрузка 11:09). Сначала снова 8000 как опора этой загрузки, затем 4000…2500.
+# ТЕСТ 82б (17.11): продолжение теста 82, прерванного на 4000 ради теста 85 (загрузка 11:09: 8000, 6000, 5000 — чисто по 100; 4000 — 2 застревания подъёма за 42 подъёма, обошлись). Опора 8000, затем 5000, 4500, 4000 — уточнить порог.
 # ТЕСТ 82 (17.11), модуль build-1116g: ПОРОГ ПОДЪЁМА. Спуск всегда 8000 (безопасно), тепловые биты после запроса; меняется
 # ОДНО — пауза подъёма (запрос -> переключатель делитель -> PLL): 8000, 6000, 5000, 4000, 3500, 3000, 2500 нс, по N подъёмов.
 # Тест 81а: 2000 — застревание на подъёме, через 48 подъёмов зависание. Останов на первой ступени с застреванием подъёма.
@@ -14,7 +14,7 @@ PRM=/sys/module/nouveau/parameters; HERE="$(cd "$(dirname "$0")" && pwd)"
 N="${1:-100}"
 for k in lab_pmu_up_ns lab_pmu_dn_ns lab_mux_recover lab_pmu_ctrl1_first; do [ -e "$PRM/$k" ] || { echo "Нет $k — нужен модуль build-1116g"; exit 1; }; done
 pgrep -f "ladder70|seq68|xfer71|cntr7[23]|srcclk7|bootprobe|pmubr7[6789]|pmubr8[01]|domains.sh|hangtest" >/dev/null && { echo "Идёт другой тест — дождитесь конца"; exit 1; }
-WAITS=(8000 4000 3500 3000 2500)
+WAITS=(8000 5000 4500 4000)
 BASE="lab_mem=0 lab_vbios_src=1 lab_nv_div_late=1 lab_mux_guard=1 lab_therm_code_nv=1 lab_therm_wait_nv=2 lab_therm_wait_nv_margin_ns=0 lab_order=1 lab_gpc_pre405=1 lab_nv_hubpost=1 lab_pll_keep=1 lab_xbar=1 lab_volt_wait_us=195 lab_e9e0=1"
 STEP="lab_gov lab_pmu_ctrl1_first lab_pmu_bracket_ns lab_pmu_up_ns lab_pmu_dn_ns lab_pmu_dn_flag lab_mux_recover lab_therm_fixed_hub_ns lab_therm_fixed_floor_ns lab_therm_gpc_factor"
 OUT=~/Home/nouveau-fix/results/test82b-$(date +%Y%m%d-%H%M%S).txt
