@@ -5,10 +5,11 @@
 # Набор службы (с lab_nv_up07=1: с 07 ступени уже нет); одно отличие — lab_gpc_pre405=0. Прогоны чередуются: со ступенью,
 # без, со ступенью, без — по N подъёмов 03 -> 0f со спуском через 07 под нагрузкой (FAST). Регулятор на время теста выключен.
 # Стоп на зависании графики или вечном застревании.
-#   bash ~/Home/nouveau-fix/lab/pre99.sh [N=300]     — в терминале рабочего стола; около 50 минут
+#   bash ~/Home/nouveau-fix/lab/pre99.sh [N=300] [R=2]     — в терминале рабочего стола; N=300 R=2 — около 50 минут;
+#   на ночь: N=2000 R=4 — около 11 часов (≈25 подъёмов в минуту)
 set -uo pipefail
 PRM=/sys/module/nouveau/parameters; HERE="$(cd "$(dirname "$0")" && pwd)"
-N="${1:-300}"
+N="${1:-300}"; R="${2:-2}"   # R — число пар «со ступенью / без»
 [ -e "$PRM/lab_nv_up07" ] || { echo "Нет lab_nv_up07 — нужен модуль от build-1117j"; exit 1; }
 pgrep -f "hangtest|core9|night93|disp91|gov94|e9gov95|up96|nvx97|uf98|cntr[78]|fsrm8|pmubr|big83" >/dev/null && { echo "Идёт другой тест — дождитесь конца"; exit 1; }
 [ "$(cat $PRM/lab_nv_up07)" = 1 ] && [ "$(cat $PRM/lab_gpc_pre405)" = 1 ] || { echo "Служба не на наборе 18.11 — сначала autoclock.sh install"; exit 1; }
@@ -34,10 +35,10 @@ run() {   # $1 — 0/1 ступень
   return 0
 }
 PS="$(sudo sh -c 'ls /sys/kernel/debug/dri/*/pstate | head -n 1')"
-say "тест 99: N=$N по 4 прогона; $(uname -r), модуль $(cat /sys/module/nouveau/srcversion), загрузка $(uptime -s)"
+say "тест 99: N=$N, пар $R; $(uname -r), модуль $(cat /sys/module/nouveau/srcversion), загрузка $(uptime -s)"
 w lab_gov 0; sudo sh -c "echo 03 > $PS"; sleep 2
 say "подготовка: $(sudo grep '^AC' "$PS")"
-for p in 1 0 1 0; do
+for p in $(for i in $(seq 1 "$R"); do echo 1 0; done); do
   [ $STOP = 0 ] || break
   say "--- прогон: ступень 405 = $p"; run "$p"
 done
