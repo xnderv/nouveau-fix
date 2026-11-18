@@ -16,8 +16,9 @@ OUT=~/Home/nouveau-fix/results/test95-$(date +%Y%m%d-%H%M%S).txt
 say() { echo "$(date +%T) $*" | tee -a "$OUT"; }
 w() { sudo sh -c "echo $2 > $PRM/$1"; }
 sudo -v || exit 1
+( while sleep 50; do sudo -n -v 2>/dev/null || exit; done ) & KEEP=$!   # 18.11: без продления возврат ключа ждал пароль
 E0=$(cat $PRM/lab_e9e0)
-trap 'w lab_e9e0 "$E0"; w lab_gov 2; say "прервано — ключи возвращены"; exit 1' INT TERM
+trap 'kill $KEEP 2>/dev/null; w lab_e9e0 "$E0"; w lab_gov 2; say "прервано — ключи возвращены"; exit 1' INT TERM
 PS="$(sudo sh -c 'ls /sys/kernel/debug/dri/*/pstate | head -n 1')"
 say "тест 95: C=$C; $(uname -r), модуль $(cat /sys/module/nouveau/srcversion), загрузка $(uptime -s)"
 say "--- 1. сверка поля A по уровням"
@@ -28,13 +29,14 @@ journalctl -k -b 0 --no-pager --since "$T0" | grep -E "LAB e9e0 из VBIOS|LAB x
 BAD=$(journalctl -k -b 0 --no-pager --since "$T0" | grep "LAB e9e0 из VBIOS" | sed -E 's/.*поле A ([0-9a-f]+) .*дала бы ([0-9a-f]+)$/\1 \2/' | awk '$1!=$2' | wc -l)
 GOT=$(journalctl -k -b 0 --no-pager --since "$T0" | grep -c "LAB e9e0 из VBIOS")
 if [ "$GOT" -lt 4 ] || [ "$BAD" -gt 0 ]; then
-  say "--- сверка не сошлась (строк $GOT из 4, расхождений $BAD) — стоп"; w lab_e9e0 "$E0"; w lab_gov 2; exit 1
+  say "--- сверка не сошлась (строк $GOT из 4, расхождений $BAD) — стоп"; kill $KEEP 2>/dev/null; w lab_e9e0 "$E0"; w lab_gov 2; exit 1
 fi
 say "сверка: 4 смены, поле A по VBIOS совпадает с таблицей"
 say "--- 2. обычная работа под регулятором, $C циклов"
 w lab_gov 2
 bash "$HERE/gov94.sh" "$C" 2>&1 | tee -a "$OUT"
 w lab_e9e0 "$E0"
+kill $KEEP 2>/dev/null
 say "=== конец; lab_e9e0 возвращён в $E0"
 grep -E "тест 9[45]|сверка|=== итог|---" "$OUT" > "$OUT.sum"
 echo "Результат: $OUT"
