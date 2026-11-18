@@ -81,3 +81,10 @@ cd ~/Home/nouveau-fix && git send-email --to='Lyude Paul <lyude@redhat.com>' --t
 - **v2 0006 отправлен 29.10.2026 16:00 (MSK)** через `send-0006-v2.sh` (подпись напечатал автор), Message-ID
   `<20261029130012.21738-1-xnderv@yandex.com>`, результат 250. Кому: Lyude Paul, Danilo Krummrich; копии: Martin Roukala,
   dri-devel@, nouveau@, linux-kernel@, stable@, автор. Новая ветка (не ответом в v1); ссылка на v1 — под чертой.
+
+## Напоминание 18.11.2026 (ответов сопровождающих не было; оба патча накладываются на master 18.11)
+Отправлено `ping-2026-11-18.sh`, ответами в ветки, оба видны в lore:
+- 0001 v2 — 19:53 (MSK), Message-ID `<20261118165328.53341-1-xnderv@yandex.com>`, In-Reply-To `<20261023152332.9420-2-xnderv@yandex.com>`;
+- 0006 v2 — 19:54 (MSK), Message-ID `<20261118165402.53610-1-xnderv@yandex.com>`, In-Reply-To `<20261029130012.21738-1-xnderv@yandex.com>`,
+  копия Martin Roukala и stable@.
+Дальше: ждать ответа ~2 недели; если тишина — спросить в IRC #nouveau (OFTC).
