@@ -1,5 +1,5 @@
 #!/bin/bash
-# ТЕСТ 91 (17.11), модуль build-1117h (ключ lab_e9e0_probe). Домен 7 VBIOS (регистр 0x00e9e0) — такт дисплея?
+# ТЕСТ 91 (17.11), модуль build-1117i (ключ lab_e9e0_probe; 1117h не грузился — нет чтения домена 7). Домен 7 VBIOS (регистр 0x00e9e0) — такт дисплея?
 # Монитор host: 2560x1440@60, частота пикселей 241,5 МГц (EDID). Домен 7: 270 / 405 / 540 МГц на 03 / 07 / 0f.
 # На уровнях 07 и 03 модуль ступенями опускает 0x00e9e0: 270 (/6), 202,5 (/8), 162 (/10) — по 100 мс — и читает липкий бит
 # «был недогруз» каждого выхода дисплея (0x616308, 0x616b08, бит 4). Предсказание версии «такт дисплея»: 270 — чисто,
@@ -8,7 +8,7 @@
 #   bash ~/Home/nouveau-fix/lab/disp91.sh     — в терминале рабочего стола; около полуминуты
 set -uo pipefail
 PRM=/sys/module/nouveau/parameters
-[ -e "$PRM/lab_e9e0_probe" ] || { echo "Нет lab_e9e0_probe — нужен модуль build-1117h"; exit 1; }
+[ -e "$PRM/lab_e9e0_probe" ] || { echo "Нет lab_e9e0_probe — нужен модуль build-1117i"; exit 1; }
 pgrep -f "ladder70|seq68|xfer71|cntr[78]|srcclk7|bootprobe|pmubr|big83|fsrm8|core90|domains.sh|hangtest" >/dev/null && { echo "Идёт другой тест — дождитесь конца"; exit 1; }
 OUT=~/Home/nouveau-fix/results/test91-$(date +%Y%m%d-%H%M%S).txt
 say() { echo "$(date +%T) $*" | tee -a "$OUT"; }
