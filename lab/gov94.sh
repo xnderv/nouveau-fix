@@ -5,6 +5,12 @@
 # и сбои: застревания переключателя (подъём/спуск), вечные застревания, ошибки GPU. Стоп на вечном застревании или ошибке.
 #   bash ~/Home/nouveau-fix/lab/gov94.sh [C=40] [L=45] [I=45]     — в терминале рабочего стола; 40 циклов ≈ 60 минут
 set -uo pipefail
+# 20.11 (тест 101): при отдельном запуске экран через 5 мин простоя гас, браузер переставал рисовать — нагрузки не было и
+# регулятору нечего было делать. Как hangtest: на время теста запрещаем простой и сон; запрет снимается с концом теста.
+if [ -z "${GOV_INHIBITED:-}${HANG_INHIBITED:-}" ] && command -v gnome-session-inhibit >/dev/null; then
+    exec env GOV_INHIBITED=1 gnome-session-inhibit --inhibit idle --inhibit suspend --inhibit logout \
+         --reason "nouveau gov test" bash "$0" "$@"
+fi
 HERE="$(cd "$(dirname "$0")" && pwd)"; PRM=/sys/module/nouveau/parameters
 C="${1:-40}"; L="${2:-45}"; I="${3:-45}"
 pgrep -f "hangtest|core9|night93|disp91|cntr[78]|fsrm8|pmubr|big83" >/dev/null && { echo "Идёт другой тест — дождитесь конца"; exit 1; }
