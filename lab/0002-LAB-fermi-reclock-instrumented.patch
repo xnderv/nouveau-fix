@@ -70,14 +70,18 @@
  
  /******************************************************************************
   * misc
-@@ -190,12 +253,38 @@
+@@ -190,27 +253,57 @@
  			nvkm_error(subdev, "failed to raise voltage: %d\n", ret);
  			return ret;
  		}
 +		nvkm_info(subdev, "LAB voltage after raise: %d uV (cstate voltage id %d)\n",
 +			  nvkm_volt_get(volt), cstate->voltage);
-+	}
-+
+ 	}
+ 
+-	ret = clk->func->calc(clk, cstate);
+-	if (ret == 0) {
+-		ret = clk->func->prog(clk);
+-		clk->func->tidy(clk);
 +	lab_mux_stuck = 0;
 +	if (lab_core) {
 +		ret = clk->func->calc(clk, cstate);
@@ -99,12 +103,8 @@
 +	} else {
 +		nvkm_info(subdev, "LAB core clocks SKIPPED (lab_core=0)\n");
 +		ret = 0;
- 	}
- 
--	ret = clk->func->calc(clk, cstate);
--	if (ret == 0) {
--		ret = clk->func->prog(clk);
--		clk->func->tidy(clk);
++	}
++
 +	/* LAB 31.10: блоки снижения напряжения и вентилятора ниже — без правок (в стабильных 6.12/6.18 они другие: ошибка в err) */
 +	if (volt && lab_mux_stuck) {
 +		nvkm_error(subdev, "LAB mux_guard: узлы %08x остались на PLL — напряжение не снижаю (%d мкВ)\n",
@@ -113,8 +113,25 @@
  	}
  
  	if (volt) {
-@@ -211,6 +300,8 @@
- 			nvkm_error(subdev, "failed to lower fan speed: %d\n", ret);
+-		ret = nvkm_volt_set_id(volt, cstate->voltage,
+-				       pstate->base.voltage, clk->temp, -1);
+-		if (ret && ret != -ENODEV)
+-			nvkm_error(subdev, "failed to lower voltage: %d\n", ret);
++		int err = nvkm_volt_set_id(volt, cstate->voltage,
++					   pstate->base.voltage, clk->temp, -1);
++
++		if (err && err != -ENODEV)
++			nvkm_error(subdev, "failed to lower voltage: %d\n", err);
+ 	}
+ 
+ 	if (therm) {
+-		ret = nvkm_therm_cstate(therm, pstate->fanspeed, -1);
+-		if (ret && ret != -ENODEV)
+-			nvkm_error(subdev, "failed to lower fan speed: %d\n", ret);
++		int err = nvkm_therm_cstate(therm, pstate->fanspeed, -1);
++
++		if (err && err != -ENODEV)
++			nvkm_error(subdev, "failed to lower fan speed: %d\n", err);
  	}
  
 +	if (volt)
@@ -122,7 +139,7 @@
  	return ret;
  }
  
-@@ -264,13 +355,75 @@
+@@ -264,36 +357,184 @@
   * P-States
   *****************************************************************************/
  static int
@@ -193,16 +210,23 @@
  	struct nvkm_pci *pci = subdev->device->pci;
  	struct nvkm_pstate *pstate;
 -	int ret, idx = 0;
++	bool found = false;
 +	int ret, idx = 0, was, mret = 0;
 +	bool up;
 +	uint uf;
 +	u32 uf0[2] = { 0, 0 };
  
  	list_for_each_entry(pstate, &clk->states, head) {
- 		if (idx++ == pstatei)
-@@ -278,22 +431,102 @@
+-		if (idx++ == pstatei)
++		if (idx++ == pstatei) {
++			found = true;
+ 			break;
++		}
  	}
  
++	if (!found)
++		return -EINVAL;
++
  	nvkm_debug(subdev, "setting performance state %d\n", pstatei);
 +	up = pstatei > clk->pstate;
 +	was = clk->pstate;
@@ -315,7 +339,32 @@
  }
  
  static void
-@@ -608,6 +841,8 @@
+@@ -473,6 +714,7 @@
+ nvkm_clk_ustate_update(struct nvkm_clk *clk, int req)
+ {
+ 	struct nvkm_pstate *pstate;
++	bool found = false;
+ 	int i = 0;
+ 
+ 	if (!clk->allow_reclock)
+@@ -480,12 +722,14 @@
+ 
+ 	if (req != -1 && req != -2) {
+ 		list_for_each_entry(pstate, &clk->states, head) {
+-			if (pstate->pstate == req)
++			if (pstate->pstate == req) {
++				found = true;
+ 				break;
++			}
+ 			i++;
+ 		}
+ 
+-		if (pstate->pstate != req)
++		if (!found)
+ 			return -EINVAL;
+ 		req = i;
+ 	}
+@@ -608,6 +852,8 @@
  	}
  
  	nvkm_pstate_info(clk, &clk->bstate);
