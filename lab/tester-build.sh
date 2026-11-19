@@ -42,6 +42,12 @@ build)
     cd "$WORK/nouveau"
     for P in "${PATCHES[@]}"; do
         [ -r "$P" ] || die "patch not found: $P"
+        # a newer kernel changed the context: try the variants of this patch made for newer nouveau (e.g. ...-v7.3.patch)
+        if ! patch -p1 --dry-run -s < "$P" > "$WORK/dry.txt" 2>&1; then
+            for ALT in "${P%.patch}"-v*.patch; do
+                [ -r "$ALT" ] && patch -p1 --dry-run -s < "$ALT" > /dev/null 2>&1 && { echo "  using $(basename "$ALT") for this kernel"; P="$ALT"; break; }
+            done
+        fi
         if patch -p1 --dry-run -s < "$P" > "$WORK/dry.txt" 2>&1; then
             patch -p1 < "$P" > "$WORK/patch-$(basename "$P").txt" 2>&1
             echo "  applied $(basename "$P")$(grep -qE 'fuzz' "$WORK/patch-$(basename "$P").txt" && echo ' (with fuzz — please mention it)')"

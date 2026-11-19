@@ -31,9 +31,14 @@ switched on separately:
   <15 %, 07->03 at <5 %), no 5 s dwell after a switch. Load thresholds and the temperature
   brake stay ours. 0 by default (= the rules above).
 
-diff -ruN a/nvkm/subdev/pmu/fuc/gf100.fuc3.h b/nvkm/subdev/pmu/fuc/gf100.fuc3.h
---- a/nvkm/subdev/pmu/fuc/gf100.fuc3.h	2026-10-24 11:43:52.108786731 +0300
-+++ b/nvkm/subdev/pmu/fuc/gf100.fuc3.h	2026-10-24 11:43:52.111000865 +0300
+
+Update 19.11.2026: works without the gpu-autoclock service. Defaults now start sampling and the governor
+by themselves: lab_perf_ticks=-1 (100 ms from this card's PMU clock), lab_perf_ms=1000, lab_gov=2;
+temperature brake thresholds from the VBIOS sensor table (lab_gov_hot/lab_gov_crit=-1); the VBIOS boot
+clocks count as level 07 for the governor's first decision.
+
+--- a/nvkm/subdev/pmu/fuc/gf100.fuc3.h
++++ b/nvkm/subdev/pmu/fuc/gf100.fuc3.h
 @@ -69,8 +69,8 @@
  	0x00000000,
  	0x00000000,
@@ -929,9 +934,8 @@ diff -ruN a/nvkm/subdev/pmu/fuc/gf100.fuc3.h b/nvkm/subdev/pmu/fuc/gf100.fuc3.h
  	0x00000000,
  	0x00000000,
  	0x00000000,
-diff -ruN a/nvkm/subdev/pmu/fuc/perf.fuc b/nvkm/subdev/pmu/fuc/perf.fuc
---- a/nvkm/subdev/pmu/fuc/perf.fuc	2026-10-24 11:43:52.113964245 +0300
-+++ b/nvkm/subdev/pmu/fuc/perf.fuc	2026-10-24 11:43:52.116000831 +0300
+--- a/nvkm/subdev/pmu/fuc/perf.fuc
++++ b/nvkm/subdev/pmu/fuc/perf.fuc
 @@ -22,6 +22,19 @@
   * Authors: Ben Skeggs
   */
@@ -1134,10 +1138,9 @@ diff -ruN a/nvkm/subdev/pmu/fuc/perf.fuc b/nvkm/subdev/pmu/fuc/perf.fuc
  // $r15 - current (perf)
  // $r0  - zero
  perf_init:
-diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
---- a/nvkm/subdev/pmu/gf100.c	2026-10-24 11:43:52.118729690 +0300
-+++ b/nvkm/subdev/pmu/gf100.c	2026-10-24 11:43:52.120879357 +0300
-@@ -25,6 +25,257 @@
+--- a/nvkm/subdev/pmu/gf100.c
++++ b/nvkm/subdev/pmu/gf100.c
+@@ -25,6 +25,270 @@
  #include "fuc/gf100.fuc3.h"
  
  #include <subdev/mc.h>
@@ -1156,10 +1159,10 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 + *   lab_perf_ms > 0    — драйвер раз в N мс спрашивает итог; значения в lab_perf_{gr,vid,samples},
 + *                        при lab_perf_log=1 — в журнал.
 + * Режимы этот код НЕ переключает. */
-+static int lab_perf_ticks;
++static int lab_perf_ticks = -1;	/* 19.11: -1 — период 100 мс, пересчитанный из такта PMU этой карты (у нас 202,5 МГц -> 20 250 000) */
 +module_param(lab_perf_ticks, int, 0644);
-+MODULE_PARM_DESC(lab_perf_ticks, "LAB: start PMU PERF sampling with this period in PMU ticks (0 = leave it asleep)");
-+static int lab_perf_ms;
++MODULE_PARM_DESC(lab_perf_ticks, "LAB: start PMU PERF sampling with this period in PMU ticks (-1 = 100 ms from this card's PMU clock, 0 = leave it asleep)");
++static int lab_perf_ms = 1000;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_perf_ms, int, 0644);
 +MODULE_PARM_DESC(lab_perf_ms, "LAB: query PMU PERF load every N ms (0 = off)");
 +static bool lab_perf_log;
@@ -1181,17 +1184,17 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 + * lab_gov: 0 — выключено; 1 — ТЕНЬ: драйвер ведёт свой воображаемый режим и только пишет в журнал,
 + *          куда бы переключил (переключает служба); 2 — драйвер переключает сам (ступень 2б).
 + * Работает только при включённых замерах и опросе (lab_perf_ticks > 0, lab_perf_ms > 0). */
-+static int lab_gov;
++static int lab_gov = 2;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_gov, int, 0644);
 +MODULE_PARM_DESC(lab_gov, "LAB: in-driver pstate governor on PMU PERF load (0 off, 1 shadow/log only, 2 act)");
 +/* LAB 22.10: температурный тормоз (у nouveau его нет: до 135 °C он только крутит вентилятор; у NVIDIA
 + * частоты при перегреве снижаются). lab_gov_hot: при температуре >= hot не подниматься в 0f, а из 0f уйти
 + * в 07; lab_gov_crit: >= crit — уйти в 03 и сидеть; отпускает, когда остынет на lab_gov_hyst градусов
 + * ниже порога. 0 — тормоз выключен. Термодатчик тот же, что у вентилятора (nvkm_therm_temp_get). */
-+static int lab_gov_hot;
++static int lab_gov_hot = -1;	/* 19.11: -1 — порог VBIOS «вентилятор на максимум» (у нас 90, как ставила служба) */
 +module_param(lab_gov_hot, int, 0644);
 +MODULE_PARM_DESC(lab_gov_hot, "LAB: temperature (C) above which the governor stays out of 0f (0 = off)");
-+static int lab_gov_crit;
++static int lab_gov_crit = -1;	/* 19.11: -1 — порог VBIOS «снижать частоты» (у нас 95, как ставила служба) */
 +module_param(lab_gov_crit, int, 0644);
 +MODULE_PARM_DESC(lab_gov_crit, "LAB: temperature (C) above which the governor drops to 03 (0 = off)");
 +static int lab_gov_hyst = 5;
@@ -1223,6 +1226,10 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 +	int hot = READ_ONCE(lab_gov_hot), crit = READ_ONCE(lab_gov_crit), hyst = READ_ONCE(lab_gov_hyst);
 +	int temp, b = lab_gov_st.brake;
 +
++	if (therm && hot < 0)	/* 19.11: пороги из VBIOS (nouveau читает их в bios_sensor) */
++		hot = therm->bios_sensor.thrs_fan_boost.temp;
++	if (therm && crit < 0)
++		crit = therm->bios_sensor.thrs_down_clock.temp;
 +	if (!therm || (hot <= 0 && crit <= 0))
 +		return 0;
 +	temp = nvkm_therm_temp_get(therm);
@@ -1281,6 +1288,8 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 +	}
 +	if (mode == 2)	/* сам переключает — сверяемся с картой (режим мог сменить кто-то ещё) */
 +		lab_gov_st.cur = lab_gov_cur_pstate(clk);
++	if (lab_gov_st.cur < 0)	/* 19.11: загрузочные частоты VBIOS (уровень ещё не ставили) — считаем за 07, как служба на старте */
++		lab_gov_st.cur = 0x07;
 +
 +	lab_gov_st.hi  = load >= 500 ? lab_gov_st.hi + 1 : 0;
 +	lab_gov_st.mid = load >= 150 ? lab_gov_st.mid + 1 : 0;
@@ -1340,6 +1349,13 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
 +	int ticks = READ_ONCE(lab_perf_ticks);
 +	u32 reply[2];
 +
++	if (ticks < 0 && pmu) {	/* 19.11: 100 мс по такту PMU этой карты (кГц · 100) */
++		struct nvkm_clk *clk = pmu->subdev.device->clk;
++		int khz = clk ? nvkm_clk_read(clk, nv_clk_src_pmu) : 0;
++
++		ticks = khz > 0 ? khz * 100 : 0;
++	}
++
 +	if (pmu && ticks > 0 && ticks != lab_perf.started &&
 +	    !nvkm_pmu_send(pmu, NULL, LAB_PROC_PERF, LAB_PERF_MSG_START, ticks, 0)) {
 +		nvkm_info(&pmu->subdev, "LAB perf: прошивке дана команда начать замеры, период %d тактов\n", ticks);
@@ -1395,7 +1411,7 @@ diff -ruN a/nvkm/subdev/pmu/gf100.c b/nvkm/subdev/pmu/gf100.c
  
  void
  gf100_pmu_reset(struct nvkm_pmu *pmu)
-@@ -49,8 +300,8 @@
+@@ -49,8 +313,8 @@
  	.data.size = sizeof(gf100_pmu_data),
  	.enabled = gf100_pmu_enabled,
  	.reset = gf100_pmu_reset,

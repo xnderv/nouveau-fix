@@ -1,6 +1,7 @@
 --- a/nvkm/subdev/clk/base.c
 +++ b/nvkm/subdev/clk/base.c
-@@ -34,4 +34,55 @@
+@@ -33,6 +33,69 @@
+ #include <subdev/volt.h>
  
  #include <core/option.h>
 +#include <subdev/pci.h>
@@ -12,29 +13,29 @@
 +/* 22.10: 0 — шину не трогать; 1 — менять скорость при каждой смене уровня (как NVIDIA; на Z68 два
 + * обрыва шины под нагрузкой за день); 2 — один раз поднять до 5 GT/s при первой смене уровня (шина
 + * пуста) и больше не переобучать; после сна nvkm_pcie_init восстанавливает заданную скорость сам. */
-+static int lab_pcie = 0;
++static int lab_pcie = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_pcie, int, 0644);
 +MODULE_PARM_DESC(lab_pcie, "LAB: PCIe link: 0 leave, 1 switch per pstate (NVIDIA), 2 raise to 5 GT/s once");
 +static bool lab_pcie_raised;
 +static bool lab_mem = true;
 +module_param(lab_mem, bool, 0644);
 +MODULE_PARM_DESC(lab_mem, "LAB: reclock memory on pstate switch");
-+static bool lab_mem_order;
++static bool lab_mem_order = true;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_mem_order, bool, 0644);
 +MODULE_PARM_DESC(lab_mem_order, "LAB: like NVIDIA — going up: core clocks first, then memory; going down: memory first");
 +static bool lab_core = true;
 +module_param(lab_core, bool, 0644);
 +MODULE_PARM_DESC(lab_core, "LAB: reclock core clocks on pstate switch");
-+static bool lab_volt_first;
++static bool lab_volt_first = true;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_volt_first, bool, 0644);
 +MODULE_PARM_DESC(lab_volt_first, "LAB: raise voltage before memory reclock");
 +/* LAB 24.10, по записи NVIDIA 7: lab_nv_pcie_late — на спуске NVIDIA переводит PCIe в gen1 ПОСЛЕ частот и памяти
 + * (на подъёме — в начале, как и nouveau); lab_nv_hub07mem — hubk07 (idx 2) идёт вместе с памятью: подъём — ядро, память,
 + * hubk07; спуск — hubk07, память, ядро (записи 1, 3, 5, 7). */
-+static uint lab_nv_pcie_late;
++static uint lab_nv_pcie_late = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_nv_pcie_late, uint, 0644);
 +MODULE_PARM_DESC(lab_nv_pcie_late, "LAB: going down, retrain PCIe after clocks and memory (as NVIDIA); going up it stays first");
-+static uint lab_nv_hub07mem;
++static uint lab_nv_hub07mem = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_nv_hub07mem, uint, 0644);
 +MODULE_PARM_DESC(lab_nv_hub07mem, "LAB: switch hubk07 together with memory as NVIDIA (up: core, memory, hubk07; down: hubk07, memory, core)");
 +/* LAB 24.10 (В2б): 0x022680 по уровню, как NVIDIA: младший байт — байт 0x0c записи уровня в таблице VBIOS (0x1c на 03,
@@ -47,6 +48,18 @@
 +static uint lab_nv_disphold;
 +module_param(lab_nv_disphold, uint, 0644);
 +MODULE_PARM_DESC(lab_nv_disphold, "LAB: set bit 0 of 0x610300 for the whole level switch, as NVIDIA (display)");
++/* LAB 18.11 (тест 98): прибор для 0x610300 — липкий признак «был недогруз» выходов дисплея (0x616308 + выход·0x800, бит 4;
++ * тест 91: ставится без включения учёта). lab_disp_uf=1: перед переходом прочитать (недогруз в покое, с прошлого перехода) и
++ * сбросить, после перехода прочитать — недогруз за переход. Счётчики — lab_disp_uf_trans / lab_disp_uf_idle (только чтение). */
++static uint lab_disp_uf;
++module_param(lab_disp_uf, uint, 0644);
++MODULE_PARM_DESC(lab_disp_uf, "LAB: read and clear the display underflow sticky bits (0x616308/0x616b08 bit 4) before each level switch and read them after it; log and count (0 off, 1 on)");
++static int lab_disp_uf_trans, lab_disp_uf_idle;
++module_param(lab_disp_uf_trans, int, 0444);
++module_param(lab_disp_uf_idle, int, 0444);
++MODULE_PARM_DESC(lab_disp_uf_trans, "LAB: level switches with a display underflow during the switch (lab_disp_uf, read-only)");
++MODULE_PARM_DESC(lab_disp_uf_idle, "LAB: display underflows seen between switches (lab_disp_uf, read-only)");
++extern int lab_mem_board;	/* fb/ramgf100.c: 0 — для платы нет сценариев памяти */
 +extern u32 lab_clk_prog_mask;
 +extern u32 lab_mux_stuck;	/* clk/gf100.c: узлы, оставшиеся на PLL после неудачного переключения (lab_mux_guard) */
 +extern void lab_boot_snapshot(struct nvkm_clk *);	/* clk/gf100.c: снимок регистров при инициализации */
@@ -56,7 +69,9 @@
 +static int lab_pstate_mem(struct nvkm_clk *clk, struct nvkm_pstate *pstate, int pstatei);
  
  /******************************************************************************
-@@ -191,10 +242,36 @@
+  * misc
+@@ -190,12 +253,38 @@
+ 			nvkm_error(subdev, "failed to raise voltage: %d\n", ret);
  			return ret;
  		}
 +		nvkm_info(subdev, "LAB voltage after raise: %d uV (cstate voltage id %d)\n",
@@ -97,14 +112,18 @@
 +		volt = NULL;
  	}
  
-@@ -212,4 +289,6 @@
+ 	if (volt) {
+@@ -211,6 +300,8 @@
+ 			nvkm_error(subdev, "failed to lower fan speed: %d\n", ret);
  	}
  
 +	if (volt)
 +		nvkm_info(subdev, "LAB voltage final: %d uV\n", nvkm_volt_get(volt));
  	return ret;
  }
-@@ -265,11 +344,65 @@
+ 
+@@ -264,13 +355,75 @@
+  * P-States
   *****************************************************************************/
  static int
 -nvkm_pstate_prog(struct nvkm_clk *clk, int pstatei)
@@ -114,7 +133,13 @@
  	struct nvkm_fb *fb = subdev->device->fb;
 +	int ret = 0;
 +
-+	if (!lab_mem) {
++	if (lab_mem && lab_mem_board == 0) {
++		static bool said;
++
++		if (!said)
++			nvkm_info(subdev, "LAB: для этой платы нет сценариев памяти — память остаётся на частоте VBIOS, меняется только ядро\n");
++		said = true;
++	} else if (!lab_mem) {
 +		nvkm_info(subdev, "LAB pstate %d: memory SKIPPED (lab_mem=0)\n", pstatei);
 +	} else if (fb && fb->ram && fb->ram->func->calc) {
 +		struct nvkm_ram *ram = fb->ram;
@@ -170,9 +195,13 @@
 -	int ret, idx = 0;
 +	int ret, idx = 0, was, mret = 0;
 +	bool up;
++	uint uf;
++	u32 uf0[2] = { 0, 0 };
  
  	list_for_each_entry(pstate, &clk->states, head) {
-@@ -279,20 +412,80 @@
+ 		if (idx++ == pstatei)
+@@ -278,22 +431,102 @@
+ 	}
  
  	nvkm_debug(subdev, "setting performance state %d\n", pstatei);
 +	up = pstatei > clk->pstate;
@@ -192,6 +221,17 @@
 -		ram->func->tidy(ram);
 +	nvkm_info(subdev, "LAB pstate %d: flags pcie=%d mem=%d core=%d volt_first=%d\n",
 +		  pstatei, lab_pcie, lab_mem, lab_core, lab_volt_first);
++	uf = READ_ONCE(lab_disp_uf);
++	if (uf) {
++		int h;
++
++		for (h = 0; h < 2; h++) {
++			uf0[h] = nvkm_rd32(subdev->device, 0x616308 + h * 0x800);
++			nvkm_mask(subdev->device, 0x616308 + h * 0x800, 0x00000010, 0x00000010);	/* сбросить липкий бит */
++		}
++		if ((uf0[0] | uf0[1]) & 0x10)
++			lab_disp_uf_idle++;
++	}
 +	if (lab_nv_disphold) {
 +		u32 was = nvkm_rd32(subdev->device, 0x610300);
 +
@@ -261,20 +301,32 @@
 +		nvkm_mask(subdev->device, 0x610300, 0x00000001, 0x00000000);
 +		nvkm_info(subdev, "LAB nv_disphold: 0x610300 -> %08x после перехода\n", nvkm_rd32(subdev->device, 0x610300));
 +	}
++	if (uf) {
++		u32 u0 = nvkm_rd32(subdev->device, 0x616308), u1 = nvkm_rd32(subdev->device, 0x616b08);
++
++		if ((u0 | u1) & 0x10)
++			lab_disp_uf_trans++;
++		nvkm_info(subdev, "LAB disp_uf: переход %d -> %d (%s): до %08x %08x, за переход %08x %08x — %s\n",
++			  was, pstatei, lab_nv_disphold ? "с 0x610300" : "без 0x610300", uf0[0], uf0[1], u0, u1,
++			  ((u0 | u1) & 0x10) ? "НЕДОГРУЗ" : "чисто");
++	}
 +	nvkm_info(subdev, "LAB pstate %d: done ret %d\n", pstatei, ret);
 +	return ret;
  }
  
-@@ -609,4 +802,6 @@
+ static void
+@@ -608,6 +841,8 @@
+ 	}
  
  	nvkm_pstate_info(clk, &clk->bstate);
 +	if (subdev->device->card_type == NV_C0)
 +		lab_boot_snapshot(clk);
  
  	if (clk->func->init)
+ 		return clk->func->init(clk);
 --- a/nvkm/subdev/clk/gf100.c
 +++ b/nvkm/subdev/clk/gf100.c
-@@ -23,11 +23,19 @@
+@@ -23,11 +23,20 @@
   */
  #define gf100_clk(p) container_of((p), struct gf100_clk, base)
  #include "priv.h"
@@ -286,6 +338,7 @@
  #include <subdev/bios/pll.h>
 +#include <subdev/bios/perf.h>
  #include <subdev/timer.h>
++#include <subdev/pmu.h>
 +#include <core/device.h>
 +#include <engine/fifo.h>
 +#include <engine/fifo/runl.h>
@@ -294,7 +347,7 @@
  
  struct gf100_clk_info {
  	u32 freq;
-@@ -45,6 +53,15 @@
+@@ -45,6 +54,15 @@
  
  static u32 read_div(struct gf100_clk *, int, u32, u32);
  
@@ -303,14 +356,14 @@
 + * бит1 — перед настройкой PLL ядра записать в 0x1371d0 младшее поле 0x06 (блоб: 81201e1e -> 81201e06);
 + * бит2 — не ставить бит 0x10 у ВСЕХ PLL (ROP, hubk07, hubk06 тоже);
 + * бит3 — опора PLL hubk06 (узел 7) через его делитель 0x13715c, как у узлов 0-2 (405, а не 1620). */
-+static uint lab_gpc_seq;
++static uint lab_gpc_seq = 13;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_gpc_seq, uint, 0644);
 +MODULE_PARM_DESC(lab_gpc_seq, "LAB: blob-like PLL: bit0 gpc no 0x10, bit1 gpc 0x1371d0[5:0]=6, bit2 all PLL no 0x10, bit3 hubk06 PLL ref via divider");
 +
  static u32
  read_vco(struct gf100_clk *clk, u32 dsrc)
  {
-@@ -55,6 +72,25 @@
+@@ -55,6 +73,25 @@
  	return nvkm_clk_read(&clk->base, nv_clk_src_sppll1);
  }
  
@@ -336,7 +389,7 @@
  static u32
  read_pll(struct gf100_clk *clk, u32 pll)
  {
-@@ -86,11 +122,18 @@
+@@ -86,11 +123,18 @@
  	case 0x137040:
  	case 0x1370e0:
  		sclk = read_div(clk, (pll & 0xff) / 0x20, 0x137120, 0x137140);
@@ -355,7 +408,22 @@
  	return sclk * N / M / P;
  }
  
-@@ -259,6 +302,13 @@
+@@ -200,6 +244,14 @@
+ 		return read_clk(clk, 0x0c);
+ 	case nv_clk_src_vdec:
+ 		return read_clk(clk, 0x0e);
++	case nv_clk_src_dom6: {
++		/* LAB 17.11: домен 7 VBIOS — 0x00e9e0; nvkm_clk_init опрашивает каждый домен списка, без этого init = -EINVAL */
++		u32 v = nvkm_rd32(device, 0x00e9e0);
++
++		if (!(v & 0x80000000))
++			return 0;
++		return nvkm_clk_read(&clk->base, nv_clk_src_sppll0) * 2 / ((v & 0x3f) + 2);
++	}
+ 	default:
+ 		nvkm_error(subdev, "invalid clock source %d\n", src);
+ 		return -EINVAL;
+@@ -259,6 +311,13 @@
  		return 0;
  
  	limits.refclk = read_div(clk, idx, 0x137120, 0x137140);
@@ -369,7 +437,7 @@
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +320,444 @@
+@@ -270,6 +329,510 @@
  	return ret;
  }
  
@@ -422,9 +490,68 @@
 +MODULE_PARM_DESC(lab_xbar, "LAB: PXBAR transition bracket around core clock switch as NVIDIA: 0 off, 1 bracket, 2 + level-dependent 13c844/13ec14");
 +/* Делитель 0x00e9e0 (PNVIO, формат как у PCLOCK: бит 31 вкл, поля 13:8 и 5:0) NVIDIA меняет на каждом уровне:
 + * 0x81200a04 на 0f, 0x81200a06 на 07, 0x81200a0a на 03. nouveau его не трогает. Отдельная гипотеза. */
-+static uint lab_e9e0;
++static uint lab_e9e0 = 2;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_e9e0, uint, 0644);
-+MODULE_PARM_DESC(lab_e9e0, "LAB: program 0x00e9e0 divider per level as NVIDIA (04/06/0a): 0 off, 1 on");
++MODULE_PARM_DESC(lab_e9e0, "LAB: program 0x00e9e0 divider per level as NVIDIA: 0 off, 1 table of this card (04/06/0a), 2 from VBIOS perf domain 7 (field A only)");
++/* LAB 17.11: 0x00e9e0 — такт домена 7 таблицы уровней VBIOS (nvbios: «unk_engine»; nouveau его не читал). Наша GF114:
++ * 270 / 405 / 540 МГц на 03 / 07 / 0f = SPPLL0 1620 · 2 / (A + 2) при A = 0x0a / 0x06 / 0x04 — ровно таблица NVIDIA; GF108 —
++ * 270 / 405 / 405 и 0a / 06 / 06 в трассах. lab_e9e0=2 — код поля A из частоты домена 7 (поле B и бит 31 не трогаются, как
++ * у NVIDIA); место записи — прежнее (после всех стадий), чтобы отличие было одно. У NVIDIA место — между LTC и XBAR. */
++static u32 lab_e9e0_khz;
++/* LAB 17.11 (тест 91): домен 7 — такт дисплея? Монитор 2560x1440@60 — частота пикселей 241,5 МГц; домен 7 на 03 —
++ * 270. lab_e9e0_probe=1: после смены уровня (не 0f) для каждого выхода дисплея (0x616308 + выход·0x800, бит 4 — липкий
++ * «был недогруз», ET; сброс записью 1) — опора: сбросить, 100 мс, прочитать; затем поле A 0x00e9e0 = 0x0a (/6, 270), 0x0e
++ * (/8, 202,5), 0x12 (/10, 162) — по 100 мс каждое, прочитать; на первом недогрузе дальше не идти; вернуть как было.
++ * lab_e9e0_probe=2 — то же, но на время опыта включить учёт (бит 0 = 1, режим «повтор», бит 8 = 0). */
++static uint lab_e9e0_probe;
++module_param(lab_e9e0_probe, uint, 0644);
++MODULE_PARM_DESC(lab_e9e0_probe, "LAB: after a pstate change (not 0f) step 0x00e9e0 field A down (0x0a, 0x0e, 0x12, 100 ms each) and read display underflow sticky bits; 2 = also enable underflow reporting (repeat mode) during the probe; restored after");
++
++static void
++lab_e9e0_probe_run(struct gf100_clk *clk)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	static const u32 codes[] = { 0x0a, 0x0e, 0x12 };
++	u32 mode = READ_ONCE(lab_e9e0_probe), e0, r0[2], h, k;
++	char buf[200];
++	int o = 0;
++
++	if (!mode || (nvkm_rd32(device, 0x137100) & 1))
++		return;
++	e0 = nvkm_rd32(device, 0x00e9e0);
++	for (h = 0; h < 2; h++) {
++		r0[h] = nvkm_rd32(device, 0x616308 + h * 0x800);
++		if (mode == 2)
++			nvkm_mask(device, 0x616308 + h * 0x800, 0x00000101, 0x00000001);
++		nvkm_mask(device, 0x616308 + h * 0x800, 0x00000010, 0x00000010);	/* сбросить липкий бит */
++	}
++	msleep(100);
++	o += scnprintf(buf + o, sizeof(buf) - o, " опора(A=%02x): %08x %08x;", e0 & 0x3f,
++		       nvkm_rd32(device, 0x616308), nvkm_rd32(device, 0x616b08));
++	for (k = 0; k < ARRAY_SIZE(codes); k++) {
++		u32 u0, u1;
++
++		for (h = 0; h < 2; h++)
++			nvkm_mask(device, 0x616308 + h * 0x800, 0x00000010, 0x00000010);
++		nvkm_mask(device, 0x00e9e0, 0x3f, codes[k]);
++		msleep(100);
++		u0 = nvkm_rd32(device, 0x616308);
++		u1 = nvkm_rd32(device, 0x616b08);
++		nvkm_wr32(device, 0x00e9e0, e0);
++		o += scnprintf(buf + o, sizeof(buf) - o, " A=%02x (%u кГц): %08x %08x;", codes[k],
++			       nvkm_clk_read(&clk->base, nv_clk_src_sppll0) * 2 / (codes[k] + 2), u0, u1);
++		if ((u0 | u1) & 0x10)
++			break;
++	}
++	nvkm_wr32(device, 0x00e9e0, e0);
++	msleep(20);
++	for (h = 0; h < 2; h++) {
++		nvkm_mask(device, 0x616308 + h * 0x800, 0x00000010, 0x00000010);
++		nvkm_mask(device, 0x616308 + h * 0x800, 0x00000101, r0[h] & 0x101);
++	}
++	nvkm_info(&clk->base.subdev, "LAB e9e0-проба (режим %u), недогруз выходов 0/1 (бит 4):%s вернул e9e0 %08x\n",
++		  mode, buf, nvkm_rd32(device, 0x00e9e0));
++}
 +/* LAB 23.10, запись NVIDIA: PLL ядра/ROP (0x1370e0, idx 7/8) NVIDIA НИКОГДА не перепрограммирует и не выключает — она
 + * заведена при загрузке (0x30005, coef 0x14110 = 1645 МГц) и работает постоянно; при подъёме только переключается
 + * мультиплексор 0x137100 (биты 7, 8). PLL hub06 (0x137000) при спуске тоже остаётся включённой, выключаются только
@@ -432,7 +559,7 @@
 + * переключается на неё, а при спуске выключает. Гипотеза: выход PLL сразу после захвата нечист (дрожание/выброс частоты);
 + * занятые GPC/ROP ловят сбой, простаивающие — нет (поэтому помогала пауза). lab_pll_keep: 1 — если PLL уже включена,
 + * захвачена и coef совпадает, ничего с ней не делать; при спуске (цель — делитель) PLL не выключать. */
-+static uint lab_pll_keep;
++static uint lab_pll_keep = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_pll_keep, uint, 0644);
 +MODULE_PARM_DESC(lab_pll_keep, "LAB: keep core PLLs running as NVIDIA: skip reprogramming a locked PLL with the same coef, never disable on downshift (0 off, 1 on)");
 +/* LAB 23.10, запись NVIDIA (try1/try2, одинаково): порядок переключения мультиплексоров 0x137100 при подъёме —
@@ -442,7 +569,7 @@
 + * несколько мкс гонят трафик в хабы, которые ещё на 405/810 МГц. Гипотеза: переполнение очередей кросс-бара → потерянная
 + * транзакция → GPC/ROP ждут вечно (очередь команд GR при этом пуста — снимок теста 10). lab_order: 1 — порядок NVIDIA
 + * для стадий 1 (снятие PLL) и 3 (выбор PLL); lab_order_us — пауза между переключениями доменов, мкс (у NVIDIA ~80–900). */
-+static uint lab_order;
++static uint lab_order = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_order, uint, 0644);
 +MODULE_PARM_DESC(lab_order, "LAB: domain switch order as NVIDIA (hubs before GPC/ROP going up, reverse going down): 0 off, 1 on");
 +static uint lab_order_us;
@@ -464,14 +591,14 @@
 + * потому что он на 106 кГц ближе к таблице (101 000), чем делитель (101 250), и на 03->07 уводит GPC с PLL — такого
 + * переключения у NVIDIA нет (24.10: 6 тайм-аутов мультиплексора, все на нём). 1 = для GPC, если частота не выше VCO/2,
 + * путь NVIDIA: делитель /2 + пост-делитель на остаток, PLL не пробуем; 03<->07 у GPC — только смена пост-делителя. */
-+static uint lab_gpc_div;
++static uint lab_gpc_div = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_gpc_div, uint, 0644);
 +MODULE_PARM_DESC(lab_gpc_div, "LAB: GPC source as NVIDIA: divider /2 + post-divider when freq <= VCO/2, no PLL (0 = nouveau: closest of divider/PLL)");
 +/* LAB 24.10: такт PMU как у NVIDIA. В записях NVIDIA 0x137280 (пост-делитель PMU) только читается: 0x81200e0e, источник
 + * 0x137190 = 3 (SPPLL 1620) -> 1620 / 8 = 202,5 МГц на всех уровнях. В таблице 203 000 кГц, а calc_div округляет делитель вниз
 + * (3 240 000 / 203 000 = 15,96 -> 15), и nouveau на каждом переходе ставит 216 МГц (+6,4 %). 1 = делитель PMU к ближайшему,
 + * оба поля как у BIOS (0x0e0e -> 0x81200e0e). */
-+static uint lab_pmu_div;
++static uint lab_pmu_div = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_pmu_div, uint, 0644);
 +MODULE_PARM_DESC(lab_pmu_div, "LAB: PMU clock divider rounded to nearest, both fields as BIOS/NVIDIA (0x81200e0e = 202.5 MHz); 0 = nouveau (rounds down: 216 MHz)");
 +/* LAB 24.10, по записи NVIDIA 7 (переходы под нагрузкой):
@@ -480,11 +607,18 @@
 + *   переключается с 405 на PLL 1800 (разрыв ~4,4), а не со 101,25 (17,8) или 810.
 + * lab_nv_hubpost — на спуске с PLL NVIDIA ставит пост-делитель hubk06 и hubk01 ДО мультиплексора (hubk06 — внутри скобки);
 + *   nouveau ставит его на стадии 4, и между стадиями 1 и 4 узел работает на 1620 МГц. */
-+static uint lab_gpc_pre405;
++static uint lab_gpc_pre405 = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_gpc_pre405, uint, 0644);
 +MODULE_PARM_DESC(lab_gpc_pre405, "LAB: before switching GPC to its PLL set the divider path to VCO/4 (405 MHz) inside the bracket, as NVIDIA");
-+static uint lab_nv_hubpost;
++static uint lab_nv_hubpost = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_nv_hubpost, uint, 0644);
++/* LAB 18.11 (аудит, docs/2026-11-18/core-audit.md): подъём GPC на PLL как в записях NVIDIA. Ступень 405 перед PLL NVIDIA делает,
++ * только когда делительный путь ниже VCO/4 (с 03: 101 -> 405, GF110/GF114); с 07 (810) переключает сразу, без ступени, — на всех
++ * чипах. После перехода на PLL делитель GPC не трогает до спуска (13 из 13 на GF114). lab_nv_up07=1: ступень только если путь
++ * ниже VCO/4; поле A = 06 после подъёма (часть lab_nv_div_late) не писать. Запись делителя внутри скобки на спуске — как была. */
++static uint lab_nv_up07 = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
++module_param(lab_nv_up07, uint, 0644);
++MODULE_PARM_DESC(lab_nv_up07, "LAB: GPC upshift as NVIDIA traces: 405 MHz pre-step only when the divider path is below VCO/4 (from 03), none from 07; do not rewrite the GPC divider while on the PLL (0 off, 1 on)");
 +MODULE_PARM_DESC(lab_nv_hubpost, "LAB: hubk06/hubk01 leaving the PLL: write the post-divider before the mux, as NVIDIA (no 1620 MHz transient)");
 +/* LAB 24.10 (В4): у NVIDIA в неактивном поле B делителей GPC/ROP/hubk07 (0x1371d0/d4/d8, биты 8–13) всегда делитель самого
 + * низкого уровня (GPC 0x1e = 101,25, ROP/hubk07 0x0a = 270; тест Б: у нас там копия поля A). Значение не константа: берётся
@@ -497,7 +631,7 @@
 + * (405 МГц). У нас 0x1371d0 = 81200202 с первого перехода после загрузки и до конца сессии не меняется. 1 = как у NVIDIA:
 + * после перехода ядра на PLL поле A = 06; на спуске с PLL делитель пишется не на стадии 0, а внутри скобки прямо перед
 + * мультиплексором. Только ядро (idx 0): тайм-ауты были только у него. */
-+static uint lab_nv_div_late;
++static uint lab_nv_div_late = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_nv_div_late, uint, 0644);
 +MODULE_PARM_DESC(lab_nv_div_late, "LAB: GPC divider as NVIDIA: field A = 06 (405 MHz) while the core is on its PLL; leaving the PLL, write the divider inside the bracket right before the mux (0 off, 1 on)");
 +static bool lab_div_late_pending;	/* стадия 0 отложила запись делителя ядра до стадии 1 */
@@ -579,7 +713,7 @@
 + * 07 = 810, у GF108 405, у GF119 540), ниже — пост-делителем от него; если так не попасть в окно — обычный путь nouveau.
 + * Коэффициенты PLL GPC — из равноценных решений наибольшее M, как NVIDIA 304+ / 390 (у ROP, hubk07, hubk06 — как nouveau).
 + * На нашей плате значения те же, что с lab_gpc_div=1; lab_gpc_div при включённом ключе не действует. */
-+static uint lab_vbios_src;
++static uint lab_vbios_src = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_vbios_src, uint, 0644);
 +MODULE_PARM_DESC(lab_vbios_src, "LAB: node source from the VBIOS perf-entry flag (bits 14-15: 1 PLL, 2 divider, 0 divider within -2..+3 MHz else PLL), GPC main divider on the highest divider level (0 off, 1 on)");
 +
@@ -814,7 +948,7 @@
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +770,87 @@
+@@ -282,6 +845,87 @@
  	if (!freq)
  		return 0;
  
@@ -902,7 +1036,7 @@
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +860,9 @@
+@@ -291,7 +935,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -913,7 +1047,7 @@
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +889,11 @@
+@@ -318,6 +964,11 @@
  		info->freq = clk1;
  	}
  
@@ -925,7 +1059,15 @@
  	return 0;
  }
  
-@@ -346,20 +922,567 @@
+@@ -327,6 +978,7 @@
+ 	struct gf100_clk *clk = gf100_clk(base);
+ 	int ret;
+ 
++	lab_e9e0_khz = cstate->domain[nv_clk_src_dom6];
+ 	if ((ret = calc_clk(clk, cstate, 0x00, nv_clk_src_gpc)) ||
+ 	    (ret = calc_clk(clk, cstate, 0x01, nv_clk_src_rop)) ||
+ 	    (ret = calc_clk(clk, cstate, 0x02, nv_clk_src_hubk07)) ||
+@@ -346,20 +998,793 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -999,9 +1141,12 @@
 + * даже в хорошей сессии; 63а: скобка без ожидания — чисто). Две части скобки по отдельности:
 + * lab_therm_ctrl1_clr — какие биты CTRL_1 (0x020004) снимать на время скобки (по умолчанию 0x68, как NVIDIA; 0 — не трогать);
 + * lab_therm_noslow=1 — не включать замедление (FSRM_2/3/4 не пишутся и не восстанавливаются), оставить только смену CTRL_1. */
-+static uint lab_therm_ctrl1_clr = 0x68;
++/* LAB 18.11 (аудит, lab/db-core-audit.py): NVIDIA снимает в скобке все поставленные младшие биты CTRL_1 — по платам 0x28,
++ * 0x68, 0xed, 0x128, 0x168 — и на выходе возвращает прежнее. Маска 0x1ff снимает ровно поставленные; у нас (0x110068) — те же
++ * 0x68, что и раньше. */
++static uint lab_therm_ctrl1_clr = 0x1ff;
 +module_param(lab_therm_ctrl1_clr, uint, 0644);
-+MODULE_PARM_DESC(lab_therm_ctrl1_clr, "LAB: bits of PTHERM CTRL_1 (0x020004) cleared during the FSRM bracket (default 0x68 as NVIDIA; 0 = leave CTRL_1)");
++MODULE_PARM_DESC(lab_therm_ctrl1_clr, "LAB: bits of PTHERM CTRL_1 (0x020004) cleared during the FSRM bracket (default 0x1ff = every set low bit, as NVIDIA; 0 = leave CTRL_1)");
 +static uint lab_therm_noslow;
 +module_param(lab_therm_noslow, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_noslow, "LAB: bracket without the slowdown itself: do not write FSRM_2/3/4, only the CTRL_1 change (0 off, 1 on)");
@@ -1016,7 +1161,7 @@
 +static uint lab_therm_real;	/* 24.10: по умолчанию 0 — у NVIDIA тоже есть пустые скобки (lab/trace-brackets.py) */
 +module_param(lab_therm_real, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_real, "LAB: bracket only when the domain mux bit really changes (0 = every stage-1/3 call, 1 = real changes only)");
-+static uint lab_clk_mmu_lock = 1;
++static uint lab_clk_mmu_lock = 0;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_clk_mmu_lock, uint, 0644);
 +MODULE_PARM_DESC(lab_clk_mmu_lock, "LAB: hold mmu->mutex (serialises TLB invalidates) across the clock programming stages (0 off, 1 on)");
 +/* LAB 24.10, запись NVIDIA (try1 104,511 и 50,0563): пост-делители GPC (0x137250) и hubk06 (0x13726c) NVIDIA меняет только
@@ -1035,7 +1180,7 @@
 +/* LAB 02.11: коды замедления в скобке, как их ставит NVIDIA 390, — по чипу, из записей базы (docs/2026-10-29/db-fermi-waits.md,
 + * lab/db-bracket-codes.py). От VBIOS (0x020130, 0x020144) не зависят — проверено подменой 02.11. GF110: 1080/1081 — /2,
 + * остальные — /6. GF108: в записях 2016–2017 GPC /8 (в 2010–2011 было /2). lab_therm_code_nv=0 — прежнее (GF106 /2, иначе /6). */
-+static uint lab_therm_code_nv;
++static uint lab_therm_code_nv = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_therm_code_nv, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_code_nv, "LAB: bracket slowdown codes per chip as NVIDIA 390 (0 = old: GF106 /2, else /6; 1 = table from NVIDIA traces)");
 +static u32
@@ -1081,10 +1226,10 @@
 + * b1 — байт 1 (биты 8–11) 0x020130, код — код замедления домена. GF104 в разных записях шёл обоими путями — берётся больший.
 + * Сверху запас lab_therm_wait_nv_margin_ns. Ожидание — от входа в скобку, признак только пишется в журнал (как lab_therm_fixed_ns).
 + * lab_therm_wait_nv=1 действует, если lab_therm_fixed_ns / lab_therm_fixed_hub_ns не заданы. */
-+static uint lab_therm_wait_nv;
++static uint lab_therm_wait_nv = 2;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_therm_wait_nv, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_wait_nv, "LAB: bracket wait computed as NVIDIA 390 from 0x020130/0x020144 (0 off, 1 = 27 MHz tick formula of 02.11, 2 = whole-microsecond model of 13.11)");
-+static uint lab_therm_wait_nv_margin_ns = 500;
++static uint lab_therm_wait_nv_margin_ns = 0;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_therm_wait_nv_margin_ns, uint, 0644);
 +MODULE_PARM_DESC(lab_therm_wait_nv_margin_ns, "LAB: margin added to the computed NVIDIA wait, ns (default 500)");
 +/* LAB 13.11: lab_therm_wait_nv=2 — путь GF11x в целых микросекундах (docs/2026-11-01/didt-evolution.md, §9; 30 интервалов
@@ -1115,6 +1260,12 @@
 +	return min_t(u32, t + READ_ONCE(lab_therm_wait_nv_margin_ns), 300000);
 +}
 +
++/* LAB 18.11 (аудит): на выходе из скобки NVIDIA пишет в 0x020160/164, 0x020180/184, 0x0201a0/1a4 то, что было там до первой
++ * скобки, — состояние после init-скрипта VBIOS (9 чипов Fermi). Снимается при инициализации тактов (lab_boot_snapshot), до
++ * первой скобки. У нас это 0 / 0x82, 0 / 0, 0x4040 / 0x4040 — те же числа, что раньше были вписаны в код. */
++static u32 lab_fs_boot[2][3];		/* [i: 0 GPC, 1 hub][0x020160, 0x020180, 0x0201a0] */
++static bool lab_fs_boot_ok;
++
 +struct lab_therm_save {
 +	bool on; int i; u32 ctrl1, f2, f3, f4;
 +	uint us; int np; u32 st0; u32 pv[8]; u32 pt[8]; u32 nrd;
@@ -1122,6 +1273,17 @@
 +	bool fx; bool fxok; u32 fxset, fxns, fxflag;	/* 29.10: фиксированное ожидание от входа */
 +	u32 ns;						/* 29.10 Е18: скобка без замедления */
 +};
++
++/* LAB 16.11, тест 72: когда замедление реально снижает такт GPC — по счётчику тактов (0x134124/0x134128, см. lab_cntr_n,
++ * docs/2026-11-16/gpc-counter.md). lab_cntr_win = N тактов кварца 27 МГц: окно счёта открывается записью прямо перед
++ * запросом замедления в скобке GPC и закрывается само через (N + ~4) тактов кварца по часам карты. Отсчёт читается при
++ * выходе из скобки; окно должно закончиться до переключателя (N·37 нс заметно меньше ожидания). Если такт до момента te
++ * идёт полностью (F = GPC2CLK/2), а после — замедленным (F/s), то te = T·(C − Cs)/(Cf − Cs). Пишется рядом с моментом
++ * признака 0x0201e0 (тот отсчитан по часам процессора от отправки записей — опоры разные, сравнение приблизительное). */
++static uint lab_cntr_win;
++module_param(lab_cntr_win, uint, 0644);
++MODULE_PARM_DESC(lab_cntr_win, "LAB: in the GPC bracket open a GPC clock counter window of N 27 MHz cycles right before the slowdown request and log when the clock actually slowed (0 = off, max 16383; keep N*37ns below the bracket wait)");
++static u32 lab_cw_n, lab_cw_half, lab_cw_code;
 +
 +static void
 +lab_therm_enter(struct gf100_clk *clk, int idx, struct lab_therm_save *sv)
@@ -1133,14 +1295,25 @@
 +	if (!lab_therm || (idx != 0 && idx != 7))
 +		return;
 +	sv->i = (idx == 0) ? 0 : 1;
-+	e2 = (idx == 0) ? ((lab_therm_gpc_code(device) << 16) | 0x0000008a)
-+			: ((lab_therm_hub_code(device) << 16) | 0x00000082);
++	/* LAB 17.11: глубина в ОБА поля, как NVIDIA во всех записях (биты 16–21 «в простое» и 0–5 «по команде») + флаг 7;
++	 * при коде по умолчанию значение прежнее (0x000a008a / 0x00020082). До 17.11 ключ глубины менял только биты 16–21. */
++	e2 = (idx == 0) ? ((lab_therm_gpc_code(device) << 16) | 0x80 | lab_therm_gpc_code(device))
++			: ((lab_therm_hub_code(device) << 16) | 0x80 | lab_therm_hub_code(device));
 +	e3 = (idx == 0) ? lab_therm_gpc_code(device) : lab_therm_hub_code(device);
 +	sv->ctrl1 = nvkm_rd32(device, 0x020004);
 +	sv->f2 = nvkm_rd32(device, 0x020160 + sv->i * 4);
 +	sv->f3 = nvkm_rd32(device, 0x020180 + sv->i * 4);
 +	sv->f4 = nvkm_rd32(device, 0x0201a0 + sv->i * 4);
 +	sv->ns = READ_ONCE(lab_therm_noslow);
++	lab_cw_n = 0;
++	if (idx == 0 && READ_ONCE(lab_cntr_win)) {
++		/* LAB 16.11: окно счётчика GPC открывается прямо перед запросом замедления (записи идут по порядку) */
++		lab_cw_half = (u32)max(read_clk(clk, 0x00), 0) / 2;
++		lab_cw_code = e3 & 0x3f;
++		lab_cw_n = min_t(u32, READ_ONCE(lab_cntr_win), 0x3fff);
++		nvkm_wr32(device, 0x134124, 0x01000000);
++		nvkm_wr32(device, 0x134124, 0x00110000 | lab_cw_n);
++	}
 +	if (!sv->ns) {
 +		nvkm_wr32(device, 0x020160 + sv->i * 4, e2);
 +		nvkm_wr32(device, 0x020180 + sv->i * 4, e3);
@@ -1221,14 +1394,19 @@
 +lab_therm_leave(struct gf100_clk *clk, int idx, struct lab_therm_save *sv)
 +{
 +	struct nvkm_device *device = clk->base.subdev.device;
-+	u32 x2 = (idx == 0) ? 0x00000000 : 0x00000082;
++	u32 x2 = (idx == 0) ? 0x00000000 : 0x00000082, x3 = 0, x4 = 0x00004040;
 +
 +	if (!sv->on)
 +		return;
++	if (lab_fs_boot_ok) {		/* 18.11: как NVIDIA — состояние до первой скобки (VBIOS) */
++		x2 = lab_fs_boot[sv->i][0];
++		x3 = lab_fs_boot[sv->i][1];
++		x4 = lab_fs_boot[sv->i][2];
++	}
 +	if (!sv->ns) {
 +		nvkm_wr32(device, 0x020160 + sv->i * 4, lab_therm >= 2 ? sv->f2 : x2);
-+		nvkm_wr32(device, 0x020180 + sv->i * 4, lab_therm >= 2 ? sv->f3 : 0);
-+		nvkm_wr32(device, 0x0201a0 + sv->i * 4, lab_therm >= 2 ? sv->f4 : 0x00004040);
++		nvkm_wr32(device, 0x020180 + sv->i * 4, lab_therm >= 2 ? sv->f3 : x3);
++		nvkm_wr32(device, 0x0201a0 + sv->i * 4, lab_therm >= 2 ? sv->f4 : x4);
 +	}
 +	nvkm_wr32(device, 0x020004, sv->ctrl1);
 +	nvkm_info(&clk->base.subdev, "LAB therm idx %02x (FSRM %d): %s%u мкс; до FSRM2 %08x FSRM3 %08x FSRM4 %08x CTRL1 %08x; после %08x %08x %08x %08x; статус %08x\n",
@@ -1242,6 +1420,21 @@
 +	if (sv->fx)
 +		nvkm_info(&clk->base.subdev, "LAB therm fixed idx %02x: ждал %u нс от входа (задано %u), признак %s%u нс\n",
 +			  idx, sv->fxns, sv->fxset, sv->fxok ? "через " : "НЕ поднялся до переключения, ждали ", sv->fxok ? sv->fxflag : sv->fxns);
++	if (idx == 0 && lab_cw_n) {
++		u32 c = nvkm_rd32(device, 0x134128) & 0xfffff, s2 = lab_cw_code + 2;	/* делитель s = s2/2 */
++		u64 cf = div_u64((u64)lab_cw_half * (lab_cw_n + 4), 27000);		/* отсчёт без замедления */
++		u64 cs = div_u64(cf * 2, s2);						/* отсчёт с полным замедлением */
++		u32 tw = (u32)div_u64((u64)(lab_cw_n + 4) * 1000000, 27000);		/* окно, нс */
++		u32 te = c >= cf ? tw : c <= cs ? 0 : (u32)div_u64((u64)tw * (c - cs), (u32)(cf - cs));
++
++		nvkm_wr32(device, 0x134124, 0x00000000);
++		nvkm_info(&clk->base.subdev, "LAB счётчик в скобке GPC: окно %u нс (N %u), отсчёт %u, без замедления было бы %llu, "
++			  "с полным /%u.%u — %llu; такт снижен через ≈ %u нс от начала окна%s; признак %s%u нс (часы процессора)\n",
++			  tw, lab_cw_n, c, cf, s2 / 2, (s2 & 1) ? 5 : 0, cs, te,
++			  c >= cf ? " (НЕ снижен в окне)" : c <= cs ? " (снижен сразу)" : "",
++			  !sv->fx ? "не мерили " : sv->fxok ? "через " : "не поднялся, ждали ", sv->fx ? (sv->fxok ? sv->fxflag : sv->fxns) : 0);
++		lab_cw_n = 0;
++	}
 +	if (lab_therm_probe && !sv->w) {
 +		char buf[200];
 +		int k, o = 0;
@@ -1313,9 +1506,27 @@
 +	 * 0x139060 + k·0x40. При запуске NVIDIA посреди настройки PCIe пишет 0x1371c8/cc = 0x30000 (источник 100 МГц от платы ->
 +	 * 108 МГц от кварца карты) и 0x139060…0x139220 = 0x74 (было 0x7c); nouveau их не трогает. Все адреса NVIDIA читает. */
 +	static const u32 src2[] = { 0x13718c, 0x137190, 0x137198, 0x1371c8, 0x1371cc, 0x139060, 0x139220 };
++	/* LAB 16.11: счётчик тактов GPC по коду NVIDIA для Kepler/Maxwell (nvgpu hw_trim_gk20a/gm20b:
++	 * trim_gpc_clk_cntr_ncgpcclk_cfg 0x134124 + i·0x200, _cnt 0x134128 + i·0x200). Есть ли он на Fermi — неизвестно;
++	 * только чтение: 0xbadf… = регистра нет, иначе — живой. */
++	static const u32 cntr[] = { 0x134124, 0x134128, 0x134324, 0x134328 };
 +	static int n;
 +	struct nvkm_subdev *subdev = &base->subdev;
 +
++	{	/* 18.11: состояние регистров замедления до первой скобки — значения выхода из скобки, как NVIDIA */
++		struct nvkm_device *device = subdev->device;
++		int k;
++
++		for (k = 0; k < 2; k++) {
++			lab_fs_boot[k][0] = nvkm_rd32(device, 0x020160 + k * 4);
++			lab_fs_boot[k][1] = nvkm_rd32(device, 0x020180 + k * 4);
++			lab_fs_boot[k][2] = nvkm_rd32(device, 0x0201a0 + k * 4);
++		}
++		lab_fs_boot_ok = true;
++		nvkm_info(subdev, "LAB выход скобки по состоянию VBIOS: GPC %08x %08x %08x, hub %08x %08x %08x\n",
++			  lab_fs_boot[0][0], lab_fs_boot[0][1], lab_fs_boot[0][2],
++			  lab_fs_boot[1][0], lab_fs_boot[1][1], lab_fs_boot[1][2]);
++	}
 +	if (lab_boot_snap) {
 +		n++;
 +		lab_snap_line(subdev, n, "PLL", pll, ARRAY_SIZE(pll));
@@ -1326,6 +1537,7 @@
 +		lab_snap_line(subdev, n, "датчик", sens, ARRAY_SIZE(sens));
 +		lab_snap_line(subdev, n, "GPIO/ШИМ", gpio, ARRAY_SIZE(gpio));
 +		lab_snap_line(subdev, n, "ист.26/27, PCIe", src2, ARRAY_SIZE(src2));
++		lab_snap_line(subdev, n, "счётчик GPC", cntr, ARRAY_SIZE(cntr));
 +	}
 +	if (lab_nv_boot) {
 +		static const u32 r139[] = { 0x139060, 0x1390a0, 0x1390e0, 0x139120, 0x139160, 0x1391a0, 0x1391e0, 0x139220 };
@@ -1357,7 +1569,7 @@
 +module_param(lab_pll_off_in_bracket, uint, 0644);
 +MODULE_PARM_DESC(lab_pll_off_in_bracket, "LAB: when the GPC leaves its PLL for the divider, disable the PLL (bit 0) inside the bracket right after the mux switch, as NVIDIA 270 (0 off, 1 on)");
 +MODULE_PARM_DESC(lab_nv_mux_release, "LAB: release the FSRM slowdown right after the clock mux write and wait for the switch outside it, as NVIDIA (0 off, 1 on)");
-+static uint lab_mux_guard;
++static uint lab_mux_guard = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_mux_guard, uint, 0644);
 +MODULE_PARM_DESC(lab_mux_guard, "LAB: on a mux timeout retry up to 3 times; if a unit stays on its PLL keep that PLL on and do not lower the voltage (0 off, 1 on)");
 +/* LAB: узлы, оставшиеся на PLL после неудачного переключения в текущем переходе (бит = idx); сбрасывает clk/base.c */
@@ -1383,6 +1595,139 @@
 +		   nvkm_rd32(device, 0x00e820), nvkm_rd32(device, 0x00e824));
 +}
 +
++/* LAB 16.11, этап Б: скобка GPC с переключателем на карте. lab_pmu_bracket_ns = W (0 — выкл.): на смене источника GPC
++ * (подъём делитель -> PLL и спуск PLL -> делитель) процессор только сохраняет состояние замедления и считает значения,
++ * а PMU одним сценарием memx пишет: запрос замедления GPC (те же три записи FSRM) -> пауза W нс по часам карты -> делитель,
++ * если он пишется внутри скобки (спуск: lab_nv_div_late; подъём: lab_gpc_pre405) -> переключатель 0x137100. Дальше всё как
++ * было: процессор ждёт переключатель (тайм-аут, mux_guard) и снимает замедление. Скобка хаба (idx 7) — по-прежнему с
++ * процессора. Если memx недоступен — та же скобка с процессора. W — от последней записи запроса до записи делителя или
++ * переключателя, без задержек PCIe и процессора; нижнего предела нет (0 = сразу). */
++static uint lab_pmu_bracket_ns;
++module_param(lab_pmu_bracket_ns, uint, 0644);
++MODULE_PARM_DESC(lab_pmu_bracket_ns, "LAB: GPC bracket with the clock-source switch executed by the PMU (memx): slowdown request, W ns pause on the card clock, divider, 0x137100 (0 = off, max 20000)");
++
++static uint lab_pmu_ctrl1_first;
++module_param(lab_pmu_ctrl1_first, uint, 0644);
++MODULE_PARM_DESC(lab_pmu_ctrl1_first, "LAB: PMU bracket: the CPU writes CTRL_1 (thermal input bits) BEFORE the slowdown request, as build-1116e did by mistake (0 = PMU writes it right after the request, as the CPU bracket and NVIDIA do)");
++
++static bool
++lab_pmu_br(struct gf100_clk *clk, int idx)
++{
++	return idx == 0 && lab_therm && READ_ONCE(lab_pmu_bracket_ns) && clk->base.subdev.device->pmu;
++}
++
++/* как lab_therm_enter для GPC, но без записей замедления и без ожидания: только сохранить, чтобы lab_therm_leave вернул */
++static void
++lab_therm_enter_pmu(struct gf100_clk *clk, struct lab_therm_save *sv)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++
++	memset(sv, 0, sizeof(*sv));
++	sv->i = 0;
++	sv->ctrl1 = nvkm_rd32(device, 0x020004);
++	sv->f2 = nvkm_rd32(device, 0x020160);
++	sv->f3 = nvkm_rd32(device, 0x020180);
++	sv->f4 = nvkm_rd32(device, 0x0201a0);
++	sv->ns = READ_ONCE(lab_therm_noslow);
++	/* CTRL_1 пишет сценарий PMU — сразу после записей запроса, в том же порядке, что lab_therm_enter (16.11: было с
++	 * процессора ДО запроса — лишнее отличие от скобки с процессора, исправлено). lab_pmu_ctrl1_first=1 возвращает
++	 * ошибочный порядок для сравнения. */
++	if (READ_ONCE(lab_pmu_ctrl1_first))
++		nvkm_wr32(device, 0x020004, sv->ctrl1 & ~READ_ONCE(lab_therm_ctrl1_clr));
++	sv->on = true;
++}
++
++/* LAB 16.11 вечер: подъём и спуск раздельно. lab_pmu_up_ns / lab_pmu_dn_ns: пауза А (запрос -> переключатель) для своего
++ * направления, -1 — как lab_pmu_bracket_ns. lab_pmu_dn_flag=1: на спуске PMU сначала ждёт на карте признак «замедление
++ * действует» (0x0201e0: биты 0–5 = код глубины и бит 17; не дольше 20 мкс), потом пауза lab_pmu_dn_ns (запас после признака,
++ * 0 — без запаса), потом делитель и переключатель. */
++static int lab_pmu_up_ns = -1;
++module_param(lab_pmu_up_ns, int, 0644);
++MODULE_PARM_DESC(lab_pmu_up_ns, "LAB: PMU bracket pause request->switch on the upshift (divider->PLL), ns; -1 = lab_pmu_bracket_ns");
++static int lab_pmu_dn_ns = -1;
++module_param(lab_pmu_dn_ns, int, 0644);
++MODULE_PARM_DESC(lab_pmu_dn_ns, "LAB: PMU bracket pause on the downshift (PLL->divider), ns; with lab_pmu_dn_flag — margin after the engaged flag; -1 = lab_pmu_bracket_ns");
++static uint lab_pmu_up_flag;
++module_param(lab_pmu_up_flag, uint, 0644);
++MODULE_PARM_DESC(lab_pmu_up_flag, "LAB: on the upshift the PMU waits on the card for the slowdown-engaged flag (0x0201e0) before lab_pmu_up_ns (then a margin) and the switch (0 off, 1 on) — 17.11");
++static uint lab_pmu_dn_flag;
++module_param(lab_pmu_dn_flag, uint, 0644);
++MODULE_PARM_DESC(lab_pmu_dn_flag, "LAB: on the downshift the PMU waits on the card for the slowdown-engaged flag (0x0201e0) before the margin and the switch (0 off, 1 on)");
++
++/* сценарий PMU: запрос замедления GPC -> [признак] -> W нс -> (a1 = v1) -> 0x137100 = v100. 0 — выполнен; иначе memx недоступен. */
++static int
++lab_pmu_bracket_run(struct gf100_clk *clk, struct lab_therm_save *sv, u32 a1, u32 v1, u32 v100, const char *what, bool up)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	int wd = up ? READ_ONCE(lab_pmu_up_ns) : READ_ONCE(lab_pmu_dn_ns);
++	u32 code = lab_therm_gpc_code(device);
++	u32 w = min_t(u32, wd >= 0 ? (u32)wd : READ_ONCE(lab_pmu_bracket_ns), 20000);
++	bool flag = (up ? READ_ONCE(lab_pmu_up_flag) : READ_ONCE(lab_pmu_dn_flag)) && !sv->ns;
++	struct nvkm_memx *memx;
++	u64 t0 = ktime_get_ns();
++	int ret = nvkm_memx_init(device->pmu, &memx);
++
++	if (ret) {
++		nvkm_error(&clk->base.subdev, "LAB PMU-скобка GPC %s: memx недоступен (%d) — скобка с процессора\n", what, ret);
++		return ret;
++	}
++	if (!sv->ns) {
++		nvkm_memx_wr32(memx, 0x020160, (code << 16) | 0x80 | code);	/* оба поля, как NVIDIA (17.11) */
++		nvkm_memx_wr32(memx, 0x020180, code);
++		nvkm_memx_wr32(memx, 0x0201a0, 0x00004040);
++	}
++	if (!READ_ONCE(lab_pmu_ctrl1_first))
++		nvkm_memx_wr32(memx, 0x020004, sv->ctrl1 & ~READ_ONCE(lab_therm_ctrl1_clr));	/* как в lab_therm_enter */
++	if (flag)
++		nvkm_memx_wait(memx, 0x0201e0, 0x0002003f, 0x00020000 | (code & 0x3f), 20000);
++	if (w)
++		nvkm_memx_nsec(memx, w);
++	if (a1)
++		nvkm_memx_wr32(memx, a1, v1);
++	nvkm_memx_wr32(memx, 0x137100, v100);
++	nvkm_memx_fini(&memx, true);
++	nvkm_info(&clk->base.subdev, "LAB PMU-скобка GPC %s: замедление /%u.%u, %s%u нс по часам карты, %s%06x = %08x, 0x137100 = %08x; "
++		  "сценарий с ответом %llu нс\n", what, (code + 2) / 2, (code & 1) ? 5 : 0,
++		  flag ? "ждать признак на карте, затем запас " : "пауза ", w,
++		  a1 ? "затем " : "делитель не пишется, ", a1, v1, v100, ktime_get_ns() - t0);
++	return 0;
++}
++
++/* LAB 16.11 вечер: как вытащить застрявший переключатель GPC (PLL -> делитель). Применяется в mux_guard перед каждым
++ * повтором, внутри скобки. lab_mux_recover — по одному способу за опыт: 1 — вернуть бит переключателя на PLL и тут же снова
++ * на делитель (повтор ниже); 2 — перезапустить основной делитель (бит 31 0x1371d0 снять и вернуть); 4 — заново записать
++ * источник делителя 0x137160 тем же значением. 0 — как было (только повтор). */
++static uint lab_mux_recover;
++module_param(lab_mux_recover, uint, 0644);
++MODULE_PARM_DESC(lab_mux_recover, "LAB: GPC mux stuck on PLL: before each mux_guard retry 1 = set the mux bit back to PLL first, 2 = restart the main divider (toggle bit 31 of 0x1371d0), 4 = rewrite the divider source 0x137160 (0 = plain retry)");
++
++static void
++lab_mux_try_recover(struct gf100_clk *clk, int t)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 m = READ_ONCE(lab_mux_recover);
++
++	if (m & 1) {
++		nvkm_mask(device, 0x137100, 0x00000001, 0x00000001);
++		udelay(1);
++		nvkm_error(&clk->base.subdev, "LAB mux_recover попытка %d: бит GPC снова на PLL (137100 %08x)\n", t, nvkm_rd32(device, 0x137100));
++	}
++	if (m & 2) {
++		u32 d = nvkm_rd32(device, 0x1371d0);
++
++		nvkm_wr32(device, 0x1371d0, d & ~0x80000000);
++		udelay(1);
++		nvkm_wr32(device, 0x1371d0, d);
++		nvkm_error(&clk->base.subdev, "LAB mux_recover попытка %d: делитель перезапущен (1371d0 %08x)\n", t, nvkm_rd32(device, 0x1371d0));
++	}
++	if (m & 4) {
++		u32 v = nvkm_rd32(device, 0x137160);
++
++		nvkm_wr32(device, 0x137160, v);
++		nvkm_error(&clk->base.subdev, "LAB mux_recover попытка %d: источник делителя записан заново (137160 %08x)\n", t, v);
++	}
++}
++
  static void
  gf100_clk_prog_1(struct gf100_clk *clk, int idx)
  {
@@ -1393,6 +1738,26 @@
 +	bool late = false;
 +	u32 dl = 0;
 +
++	if (chg && lab_pmu_br(clk, idx)) {
++		/* этап Б: спуск PLL -> делитель на карте; делитель (nv_div_late) — внутри сценария перед переключателем */
++		u32 a1 = 0, v1 = 0, v100 = nvkm_rd32(device, 0x137100) & ~(1u << idx);
++
++		lab_therm_enter_pmu(clk, &th);
++		if (lab_div_late_pending) {
++			dl = nvkm_rd32(device, 0x1371d0);
++			a1 = 0x1371d0;
++			v1 = (dl & ~0x80003f3f) | info->ddiv;
++			lab_div_late_pending = false;
++			late = true;
++		}
++		if (lab_pmu_bracket_run(clk, &th, a1, v1, v100, "спуск PLL -> делитель", false)) {
++			lab_therm_enter(clk, idx, &th);
++			if (a1)
++				nvkm_wr32(device, a1, v1);
++			nvkm_wr32(device, 0x137100, v100);
++		}
++		goto lab_mux_written;
++	}
 +	if (!lab_therm_real || chg)
 +		lab_therm_enter(clk, idx, &th);
 +	else if (lab_therm && (idx == 0 || idx == 7))
@@ -1412,6 +1777,7 @@
 +	}
  	nvkm_mask(device, 0x137100, (1 << idx), 0x00000000);
 -	nvkm_msec(device, 2000,
++lab_mux_written:
 +	if (lab_nv_mux_release)
 +		lab_therm_leave(clk, idx, &th);
 +	if (nvkm_msec(device, 2000,
@@ -1428,6 +1794,8 @@
 +				lab_therm_leave(clk, idx, &th);
 +				if (!lab_therm_real || chg)
 +					lab_therm_enter(clk, idx, &th);
++				if (idx == 0)
++					lab_mux_try_recover(clk, t);
 +				nvkm_mask(device, 0x137100, (1 << idx), 0x00000000);
 +				if (lab_nv_mux_release)
 +					lab_therm_leave(clk, idx, &th);
@@ -1496,7 +1864,7 @@
  }
  
  static void
-@@ -368,20 +1491,58 @@
+@@ -368,20 +1793,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -1558,7 +1926,7 @@
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +1551,66 @@
+@@ -390,17 +1853,106 @@
  }
  
  static void
@@ -1567,6 +1935,21 @@
 +	struct nvkm_device *device = clk->base.subdev.device;
 +	u32 d = nvkm_rd32(device, 0x1371d0), p = nvkm_rd32(device, 0x137250);
 +	u32 a = d & 0x3f, f = p & 0x3f;
++
++	if (READ_ONCE(lab_nv_up07)) {
++		/* делительный путь сейчас: VCO * 2 / (a + 2), с пост-делителем ещё * 2 / (f + 2); ступень, только если он ниже VCO/4 */
++		u32 num = 2, den = a + 2;
++
++		if (p & 0x80000000) {
++			num *= 2;
++			den *= f + 2;
++		}
++		if (num * 4 >= den) {
++			nvkm_info(&clk->base.subdev, "LAB nv_up07: делительный путь GPC не ниже VCO/4 (1371d0 %08x 137250 %08x) — без ступени, как NVIDIA\n",
++				  d, p);
++			return;
++		}
++	}
 +
 +	/* делительный путь = VCO * 2 / (a + 2) * 2 / (f + 2); цель VCO / 4, то есть (a + 2) * (f + 2) = 16 */
 +	if ((p & 0x80000000) && f && 16 % (a + 2) == 0 && 16 / (a + 2) >= 2)
@@ -1587,6 +1970,30 @@
 +		bool chg = (nvkm_rd32(device, 0x137100) & (1 << idx)) != info->ssel;
 +
 +		nvkm_info(&clk->base.subdev, "LAB prog_3 idx %02x select PLL, 0x137100=%08x\n", idx, nvkm_rd32(device, 0x137100));
++		if (chg && lab_pmu_br(clk, idx)) {
++			/* этап Б: подъём делитель -> PLL на карте; делительный путь на VCO/4 (gpc_pre405) — внутри сценария */
++			u32 r100 = nvkm_rd32(device, 0x137100), a1 = 0, v1 = 0;
++
++			lab_therm_enter_pmu(clk, &th);
++			if (lab_gpc_pre405 && !(r100 & 1)) {
++				u32 d = nvkm_rd32(device, 0x1371d0), p = nvkm_rd32(device, 0x137250);
++				u32 a = d & 0x3f, f = p & 0x3f;
++
++				if ((p & 0x80000000) && f && 16 % (a + 2) == 0 && 16 / (a + 2) >= 2) {
++					a1 = 0x137250;
++					v1 = (p & ~0x3f) | (16 / (a + 2) - 2);
++				} else {
++					a1 = 0x1371d0;
++					v1 = (d & ~0x3f) | 0x06;
++				}
++			}
++			if (lab_pmu_bracket_run(clk, &th, a1, v1, (r100 & ~(1u << idx)) | info->ssel, "подъём делитель -> PLL", true)) {
++				lab_therm_enter(clk, idx, &th);
++				if (a1)
++					nvkm_wr32(device, a1, v1);
++				nvkm_mask(device, 0x137100, (1 << idx), info->ssel);
++			}
++		} else {
 +		if (!lab_therm_real || chg)
 +			lab_therm_enter(clk, idx, &th);
 +		else if (lab_therm && (idx == 0 || idx == 7))
@@ -1595,6 +2002,7 @@
 +			lab_gpc_div405(clk);
  		nvkm_mask(device, 0x137100, (1 << idx), info->ssel);
 -		nvkm_msec(device, 2000,
++		}
 +		if (lab_nv_mux_release)
 +			lab_therm_leave(clk, idx, &th);
 +		if (nvkm_msec(device, 2000,
@@ -1607,7 +2015,7 @@
 +			lab_mux_dump(clk, idx, "ТАЙМ-АУТ делитель -> PLL");
 +		}
 +		lab_therm_leave(clk, idx, &th);
-+		if (idx == 0 && lab_nv_div_late && (nvkm_rd32(device, 0x137100) & 1)) {
++		if (idx == 0 && lab_nv_div_late && !READ_ONCE(lab_nv_up07) && (nvkm_rd32(device, 0x137100) & 1)) {
 +			u32 d = nvkm_mask(device, 0x1371d0, 0x0000003f, 0x06);	/* ядро на PLL: делитель простаивает */
 +
 +			nvkm_info(&clk->base.subdev, "LAB nv_div_late: ядро на PLL, простаивающий делитель 0x1371d0 %08x -> %08x (405 МГц, как у NVIDIA на 0f)\n",
@@ -1627,7 +2035,7 @@
  	}
  }
  
-@@ -409,7 +1619,17 @@
+@@ -409,7 +1961,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -1645,7 +2053,7 @@
  }
  
  static int
-@@ -426,15 +1646,138 @@
+@@ -426,23 +1988,485 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -1762,8 +2170,17 @@
 +				nvkm_wr32(device, 0x13ec14, 1);
 +			}
 +		}
-+		if (lab_e9e0)
++		if (lab_e9e0 == 1)
 +			nvkm_wr32(device, 0x00e9e0, lvl == 2 ? 0x81200a04 : lvl == 1 ? 0x81200a06 : 0x81200a0a);
++		if (lab_e9e0 == 2 && lab_e9e0_khz) {
++			u32 ref = nvkm_clk_read(&clk->base, nv_clk_src_sppll0);
++			int a = (int)DIV_ROUND_CLOSEST(ref * 2, lab_e9e0_khz) - 2;
++
++			a = clamp(a, 0, 0x3f);
++			nvkm_mask(device, 0x00e9e0, 0x3f, a);
++			nvkm_info(&clk->base.subdev, "LAB e9e0 из VBIOS: домен 7 %u кГц, SPPLL0 %u кГц -> поле A %02x (%u кГц); таблица этой карты дала бы %02x\n",
++				  lab_e9e0_khz, ref, a, ref * 2 / (a + 2), lvl == 2 ? 0x04 : lvl == 1 ? 0x06 : 0x0a);
++		}
 +		nvkm_info(&clk->base.subdev, "LAB xbar после (уровень %d): part0 %08x 13c844 %08x 13ec14 %08x e9e0 %08x\n",
 +			  lvl, nvkm_rd32(device, 0x13c054), nvkm_rd32(device, 0x13c844), nvkm_rd32(device, 0x13ec14),
 +			  nvkm_rd32(device, 0x00e9e0));
@@ -1786,7 +2203,353 @@
  	return 0;
  }
  
-@@ -477,5 +1820,5 @@
++/* LAB 16.11: замер счётчиком тактов GPC после каждой смены уровня. Порядок — как у NVIDIA в nvgpu (clk_gm20b.c,
++ * get_gpcclk_clk_measure): cfg = сброс; cfg = включить | разрешить запись | N тактов опоры; ждать 200 мкс; прочитать cnt;
++ * ждать 100 мкс; прочитать ещё раз (должно совпасть — счёт закончен). Поля cfg (hw_trim_gm20b): N — биты 0–13,
++ * write_en 0x10000, enable 0x100000, reset 0x1000000; cnt — биты 0–19. На Fermi регистры не описаны: 16.11 при чтении
++ * 0x134124 = 0, 0x134128 = 0x000ffbfc у обоих GPC. После замера cfg возвращается в 0 (как было при загрузке).
++ * Частота в журнале — при опоре 27 МГц (у Tegra опора 38,4); если счёт верный, отношение к частоте узла покажет и опору. */
++static uint lab_cntr_n;
++module_param(lab_cntr_n, uint, 0644);
++MODULE_PARM_DESC(lab_cntr_n, "LAB: after each pstate change measure GPC clock with counter 0x134124/0x134128 (+0x200 for GPC1) over N reference cycles (0 = off, max 16383; 2700 = 100 us at 27 MHz)");
++
++static void
++lab_cntr_measure(struct gf100_clk *clk)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 n = min_t(u32, READ_ONCE(lab_cntr_n), 0x3fff);
++	int gpc = gf100_clk_read(&clk->base, nv_clk_src_gpc);
++	int i;
++
++	if (!n)
++		return;
++	for (i = 0; i < 2; i++) {
++		u32 cfg = 0x134124 + i * 0x200, cnt = 0x134128 + i * 0x200;
++		u32 c0 = nvkm_rd32(device, cnt), f0 = nvkm_rd32(device, cfg), c1, c2;
++
++		nvkm_wr32(device, cfg, 0x01000000);
++		nvkm_wr32(device, cfg, 0x00110000 | n);
++		nvkm_rd32(device, cfg);
++		udelay(200);
++		c1 = nvkm_rd32(device, cnt) & 0xfffff;
++		udelay(100);
++		c2 = nvkm_rd32(device, cnt) & 0xfffff;
++		nvkm_wr32(device, cfg, 0x00000000);
++		nvkm_info(&clk->base.subdev, "LAB счётчик GPC%d: N %u, до cfg %08x cnt %08x; отсчёт %u / %u (%s), "
++			  "при опоре 27 МГц ≈ %u кГц; драйвер считает узел GPC %d кГц\n",
++			  i, n, f0, c0, c1, c2, c1 == c2 ? "устоялся" : "ещё менялся",
++			  (u32)div_u64((u64)c2 * 27000, n), gpc);
++	}
++}
++
++/* LAB 17.11 (тест 87): счётчики тактов хабовой стороны. У NVIDIA (nvgpu, Pascal gp106) 0x1373b0/b4 — счётчик с источником
++ * SYS2CLK, 0x1373c0/c4 — с источником XBAR2CLK (поле источника — биты 28–30). Драйвер NVIDIA на Fermi (трассы GF104/GF108/GF114)
++ * пользуется 0x1373c0 в том же формате, что счётчик GPC (сброс 0x01010000, затем 0x00110000 | N), источник всегда 0.
++ * lab_cntr_sys — маска: бит 0 — 0x1373b0, бит 1 — 0x1373c0; после каждой смены уровня для каждого счётчика перебрать
++ * источник 0…7, N = 8191 тактов кварца (≈ 303 мкс), записать частоту и частоты узлов по расчёту драйвера.
++ * lab_sys_r1 (−1 — выкл.): в том же замере сначала как есть, потом записать в 0x020164 (главный регистр замедления SYS2CLK)
++ * это значение, повторить замер и вернуть прежнее — замедляет ли SYS2CLK пара «поле B + бит 7» (0x82 после снятия скобки). */
++static uint lab_cntr_sys;
++module_param(lab_cntr_sys, uint, 0644);
++MODULE_PARM_DESC(lab_cntr_sys, "LAB: after each pstate change measure hub-side clock counters, mask: 1 = 0x1373b0, 2 = 0x1373c0; source field (bits 28-30) 0..7 each");
++/* LAB 17.11 (тест 88): контроль и разделение. lab_cntr_split — маска отдельных проходов после прохода «как есть», каждый
++ * отличается от него ОДНИМ и сразу возвращается: 1 — пост-делитель XBAR2CLK (0x137258, поле BYPDIV) вдвое глубже, только если
++ * узел на делителе (03/07) — какой источник 0x1373c0 упадёт вдвое, тот XBAR2CLK; 2 — команда замедления SYS2CLK /2
++ * (0x020184 = 2) — видит ли 0x1373b0 замедление; 4 — команда замедления GPC /2 (0x020180 = 2) — видит ли его 0x1373c0. */
++static uint lab_cntr_split;
++module_param(lab_cntr_split, uint, 0644);
++MODULE_PARM_DESC(lab_cntr_split, "LAB: with lab_cntr_sys, extra passes each restored: 1 = XBAR2CLK post-divider x2, 2 = SYS2CLK command slowdown /2, 4 = GPC command slowdown /2, 8 = copy post-divider x2, 16 = LTC main divider x2, 32 = copy divider source -> 2 (100 MHz?), 64 = LTC PLL reference divider x2 (only while LTC on divider)");
++/* LAB 17.11 (тест 89): неопознанные источники. Драйвер считает узлы copy (idx 9) и MSDCLK (idx 0xe) одинаково: 135 / 405 /
++ * 540 МГц на 03 / 07 / 0f — как 0x1373b0 источники 2 и 3. 8 — пост-делитель copy (0x137274) вдвое глубже: какой из 2/3 упадёт.
++ * 16 — основной делитель LTC2CLK (0x1371d4, поле A) вдвое глубже: на 0f путь простаивает — упадёт ли 0x1373c0 источник 7.
++ * 32 — источник делителя copy (0x137184, SRC) = 2 («100 МГц» у ET): совпадёт ли с 0x1373b0 источник 4 (~100,9 МГц).
++ * 64 — делитель опоры PLL LTC2CLK (0x137144, поля A и B) вдвое глубже, только пока LTC на делителе: упадёт ли один из
++ *      0x1373c0 источников 3–5 (постоянные 405). PLL на это время перезахватывается на половину частоты и возвращается. */
++static int lab_sys_r1 = -1;
++module_param(lab_sys_r1, int, 0644);
++MODULE_PARM_DESC(lab_sys_r1, "LAB: with lab_cntr_sys: measure as is, then with 0x020164 = this value, then restore (-1 = off)");
++
++static void
++lab_cntr_sys_pass(struct gf100_clk *clk, u32 mask, const char *tag)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	static const u32 base[2] = { 0x1373b0, 0x1373c0 };
++	const u32 n = 8191;
++	char buf[220];
++	int r, src, o;
++
++	for (r = 0; r < 2; r++) {
++		u32 save;
++
++		if (!(mask & (1u << r)))
++			continue;
++		save = nvkm_rd32(device, base[r]);
++		o = 0;
++		for (src = 0; src < 8; src++) {
++			u32 c1, c2;
++
++			nvkm_wr32(device, base[r], 0x01010000);
++			nvkm_wr32(device, base[r], ((u32)src << 28) | 0x00110000 | n);
++			nvkm_rd32(device, base[r]);
++			udelay(400);
++			c1 = nvkm_rd32(device, base[r] + 4) & 0xfffff;
++			udelay(100);
++			c2 = nvkm_rd32(device, base[r] + 4) & 0xfffff;
++			o += scnprintf(buf + o, sizeof(buf) - o, " %d:%u%s", src, (u32)div_u64((u64)c2 * 27000, n + 4),
++				       c1 == c2 ? "" : "?");
++		}
++		nvkm_wr32(device, base[r], 0x01010000);
++		nvkm_wr32(device, base[r], save);
++		nvkm_info(&clk->base.subdev, "LAB счётчик %06x (%s; 0x020164 %08x), источник:кГц —%s\n",
++			  base[r], tag, nvkm_rd32(device, 0x020164), buf);
++	}
++}
++
++static void
++lab_cntr_sys_measure(struct gf100_clk *clk)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 mask = READ_ONCE(lab_cntr_sys) & 3;
++	int v = READ_ONCE(lab_sys_r1);
++
++	if (!mask)
++		return;
++	nvkm_info(&clk->base.subdev, "LAB узлы по расчёту драйвера, кГц: GPC2CLK %u LTC2CLK %u XBAR2CLK %u SYS2CLK %u HUB2CLK %u; "
++		  "переключатель %08x\n", read_clk(clk, 0x00), read_clk(clk, 0x01), read_clk(clk, 0x02), read_clk(clk, 0x07),
++		  read_clk(clk, 0x08), nvkm_rd32(device, 0x137100));
++	lab_cntr_sys_pass(clk, mask, "как есть");
++	if (v >= 0) {
++		u32 f2 = nvkm_rd32(device, 0x020164);
++
++		nvkm_wr32(device, 0x020164, (u32)v);
++		udelay(50);
++		lab_cntr_sys_pass(clk, mask, "SYS главный регистр подменён");
++		nvkm_wr32(device, 0x020164, f2);
++	}
++	{
++		u32 sp = READ_ONCE(lab_cntr_split);
++
++		if ((sp & 1) && !(nvkm_rd32(device, 0x137100) & 0x4)) {
++			u32 d = nvkm_rd32(device, 0x137258), f = d & 0x3f, g = f * 2 + 2;	/* делит (f+2)/2 -> вдвое глубже */
++
++			if (g <= 0x3f) {
++				nvkm_wr32(device, 0x137258, (d & ~0x3f) | g);
++				udelay(20);
++				lab_cntr_sys_pass(clk, mask, "XBAR2CLK пост-делитель вдвое глубже");
++				nvkm_wr32(device, 0x137258, d);
++				udelay(20);
++			}
++		}
++		if (sp & 2) {
++			u32 f3 = nvkm_rd32(device, 0x020184);
++
++			nvkm_wr32(device, 0x020184, 0x2);
++			udelay(20);
++			lab_cntr_sys_pass(clk, mask, "команда замедления SYS2CLK /2");
++			nvkm_info(&clk->base.subdev, "LAB   признак SYS2CLK во время команды: %08x\n", nvkm_rd32(device, 0x0201e4));
++			nvkm_wr32(device, 0x020184, f3);
++			udelay(20);
++		}
++		if (sp & 8) {
++			u32 d = nvkm_rd32(device, 0x137274), f = d & 0x3f, g = f * 2 + 2;
++
++			if (g <= 0x3f) {
++				nvkm_wr32(device, 0x137274, (d & ~0x3f) | g);
++				udelay(20);
++				lab_cntr_sys_pass(clk, mask, "copy пост-делитель вдвое глубже");
++				nvkm_wr32(device, 0x137274, d);
++				udelay(20);
++			}
++		}
++		if (sp & 16) {
++			u32 d = nvkm_rd32(device, 0x1371d4), f = d & 0x3f, g = f * 2 + 2;
++
++			if (g <= 0x3f) {
++				nvkm_wr32(device, 0x1371d4, (d & ~0x3f) | g);
++				udelay(20);
++				lab_cntr_sys_pass(clk, mask, "LTC основной делитель вдвое глубже");
++				nvkm_wr32(device, 0x1371d4, d);
++				udelay(20);
++			}
++		}
++		if (sp & 32) {
++			u32 d = nvkm_rd32(device, 0x137184);
++
++			nvkm_wr32(device, 0x137184, (d & ~0xf) | 0x2);
++			udelay(20);
++			lab_cntr_sys_pass(clk, mask, "copy источник делителя = 2");
++			nvkm_wr32(device, 0x137184, d);
++			udelay(20);
++		}
++		if ((sp & 64) && !(nvkm_rd32(device, 0x137100) & 0x2)) {
++			u32 d = nvkm_rd32(device, 0x137144), f = d & 0x3f, g = f * 2 + 2;
++
++			if (g <= 0x3f && ((d >> 8) & 0x3f) == f) {
++				nvkm_wr32(device, 0x137144, (d & ~0x3f3f) | (g << 8) | g);
++				udelay(100);
++				lab_cntr_sys_pass(clk, mask, "опора PLL LTC вдвое ниже");
++				nvkm_wr32(device, 0x137144, d);
++				udelay(100);
++				nvkm_info(&clk->base.subdev, "LAB   PLL LTC после возврата опоры: ctrl %08x (захват %u)\n",
++					  nvkm_rd32(device, 0x137020), (nvkm_rd32(device, 0x137020) >> 17) & 1);
++			}
++		}
++		if (sp & 4) {
++			u32 f3 = nvkm_rd32(device, 0x020180);
++
++			nvkm_wr32(device, 0x020180, 0x2);
++			udelay(20);
++			lab_cntr_sys_pass(clk, mask, "команда замедления GPC /2");
++			nvkm_wr32(device, 0x020180, f3);
++			udelay(20);
++		}
++	}
++}
++
++/* LAB 16.11, шаг 1 «скобка на карте»: время включения замедления GPC без PCIe и процессора. После смены уровня драйвер
++ * lab_pmu_slow раз собирает сценарий memx и отдаёт его PMU (как скрипты памяти): сброс и включение счётчика тактов GPC на
++ * lab_pmu_slow_win тактов кварца → запрос замедления GPC (те же три записи FSRM, что в скобке, без CTRL_1) → пауза 8000 нс
++ * по часам PMU → снять замедление (вернуть прежние значения). Переключатель НЕ трогается: частота узла не меняется, только
++ * замедляется и возвращается. Отсчёт читается после сценария; момент снижения такта — как в lab_cntr_win (te от открытия
++ * окна; между открытием окна и приходом запроса — две записи PMU по внутренней шине). */
++static uint lab_pmu_slow;
++module_param(lab_pmu_slow, uint, 0644);
++MODULE_PARM_DESC(lab_pmu_slow, "LAB: after each pstate change run N PMU (memx) scripts: GPC counter window + GPC slowdown request + 8 us + release, no clock switch; log when the clock actually slowed (0 = off, max 20)");
++/* LAB 16.11 вечер: lab_pmu_slow_rel=1 — мерить не включение, а ОТПУСКАНИЕ замедления: запрос → 8000 нс → окно счётчика
++ * открывается → снять замедление; отсчёт показывает, через сколько после снятия такт возвращается к полному. */
++static uint lab_pmu_slow_rel;
++module_param(lab_pmu_slow_rel, uint, 0644);
++MODULE_PARM_DESC(lab_pmu_slow_rel, "LAB: lab_pmu_slow mode: 0 engagement, 1 RELEASE, 2 STEADY (window opens 8 us after the request, closes before the release: the fully slowed clock)");
++/* LAB 17.11: lab_pmu_slow_val — своё значение регистра замедления GPC 0x020160 для замера (0 — как обычно: код глубины в оба
++ * поля + бит 7). 0x020180 пишется полем B (биты 0–5) этого значения, как NVIDIA. Вопрос автора: бит 7 выбирает, какое поле
++ * действует (B «по команде» или A «в простое»)? */
++static uint lab_pmu_slow_val;
++module_param(lab_pmu_slow_val, uint, 0644);
++MODULE_PARM_DESC(lab_pmu_slow_val, "LAB: raw value for the GPC slowdown register 0x020160 in lab_pmu_slow probes (0 = depth code in both fields + bit 7); 0x020180 gets bits 0-5 of it");
++/* LAB 17.11 (тест 84): какой регистр задаёт глубину. Часть 0б теста 83: поле A 0x020160 не действует, глубина = поле B, но
++ * 0x020180 там всегда равнялся B. lab_pmu_slow_f3 — своё значение 0x020180 (−1 — как раньше: B), lab_pmu_slow_f4 — своё
++ * значение 0x0201a0 (−1 — 0x4040, как NVIDIA). В режиме 2 после сценария процессор повторяет те же три записи, через 20 мкс
++ * читает признак 0x0201e0 (какую глубину показывает карта) и возвращает регистры. */
++static int lab_pmu_slow_f3 = -1;
++module_param(lab_pmu_slow_f3, int, 0644);
++MODULE_PARM_DESC(lab_pmu_slow_f3, "LAB: lab_pmu_slow probes: value for 0x020180 (-1 = field B of the 0x020160 value, as NVIDIA)");
++static int lab_pmu_slow_f4 = -1;
++module_param(lab_pmu_slow_f4, int, 0644);
++MODULE_PARM_DESC(lab_pmu_slow_f4, "LAB: lab_pmu_slow probes: value for 0x0201a0 (-1 = 0x4040, as NVIDIA)");
++static uint lab_pmu_slow_win = 189;
++module_param(lab_pmu_slow_win, uint, 0644);
++MODULE_PARM_DESC(lab_pmu_slow_win, "LAB: counter window for lab_pmu_slow, 27 MHz cycles (default 189 = 7.15 us, must end before the 8 us release)");
++
++static void
++lab_pmu_slow_probe(struct gf100_clk *clk)
++{
++	struct nvkm_subdev *subdev = &clk->base.subdev;
++	struct nvkm_device *device = subdev->device;
++	u32 reps = min_t(u32, READ_ONCE(lab_pmu_slow), 20), n = min_t(u32, READ_ONCE(lab_pmu_slow_win), 0x3fff);
++	u32 code = lab_therm_gpc_code(device), s2 = code + 2;
++	u32 half = (u32)max(read_clk(clk, 0x00), 0) / 2;
++	u64 cf = div_u64((u64)half * (n + 4), 27000), cs = div_u64(cf * 2, s2);
++	u32 tw = (u32)div_u64((u64)(n + 4) * 1000000, 27000);
++	u32 rel = READ_ONCE(lab_pmu_slow_rel), rv = READ_ONCE(lab_pmu_slow_val);
++	int k3 = READ_ONCE(lab_pmu_slow_f3), k4 = READ_ONCE(lab_pmu_slow_f4);
++	u32 v2 = rv ? rv : ((code << 16) | 0x80 | code);
++	u32 v3 = k3 >= 0 ? (u32)k3 : (v2 & 0x3f), v4 = k4 >= 0 ? (u32)k4 : 0x00004040;
++	u32 r;
++
++	if (!reps || !n || !device->pmu)
++		return;
++	for (r = 0; r < reps; r++) {
++		struct nvkm_memx *memx;
++		u32 f2 = nvkm_rd32(device, 0x020160), f3 = nvkm_rd32(device, 0x020180), f4 = nvkm_rd32(device, 0x0201a0);
++		u32 c, te;
++		u64 t0;
++		int ret = nvkm_memx_init(device->pmu, &memx);
++
++		if (ret) {
++			nvkm_info(subdev, "LAB PMU-замедление: memx недоступен (%d)\n", ret);
++			return;
++		}
++		if (!rel) {
++			nvkm_memx_wr32(memx, 0x134124, 0x01000000);
++			nvkm_memx_wr32(memx, 0x134124, 0x00110000 | n);
++		}
++		nvkm_memx_wr32(memx, 0x020160, v2);	/* по умолчанию оба поля + бит 7, как NVIDIA (17.11) */
++		nvkm_memx_wr32(memx, 0x020180, v3);
++		nvkm_memx_wr32(memx, 0x0201a0, v4);
++		nvkm_memx_nsec(memx, 8000);
++		if (rel) {
++			nvkm_memx_wr32(memx, 0x134124, 0x01000000);
++			nvkm_memx_wr32(memx, 0x134124, 0x00110000 | n);
++		}
++		if (rel == 2)
++			nvkm_memx_nsec(memx, tw + 500);	/* устоявшееся: окно целиком под замедлением */
++		nvkm_memx_wr32(memx, 0x020160, f2);
++		nvkm_memx_wr32(memx, 0x020180, f3);
++		nvkm_memx_wr32(memx, 0x0201a0, f4);
++		if (rel == 1)
++			nvkm_memx_nsec(memx, tw + 500);	/* окно успевает закончиться до конца сценария */
++		t0 = ktime_get_ns();
++		nvkm_memx_fini(&memx, true);
++		c = nvkm_rd32(device, 0x134128) & 0xfffff;
++		nvkm_wr32(device, 0x134124, 0x00000000);
++		/* страховка: вернуть замедление в прежнее состояние и с процессора (если сценарий не дошёл до конца) */
++		nvkm_wr32(device, 0x020160, f2);
++		nvkm_wr32(device, 0x020180, f3);
++		nvkm_wr32(device, 0x0201a0, f4);
++		if (!rel) {
++			te = c >= cf ? tw : c <= cs ? 0 : (u32)div_u64((u64)tw * (c - cs), (u32)(cf - cs));
++			nvkm_info(subdev, "LAB PMU-замедление %u/%u: GPC %u кГц, /%u.%u, окно %u нс, отсчёт %u (без замедления %llu, с полным %llu); "
++				  "такт снижен через ≈ %u нс от начала окна%s; сценарий с ожиданием ответа %llu нс\n",
++				  r + 1, reps, half, s2 / 2, (s2 & 1) ? 5 : 0, tw, c, cf, cs, te,
++				  c >= cf ? " (НЕ снижен в окне)" : c <= cs ? " (снижен сразу)" : "", ktime_get_ns() - t0);
++		} else if (rel == 2) {
++			u32 st;
++
++			nvkm_wr32(device, 0x020160, v2);
++			nvkm_wr32(device, 0x020180, v3);
++			nvkm_wr32(device, 0x0201a0, v4);
++			udelay(20);
++			st = nvkm_rd32(device, 0x0201e0);
++			nvkm_wr32(device, 0x020160, f2);
++			nvkm_wr32(device, 0x020180, f3);
++			nvkm_wr32(device, 0x0201a0, f4);
++			nvkm_info(subdev, "LAB PMU-устоявшееся %u/%u: GPC %u кГц, 0x020160 = %08x, 0x020180 = %08x, 0x0201a0 = %08x, окно %u нс, "
++				  "отсчёт %u (полный %llu): такт замедлен в %u.%02u раза; признак 0x0201e0 = %08x (делитель %u, действует %u)\n",
++				  r + 1, reps, half, v2, v3, v4, tw, c, cf,
++				  c ? (u32)div_u64(cf, c) : 0, c ? (u32)(div_u64(cf * 100, c) % 100) : 0,
++				  st, st & 0x3f, (st >> 17) & 1);
++		} else {
++			/* до момента tr такт замедлен, после — полный: c = cs·tr/T + cf·(T − tr)/T */
++			te = c <= cs ? tw : c >= cf ? 0 : (u32)div_u64((u64)tw * (cf - c), (u32)(cf - cs));
++			nvkm_info(subdev, "LAB PMU-отпускание %u/%u: GPC %u кГц, /%u.%u, окно %u нс, отсчёт %u (полный %llu, замедленный %llu); "
++				  "такт вернулся к полному через ≈ %u нс от начала окна%s; сценарий с ожиданием ответа %llu нс\n",
++				  r + 1, reps, half, s2 / 2, (s2 & 1) ? 5 : 0, tw, c, cf, cs, te,
++				  c <= cs ? " (НЕ вернулся в окне)" : c >= cf ? " (вернулся сразу)" : "", ktime_get_ns() - t0);
++		}
++	}
++}
++
+ static void
+ gf100_clk_tidy(struct nvkm_clk *base)
+ {
+ 	struct gf100_clk *clk = gf100_clk(base);
+ 	memset(clk->eng, 0x00, sizeof(clk->eng));
++	lab_cntr_measure(clk);
++	lab_cntr_sys_measure(clk);
++	lab_e9e0_probe_run(clk);
++	lab_pmu_slow_probe(clk);
+ }
+ 
+ static const struct nvkm_clk_func
+@@ -461,6 +2485,7 @@
+ 		{ nv_clk_src_rop    , 0x04 },
+ 		{ nv_clk_src_mem    , 0x05, 0, "memory", 1000 },
+ 		{ nv_clk_src_vdec   , 0x06 },
++		{ nv_clk_src_dom6   , 0x07 },	/* LAB 17.11: домен 7 VBIOS — такт 0x00e9e0 */
+ 		{ nv_clk_src_pmu    , 0x0a },
+ 		{ nv_clk_src_hubk07 , 0x0b },
+ 		{ nv_clk_src_max }
+@@ -477,5 +2502,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
@@ -1817,7 +2580,7 @@
  #include <subdev/bios/rammap.h>
  #include <subdev/bios/timing.h>
  #include <subdev/clk.h>
-@@ -123,6 +135,1341 @@
+@@ -123,6 +135,1344 @@
  	}
  }
  
@@ -2719,7 +3482,7 @@
 +	0x10f050, 0xff000490,
 +};
 +
-+static uint lab_mem_replay;
++static uint lab_mem_replay = 15;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_mem_replay, uint, 0644);
 +MODULE_PARM_DESC(lab_mem_replay, "LAB: replay NVIDIA PMU memory scripts: bit0 135->324 (A), bit1 324->2004 (B), bit2 2004->324 (C+D), bit3 324->135 (D+E), bit4 also 0xe104 writes, bit5 raw NVIDIA 0x611200 values");
 +
@@ -2768,9 +3531,12 @@
 +	{ "GF106 GTS 450 (Gigabyte 1458:3500, запись rox4d 27.10)", 0xc3, 0x1458, 0x3500, 135, 324, 1804, lab_steps_gf106, lab_plan_gf106 },
 +};
 +static const struct lab_board *lab_board;
++/* 19.11: есть ли для этой платы записанные сценарии памяти: -1 — не Fermi/не дошли, 0 — нет (clk/base.c тогда меняет
++ * только ядро, память остаётся на частоте VBIOS), 1 — есть */
++int lab_mem_board = -1;
 +/* операция 0x13 (только в шаге E, аргумент 1000): пауза = аргумент × lab_mem_op13 нс.
 + * 1000 — считать аргумент микросекундами (1 мс, как было в v10), 1 — наносекундами (1 мкс). */
-+static uint lab_mem_op13 = 1000;
++static uint lab_mem_op13 = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_mem_op13, uint, 0644);
 +MODULE_PARM_DESC(lab_mem_op13, "LAB: NVIDIA op 0x13 delay multiplier (arg*N ns): 1000 = treat as us (v10), 1 = treat as ns");
 +/* LAB 22.10: операция NVIDIA 0x34 (арг. 0x0a — сразу после паузы вывода 0x611200 и ПЕРЕД остановом доступа
@@ -2778,7 +3544,7 @@
 + * пока вывод изображения остановится. nouveau для предыдущего поколения (gt215) в этом же месте ждёт
 + * «0x611200 & 3 == 0» (биты 0–1 — состояние, биты 4–5 — управление). 0 — пропускать (как было),
 + * 1 — при 0x0a ждать 0x611200 & 3 == 0 (до 2 мс), 0x0b по-прежнему пропускать. */
-+static uint lab_mem_op34;
++static uint lab_mem_op34 = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_mem_op34, uint, 0644);
 +MODULE_PARM_DESC(lab_mem_op34, "LAB: NVIDIA op 0x34 0x0a: 0 skip, 1 wait 0x611200&3==0 after display pause (gt215-style)");
 +/* LAB 26.10: операция NVIDIA 0x3a N пропускается, смысл неизвестен. Ключ lab_mem_op3a с толкованием из чужих заметок,
@@ -3159,7 +3925,7 @@
  int
  gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  {
-@@ -142,6 +1489,16 @@
+@@ -142,6 +1492,16 @@
  	int from, mode;
  	int N1, M1, P;
  	int ret;
@@ -3176,7 +3942,7 @@
  
  	/* lookup memory config data relevant to the target frequency */
  	rammap.data = nvbios_rammapEm(bios, freq / 1000, &ver, &rammap.size,
-@@ -268,7 +1625,10 @@
+@@ -268,7 +1628,10 @@
  	ram_wr32(fuc, 0x100b0c, 0x00080012);
  // 0x00030014 // 0x00000000 // 0x02b5f070
  // 0x00030014 // 0x00010000 // 0x02b5f070
@@ -3188,7 +3954,7 @@
  // 0x00020034 // 0x0000000a
  // 0x00030020 // 0x00000001 // 0x00000000
  
-@@ -322,7 +1682,7 @@
+@@ -322,7 +1685,7 @@
  		ram_wr32(fuc, 0x10f344, 0x00600009);
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700008);
@@ -3197,7 +3963,7 @@
  		ram_wr32(fuc, 0x10f830, 0x00300017);
  		gf100_ram_train(fuc, 0x80021001);
  		gf100_ram_train(fuc, 0x80081001);
-@@ -333,7 +1693,8 @@
+@@ -333,7 +1696,8 @@
  // 0x00030020 // 0x00000000 // 0x00000000
  // 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -3207,7 +3973,7 @@
  	} else {
  		ram_wr32(fuc, 0x10f800, 0x00001800);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
-@@ -376,7 +1737,7 @@
+@@ -376,7 +1740,7 @@
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700000);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
@@ -3216,7 +3982,7 @@
  
  		gf100_ram_train(fuc, 0x800e1008);
  
-@@ -386,7 +1747,8 @@
+@@ -386,7 +1750,8 @@
  	// 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -3226,7 +3992,7 @@
  		ram_nsec(fuc, 100000);
  		ram_wr32(fuc, 0x10f9b0, 0x05313f41);
  		ram_wr32(fuc, 0x10f9b4, 0x00002f50);
-@@ -408,6 +1770,8 @@
+@@ -408,6 +1773,8 @@
  {
  	struct gf100_ram *ram = gf100_ram(base);
  	struct nvkm_device *device = ram->base.fb->subdev.device;
@@ -3235,7 +4001,7 @@
  	ram_exec(&ram->fuc, nvkm_boolopt(device->cfgopt, "NvMemExec", true));
  	return 0;
  }
-@@ -416,6 +1780,10 @@
+@@ -416,6 +1783,10 @@
  gf100_ram_tidy(struct nvkm_ram *base)
  {
  	struct gf100_ram *ram = gf100_ram(base);
@@ -3246,11 +4012,12 @@
  	ram_exec(&ram->fuc, false);
  }
  
-@@ -580,6 +1948,10 @@
+@@ -580,6 +1951,11 @@
  	if (ret)
  		return ret;
  
 +	lab_board = lab_board_find(subdev);	/* LAB 28.10: данные повтора — по плате */
++	lab_mem_board = lab_board ? 1 : 0;
 +	if (lab_board)
 +		nvkm_info(subdev, "LAB: плата %s, память %d/%d/%d МГц\n", lab_board->name, lab_board->lo, lab_board->mid, lab_board->hi);
 +
@@ -3274,7 +4041,7 @@
  
 +/* LAB 24.10 (В1): после смены напряжения NVIDIA ждёт ~195 мкс по таймеру карты — и вверх, и вниз (запись 7: 10 смен из 10,
 + * 104–107 чтений только PTIMER, других регистров нет): признака готовности регулятора на плате у карты нет. 0 = без выдержки. */
-+static uint lab_volt_wait_us;
++static uint lab_volt_wait_us = 195;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_volt_wait_us, uint, 0644);
 +MODULE_PARM_DESC(lab_volt_wait_us, "LAB: after a VID change wait this many microseconds, as NVIDIA (~195 us both ways); 0 = none, max 2000");
 +
