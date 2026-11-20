@@ -1,0 +1,198 @@
+From: Alex <xnderv@yandex.com>
+Subject: [PATCH RFC] drm/nouveau/clk/gf100: slow the GPC and hub clocks down
+ around source switches on GF114
+
+When the binary driver changes the GPC or hubk06 clock on GF114, it
+first asks PTHERM for a forced clock slowdown (/6 for GPC, /2 for
+hubk06, thermal threshold inputs in 0x020004 masked), waits 8 us (GPC)
+or 4 us (hubk06), then flips the clock source switch 0x137100 or writes
+the post-divider, and drops the slowdown right after.  Without this,
+reclocking the core of a GeForce GTX 560 Ti hangs PGRAPH.
+
+Do the same for GF114 only.  The slowdown factors and waits differ
+between Fermi chips (and between board groups), so other chips keep
+the current behaviour until they are tested.
+
+Prepared with the help of an AI assistant (Claude); reviewed by me.
+
+@@SOB@@
+---
+DRAFT, not for sending yet: not compiled, not tested in this form.
+TODO before sending: build on top of upstream and test on the GTX 560 Ti
+with NvMemExec=0 (core only), without and with the patch; fill in below.
+
+Where the values come from:
+- mmiotraces of the binary driver on two GF114 boards (ours and another
+  user's EVGA GTX 560, 390.157): before each switch it writes
+  0x020160/0x020180/0x0201a0 (index 0 GPC, 1 hubk06) and clears 0x68 in
+  0x020004, then polls PTIMER until 8.000 us (GPC) or 4.000 us (hubk06)
+  have passed (7744 < T <= 8000 ns and 3840 < T <= 4032 ns from the
+  timer reads), then writes the switch.
+- 260.19.12 has no slowdown at all, 270.30/270.41.06 have it without the
+  wait, 304.60 and later have the wait.
+- other Fermi chips use other factors (GF100 /8 /8, GF104 and GF106
+  /2 /2, GF110 /6 or /2 depending on the board) and other waits (GF106
+  about 18 us, mobile parts about 150 us), hence GF114 only.
+
+Lab results on GTX 560 Ti (Gigabyte 1458:3515), lab build that follows
+the binary driver's order of writes:
+- without the slowdown: PGRAPH hang in 7 of 7 reclock runs;
+- with the slowdown and the same 8 us / 4.5 us waits: 3000 switches
+  07 <-> 0f, no hang, no stuck switch;
+- the slowdown can be dropped right after the switch write (200 runs).
+TODO: results for this patch alone on upstream.
+
+--- a/drivers/gpu/drm/nouveau/nvkm/subdev/clk/gf100.c
++++ b/drivers/gpu/drm/nouveau/nvkm/subdev/clk/gf100.c
+@@ -38,13 +38,75 @@
+ 	u32 coef;
+ };
+ 
++/*
++ * PTHERM clock slowdown requested around a clock source switch, for the
++ * GPC (slowdown index 0) and hubk06 (index 1) clocks, the way the binary
++ * driver does it.  factor is the idle_factor field of 0x020160 (2 * div - 2),
++ * settle_us the time it waits after the request before switching.
++ */
++struct gf100_clk_slowdown {
++	u8 factor[2];
++	u8 settle_us[2];
++};
++
+ struct gf100_clk {
+ 	struct nvkm_clk base;
+ 	struct gf100_clk_info eng[16];
++	const struct gf100_clk_slowdown *slowdown;
+ };
+ 
+ static u32 read_div(struct gf100_clk *, int, u32, u32);
+ 
++struct gf100_clk_slowdown_state {
++	int i;
++	u32 ctrl1;
++	u32 fsrm[3];
++};
++
++static bool
++gf100_clk_slowdown_enter(struct gf100_clk *clk, int idx,
++			 struct gf100_clk_slowdown_state *st)
++{
++	const struct gf100_clk_slowdown *sd = clk->slowdown;
++	struct nvkm_device *device = clk->base.subdev.device;
++	int i;
++
++	if (!sd || (idx != 0 && idx != 7))
++		return false;
++
++	i = (idx == 0) ? 0 : 1;
++	st->i = i;
++	st->ctrl1 = nvkm_rd32(device, 0x020004);
++	st->fsrm[0] = nvkm_rd32(device, 0x020160 + (i * 0x04));
++	st->fsrm[1] = nvkm_rd32(device, 0x020180 + (i * 0x04));
++	st->fsrm[2] = nvkm_rd32(device, 0x0201a0 + (i * 0x04));
++
++	nvkm_wr32(device, 0x020160 + (i * 0x04),
++		  (sd->factor[i] << 16) | 0x00000080 | sd->factor[i]);
++	nvkm_wr32(device, 0x020180 + (i * 0x04), sd->factor[i]);
++	nvkm_wr32(device, 0x0201a0 + (i * 0x04), 0x00004040);
++	/* thermal threshold inputs stay off while the slowdown is forced */
++	nvkm_wr32(device, 0x020004, st->ctrl1 & ~0x00000068);
++
++	/* flush the posted writes before timing the settle delay */
++	nvkm_rd32(device, 0x020004);
++	udelay(sd->settle_us[i]);
++	return true;
++}
++
++static void
++gf100_clk_slowdown_leave(struct gf100_clk *clk,
++			 struct gf100_clk_slowdown_state *st)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	int i = st->i;
++
++	nvkm_wr32(device, 0x020160 + (i * 0x04), st->fsrm[0]);
++	nvkm_wr32(device, 0x020180 + (i * 0x04), st->fsrm[1]);
++	nvkm_wr32(device, 0x0201a0 + (i * 0x04), st->fsrm[2]);
++	nvkm_wr32(device, 0x020004, st->ctrl1);
++}
++
+ static u32
+ read_vco(struct gf100_clk *clk, u32 dsrc)
+ {
+@@ -355,11 +417,16 @@
+ gf100_clk_prog_1(struct gf100_clk *clk, int idx)
+ {
+ 	struct nvkm_device *device = clk->base.subdev.device;
++	struct gf100_clk_slowdown_state st;
++	bool slow = gf100_clk_slowdown_enter(clk, idx, &st);
++
+ 	nvkm_mask(device, 0x137100, (1 << idx), 0x00000000);
+ 	nvkm_msec(device, 2000,
+ 		if (!(nvkm_rd32(device, 0x137100) & (1 << idx)))
+ 			break;
+ 	);
++	if (slow)
++		gf100_clk_slowdown_leave(clk, &st);
+ }
+ 
+ static void
+@@ -395,12 +462,17 @@
+ 	struct gf100_clk_info *info = &clk->eng[idx];
+ 	struct nvkm_device *device = clk->base.subdev.device;
+ 	if (info->ssel) {
++		struct gf100_clk_slowdown_state st;
++		bool slow = gf100_clk_slowdown_enter(clk, idx, &st);
++
+ 		nvkm_mask(device, 0x137100, (1 << idx), info->ssel);
+ 		nvkm_msec(device, 2000,
+ 			u32 tmp = nvkm_rd32(device, 0x137100) & (1 << idx);
+ 			if (tmp == info->ssel)
+ 				break;
+ 		);
++		if (slow)
++			gf100_clk_slowdown_leave(clk, &st);
+ 	}
+ }
+ 
+@@ -409,7 +481,15 @@
+ {
+ 	struct gf100_clk_info *info = &clk->eng[idx];
+ 	struct nvkm_device *device = clk->base.subdev.device;
+-	nvkm_mask(device, 0x137250 + (idx * 0x04), 0x00003f3f, info->mdiv);
++	const u32 addr = 0x137250 + (idx * 0x04);
++	struct gf100_clk_slowdown_state st;
++	bool slow = false;
++
++	if ((nvkm_rd32(device, addr) & 0x00003f3f) != (info->mdiv & 0x00003f3f))
++		slow = gf100_clk_slowdown_enter(clk, idx, &st);
++	nvkm_mask(device, addr, 0x00003f3f, info->mdiv);
++	if (slow)
++		gf100_clk_slowdown_leave(clk, &st);
+ }
+ 
+ static int
+@@ -445,6 +525,13 @@
+ 	memset(clk->eng, 0x00, sizeof(clk->eng));
+ }
+ 
++/* GF114: GPC /6 for 8 us, hubk06 /2 for 4 us (binary driver, mmiotraces) */
++static const struct gf100_clk_slowdown
++gf114_clk_slowdown = {
++	.factor = { 0x0a, 0x02 },
++	.settle_us = { 8, 4 },
++};
++
+ static const struct nvkm_clk_func
+ gf100_clk = {
+ 	.read = gf100_clk_read,
+@@ -477,5 +564,9 @@
+ 		return -ENOMEM;
+ 	*pclk = &clk->base;
+ 
++	/* the only chip this has been tested on, the factors differ per chip */
++	if (device->chipset == 0xce)
++		clk->slowdown = &gf114_clk_slowdown;
++
+ 	return nvkm_clk_ctor(&gf100_clk, device, type, inst, false, &clk->base);
+ }

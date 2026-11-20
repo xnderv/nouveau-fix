@@ -88,3 +88,9 @@ cd ~/Home/nouveau-fix && git send-email --to='Lyude Paul <lyude@redhat.com>' --t
 - 0006 v2 — 19:54 (MSK), Message-ID `<20261118165402.53610-1-xnderv@yandex.com>`, In-Reply-To `<20261029130012.21738-1-xnderv@yandex.com>`,
   копия Martin Roukala и stable@.
 Дальше: ждать ответа ~2 недели; если тишина — спросить в IRC #nouveau (OFTC).
+
+## Тестировщикам 20.11.2026 — опубликовано (по согласию автора)
+- issue #1 (rox4d): ответ на прогон 4 + новая сборка — https://github.com/xnderv/nouveau-fix/issues/1#issuecomment-7032277513
+- issue #2 (Q0AL): новая сборка; GTX 560 — да, GT 730 и NVS 5200M — пока нет — https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-7032277921
+- issue #4: «Fermi owners: automatic core reclocking from your card's VBIOS — testers wanted», упоминания 8 человек — https://github.com/xnderv/nouveau-fix/issues/4
+- sasim44 (issue #3): письмом — повторить запись с одним монитором; сообщение про пакет — черновик, ждёт его ответа.
