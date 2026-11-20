@@ -444,7 +444,7 @@
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +329,510 @@
+@@ -270,6 +329,622 @@
  	return ret;
  }
  
@@ -878,6 +878,97 @@
 +	return flag == 0 && f && !lab_in_window(f, calc_div(clk, 7, read_vco(clk, 0x137160 + (7 * 4)), f, &div));
 +}
 +
++/* LAB 20.11 (docs/2026-11-20/hub2clk-gf108.md): HUB2CLK (idx 8) от PLL XBAR2CLK — «код 2, подвыбор 7» в 0x137180, как NVIDIA
++ * на GF108 (записи 4 из 4). Решение — без списка чипов: по таблице VBIOS (у HUB2CLK флаг «делитель», делитель не даёт частоту,
++ * XBAR2CLK на этом уровне просит ту же частоту и идёт на своей PLL) и по САМОПРОВЕРКЕ: после переключения HUB2CLK меряется
++ * счётчиком 0x1373b0 (источник 1); не совпало в пределах 2 % — откат на делитель (правило «не выше VBIOS») и отказ от
++ * обходного пути до перезагрузки. Без счётчика обходной путь не включается.
++ * lab_hub01_alt: 1 — разрешено (по умолчанию); 0 — выключено. lab_hub01_alt_force=1 — ОПЫТ: на ближайшем уровне без PLL у
++ * HUB2CLK попробовать обходной путь принудительно (цель — текущая частота HUB2CLK, пост-делитель — чтобы не выше неё). */
++static uint lab_hub01_alt = 1;
++module_param(lab_hub01_alt, uint, 0644);
++MODULE_PARM_DESC(lab_hub01_alt, "LAB: allow HUB2CLK from the XBAR2CLK PLL (source code 2, sub-select 7) when the VBIOS asks for it, with a counter self-check (1 on, 0 off)");
++static uint lab_hub01_alt_force;
++module_param(lab_hub01_alt_force, uint, 0644);
++MODULE_PARM_DESC(lab_hub01_alt_force, "LAB experiment: force one HUB2CLK alternative-source attempt (with self-check and fallback) at the next level where HUB2CLK is not on a PLL; resets to 0");
++static int lab_hub01_alt_bad;		/* самопроверка не прошла — до перезагрузки не пробовать */
++module_param(lab_hub01_alt_bad, int, 0444);
++static u32 lab_hub01_alt_want;		/* цель (кГц), выставляет calc; 0 — не нужно */
++static bool lab_hub01_alt_on;		/* сейчас HUB2CLK на обходном пути */
++static u32 lab_hub01_alt_src0, lab_hub01_alt_post0;	/* что было до переключения */
++
++static u32 lab_meas_khz(struct nvkm_device *device, u32 base, u32 src);
++
++static void
++lab_hub01_alt_apply(struct gf100_clk *clk)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	bool force = READ_ONCE(lab_hub01_alt_force);
++	u32 want = force ? (u32)max(read_clk(clk, 0x08), 0) : lab_hub01_alt_want;
++	u32 src0, post0, xbar, a, expect, got, cnt;
++
++	lab_hub01_alt_want = 0;
++	if (!want || lab_hub01_alt_on || (!force && (!READ_ONCE(lab_hub01_alt) || lab_hub01_alt_bad)))
++		return;
++	if (nvkm_rd32(device, 0x137100) & 0x100)			/* HUB2CLK на PLL — не наш случай */
++		return;
++	if (force)
++		WRITE_ONCE(lab_hub01_alt_force, 0);
++	xbar = read_pll(clk, 0x137040);
++	cnt = nvkm_rd32(device, 0x1373b0);
++	if (!xbar || (cnt & 0xfff00000) == 0xbad00000) {
++		nvkm_info(&clk->base.subdev, "LAB hub01-alt: %s — обходной путь не включаю\n",
++			  !xbar ? "PLL XBAR2CLK не работает" : "счётчика тактов нет — проверить нельзя");
++		return;
++	}
++	for (a = 0; a < 63 && (xbar * 2) / (a + 2) > want + want / 50; a++)
++		;
++	expect = (xbar * 2) / (a + 2);
++	src0 = nvkm_rd32(device, 0x137180);
++	post0 = nvkm_rd32(device, 0x137270);
++	/* туда без выброса вверх: сначала источник (с прежним делителем частота не выше), потом делитель */
++	nvkm_wr32(device, 0x137180, (src0 & ~0x07000103) | 0x07000002);
++	udelay(5);
++	nvkm_wr32(device, 0x137270, (post0 & ~0x3f) | 0x80000000 | a);
++	udelay(20);
++	got = lab_meas_khz(device, 0x1373b0, 1);
++	if (got && got + expect / 50 >= expect && got <= expect + expect / 50) {
++		lab_hub01_alt_on = true;
++		lab_hub01_alt_src0 = src0;
++		lab_hub01_alt_post0 = post0;
++		nvkm_info(&clk->base.subdev, "LAB hub01-alt: HUB2CLK от PLL XBAR2CLK (%u кГц, пост-делитель A %u): ждали %u, счётчик %u — оставляю%s\n",
++			  xbar, a, expect, got, force ? " (опыт: сразу возвращаю)" : "");
++		if (!force)
++			return;
++	} else {
++		lab_hub01_alt_bad = 1;
++		nvkm_info(&clk->base.subdev, "LAB hub01-alt: ждали %u кГц, счётчик %u — пути «код 2/подвыбор 7 → PLL XBAR2CLK» на этом чипе нет; откат, до перезагрузки не пробую\n",
++			  expect, got);
++	}
++	/* обратно без выброса: сначала делитель, потом источник */
++	nvkm_wr32(device, 0x137270, post0);
++	udelay(5);
++	nvkm_wr32(device, 0x137180, src0);
++	lab_hub01_alt_on = false;
++	nvkm_info(&clk->base.subdev, "LAB hub01-alt: вернул 0x137180 %08x, 0x137270 %08x; HUB2CLK %u кГц\n",
++		  nvkm_rd32(device, 0x137180), nvkm_rd32(device, 0x137270), lab_meas_khz(device, 0x1373b0, 1));
++}
++
++/* перед любой сменой уровня — HUB2CLK с обходного пути обратно (без выброса: делитель, потом источник) */
++static void
++lab_hub01_alt_leave(struct gf100_clk *clk)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++
++	if (!lab_hub01_alt_on)
++		return;
++	nvkm_wr32(device, 0x137270, lab_hub01_alt_post0);
++	udelay(5);
++	nvkm_wr32(device, 0x137180, lab_hub01_alt_src0);
++	lab_hub01_alt_on = false;
++	nvkm_info(&clk->base.subdev, "LAB hub01-alt: перед сменой уровня HUB2CLK возвращён на делитель (0x137180 %08x)\n", lab_hub01_alt_src0);
++}
++
 +static int
 +lab_calc_vbios(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom, u32 freq, u8 level, int flag)
 +{
@@ -897,9 +988,23 @@
 +			base = 0;
 +	}
 +	if (!base) {
++		u32 pre;
++
 +		div0 = div1D = 0;
-+		clk0 = calc_src(clk, idx, freq, &src0, &div0);
-+		clk0 = calc_div(clk, idx, clk0, freq, &div1D);
++		pre = calc_src(clk, idx, freq, &src0, &div0);
++		clk0 = calc_div(clk, idx, pre, freq, &div1D);
++		/* LAB 20.11: никогда выше VBIOS. Если делитель частоту не даёт, calc_div берёт ближайшую СВЕРХУ (GT 730: 1400 -> 1620,
++		 * +16 %, разгон сверх заводского). Допуск — +2 % (так поступает сама NVIDIA: GF108 у5, 1595 -> 1620); выше — ближайший
++		 * делитель снизу. Одно правило на все узлы и чипы. */
++		if (clk0 > freq + freq / 50) {
++			u32 was = clk0;
++
++			while (div1D < 63 && (pre * 2) / (div1D + 2) > freq + freq / 50)
++				div1D++;
++			clk0 = (pre * 2) / (div1D + 2);
++			nvkm_info(&clk->base.subdev, "LAB calc idx %02x: делитель даёт %u кГц вместо %u (выше VBIOS больше чем на 2 %%) — беру снизу: %u кГц\n",
++				  idx, was, freq, clk0);
++		}
 +	}
 +
 +	/* путь PLL: свой PLL у GPC, ROP, hubk07, hubk06; hubk01 — на PLL hubk06, только если hubk06 на этом уровне на PLL */
@@ -929,6 +1034,13 @@
 +		break;
 +	}
 +
++	if (idx == 0x08 && !use_pll && flag == 2 && !lab_in_window(freq, clk0)) {
++		/* таблица просит частоту, которую делитель не даёт: у GF108 так задумано — HUB2CLK = XBAR2CLK того же уровня */
++		u32 x = cstate->domain[nv_clk_src_hubk07];
++
++		if (x && abs((int)x - (int)freq) <= 3000 && lab_perf_flag(clk, level, nv_clk_src_hubk07) == 1 && clk->eng[2].ssel)
++			lab_hub01_alt_want = freq;
++	}
 +	if (use_pll) {
 +		info->dsrc = info->ddiv = 0;
 +		info->mdiv = div1P ? (0x80000000 | (div1P << 8)) : 0;
@@ -955,7 +1067,7 @@
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +845,87 @@
+@@ -282,6 +957,87 @@
  	if (!freq)
  		return 0;
  
@@ -1043,7 +1155,7 @@
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +935,9 @@
+@@ -291,7 +1047,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -1054,7 +1166,7 @@
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +964,11 @@
+@@ -318,6 +1076,11 @@
  		info->freq = clk1;
  	}
  
@@ -1066,15 +1178,16 @@
  	return 0;
  }
  
-@@ -327,6 +978,7 @@
+@@ -327,6 +1090,8 @@
  	struct gf100_clk *clk = gf100_clk(base);
  	int ret;
  
 +	lab_e9e0_khz = cstate->domain[nv_clk_src_dom6];
++	lab_hub01_alt_want = 0;
  	if ((ret = calc_clk(clk, cstate, 0x00, nv_clk_src_gpc)) ||
  	    (ret = calc_clk(clk, cstate, 0x01, nv_clk_src_rop)) ||
  	    (ret = calc_clk(clk, cstate, 0x02, nv_clk_src_hubk07)) ||
-@@ -346,20 +998,793 @@
+@@ -346,20 +1111,793 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -1871,7 +1984,7 @@
  }
  
  static void
-@@ -368,20 +1793,58 @@
+@@ -368,20 +1906,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -1933,7 +2046,7 @@
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +1853,106 @@
+@@ -390,17 +1966,106 @@
  }
  
  static void
@@ -2042,7 +2155,7 @@
  	}
  }
  
-@@ -409,7 +1961,17 @@
+@@ -409,7 +2074,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -2060,7 +2173,7 @@
  }
  
  static int
-@@ -426,23 +1988,485 @@
+@@ -426,23 +2101,720 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -2075,6 +2188,7 @@
 +	bool mmu_locked = false;
 +	u64 lk0 = 0;
 +
++	lab_hub01_alt_leave(clk);
 +	if (lab_clk_mmu_lock && mmu) {
 +		lk0 = ktime_get_ns();
 +		mutex_lock(&mmu->mutex);
@@ -2312,6 +2426,236 @@
 +	}
 +}
 +
++/* LAB 20.11 (опыт 103): что за «источник 2» у HUB2CLK (hubk01, 0x137180). На GF108 NVIDIA на 0f ставит 0x07000102 / 0x07000002
++ * (код 2, подвыбор 7 в битах 24–26), когда делитель не даёт частоту таблицы; envytools знает у кода 2 только подвыборы
++ * 0 (100 МГц) и 1 (277 МГц). lab_hub01_probe=1: на уровне, где HUB2CLK не на PLL (бит 8 0x137100 = 0), по очереди
++ * ставит код 2 с подвыбором 0..7, без и с битом 8, ~20 мкс, меряет HUB2CLK счётчиком 0x1373b0 (источник 1, окно
++ * 8191 тактов кварца ≈ 0,3 мс) и сразу возвращает исходное значение. Пост-делитель 0x137270 не трогается (пишется в журнал).
++ * Ключ сам сбрасывается в 0 после одного прохода. */
++static uint lab_hub01_probe;
++module_param(lab_hub01_probe, uint, 0644);
++MODULE_PARM_DESC(lab_hub01_probe, "LAB: probe HUB2CLK (0x137180) source code 2 with sub-select 0..7 (bits 24-26), with/without bit 8, and measure it with counter 0x1373b0 source 1; one pass, then resets to 0");
++
++static u32
++lab_hub2_khz(struct nvkm_device *device)
++{
++	const u32 n = 8191;
++	u32 c1, c2;
++
++	nvkm_wr32(device, 0x1373b0, 0x01010000);
++	nvkm_wr32(device, 0x1373b0, (1u << 28) | 0x00110000 | n);
++	nvkm_rd32(device, 0x1373b0);
++	udelay(400);
++	c1 = nvkm_rd32(device, 0x1373b4) & 0xfffff;
++	udelay(50);
++	c2 = nvkm_rd32(device, 0x1373b4) & 0xfffff;
++	return c1 == c2 ? (u32)div_u64((u64)c2 * 27000, n + 4) : 0;
++}
++
++static void
++lab_hub01_probe_run(struct gf100_clk *clk)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 orig, save, post, base_khz, sub, b8;
++	char buf[400];
++	int o = 0;
++
++	if (!READ_ONCE(lab_hub01_probe) || (nvkm_rd32(device, 0x137100) & 0x100))
++		return;
++	WRITE_ONCE(lab_hub01_probe, 0);
++	orig = nvkm_rd32(device, 0x137180);
++	post = nvkm_rd32(device, 0x137270);
++	save = nvkm_rd32(device, 0x1373b0);
++	base_khz = lab_hub2_khz(device);
++	for (b8 = 0; b8 < 2; b8++) {
++		for (sub = 0; sub < 8; sub++) {
++			u32 khz;
++
++			nvkm_wr32(device, 0x137180, (orig & ~0x07000103) | (sub << 24) | (b8 << 8) | 0x2);
++			udelay(20);
++			khz = lab_hub2_khz(device);
++			nvkm_wr32(device, 0x137180, orig);
++			udelay(20);
++			o += scnprintf(buf + o, sizeof(buf) - o, " %s%u:%u", b8 ? "b8/" : "", sub, khz);
++		}
++	}
++	nvkm_wr32(device, 0x1373b0, 0x01010000);
++	nvkm_wr32(device, 0x1373b0, save);
++	nvkm_info(&clk->base.subdev, "LAB hub01-проба: 0x137180 %08x, пост 0x137270 %08x, 0x137100 %08x; PLL: GPC %08x/%08x LTC %08x/%08x XBAR %08x/%08x SYS2 %08x/%08x; HUB2CLK как есть %u кГц, после %u кГц; код 2, подвыбор:кГц —%s\n",
++		  orig, post, nvkm_rd32(device, 0x137100),
++		  nvkm_rd32(device, 0x137000), nvkm_rd32(device, 0x137004), nvkm_rd32(device, 0x137020), nvkm_rd32(device, 0x137024),
++		  nvkm_rd32(device, 0x137040), nvkm_rd32(device, 0x137044), nvkm_rd32(device, 0x1370e0), nvkm_rd32(device, 0x1370e4),
++		  base_khz, lab_hub2_khz(device), buf);
++}
++
++/* LAB 20.11 (опыт 104): карта полей регистров источника — перебор полей с замером счётчиками тактов. lab_src_probe — маска
++ * этапов (каждый бит сбрасывается после своего прохода; этап идёт только на подходящем уровне):
++ *   1 — на 0f (GPC и LTC на PLL): источник делителя GPC 0x137160 и LTC 0x137164; меряем делительный путь (0x1373c0, 6 и 7);
++ *   2 — на 07 (GPC/LTC/XBAR и HUB2CLK не на PLL): опора PLL GPC 0x137120, LTC 0x137124, XBAR 0x137128 (0x1373c0, 3/4/5);
++ *       источник делителя HUB2CLK 0x137180 (0x1373b0, 1) и copy 0x137184 (0x1373b0, 2);
++ *   4 — на 03/07: РАБОЧИЙ источник XBAR2CLK 0x137168 (0x1373c0, 2) — узел под трафиком, риск недогруза/зависания;
++ *   8 — на 03/07: РАБОЧИЙ источник SYS2CLK 0x13717c (0x1373b0, 0) — самый рискованный.
++ * Варианты (от исходного значения): код 0 с кварцем 16–17 = 0…3; код 1; код 2 с подвыбором 0…7; код 3 с переключённым
++ * битом 8, битом 12, битом 31. Каждый ~0,5 мс, затем исходное значение. Для опор PLL после прохода — ждём захват PLL. */
++static uint lab_src_probe;
++module_param(lab_src_probe, uint, 0644);
++MODULE_PARM_DESC(lab_src_probe, "LAB: source-register field probe with clock counters, stage mask: 1 div src GPC/LTC at 0f, 2 PLL ref src GPC/LTC/XBAR + div src HUB2/copy at 07, 4 working src XBAR2CLK at 03/07 (risky), 8 working src SYS2CLK (riskiest); each bit resets after its pass");
++
++static u32
++lab_meas_khz(struct nvkm_device *device, u32 base, u32 src)
++{
++	const u32 n = 8191;
++	u32 c1, c2;
++
++	nvkm_wr32(device, base, 0x01010000);
++	nvkm_wr32(device, base, (src << 28) | 0x00110000 | n);
++	nvkm_rd32(device, base);
++	udelay(400);
++	c1 = nvkm_rd32(device, base + 4) & 0xfffff;
++	udelay(50);
++	c2 = nvkm_rd32(device, base + 4) & 0xfffff;
++	return c1 == c2 ? (u32)div_u64((u64)c2 * 27000, n + 4) : 0;
++}
++
++static void
++lab_src_probe_reg(struct gf100_clk *clk, u32 reg, const char *name, u32 cbase, u32 csrc, u32 pll)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 orig = nvkm_rd32(device, reg), csave = nvkm_rd32(device, cbase), v, k;
++	char buf[700];
++	int o = 0;
++	struct { const char *t; u32 val; } var[24];
++	int nv = 0, i;
++
++	for (k = 0; k < 4; k++) {
++		var[nv].t = k == 0 ? "к0/27" : k == 1 ? "к0/s1" : k == 2 ? "к0/s2" : "к0/s3";
++		var[nv++].val = (orig & ~0x07030003) | (k << 16);
++	}
++	var[nv].t = "к1"; var[nv++].val = (orig & ~0x07000003) | 1;
++	for (k = 0; k < 8; k++) {
++		static const char *t[8] = { "к2/0", "к2/1", "к2/2", "к2/3", "к2/4", "к2/5", "к2/6", "к2/7" };
++		var[nv].t = t[k];
++		var[nv++].val = (orig & ~0x07000003) | (k << 24) | 2;
++	}
++	var[nv].t = "^б8";  var[nv++].val = orig ^ 0x00000100;
++	var[nv].t = "^б12"; var[nv++].val = orig ^ 0x00001000;
++	var[nv].t = "^б31"; var[nv++].val = orig ^ 0x80000000;
++
++	o += scnprintf(buf + o, sizeof(buf) - o, " исх:%u", lab_meas_khz(device, cbase, csrc));
++	for (i = 0; i < nv; i++) {
++		nvkm_wr32(device, reg, var[i].val);
++		udelay(20);
++		v = lab_meas_khz(device, cbase, csrc);
++		nvkm_wr32(device, reg, orig);
++		udelay(20);
++		o += scnprintf(buf + o, sizeof(buf) - o, " %s:%u", var[i].t, v);
++	}
++	if (pll) {	/* опора PLL менялась — ждём захват (бит 17), до 2 мс */
++		nvkm_msec(device, 2, if (nvkm_rd32(device, pll) & 0x00020000) break;);
++	}
++	nvkm_wr32(device, cbase, 0x01010000);
++	nvkm_wr32(device, cbase, csave);
++	nvkm_info(&clk->base.subdev, "LAB src-проба %06x (%s; счётчик %06x/%u; исходно %08x%s%s), вариант:кГц —%s\n",
++		  reg, name, cbase, csrc, orig, pll ? ", PLL " : "",
++		  pll ? ((nvkm_rd32(device, pll) & 0x00020000) ? "захвачена" : "НЕ ЗАХВАЧЕНА") : "", buf);
++}
++
++/* LAB 20.11 (опыт 105): РАБОЧИЙ источник SYS2CLK 0x13717c — только «живые» варианты, по ОДНОМУ за запуск, внутри скобки
++ * замедления SYS2CLK (как NVIDIA переключает этот узел). Этап 3 опыта 104 (все варианты без скобки) повесил машину.
++ * lab_sys2_probe = 1: бит 8 (SPPLL1, ~269); 2: код 2/подвыбор 1 (280); 3: код 0/кварц 108; 4: код 2/подвыбор 0 (100,9);
++ * 5: код 0/кварц 27. На 03/07; перед сменой — строка в журнал (если встанет, видно, на чём). Сбрасывается в 0. */
++static uint lab_sys2_probe;
++module_param(lab_sys2_probe, uint, 0644);
++/* LAB 20.11: lab_sys2_post=1 — вместе с источником менять и пост-делитель SYS2CLK 0x13726c (поле A, биты 0–5), чтобы частота
++ * была наибольшей, не выше исходной: источник × 2 / (A + 2) ≤ исходной. Порядок без выброса вверх: туда — источник, потом
++ * делитель; обратно — делитель, потом источник. */
++static uint lab_sys2_post;
++module_param(lab_sys2_post, uint, 0644);
++MODULE_PARM_DESC(lab_sys2_post, "LAB: with lab_sys2_probe also set the SYS2CLK post-divider so the clock stays as close as possible to (never above) the original");
++MODULE_PARM_DESC(lab_sys2_probe, "LAB: one live variant of the WORKING SYS2CLK source 0x13717c inside the SYS2CLK slowdown bracket: 1 bit8/SPPLL1, 2 code2/sub1 (280), 3 code0/108, 4 code2/sub0 (100.9), 5 code0/27; resets to 0");
++
++static void
++lab_sys2_probe_run(struct gf100_clk *clk)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	struct lab_therm_save th = { .on = false };
++	u32 k = READ_ONCE(lab_sys2_probe), orig, val, before, during, after;
++	static const char *name[6] = { "", "бит 8 (SPPLL1)", "код 2/подвыбор 1 (280)", "код 0/кварц 108",
++				       "код 2/подвыбор 0 (100,9)", "код 0/кварц 27" };
++
++	if (!k || k > 5 || (nvkm_rd32(device, 0x137100) & 0x187))
++		return;
++	WRITE_ONCE(lab_sys2_probe, 0);
++	orig = nvkm_rd32(device, 0x13717c);
++	switch (k) {
++	case 1: val = orig ^ 0x00000100; break;
++	case 2: val = (orig & ~0x07030003) | (1 << 24) | 2; break;
++	case 3: val = (orig & ~0x07030003) | (3 << 16); break;
++	case 4: val = (orig & ~0x07030003) | 2; break;
++	default: val = orig & ~0x07030003; break;
++	}
++	{
++		static const u32 src_khz[6] = { 0, 1616700, 280300, 108000, 100900, 27000 };
++		u32 p0 = nvkm_rd32(device, 0x13726c), a0 = p0 & 0x3f, a = a0, fo;
++
++		fo = (p0 & 0x80000000) ? 1620000 * 2 / (a0 + 2) : 1620000;
++		if (READ_ONCE(lab_sys2_post)) {
++			for (a = 0; a < 63 && src_khz[k] * 2 / (a + 2) > fo; a++)
++				;
++		}
++		nvkm_info(&clk->base.subdev, "LAB sys2-проба: НАЧИНАЮ вариант %u — %s: 0x13717c %08x -> %08x; пост-делитель A %u -> %u (ожидаем %u кГц, в скобке вдвое меньше)\n",
++			  k, name[k], orig, val, a0, a, src_khz[k] * 2 / (a + 2));
++		before = lab_meas_khz(device, 0x1373b0, 0);
++		lab_therm_enter(clk, 7, &th);
++		nvkm_wr32(device, 0x13717c, val);			/* туда: сначала источник (частота вниз) */
++		udelay(5);
++		if (a != a0)
++			nvkm_wr32(device, 0x13726c, (p0 & ~0x3f) | 0x80000000 | a);	/* потом делитель (вверх до цели) */
++		udelay(20);
++		during = lab_meas_khz(device, 0x1373b0, 0);
++		if (a != a0)
++			nvkm_wr32(device, 0x13726c, p0);		/* обратно: сначала делитель (вниз) */
++		udelay(5);
++		nvkm_wr32(device, 0x13717c, orig);			/* потом источник */
++		udelay(20);
++		lab_therm_leave(clk, 7, &th);
++	}
++	after = lab_meas_khz(device, 0x1373b0, 0);
++	nvkm_info(&clk->base.subdev, "LAB sys2-проба: вариант %u — %s: SYS2CLK до %u кГц, в скобке с новым источником %u кГц, после %u кГц\n",
++		  k, name[k], before, during, after);
++}
++
++static void
++lab_src_probe_run(struct gf100_clk *clk)
++{
++	struct nvkm_device *device = clk->base.subdev.device;
++	u32 m = READ_ONCE(lab_src_probe), mux = nvkm_rd32(device, 0x137100);
++
++	if (!m)
++		return;
++	if ((m & 1) && (mux & 0x3) == 0x3) {
++		WRITE_ONCE(lab_src_probe, READ_ONCE(lab_src_probe) & ~1u);
++		lab_src_probe_reg(clk, 0x137160, "делитель GPC", 0x1373c0, 6, 0);
++		lab_src_probe_reg(clk, 0x137164, "делитель LTC", 0x1373c0, 7, 0);
++	}
++	if ((m & 2) && !(mux & 0x107)) {
++		WRITE_ONCE(lab_src_probe, READ_ONCE(lab_src_probe) & ~2u);
++		lab_src_probe_reg(clk, 0x137120, "опора PLL GPC", 0x1373c0, 3, (nvkm_rd32(device, 0x137000) & 1) ? 0x137000 : 0);
++		lab_src_probe_reg(clk, 0x137124, "опора PLL LTC", 0x1373c0, 4, (nvkm_rd32(device, 0x137020) & 1) ? 0x137020 : 0);
++		lab_src_probe_reg(clk, 0x137128, "опора PLL XBAR", 0x1373c0, 5, (nvkm_rd32(device, 0x137040) & 1) ? 0x137040 : 0);
++		lab_src_probe_reg(clk, 0x137180, "делитель HUB2CLK", 0x1373b0, 1, 0);
++		lab_src_probe_reg(clk, 0x137184, "делитель copy", 0x1373b0, 2, 0);
++	}
++	if ((m & 4) && !(mux & 0x187)) {
++		WRITE_ONCE(lab_src_probe, READ_ONCE(lab_src_probe) & ~4u);
++		lab_src_probe_reg(clk, 0x137168, "РАБОЧИЙ XBAR2CLK", 0x1373c0, 2, 0);
++	}
++	if ((m & 8) && !(mux & 0x187)) {
++		WRITE_ONCE(lab_src_probe, READ_ONCE(lab_src_probe) & ~8u);
++		lab_src_probe_reg(clk, 0x13717c, "РАБОЧИЙ SYS2CLK", 0x1373b0, 0, 0);
++	}
++}
++
 +static void
 +lab_cntr_sys_measure(struct gf100_clk *clk)
 +{
@@ -2541,14 +2885,18 @@
  {
  	struct gf100_clk *clk = gf100_clk(base);
  	memset(clk->eng, 0x00, sizeof(clk->eng));
++	lab_hub01_alt_apply(clk);
 +	lab_cntr_measure(clk);
 +	lab_cntr_sys_measure(clk);
++	lab_hub01_probe_run(clk);
++	lab_src_probe_run(clk);
++	lab_sys2_probe_run(clk);
 +	lab_e9e0_probe_run(clk);
 +	lab_pmu_slow_probe(clk);
  }
  
  static const struct nvkm_clk_func
-@@ -461,6 +2485,7 @@
+@@ -461,6 +2833,7 @@
  		{ nv_clk_src_rop    , 0x04 },
  		{ nv_clk_src_mem    , 0x05, 0, "memory", 1000 },
  		{ nv_clk_src_vdec   , 0x06 },
@@ -2556,7 +2904,7 @@
  		{ nv_clk_src_pmu    , 0x0a },
  		{ nv_clk_src_hubk07 , 0x0b },
  		{ nv_clk_src_max }
-@@ -477,5 +2502,5 @@
+@@ -477,5 +2850,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  

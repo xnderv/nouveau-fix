@@ -12,9 +12,12 @@ Tested on our GTX 560 Ti (GF114): 10,000 core switches under load without a hang
 without an error. On your card it has not run yet — that's what we ask you for.
 
 ## Before you start
-- **Post your card report first** (`bash tools/card-report.sh`, attach the output to your issue) and wait for an OK. On
-  one GF108 board the VBIOS asks for a hub clock that a divider can't make exactly, and this build would set it 16 % higher;
-  the report shows in a minute whether your board has that case.
+- **Post your card report** (`bash tools/card-report.sh`, attach the output to your issue) — it helps us check your VBIOS.
+  Since 20.11 the build never sets a clock above what the VBIOS asks for: where a divider can't make the clock exactly (seen
+  on GF108), it takes the next lower one, or — like the NVIDIA driver on GF108 — feeds the hub from another PLL and checks
+  the result with the card's clock counter, falling back if that path doesn't work. The log shows it as `hub01-alt`.
+- **Already built an earlier version?** `git pull`, then build and install again (below). Builds from before 20.11 lack
+  the rule above.
 - **One monitor.** We have never tested with two or more displays. Please unplug the others for these tests.
 - If you tested an earlier round: **delete the old options line** in `/etc/modprobe.d/nouveau-lab.conf` (or delete the
   file). Old options override the new defaults.
