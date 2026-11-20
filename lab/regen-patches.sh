@@ -65,5 +65,5 @@ cp p2.patch "$KIT/lab/0002-LAB-fermi-reclock-instrumented.patch"
 cp p2-72.patch "$KIT/lab/0002-LAB-fermi-reclock-instrumented-v7.2.patch"
 cp p2-73.patch "$KIT/lab/0002-LAB-fermi-reclock-instrumented-v7.3.patch"
 cp p4.patch "$P4"
-grep -lE "/home/[a-z]|alex-pc|alexpc|Alex-MSI" "$KIT"/lab/0002-*.patch "$P4" && { echo "СТОП: личные данные в патчах"; exit 1; } || true
+grep -liE "/home/[a-z]|$(hostname)|$USER@" "$KIT"/lab/0002-*.patch "$P4" && { echo "СТОП: личные данные в патчах"; exit 1; } || true
 echo "патчи обновлены в репозитории"
