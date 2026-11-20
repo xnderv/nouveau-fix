@@ -73,8 +73,8 @@ install)
     sudo depmod -a "$KVER"
     if command -v update-initramfs >/dev/null; then sudo update-initramfs -u -k "$KVER"
     elif command -v dracut >/dev/null; then sudo dracut -f --kver "$KVER"; fi
-    echo "=== installed. Set the options line in /etc/modprobe.d/nouveau-lab.conf (see the instructions), update the"
-    echo "    initramfs once more if you changed it, and reboot. Undo at any time: bash $0 remove"
+    [ -e /etc/modprobe.d/nouveau-lab.conf ] && echo "!!! /etc/modprobe.d/nouveau-lab.conf exists — options from an earlier round override the new defaults; delete it (sudo rm /etc/modprobe.d/nouveau-lab.conf) and update the initramfs again."
+    echo "=== installed. No module options are needed (see docs/TESTING-core.md). Reboot. Undo at any time: bash $0 remove"
     ;;
 remove)
     sudo rm -f "$SLOT"; sudo depmod -a "$KVER"
