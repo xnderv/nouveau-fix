@@ -18,6 +18,10 @@ It builds against your running kernel (checked on 6.12, 7.0, 7.2, 7.3) and is re
 Before installing, please post the output of `tools/card-report.sh` here (or open a "Card data" issue): it lets me check your
 VBIOS for the one known problem case (a clock that a divider can't make exactly; seen on one GF108 board).
 
-I've seen several of you report Fermi cards in other reclocking projects — if you'd like to try a VBIOS-based approach,
-you're very welcome: @chrisnoisel (GTX 560 Ti), @MegaRak64 (GTX 550 Ti), @aruncveli (820M), @Bonjour540 (410M),
-@kriho520m (GT 520M), @yhaenggi (NVS 4200M), @jfouquart (GT 610M), @RowerStudios (GF108).
+I came across your hardware reports for Fermi cards in another reclocking project — thank you for posting them; reports
+like these are exactly what moves this work forward. This project takes a different route (everything derived from the
+card's VBIOS and from recordings of the NVIDIA driver), and if you'd like to contribute — a card report, an evening of
+testing, or a recording of the NVIDIA driver on your card — I'd be very grateful. Every chip group you cover is one we
+can't test ourselves:
+@chrisnoisel (GTX 560 Ti), @MegaRak64 (GTX 550 Ti), @aruncveli (820M), @Bonjour540 (410M), @kriho520m (GT 520M),
+@yhaenggi (NVS 4200M), @jfouquart (GT 610M), @RowerStudios (GF108).
