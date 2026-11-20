@@ -92,5 +92,6 @@ cd ~/Home/nouveau-fix && git send-email --to='Lyude Paul <lyude@redhat.com>' --t
 ## Тестировщикам 20.11.2026 — опубликовано (по согласию автора)
 - issue #1 (rox4d): ответ на прогон 4 + новая сборка — https://github.com/xnderv/nouveau-fix/issues/1#issuecomment-7032277513
 - issue #2 (Q0AL): новая сборка; GTX 560 — да, GT 730 и NVS 5200M — пока нет — https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-7032277921
+- issue #2 (Q0AL): GT 730 теперь можно (правила А/Б, самопроверка), просьба о строках hub01-alt — https://github.com/xnderv/nouveau-fix/issues/2#issuecomment-7044441540
 - issue #4: «Fermi owners: automatic core reclocking from your card's VBIOS — testers wanted», упоминания 8 человек — https://github.com/xnderv/nouveau-fix/issues/4
 - sasim44 (issue #3): письмом — повторить запись с одним монитором; сообщение про пакет — черновик, ждёт его ответа.
