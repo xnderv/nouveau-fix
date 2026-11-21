@@ -9,7 +9,7 @@ set -euo pipefail
 KIT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="${SRC:-$HOME/Home/nouveau-build/lab-vbios-src/nouveau}"
 W="${W:-$HOME/Home/nouveau-build/regen}"
-KHDR="${KHDR:-/usr/src/linux-headers-7.0.0-42-generic}"
+KHDR="${KHDR:-/lib/modules/$(uname -r)/build}"   # build check against the running kernel (the old fixed -42 path vanished after an update, 21.11)
 P1="$KIT/patches/0001-nouveau-abi16-idle-channel-before-engobj-del.patch"
 P3="$KIT/patches/0003-nouveau-disp-hdmi-without-scdc-below-340mhz.patch"
 P4="$KIT/patches/0004-LAB-pmu-perf-load.patch"
