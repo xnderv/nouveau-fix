@@ -22,6 +22,18 @@ die() { echo "STOP: $*"; exit 1; }
 case "${1:-build}" in
 build)
     command -v git >/dev/null || die "git is missing (sudo apt install git)"
+    # 21.11: build only from the newest patches — compare this copy with GitHub first (OLD_OK=1 skips the stop)
+    REV="unknown"
+    if git -C "$KIT" rev-parse --git-dir >/dev/null 2>&1; then
+        if git -C "$KIT" fetch -q 2>/dev/null; then
+            BEHIND="$(git -C "$KIT" rev-list --count HEAD..@{u} 2>/dev/null || echo 0)"
+            [ "$BEHIND" -gt 0 ] && [ -z "${OLD_OK:-}" ] && die "this copy is $BEHIND commit(s) behind GitHub. Update it: git -C $KIT pull   — then run this again"
+        else
+            echo "  (GitHub not reachable — could not check for a newer version; building what is here)"
+        fi
+        REV="$(git -C "$KIT" log -1 --format='%h_%cs')$(git -C "$KIT" diff --quiet HEAD -- lab patches || echo '_modified')"
+    fi
+    echo "=== nouveau-fix version $REV"
     command -v make >/dev/null && command -v gcc >/dev/null || die "make/gcc missing (sudo apt install build-essential)"
     [ -e "$KBUILD/Makefile" ] || die "no headers for the running kernel $KVER (sudo apt install linux-headers-$KVER)"
     rm -rf "$WORK"; mkdir -p "$WORK"
@@ -57,12 +69,12 @@ build)
         fi
     done
     echo "=== building (a few minutes)..."
-    make -C "$KBUILD" M="$WORK/nouveau" -j"$(nproc)" modules > "$WORK/build.log" 2>&1 \
+    make -C "$KBUILD" M="$WORK/nouveau" -j"$(nproc)" KCFLAGS="-DLAB_REPO_REV=\\\"$REV\\\"" modules > "$WORK/build.log" 2>&1 \
         || { tail -n 25 "$WORK/build.log"; die "build failed; nothing installed. Please send $WORK/build.log"; }
     KO="$WORK/nouveau/nouveau.ko"
     VM="$(modinfo -F vermagic "$KO")"; [ "${VM%% *}" = "$KVER" ] || die "the module was not built for $KVER ($VM)"
     PRMS="$(modinfo -p "$KO")"; [[ "$PRMS" == *lab_vbios_src:* ]] || die "the built module has no lab_vbios_src parameter (old patch?)"
-    echo "=== built: $KO, srcversion $(modinfo -F srcversion "$KO")"
+    echo "=== built: $KO, srcversion $(modinfo -F srcversion "$KO"), nouveau-fix $REV (the kernel log says it at load: LAB build)"
     echo "    next: bash $0 install"
     ;;
 install)

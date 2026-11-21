@@ -111,13 +111,13 @@ install)
     case "$ans" in y|Y|д|Д) ;; *) echo "Не ставлю."; exit 0 ;; esac
     # 22.10: если для этого ядра стоит СТАБИЛЬНЫЙ драйвер через DKMS — снять его, чтобы в updates/ был один nouveau.ko
     if command -v dkms >/dev/null && dkms status nouveau-gf114/1.0 -k "$KVER" 2>/dev/null | grep -q installed; then
-        sudo dkms uninstall nouveau-gf114/1.0 -k "$KVER" && echo "=== Стабильный драйвер (DKMS) для $KVER отключён; вернуть: ~/Home/nouveau-fix/stable/stable.sh install"
+        sudo dkms uninstall nouveau-gf114/1.0 -k "$KVER" && echo "=== Стабильный драйвер (DKMS) для $KVER отключён; вернуть: ~/Home/nouveau-fix/archive/stable-2026-10/stable.sh install (не используется с 21.11)"
     fi
     sudo install -m 644 "$WORK/nouveau/nouveau.ko" "$SLOT"
     sudo depmod -a "$KVER"; sudo update-initramfs -u -k "$KVER"
     sudo rm -f "/var/lib/nouveau-fix/pending-$KVER" 2>/dev/null || true
     "$KIT/daily/grub-pin.sh" "$KVER" || echo "--- Закрепить ядро $KVER в GRUB не удалось: daily/grub-pin.sh status"   # 28.10
-    echo "=== Готово. Перезагрузись. Вернуть стабильный: ~/Home/nouveau-fix/stable/stable.sh install (или lab.sh restore — только исправление гонки)"
+    echo "=== Готово. Перезагрузись. Вернуть стабильный: ~/Home/nouveau-fix/archive/stable-2026-10/stable.sh install (не используется с 21.11) (или lab.sh restore — только исправление гонки)"
     ;;
 pstate)
     P="${2:-}"; [[ "$P" =~ ^(03|07|0f)$ ]] || { echo "Укажи режим: 03, 07 или 0f"; exit 1; }

@@ -1,54 +1,44 @@
-# nouveau-fix: how NVIDIA drives a Fermi GPU — a model built by observation (GeForce GTX 560 Ti, GF114)
+# nouveau-fix: automatic clock changes for NVIDIA Fermi cards in nouveau, computed from the card's own VBIOS
 
-A hobby research project. The goal is to understand the principles by which NVIDIA's driver manages clocks, voltage,
-memory and level switches on a Fermi GPU, and to write them down as a **model that predicts what the driver does**.
-The model is built only from observation and experiment (see *How we work*). A working reclocking driver for one GTX 560 Ti
-board on Linux 7.0 — core, shader and GDDR5 memory, voltage, PCIe, a load governor — is a special case of the model.
+A hobby research project. Upstream nouveau keeps Fermi cards (GeForce 400/500 and many 600/700 and mobile parts) at their
+boot clocks, so they are slow in 3D and video. This project records how the NVIDIA driver changes clocks, works out the
+rules behind it, and builds a lab nouveau driver that does the same **on any Fermi card, from that card's VBIOS** — no
+per-board tables. Small, self-contained fixes go upstream; there are no support promises.
 
-**English first; the same in Russian below. / Русская версия — ниже.**
+Issues may be written in Russian too. / Issues можно писать по-русски. Research notes under `docs/` (dated folders, the
+model) are in Russian — they are the lab notebook; everything a tester needs is in English.
 
-Upstream nouveau keeps Fermi cards at their boot clocks: a GTX 560 Ti stays at 50 MHz core and 135 MHz memory, so it
-is slow in 3D and video. On the reference board below, the card now switches between its performance levels the way
-the NVIDIA driver does. Only small, self-contained fixes are sent upstream; there are no support promises.
+## Status (21 Nov 2026)
 
-**The model:** [`docs/model/`](docs/model/README.md) (version 0.2, in Russian). When it switches levels, NVIDIA writes
-155 registers that belong to the model. We reproduce 90 % of them, understand why for 43 %, and have tested 8 % by
-experiment ([coverage](docs/model/coverage.md), recomputed by `lab/coverage.py`).
+- **Core clocks change automatically by load**, the way the NVIDIA driver does it: up to the top level when the GPU is
+  busy, down step by step when it's idle. The governor runs inside the driver (load is counted in the PMU firmware); no
+  service or options are needed.
+- **Every core clock, source, divider, PLL and voltage is computed from the card's VBIOS**, including the display clock and
+  the waits around each switch. The one rule for choosing a clock route — the VBIOS flag first, then a divider, then a PLL,
+  always within ±2 % of the VBIOS number — is checked against 473 Fermi VBIOS images
+  ([docs/2026-11-21/vbios-hit.md](docs/2026-11-21/vbios-hit.md)).
+- **Memory stays at the VBIOS boot clock** on every card except the reference board. The memory part is the next stage;
+  recordings from testers (GF108 DDR3 so far) are its material.
+- **Not tested with more than one monitor.** Please use one.
 
-| Level | Core / shader | Memory | When |
+| Card | Chip | What ran | Result |
 |---|---|---|---|
-| 03 | 50 / 101.25 MHz | 135 MHz | idle |
-| 07 | 405 / 810 MHz | 324 MHz | desktop, video |
-| 0f | 900 / 1800 MHz | 2004 MHz (4 GT/s) | 3D, heavy load |
+| Gigabyte GTX 560 Ti (reference board, ours) | GF114 | 10,000 + 17,600 core switches under load; a night of 900 automatic switches | no hang, no error |
+| ASUS GT 630 (tester) | GF108 | an evening of normal use and games; 38 automatic switches; clock counters | no hang, no error |
+| GF100, GF104, GF106, GF110, GF116, GF117 | — | not yet | testers wanted |
+| GF119 | — | not yet: its PMU firmware has no load counting, so no automatic governor | planned |
 
-The reference board is a Gigabyte GV-N560OC-1GI (PCI subsystem 1458:3515). Its 0f level is a factory overclock;
-03 and 07 are the chip's standard levels.
+**Where we differ from the NVIDIA driver and the VBIOS** — VBIOS errors, NVIDIA misses and nouveau bugs, each with its
+evidence: [docs/deviations.md](docs/deviations.md).
 
-## Results so far (26 Oct 2026)
+## Try it
 
-- **Reclocking works on the reference board** — core, shader, memory, voltage, PCIe 2.5/5 GT/s, and an automatic
-  governor that uses load measured in the PMU firmware.
-- **The cause of the remaining hangs is found and fixed in the lab driver.** The VBIOS stores whole megahertz
-  (101 for 101.25 MHz), and nouveau took that as an exact target. At level 03 it therefore put the shader clock
-  on its PLL, while NVIDIA uses the 1620 MHz divider. Switching away from that PLL could wedge the GPU. With the
-  divider, as NVIDIA does it, 900 level switches under browser load (tests 22–33a, 60 per test) passed without a
-  single hang. The same rounding made nouveau run the PMU at 216 instead of 202.5 MHz; that is fixed too.
-- **A rare clock-switch timeout is worked around; its cause is not known yet.** In some boots (a boot is either good
-  or bad as a whole) the shader clock switch stays on its PLL for 2 s in about 1 % of the 0f→07 downshifts. NVIDIA
-  writes a new value into the core divider right before every switch; in nouveau the divider value never changes after
-  the first switch. Doing it the NVIDIA way (`lab_nv_div_late`) gave 0 timeouts in 2700 load cycles (03→0f→07) in a
-  bad boot, against 27 in 2279 without it in the same boot. Why this works and what differs between boots is still
-  open. A guard (`lab_mux_guard`) retries a stuck switch and then keeps the PLL and the voltage: with it, those 27
-  timeouts did not hang the card. Details: `docs/2026-10-24/hang-20261024-1654.md`.
-- **NVIDIA's order of operations is reproduced step by step**, each step behind its own switch and tested alone:
-  `docs/2026-10-24/nvidia-logic.md` explains what NVIDIA does and why.
-- **The author's daily driver** is the lab driver (`lab/`) with these settings, applied by `daily/gpu-autoclock.py`.
-  Since 25 Oct the service also turns on the divider write before the switch and the guard, and shows a desktop
-  notification on any switch timeout and on any nouveau warning or error except the known boot-time ones. The stable
-  patch (`patches/0010`) has none of the divider, PMU and divider-write fixes; updating it is not planned now.
-- **Memory reclock is board-specific for now.** It replays the memory scripts recorded on the reference board,
-  just as upstream nouveau replays a sequence recorded on another board. A generator from each card's own VBIOS
-  tables would need data from other cards (`docs/2026-10-24/memory-scripts-vs-nouveau.md`); not active now.
+Step by step: **[docs/TESTING-core.md](docs/TESTING-core.md)**. In short: `bash tools/card-report.sh` (read-only report of
+your card), `bash lab/tester-build.sh` (fetches nouveau for your running kernel, applies the patches, builds; checked on
+Linux 6.12, 7.0, 7.2, 7.3), `bash lab/tester-build.sh install`, reboot. Undo: `bash lab/tester-build.sh remove`. Your
+distribution's nouveau stays untouched. Results and questions: the issues of this repository.
+
+On a GF108 card, `bash lab/gf108-check.sh` measures which PLL feeds the hub clock (read-only, 15 seconds).
 
 ## How we work
 
@@ -66,196 +56,41 @@ The reference board is a Gigabyte GV-N560OC-1GI (PCI subsystem 1458:3515). Its 0
 
 ## Data from other Fermi cards (welcome, not required)
 
-This is a hobby project without support promises. If you own another Fermi card — GTX 460–590, GTS 450, GT 4xx/5xx
-or a mobile part — and want to share its VBIOS tables, the model can be checked against your card:
+If you own another Fermi card and want to help: `bash tools/card-report.sh` only reads; it prints a summary of your VBIOS
+tables and, with your consent, saves an archive. Open a **Card data** issue with the summary, and send the archive to
+**xnderv@yandex.com** — not to the issue: the image belongs to NVIDIA and your card's vendor, so we never publish it, only
+values from its tables. A recording of the NVIDIA driver on your card (`trace/`, one evening) helps most.
 
-1. `git clone https://github.com/xnderv/nouveau-fix && cd nouveau-fix && bash tools/card-report.sh`.
-   It only reads. It prints a summary of your VBIOS tables, asks a few questions (vendor, cooling, factory
-   overclock), and with your consent saves an archive in your home folder.
-2. Open a **Card data** issue and paste the summary there.
-3. Send the archive to **xnderv@yandex.com**. Please don't attach it to the issue: the image belongs to NVIDIA and your
-   card's vendor, so we never publish it, only values from its tables.
+## Patches
 
-Hangs and results on other boards: the **Hang report** and **Hardware report** issue forms.
+Tester build (`lab/tester-build.sh`): `0001` + `lab/0002` (one of three variants, picked for your kernel) + `0004` + `0006`.
 
-## Install (Ubuntu, kernel 7.0.x)
-
-Needs `dkms build-essential patch git linux-headers-generic`.
-
-| Command | What it does |
-|---|---|
-| `bash stable/stable.sh install` | stable driver via DKMS (rebuilt for every new kernel): patches 0001 + 0003 + 0010 |
-| `bash stable/stable.sh status` | loaded driver, level, load, temperature, PCIe link, events |
-| `bash lab/lab.sh install` | lab driver: 0001 + lab 0002 + 0003 + 0004 + 0005 + 0006, with `lab_*` switches for every step |
-| `bash tools/card-report.sh` | read-only report about your card (see above) |
-
-Reclocking is active only on the reference board. On any other card the driver behaves like upstream; the stable
-driver tries other GF114 boards with `nouveau.gf114_board=1` (untested; watch for VRAM errors).
-
-## Patches (`patches/`, on top of nouveau in Linux 7.0.x)
-
-- `0001` — a GPU hang when a Chromium-based app deletes an engine object while the channel is still busy
-  (`nouveau_abi16.c`). **Sent upstream** 23 Oct 2026 (v2 the same day after an automated review), waiting for
-  review: [lore](https://lore.kernel.org/dri-devel/20261023144219.46478-1-xnderv@yandex.com/).
-- `0003` — HDMI was refused when the monitor supports SCDC and the GPU does not; refuse only above 340 MHz.
-  Fixed upstream independently in Sept 2026 (`1717fcc5be57`); skipped automatically where present.
-- `0004` (lab) — load accounting in the PMU firmware and the in-driver governor. `0005` (lab) — HDMI AVI InfoFrame ITC.
-- `0006` — the fan could drop to 3 % on its own: nouveau read back the PWM duty with the update bit still set, and its
-  u32 math turned that into 0 % (race between its two fan timers; `docs/2026-10-24/vent-20261024.md`). **Sent upstream**
-  25 Oct 2026, waiting for review: [lore](https://lore.kernel.org/dri-devel/20261025101640.49779-1-xnderv@yandex.com/).
-- `0010` — stable reclocking for the reference board (22–24 Oct); it does not yet have the shader-divider and PMU
-  clock fixes from the lab driver.
-- `lab/0002` — the instrumented reclocking with all switches.
-
-## License
-
-MIT (see `LICENSE`) for everything in this repository. The patches change files of the nouveau driver, which are
-themselves MIT-licensed; the patched files keep their license. NVIDIA binaries and VBIOS images are not part of the
-repository.
+- `0001` — a GPU hang when a Chromium-based app deletes an engine object while its channel is busy. **Sent upstream**
+  23 Oct 2026 (v2 the same day): [lore](https://lore.kernel.org/dri-devel/20261023144219.46478-1-xnderv@yandex.com/).
+- `lab/0002` — clocks computed from the VBIOS, with a `lab_*` switch for every step (`-v7.2`, `-v7.3`: the same for kernels
+  that already have upstream's own clk fixes). Rebuilt from the lab tree by `lab/regen-patches.sh`.
+- `0003` — HDMI refused when the monitor supports SCDC and the GPU does not; fixed upstream (`1717fcc5be57`), kept for 7.0.x.
+- `0004` — load counting in the PMU firmware and the in-driver governor.
+- `0005` — HDMI AVI InfoFrame ITC (lab).
+- `0006` — the fan could drop to 3 %: the PWM duty was read back with the update bit set. **Sent upstream** 25 Oct 2026:
+  [lore](https://lore.kernel.org/dri-devel/20261025101640.49779-1-xnderv@yandex.com/).
+- `archive/stable-2026-10/` — the first, board-specific driver (`0010`, DKMS) for the reference board only; retired.
 
 ## Where things are
 
 | Path | Contents |
 |---|---|
-| `docs/model/` | the model (textbook), the register coverage table and its status file |
-| `docs/provenance.md` | where our knowledge may come from, and what happened with the Twilight0 notes |
-| `docs/2026-10-24/nvidia-logic.md` | how NVIDIA reclocks GF114 and why: rules, open questions, what we do the same way |
-| `docs/boot-recovery.md` | the author's machine does not boot during lab tests: the GRUB fallback line |
-| `docs/glossary.md` | glossary of abbreviations (Russian) |
-| `docs/2026-10-24/nvidia-vs-lab-map.md` | register-level map: NVIDIA vs the lab driver, every recording |
-| `docs/2026-10-24/memory-scripts-vs-nouveau.md` | memory scripts: NVIDIA vs nouveau vs VBIOS tables |
-| `docs/2026-10-23/hang-20261023-1802.md` | the hang investigation, tests 1–24 |
-| `lab/` | lab driver, test series (`night.sh`, `hangtest.sh`), probes, VBIOS parsers |
-| `trace/` | mmiotrace recording kit (a separate boot disk with the NVIDIA 390 driver) |
+| `docs/TESTING-core.md` | how to test the build on your card |
+| `docs/deviations.md` | VBIOS errors, NVIDIA misses, nouveau bugs — and what we do |
+| `docs/model/` | the model of NVIDIA's behaviour (Russian), register coverage |
+| `docs/2026-MM-DD/` | research notes by date (Russian); the newest are the most current |
+| `docs/provenance.md` | where our knowledge may come from |
+| `lab/` | lab driver patches, tester scripts, tests, VBIOS and trace parsers |
+| `tools/card-report.sh` | read-only card report |
+| `trace/` | kit for recording the NVIDIA driver (a separate boot disk with NVIDIA 390) |
 | `results/` | test logs |
-| `stable/`, `daily/` | stable DKMS driver; the service that applies the daily settings |
 
----
+## License
 
-# nouveau-fix: как NVIDIA управляет картой Fermi — модель, построенная наблюдением (GeForce GTX 560 Ti, GF114)
-
-Исследовательский проект для души. Цель — понять принципы, по которым драйвер NVIDIA управляет частотами, напряжением,
-памятью и переходами между уровнями на карте Fermi, и записать их как **модель, которая предсказывает, что делает
-драйвер**. Модель строится только наблюдением и опытом (см. «Как мы работаем»). Работающая смена частот для одной
-платы GTX 560 Ti в Linux 7.0 — ядро, шейдеры, память GDDR5, напряжение, PCIe, регулятор — частный случай модели.
-
-Штатный nouveau оставляет карты Fermi на частотах загрузки: GTX 560 Ti так и работает на 50 МГц ядра и 135 МГц памяти,
-в 3D и видео она медленная. На эталонной плате ниже карта теперь переключает уровни так же, как драйвер NVIDIA.
-В основное ядро отправляются только небольшие отдельные исправления; поддержку мы не обещаем.
-
-**Модель:** [`docs/model/`](docs/model/README.md) (версия 0.2). При смене уровня NVIDIA пишет в 155 регистров, которые
-относятся к модели. Мы повторяем 90 % из них, понимаем, зачем они, — 43 %, проверили опытом — 8 %
-([покрытие](docs/model/coverage.md), пересчитывает `lab/coverage.py`).
-
-| Уровень | Ядро / шейдеры | Память | Когда |
-|---|---|---|---|
-| 03 | 50 / 101,25 МГц | 135 МГц | простой |
-| 07 | 405 / 810 МГц | 324 МГц | рабочий стол, видео |
-| 0f | 900 / 1800 МГц | 2004 МГц (4 ГТ/с) | 3D, тяжёлая нагрузка |
-
-Эталонная плата — Gigabyte GV-N560OC-1GI (подсистема PCI 1458:3515). Уровень 0f у неё — заводской разгон;
-03 и 07 — штатные уровни чипа.
-
-## Что уже получено (26.10.2026)
-
-- **Смена частот работает на эталонной плате**: ядро, шейдеры, память, напряжение, PCIe 2,5/5 ГТ/с и регулятор,
-  который сам выбирает уровень по загрузке, измеренной в прошивке PMU.
-- **Причина оставшихся зависаний найдена и устранена в лабораторном драйвере.** VBIOS хранит целые мегагерцы
-  (101 вместо 101,25 МГц), а nouveau принимал это число за точную цель. Поэтому на уровне 03 он ставил шейдерный
-  такт на PLL, а NVIDIA — на делитель от 1620 МГц. Переход с этого PLL мог подвесить карту. С делителем, как у NVIDIA,
-  900 переключений уровней под нагрузкой браузера (тесты 22–33а, по 60 в каждом) прошли без единого зависания.
-  То же округление заставляло nouveau гнать PMU на 216 МГц вместо 202,5 — тоже исправлено.
-- **Редкий тайм-аут переключателя такта обойдён; его причина пока неизвестна.** В части загрузок (загрузка либо
-  хорошая, либо плохая целиком) переключатель шейдерного такта примерно в 1 % спусков 0f→07 застревает на PLL на 2 с.
-  NVIDIA прямо перед каждым переключением пишет в делитель ядра новое значение, а у nouveau значение делителя после
-  первого переключения не меняется. Сделать как NVIDIA (`lab_nv_div_late`) — в плохой загрузке 0 тайм-аутов на 2700
-  циклов нагрузки (03→0f→07) против 27 на 2279 без этого в той же загрузке. Почему это помогает и чем различаются
-  загрузки — пока открыто. Защита (`lab_mux_guard`) повторяет застрявшее переключение, а потом оставляет PLL и
-  напряжение как есть: с ней эти 27 тайм-аутов карту не подвесили. Подробно: `docs/2026-10-24/hang-20261024-1654.md`.
-- **Порядок действий NVIDIA повторён по шагам**: каждый шаг — отдельный переключатель, проверен отдельно.
-  Что и зачем делает NVIDIA — `docs/2026-10-24/nvidia-logic.md`.
-- **Ежедневный драйвер автора** — лабораторный (`lab/`) с этими настройками, их выставляет служба
-  `daily/gpu-autoclock.py`. С 25.10 служба включает и запись делителя перед переключателем, и защиту, а о любом
-  тайм-ауте переключателя и о любом предупреждении или ошибке nouveau, кроме известных при загрузке, показывает
-  уведомление на рабочем столе.
-  В стабильном патче (`patches/0010`) исправлений делителя, PMU и записи делителя перед переключателем нет; обновлять его
-  сейчас не планируем.
-- **Смена частоты памяти пока привязана к плате.** Она проигрывает скрипты памяти, записанные на эталонной плате, —
-  так же, как штатный nouveau проигрывает последовательность, записанную когда-то на другой плате. Генератор по
-  таблицам VBIOS каждой карты нужны данные других карт (`docs/2026-10-24/memory-scripts-vs-nouveau.md`); сейчас не ведётся.
-
-## Как мы работаем
-
-- **Только наблюдение и опыт.** Записываем, как драйвер NVIDIA 390 обращается к железу (встроенный в ядро mmiotrace),
-  читаем регистры и VBIOS, проверяем каждый шаг на железе, опираемся на открытые источники: nouveau, envytools, открытый
-  код самой NVIDIA (nvgpu, Tegra). Чужие факты — гипотезы, пока их не подтвердили наши записи или регистры; у каждого
-  факта записан источник. Выводов из декомпиляции или дизассемблирования кода NVIDIA — ни своих, ни чужих — не
-  используем ([`docs/provenance.md`](docs/provenance.md)).
-- **Что было раньше.** До 24.10.2026 мы опирались и на заметки и декодер проекта Twilight0. Часть его находок получена
-  декомпиляцией драйвера NVIDIA. Мы остановились, сделали опись взятого и 26.10 убрали то, что сами не проверили
-  (`docs/2026-10-26/provenance-and-research.md`, часть 1).
-- **Никаких бинарных файлов NVIDIA в репозитории.** Образы VBIOS и сырые записи остаются у нас; публикуются только
-  выводы и значения регистров.
-- **Одно изменение на опыт.** Каждый шаг — отдельный переключатель, проверенный отдельно на железе; журналы — в `results/`.
-
-## Данные других карт Fermi (будем рады, но не просим)
-
-Это проект для души, поддержку мы не обещаем. Если у вас другая карта Fermi — GTX 460–590, GTS 450, GT 4xx/5xx или
-мобильная — и вы хотите поделиться таблицами её VBIOS, модель можно будет сверить с вашей картой:
-
-1. `git clone https://github.com/xnderv/nouveau-fix && cd nouveau-fix && bash tools/card-report.sh`.
-   Скрипт только читает. Он печатает разбор таблиц VBIOS, задаёт несколько вопросов (производитель, охлаждение,
-   заводской разгон) и с вашего согласия сохраняет архив в домашнем каталоге.
-2. Откройте на GitHub заявку **Card data** и вставьте туда разбор.
-3. Сам архив отправьте на **xnderv@yandex.com**. Не прикладывайте его к заявке: образ принадлежит NVIDIA и производителю
-   карты, поэтому мы его никогда не публикуем — только значения из его таблиц.
-
-Зависания и результаты на других платах — формы **Hang report** и **Hardware report**.
-
-## Установка (Ubuntu, ядро 7.0.x)
-
-Нужны пакеты `dkms build-essential patch git linux-headers-generic`.
-
-| Команда | Что делает |
-|---|---|
-| `bash stable/stable.sh install` | стабильный драйвер через DKMS (сам пересобирается под каждое новое ядро): патчи 0001 + 0003 + 0010 |
-| `bash stable/stable.sh status` | какой драйвер загружен, уровень, загрузка, температура, шина PCIe, события |
-| `bash lab/lab.sh install` | лабораторный драйвер: 0001 + лабораторный 0002 + 0003 + 0004 + 0005 + 0006, с переключателями `lab_*` на каждый шаг |
-| `bash newkernel.sh` | после установки нового ядра, до перезагрузки: проверить и при необходимости дособрать драйвер |
-| `bash tools/card-report.sh` | отчёт о вашей карте, только чтение (см. выше) |
-
-Смена частот включается только на эталонной плате; на других картах драйвер ведёт себя как штатный. Стабильный драйвер
-можно попробовать на другой плате GF114 параметром `nouveau.gf114_board=1` (не проверено; следите за ошибками видеопамяти).
-
-Старый путь «только исправление 0001» (`rebuild.sh`, `check.sh`, `revert.sh`) сохранён для истории.
-
-## Отправлено в основное ядро
-
-- `0001` (зависание при удалении объекта движка, Chromium) — отправлено 23.10.2026, в тот же день v2 после автоматической
-  проверки; ждём ответа: [lore](https://lore.kernel.org/dri-devel/20261023144219.46478-1-xnderv@yandex.com/).
-- `0006` (вентилятор падает до 3 %) — отправлено 25.10.2026; ждём ответа:
-  [lore](https://lore.kernel.org/dri-devel/20261025101640.49779-1-xnderv@yandex.com/).
-
-Подробности и тексты писем — `docs/upstream/`.
-
-## Лицензия
-
-MIT (файл `LICENSE`) на всё в репозитории. Патчи меняют файлы драйвера nouveau, которые сами под MIT; изменённые файлы
-сохраняют свою лицензию. Двоичных файлов NVIDIA и образов VBIOS в репозитории нет.
-
-## Где что лежит
-
-| Путь | Что там |
-|---|---|
-| `docs/model/` | модель (учебник), таблица покрытия регистров и файл их статусов |
-| `docs/provenance.md` | откуда могут браться наши знания и что было с заметками Twilight0 |
-| `docs/2026-10-24/nvidia-logic.md` | как NVIDIA меняет частоты GF114 и почему: правила, белые пятна, что у нас так же |
-| `docs/boot-recovery.md` | машина автора не загружается во время лабораторных тестов: запасная строка GRUB |
-| `docs/glossary.md` | словарь сокращений: GPC, PLL, FSRM, PMU и другие |
-| `docs/2026-10-24/nvidia-vs-lab-map.md` | карта регистров: NVIDIA против лабораторного драйвера, все записи |
-| `docs/2026-10-24/memory-scripts-vs-nouveau.md` | скрипты памяти: NVIDIA, nouveau и таблицы VBIOS |
-| `docs/2026-10-23/hang-20261023-1802.md` | расследование зависаний, тесты 1–24 |
-| `lab/` | лабораторный драйвер, серии тестов (`night.sh`, `hangtest.sh`), пробники, разборщики VBIOS |
-| `trace/` | набор для записи mmiotrace (отдельный загрузочный диск с драйвером NVIDIA 390) |
-| `results/` | журналы тестов |
-| `stable/`, `daily/` | стабильный драйвер DKMS; служба, выставляющая ежедневные настройки |
+MIT (see `LICENSE`). The patches change files of the nouveau driver, which are themselves MIT-licensed. NVIDIA binaries
+and VBIOS images are not part of the repository.

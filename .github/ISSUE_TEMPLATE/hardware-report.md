@@ -1,17 +1,18 @@
 ---
-name: Hardware report (another GF11x board)
-about: You tried this on a different Fermi card — tell us what happened
+name: Test report (lab build on your Fermi card)
+about: You ran the tester build (docs/TESTING-core.md) — tell us what happened
 ---
-**GPU / board** (`lspci -nn | grep -i vga`, PCI subsystem id):
+**GPU / board** (`lspci -nn | grep -iE "vga|3d"`, vendor and model):
 **Kernel / distro:**
-**Which driver:** stable (`stable/stable.sh install`) / lab (`lab/lab.sh install`)
-**Boot parameters used** (e.g. `nouveau.gf114_board=1`):
+**Monitors connected** (we ask for one):
 
 **Result:** works / partially / hang / no change
 
-**Output:**
+**What you did** (desktop, video, games, how long):
+
+**Attach the kernel log** (it is partly in Russian — that's fine):
 ```
-bash stable/stable.sh status
-dmesg | grep -iE "nouveau|GF11" | tail -n 60
+journalctl -k -b | grep -E "nouveau|LAB" > nouveau-log.txt
+cat /sys/module/nouveau/srcversion
 ```
-**Your VBIOS pstate table** (`sudo cat /sys/kernel/debug/dri/0/pstate`):
+On a GF108 card, also the file printed by `bash lab/gf108-check.sh`.

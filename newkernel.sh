@@ -2,8 +2,7 @@
 # НОВОЕ ЯДРО: убедиться, что под него собран наш драйвер — ДО перезагрузки.
 #   ~/Home/nouveau-fix/newkernel.sh                  — самое новое установленное ядро
 #   ~/Home/nouveau-fix/newkernel.sh 7.0.0-40-generic — конкретное ядро
-# Стабильный драйвер (DKMS) обычно собирается сам при установке ядра; этот скрипт проверяет и при необходимости
-# досабирает. Для лабораторного драйвера — отдельно: KVER=<ядро> ~/Home/nouveau-fix/lab/lab.sh install
+# 21.11: стабильный DKMS-драйвер выведен из работы (archive/stable-2026-10) — только лабораторный: KVER=<ядро> lab/lab.sh install
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 KVER="${1:-$(ls -1 /lib/modules | sort -V | tail -n 1)}"
@@ -18,18 +17,11 @@ if [ -e "/lib/modules/$(uname -r)/updates/nouveau-fix/nouveau.ko" ] || [ -e /sys
         echo "=== Лабораторный драйвер под $KVER — собираю: KVER=$KVER lab/lab.sh install (пароль)"
         KVER="$KVER" bash "$HERE/lab/lab.sh" install || exit 1
     fi
-elif command -v dkms >/dev/null && dkms status nouveau-gf114/1.0 2>/dev/null | grep -q .; then
-    if dkms status nouveau-gf114/1.0 -k "$KVER" | grep -q installed; then
-        echo "=== Стабильный драйвер для $KVER уже собран DKMS ✅: $(modinfo -k "$KVER" -n nouveau)"
-    else
-        echo "=== DKMS ещё не собрал стабильный драйвер для $KVER — собираю (пароль)"
-        "$HERE/stable/stable.sh" build "$KVER"
-    fi
 else
-    echo "=== Стабильный драйвер через DKMS не установлен. Поставить: bash ~/Home/nouveau-fix/stable/stable.sh install"
-    echo "    (старый путь — стабильный-0001 + лабораторный: ~/Home/nouveau-fix/rebuild.sh и lab/lab.sh install)"
+    echo "=== Лабораторный драйвер на этом ядре не стоит. Поставить: KVER=$KVER bash ~/Home/nouveau-fix/lab/lab.sh install"
+    echo "    (тестировщики: bash lab/tester-build.sh; старый стабильный DKMS-драйвер — в archive/stable-2026-10, не используется)"
     exit 1
 fi
 sudo rm -f "/var/lib/nouveau-fix/pending-$KVER" 2>/dev/null || true
 "$HERE/daily/grub-pin.sh" "$KVER" || echo "--- Закрепить ядро в GRUB не удалось: daily/grub-pin.sh status"
-echo "Перезагрузись. После неё: daily/check-driver.sh (или stable/stable.sh status)"
+echo "Перезагрузись. После неё: daily/check-driver.sh"

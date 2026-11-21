@@ -1,5 +1,5 @@
 name: Card data (VBIOS for research)
-description: Share your Fermi card's VBIOS tables so the reclocking can be made to work on boards other than ours
+description: Share your Fermi card's VBIOS tables so we can check the build against your board before you install it
 title: "Card data: <vendor> <model>"
 labels: ["card data"]
 body:

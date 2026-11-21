@@ -8,8 +8,9 @@ VBIOS**; nothing in it is tuned for one particular board. No service and no modu
 NVIDIA memory scripts we have recorded (GTX 560 Ti Gigabyte 1458:3515, GTS 450 Gigabyte 1458:3500). So you get the full
 core clock with the memory at its boot clock: a clear gain in compute-heavy work, less in memory-heavy 3D.
 
-Tested on our GTX 560 Ti (GF114): 10,000 core switches under load without a hang, and 900 automatic switches overnight
-without an error. On your card it has not run yet — that's what we ask you for.
+Tested on our GTX 560 Ti (GF114): 10,000 + 17,600 core switches under load without a hang, and 900 automatic switches
+overnight without an error; and by a tester on an ASUS GT 630 (GF108): an evening of normal use and games without an error.
+Other chips have not run it yet — that's what we ask you for. GF119 cards: not yet (no automatic governor there).
 
 ## Before you start
 - **Post your card report** (`bash tools/card-report.sh`, attach the output to your issue) — it helps us check your VBIOS.
