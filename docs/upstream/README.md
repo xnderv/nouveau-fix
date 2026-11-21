@@ -96,3 +96,5 @@ cd ~/Home/nouveau-fix && git send-email --to='Lyude Paul <lyude@redhat.com>' --t
 - sasim44 (почта, 20.11 вечер): ответ на раунд 3 — сборка готова, lab/gf108-check.sh (счётчики; по желанию проба источника 2), опыт с двумя мониторами 1024×768 на NVIDIA, просьба о заводском VBIOS. Черновик 2026-11-20-sasim44-issue3-draft.md устарел (заменён этим письмом)
 - issue #4: «Fermi owners: automatic core reclocking from your card's VBIOS — testers wanted», упоминания 8 человек — https://github.com/xnderv/nouveau-fix/issues/4
 - sasim44 (issue #3): письмом — повторить запись с одним монитором; сообщение про пакет — черновик, ждёт его ответа.
+- issue #3 (sasim44): публичная сводка раундов по почте (GF108: хаб 1282 от SYS2CLK, провод подвыбора 7 к PLL XBAR2CLK, ошибка флага в VBIOS ASUS, что изменилось в сборке) — https://github.com/xnderv/nouveau-fix/issues/3#issuecomment-7061135904
+- issue #5 (jfouquart, GF119 GT 610M): сборка для GF119 «собрана по данным, ни разу не запускалась», один заход lab/tester-check.sh; про nouveau-dkms — только наблюдения, не код — https://github.com/xnderv/nouveau-fix/issues/5#issuecomment-7061138004
