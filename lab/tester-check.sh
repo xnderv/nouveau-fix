@@ -4,11 +4,15 @@
 # Every stage is written to the result file as soon as it finishes, so if the machine hangs, what came before is kept.
 #
 #   bash lab/tester-check.sh              — all stages, about 6–8 minutes; one monitor, other programs closed
+#   bash lab/tester-check.sh sleep        — (new 21.11, not yet run) the same plus stage 6: the whole computer sleeps 20 s and wakes up by itself,
+#                                           twice (at the lowest and at the top level); you'll be asked whether the picture
+#                                           on the screen was normal. Only if suspend works on this computer at all.
 #   bash lab/tester-check.sh after-hang   — after a hang and a reboot: collects the kernel log of the previous boot
 #
 # Stages: 1 system and card; 2 clocks at every level, measured by the card's own clock counters; 3 fifty manual switches
 # between the lowest and the top level; 4 the automatic governor under load (glxgears on the NVIDIA GPU) and at rest;
-# 5 on laptops: the NVIDIA GPU goes to sleep and wakes up — load counting and the governor must start again; 6 the log.
+# 5 on laptops: the NVIDIA GPU goes to sleep and wakes up — load counting and the governor must start again; 6 (only with "sleep") the whole
+# computer sleeps and wakes up; 7 the log.
 # At the end it prints the path of one archive — please attach that to your issue or e-mail.
 set -uo pipefail
 PRM=/sys/module/nouveau/parameters
@@ -30,6 +34,8 @@ if [ "${1:-}" = after-hang ]; then
 fi
 
 [ -e "$PRM/lab_cntr_sys" ] || { echo "The lab build is not loaded — install it first (docs/TESTING-core.md)"; exit 1; }
+MODE="${1:-}"
+[ "$MODE" != sleep ] || command -v rtcwake >/dev/null || { echo "rtcwake is missing (package util-linux) — run without 'sleep'"; exit 1; }
 sudo -v || exit 1
 ( while sleep 50; do sudo -n -v 2>/dev/null || exit; done ) & KEEP=$!
 BDF="$(lspci -D -d 10de: | grep -E "VGA|3D|Display" | head -n 1 | cut -d' ' -f1)"
@@ -102,7 +108,22 @@ else
     say "  the GPU does not sleep here (power control '$PC0') — skipped"
 fi
 
-say "=== 6. log"
+if [ "$MODE" = sleep ]; then
+    say "=== 6. the whole computer sleeps 20 s and wakes up (lowest and top level)"
+    for l in "$LO" "$HI"; do
+        T7="$(date "+%F %T")"; awake; w lab_gov 0; lvl "$l"
+        say "  level $l: going to sleep for 20 s — the screen will go dark, the computer wakes up by itself"
+        sudo rtcwake -m mem -s 20 >/dev/null 2>&1; sleep 5; awake
+        say "  woken: $(sudo grep '^AC' "$PS"); load counting restarted $(klog -b 0 --since "$T7" | grep -c 'начать замеры') time(s)"
+        for x in "${LV[@]}" "$LO"; do lvl "$x"; say "    -> $x: $(sudo grep '^AC' "$PS")"; done
+        w lab_gov 2
+        ans="no answer"; read -r -t 120 -p "  Was the picture on the screen normal after waking up? (y/n) " a && ans="$a"; echo
+        say "  picture after waking from $l: $ans; errors $(errs "$T7")"
+        klog -b 0 --since "$T7" | grep -E "LAB (perf|gov)|suspend|resume|Xid|FAULT|ТАЙМ-АУТ" | tail -n 15 >> "$OUT"
+    done
+fi
+
+say "=== 7. log"
 restore; trap - INT TERM
 klog -b 0 > "$DIR/kernel-nouveau.txt"
 sudo cat "$PS" >> "$OUT" 2>/dev/null
