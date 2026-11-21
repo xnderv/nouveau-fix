@@ -15,7 +15,9 @@ PRM=/sys/module/nouveau/parameters
 STAMP="$(date +%Y%m%d-%H%M%S)"
 DIR="$HOME/nouveau-check-$STAMP"; mkdir -p "$DIR"; OUT="$DIR/check.txt"
 say() { echo "$(date +%T) $*" | tee -a "$OUT"; sync; }
-klog() { sudo journalctl -k "$@" --no-pager 2>/dev/null | grep -E "nouveau|LAB" | sed -E 's/^.*nouveau [0-9a-f:.]+: //'; }
+# kernel log lines of nouveau / the lab build, without the host name and the root UUID (the archive may be posted publicly)
+klog() { sudo journalctl -k "$@" --no-pager 2>/dev/null | grep -E "nouveau|LAB[ :]" \
+         | sed -E 's/^([A-Z][a-z]{2} +[0-9]+ [0-9:]{8}) [^ ]+ kernel: /\1 /; s/nouveau [0-9a-f:.]+: //; s/(root|resume)=[^ ]+/\1=…/g'; }
 errs() { sudo journalctl -k -b 0 --no-pager --since "$1" 2>/dev/null | grep -cE "Xid|FAULT|DATA_ERROR|ТАЙМ-АУТ|ОСТАЛСЯ НА PLL|killed|g84_bar_flush"; }
 
 if [ "${1:-}" = after-hang ]; then
