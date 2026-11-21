@@ -10,6 +10,7 @@
 # clocks computed from the card's VBIOS with lab_vbios_src=1), 0004 (PMU load counters), 0006 (fan PWM read).
 # The module goes to /lib/modules/<kernel>/updates/nouveau-fix/nouveau.ko; the distribution's nouveau stays untouched.
 set -euo pipefail
+export PATH="$PATH:/usr/sbin:/sbin"   # Debian: modinfo and depmod live in /usr/sbin, not in a user PATH (sasim44, 21.11)
 HERE="$(cd "$(dirname "$0")" && pwd)"; KIT="$(dirname "$HERE")"
 KVER="$(uname -r)"; KBUILD="/lib/modules/$KVER/build"
 WORK="${WORK:-$HOME/nouveau-fix-build/$KVER}"
