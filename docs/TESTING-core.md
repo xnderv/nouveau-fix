@@ -10,7 +10,7 @@ core clock with the memory at its boot clock: a clear gain in compute-heavy work
 
 Tested on our GTX 560 Ti (GF114): 10,000 + 17,600 core switches under load without a hang, and 900 automatic switches
 overnight without an error; and by a tester on an ASUS GT 630 (GF108): an evening of normal use and games without an error.
-Other chips have not run it yet — that's what we ask you for. GF119 cards: not yet (no automatic governor there).
+Other chips have not run it yet — that's what we ask you for. GF119 cards: the build supports them since 21.11, but it has never run on GF119 hardware — expect several test rounds.
 
 ## Before you start
 - **Post your card report** (`bash tools/card-report.sh`, attach the output to your issue) — it helps us check your VBIOS.

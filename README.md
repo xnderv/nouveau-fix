@@ -26,7 +26,7 @@ model) are in Russian — they are the lab notebook; everything a tester needs i
 | Gigabyte GTX 560 Ti (reference board, ours) | GF114 | 10,000 + 17,600 core switches under load; a night of 900 automatic switches | no hang, no error |
 | ASUS GT 630 (tester) | GF108 | an evening of normal use and games; 38 automatic switches; clock counters | no hang, no error |
 | GF100, GF104, GF106, GF110, GF116, GF117 | — | not yet | testers wanted |
-| GF119 | — | not yet: its PMU firmware has no load counting, so no automatic governor | planned |
+| GF119 | — | build ready (PMU firmware with load counting, two-level governor), never run on the hardware | first tester wanted |
 
 **Where we differ from the NVIDIA driver and the VBIOS** — VBIOS errors, NVIDIA misses and nouveau bugs, each with its
 evidence: [docs/deviations.md](docs/deviations.md).

@@ -16,7 +16,7 @@ P4="$KIT/patches/0004-LAB-pmu-perf-load.patch"
 P5="$KIT/patches/0005-LAB-hdmi-avi-itc.patch"
 P6="$KIT/patches/0006-nouveau-therm-mask-pwm-update-bit-on-read.patch"
 F2="nvkm/subdev/clk/base.c nvkm/subdev/clk/gf100.c nvkm/subdev/fb/ramgf100.c nvkm/subdev/volt/base.c"
-F4="nvkm/subdev/pmu/fuc/gf100.fuc3.h nvkm/subdev/pmu/fuc/perf.fuc nvkm/subdev/pmu/gf100.c"
+F4="nvkm/subdev/pmu/fuc/gf100.fuc3.h nvkm/subdev/pmu/fuc/gf119.fuc4.h nvkm/subdev/pmu/fuc/perf.fuc nvkm/subdev/pmu/gf100.c nvkm/subdev/pmu/gf119.c nvkm/subdev/pmu/priv.h"
 mkdir -p "$W"; cd "$W"
 fetch() {   # $1 тег → каталог up-$1 с drivers/gpu/drm/nouveau
   [ -d "up-$1" ] && return

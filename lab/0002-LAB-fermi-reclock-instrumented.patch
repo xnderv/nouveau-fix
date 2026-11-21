@@ -1286,7 +1286,7 @@
  	if ((ret = calc_clk(clk, cstate, 0x00, nv_clk_src_gpc)) ||
  	    (ret = calc_clk(clk, cstate, 0x01, nv_clk_src_rop)) ||
  	    (ret = calc_clk(clk, cstate, 0x02, nv_clk_src_hubk07)) ||
-@@ -346,20 +1161,802 @@
+@@ -346,20 +1161,811 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -1312,6 +1312,10 @@
 +/* 24.10: включено по умолчанию — тесты 13, 15, 16, 17: 240 подъёмов под нагрузкой без зависания (без скобки 7 из 7 висло). */
 +static uint lab_therm = 1;
 +module_param(lab_therm, uint, 0644);
++static uint lab_therm_gf119 = 1;	/* 21.11: GF119/GF117 — скобка ставится (безвредна: на GF114 только убрала зависания; у NVIDIA
++					 * на GF119 — в 1 записи из 9); 0 — без скобки, как NVIDIA в остальных 8 */
++module_param(lab_therm_gf119, uint, 0644);
++MODULE_PARM_DESC(lab_therm_gf119, "LAB: GF119/GF117: PTHERM slowdown bracket around switches (1 = yes, default; 0 = no, as NVIDIA in 8 of 9 recordings)");
 +MODULE_PARM_DESC(lab_therm, "LAB: PTHERM FSRM slowdown bracket around GPC/hubk06 mux switch as NVIDIA: 0 off, 1 NVIDIA exit values, 2 restore ours");
 +static uint lab_therm_us = 24;
 +module_param(lab_therm_us, uint, 0644);
@@ -1512,6 +1516,11 @@
 +
 +	sv->on = false;
 +	if (!lab_therm || (idx != 0 && idx != 7))
++		return;
++	/* LAB 21.11: GF119 и GF117 — у NVIDIA скобка в 1 записи из 9 (2012–2017, обе эпохи драйвера; скобки хаба — ни разу).
++	 * Эпохой драйвера не объясняется (на GF114 скобка есть с 270.x, 2011). Ставим (вреда от неё на GF114 не было);
++	 * lab_therm_gf119=0 — без скобки, как NVIDIA в остальных записях. */
++	if ((device->chipset == 0xd9 || device->chipset == 0xd7) && !READ_ONCE(lab_therm_gf119))
 +		return;
 +	sv->i = (idx == 0) ? 0 : 1;
 +	/* LAB 17.11: глубина в ОБА поля, как NVIDIA во всех записях (биты 16–21 «в простое» и 0–5 «по команде») + флаг 7;
@@ -2092,7 +2101,7 @@
  }
  
  static void
-@@ -368,20 +1965,58 @@
+@@ -368,20 +1974,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -2154,7 +2163,7 @@
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +2025,106 @@
+@@ -390,17 +2034,106 @@
  }
  
  static void
@@ -2263,7 +2272,7 @@
  	}
  }
  
-@@ -409,7 +2133,17 @@
+@@ -409,7 +2142,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -2281,7 +2290,7 @@
  }
  
  static int
-@@ -426,23 +2160,720 @@
+@@ -426,23 +2169,720 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -3004,7 +3013,7 @@
  }
  
  static const struct nvkm_clk_func
-@@ -461,6 +2892,7 @@
+@@ -461,6 +2901,7 @@
  		{ nv_clk_src_rop    , 0x04 },
  		{ nv_clk_src_mem    , 0x05, 0, "memory", 1000 },
  		{ nv_clk_src_vdec   , 0x06 },
@@ -3012,7 +3021,7 @@
  		{ nv_clk_src_pmu    , 0x0a },
  		{ nv_clk_src_hubk07 , 0x0b },
  		{ nv_clk_src_max }
-@@ -477,5 +2909,5 @@
+@@ -477,5 +2918,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
