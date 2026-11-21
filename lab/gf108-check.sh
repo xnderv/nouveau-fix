@@ -39,7 +39,7 @@ if [ "$MODE" = probe ]; then
 fi
 lvl 03
 w lab_gov "$G0"
-sudo journalctl -k -b 0 --no-pager --since "$T0" | grep -E "LAB узлы по расчёту|LAB счётчик|LAB hub01-проба|hub01-alt|беру снизу|LAB calc idx 0[278] |Xid|FAULT|ТАЙМ-АУТ" \
+{ sudo journalctl -k -b 0 --no-pager | grep -m1 "LAB build"; sudo journalctl -k -b 0 --no-pager --since "$T0"; } | grep -E "LAB build|LAB узлы по расчёту|LAB счётчик|LAB hub01-проба|hub01-alt|беру снизу|LAB calc idx 0[278] |Xid|FAULT|ТАЙМ-АУТ" \
   | sed -E 's/^.*nouveau [0-9a-f:.]+: //' >> "$OUT"
 echo "=== end; governor restored" >> "$OUT"
 cat "$OUT"
