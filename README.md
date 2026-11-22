@@ -25,7 +25,8 @@ model) are in Russian — they are the lab notebook; everything a tester needs i
 |---|---|---|---|
 | Gigabyte GTX 560 Ti (reference board, ours) | GF114 | 10,000 + 17,600 core switches under load; a night of 900 automatic switches | no hang, no error |
 | ASUS GT 630 (tester) | GF108 | an evening of normal use and games; 38 automatic switches; clock counters | no hang, no error |
-| GF100, GF104, GF106, GF110, GF116, GF117 | — | not yet | testers wanted |
+| GF100, GF104, GF106, GF110, GF116 | — | not yet | testers wanted |
+| GF117 | — | not yet: no display, and nouveau doesn't run its power-management controller (PMU), so no automatic governor | planned |
 | GF119 | — | build ready (PMU firmware with load counting, two-level governor), never run on the hardware | first tester wanted |
 
 ## Which cards
@@ -41,8 +42,7 @@ suits you (it ended in 2022 and needs patches for new kernels), this project is 
 
 Many of these names were also used for Kepler or Maxwell chips (GT 630, GT 640, GT 705, GT 730, GT 720M and others), so the
 name alone isn't enough: `bash tools/card-report.sh` tells you which chip you have, and `lspci -nn` shows it as well.
-Status by chip is in the table above; GF117 (some 600M/700M laptop parts) is not supported yet — nouveau doesn't run its
-power-management controller.
+Status by chip is in the table above.
 
 **Where we differ from the NVIDIA driver and the VBIOS** — VBIOS errors, NVIDIA misses and nouveau bugs, each with its
 evidence: [docs/deviations.md](docs/deviations.md).
