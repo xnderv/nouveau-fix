@@ -4,7 +4,7 @@
 # Every stage is written to the result file as soon as it finishes, so if the machine hangs, what came before is kept.
 #
 #   bash lab/tester-check.sh              — all stages, about 6–8 minutes; one monitor, other programs closed
-#   bash lab/tester-check.sh sleep        — (new 21.11, not yet run) the same plus stage 6: the whole computer sleeps 20 s and wakes up by itself,
+#   bash lab/tester-check.sh sleep        — the same plus stage 6: the whole computer sleeps 20 s and wakes up by itself,
 #                                           twice (at the lowest and at the top level); you'll be asked whether the picture
 #                                           on the screen was normal. Only if suspend works on this computer at all.
 #   bash lab/tester-check.sh after-hang   — after a hang and a reboot: collects the kernel log of the previous boot
@@ -54,7 +54,7 @@ T0="$(date "+%F %T")"
 say "=== 1. system and card"
 {
   echo "kernel $(uname -r); module $(cat /sys/module/nouveau/srcversion)"
-  klog -b 0 | grep -m1 "LAB build" || echo "(no LAB build line)"
+  L1="$(klog -b 0 | grep -m1 "LAB build" || true)"; echo "${L1:-(no LAB build line)}"
   lspci -nn | grep -iE "vga|3d|display"
   echo "NVIDIA GPU $BDF: power control '$PC0', runtime status '$(cat "$PWR/runtime_status" 2>/dev/null || echo -)'"
   echo "connected displays: $(for c in /sys/class/drm/card*-*/status; do [ "$(cat "$c")" = connected ] && basename "$(dirname "$c")"; done | tr '\n' ' ')"

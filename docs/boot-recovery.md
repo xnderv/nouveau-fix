@@ -1,14 +1,14 @@
-# Если машина автора не загружается (на время тестов лабораторного драйвера, с 25.10.2026)
+# Test machine boot (since 22.11.2026: lab/safeboot.sh)
 
-1. Экран чёрный или завис — нажми кнопку **Reset** (или подожди: при панике ядра машина сама перезагрузится через 10 с).
-2. При старте 5 с видно меню GRUB (после сбоя оно ждёт 30 с). Стрелками выбери **третью строку**
-   `Ubuntu - STABLE nouveau (if the lab driver fails)` и нажми **Enter**.
-3. Загрузится стабильный драйвер (копия от 19.10). Работай как обычно; лабораторный остаётся на диске, его разберём потом.
-4. Меню не появилось — при старте держи **Shift**. Совсем ничего не помогает — в меню «Advanced options» → «recovery mode».
+- **By default GRUB boots the first menu line — the newest kernel with the distribution's own nouveau.** Our module is not in
+  the normal initramfs and not in /lib/modules. Kernels update the usual way (apt); after any reboot, Reset or power cut the
+  machine comes up this way, with SSH. The card works at its boot clocks.
+- **Our module is in its own image** `/boot/initrd.img-<kernel>.lab` and its own menu line
+  "Ubuntu - LAB nouveau (<kernel>, one boot)". Before experiments: `bash lab/safeboot.sh lab` — the next boot, and only that
+  one, uses it. If it hangs: Reset or the smart plug, and the machine is back to the safe default.
+- **New build or new kernel:** build the module (on the laptop — about 4–5× faster), copy the `.ko`, then
+  `bash lab/safeboot.sh install MODULE.ko KERNEL` (two images by dracut, 2–4 min), then `bash lab/safeboot.sh lab`.
+- `bash lab/safeboot.sh status` — what runs now, what boots by default and next time, which kernels have a `.lab` image.
 
-Как это устроено: nouveau поднимается из образа initramfs, который GRUB грузит вместе с ядром. Третья строка — то же ядро,
-но второй образ `/boot/initrd.img-<ядро>.nouveau-stable` со стабильным модулем. Ставит и убирает `lab/bootmenu.sh`
-(`install`, `status`, `uninstall`); после обновления ядра — `lab/bootmenu.sh install` заново.
-
-*If the author's machine does not boot during lab-driver tests: press Reset, then pick the 3rd GRUB line
-“Ubuntu - STABLE nouveau (if the lab driver fails)”. Set up by `lab/bootmenu.sh`.*
+The previous arrangements (pinning the kernel in GRUB, a "STABLE nouveau" fallback line, reminders on new kernels, the
+autoclock service) are in `archive/daily-2026-11/` and `archive/stable-2026-10/`.

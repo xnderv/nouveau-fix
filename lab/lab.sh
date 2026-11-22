@@ -74,6 +74,9 @@ preflight() {  # $1 = ожидаемая маска, $2..$6 = ожидаемые
 
 case "${1:-}" in
 install)
+    # 22.11: на тестовой машине наш модуль ставится только через lab/safeboot.sh (отдельный образ, одноразовая загрузка);
+    # lab.sh install кладёт модуль в обычный образ и закрепляет ядро — это ломает безопасную загрузку по умолчанию.
+    [ "${LAB_OLD_INSTALL:-}" = 1 ] || { echo "Устарело (22.11): собери модуль (на ноутбуке быстрее) и поставь: bash lab/safeboot.sh install МОДУЛЬ.ko ЯДРО; затем bash lab/safeboot.sh lab. Старый путь: LAB_OLD_INSTALL=1"; exit 1; }
     command -v git >/dev/null || { echo "Нет git: sudo apt install git"; exit 1; }
     [ -e "$KBUILD/Makefile" ] || { echo "Нет заголовков ядра: sudo apt install linux-headers-$KVER"; exit 1; }
     UPV="$(make -s -C "$KBUILD" kernelversion 2>/dev/null | tail -n 1 || true)"
@@ -116,7 +119,7 @@ install)
     sudo install -m 644 "$WORK/nouveau/nouveau.ko" "$SLOT"
     sudo depmod -a "$KVER"; sudo update-initramfs -u -k "$KVER"
     sudo rm -f "/var/lib/nouveau-fix/pending-$KVER" 2>/dev/null || true
-    "$KIT/daily/grub-pin.sh" "$KVER" || echo "--- Закрепить ядро $KVER в GRUB не удалось: daily/grub-pin.sh status"   # 28.10
+    "$KIT/archive/daily-2026-11/grub-pin.sh" "$KVER" || echo "--- Закрепить ядро $KVER в GRUB не удалось: daily/grub-pin.sh status"   # 28.10
     echo "=== Готово. Перезагрузись. Вернуть стабильный: ~/Home/nouveau-fix/archive/stable-2026-10/stable.sh install (не используется с 21.11) (или lab.sh restore — только исправление гонки)"
     ;;
 pstate)

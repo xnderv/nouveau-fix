@@ -32,7 +32,7 @@ check)
         fi
     done
     echo "нужный модуль: $WANT"
-    "$KIT/daily/grub-pin.sh" status 2>/dev/null | sed -n '2p' || true
+    "$KIT/archive/daily-2026-11/grub-pin.sh" status 2>/dev/null | sed -n '2p' || true
     ;;
 kernel)
     sudo apt install linux-image-$K38 linux-modules-$K38 linux-headers-$K38
@@ -54,7 +54,7 @@ install)
     sudo install -D -m 644 "$WORK/nouveau.ko" "$SLOT"
     sudo depmod -a "$K38"; sudo update-initramfs -u -k "$K38"
     sudo rm -f "/var/lib/nouveau-fix/pending-$K38" 2>/dev/null || true
-    "$KIT/daily/grub-pin.sh" "$K38"
+    "$KIT/archive/daily-2026-11/grub-pin.sh" "$K38"
     echo "=== модуль Е18 стоит в $K38, ядро 38 закреплено. Перезагрузись; после опыта: bash lab/e19.sh back"
     ;;
 test)
@@ -64,7 +64,7 @@ test)
     POWEROFF=0 TEST=62 SCANAUTO=1 SCANSTEPS=8000 SCANFLOOR=0 bash "$HERE/night.sh"
     ;;
 back)
-    "$KIT/daily/grub-pin.sh" "$K42"
+    "$KIT/archive/daily-2026-11/grub-pin.sh" "$K42"
     echo "=== закреплено $K42. Убрать ядро 38 совсем (по желанию): sudo apt purge linux-image-$K38 linux-modules-$K38 linux-headers-$K38"
     ;;
 tally)

@@ -43,6 +43,12 @@ shared perf.fuc; the unchanged upstream sources rebuild word for word as in the 
 nouveau trace collection). The governor takes its levels from the card's performance table (lowest / middle / top) instead of
 03/07/0f: GF119 and GF117 VBIOSes have only 07 and 0f. Untested on GF119 hardware.
 
+22.11: the driver waits at most 1 s for the PERF reply (lab_perf_wait_ms). nouveau's gt215_pmu_send waits forever, and in a
+3-hour run (test 114) one request was taken by the PMU firmware but never answered: the governor thread hung for good (no
+more clock changes, and suspend would wait for it). Now a lost reply costs one skipped sample, is logged with the state of
+both queues, and counted in lab_perf_timeouts. Why the reply was lost is not established (a queue flood from the host does
+not reproduce it, test 116). lab_perf_drop / lab_perf_flood are experiment keys.
+
 --- a/nvkm/subdev/pmu/fuc/gf100.fuc3.h
 +++ b/nvkm/subdev/pmu/fuc/gf100.fuc3.h
 @@ -69,8 +69,8 @@
@@ -2005,7 +2011,7 @@ nouveau trace collection). The governor takes its levels from the card's perform
  perf_init:
 --- a/nvkm/subdev/pmu/gf100.c
 +++ b/nvkm/subdev/pmu/gf100.c
-@@ -25,6 +25,296 @@
+@@ -25,6 +25,396 @@
  #include "fuc/gf100.fuc3.h"
  
  #include <subdev/mc.h>
@@ -2132,6 +2138,12 @@ nouveau trace collection). The governor takes its levels from the card's perform
 +/* LAB 21.11: уровни регулятора — из таблицы уровней карты, а не числа 03/07/0f: нижний, средний и верхний по возрастанию
 + * id. У карт с двумя уровнями (GF119 jfouquart: 07 и 0f) среднего нет: подъём сразу на верхний, спуск с верхнего — на
 + * нижний. У карт с тремя уровнями (все наши) — те же 03, 07, 0f, поведение не меняется. */
++/* LAB 21.11 (опыт 113): lab_gov_two=1 — регулятор не пользуется самым нижним уровнем карты, как будто уровней два (как у GF119:
++ * 07 и 0f). Проверка двухуровневого пути регулятора на нашем железе; меняется на ходу. */
++static uint lab_gov_two;
++module_param(lab_gov_two, uint, 0644);
++MODULE_PARM_DESC(lab_gov_two, "LAB experiment: governor ignores the lowest performance level (two-level path, as GF119)");
++
 +static void
 +lab_gov_levels(struct nvkm_clk *clk, int *lo, int *mid, int *hi)
 +{
@@ -2144,6 +2156,11 @@ nouveau trace collection). The governor takes its levels from the card's perform
 +	for (i = 1; i < n; i++)		/* по возрастанию */
 +		for (j = i; j > 0 && ids[j - 1] > ids[j]; j--)
 +			t = ids[j], ids[j] = ids[j - 1], ids[j - 1] = t;
++	if (READ_ONCE(lab_gov_two) && n >= 3) {	/* опыт: жить как GF119 — без самого нижнего уровня */
++		for (i = 1; i < n; i++)
++			ids[i - 1] = ids[i];
++		n--;
++	}
 +	*lo = n ? ids[0] : -1;
 +	*hi = n ? ids[n - 1] : -1;
 +	*mid = n >= 3 ? ids[n - 2] : -1;	/* ступень под верхним; при двух уровнях её нет */
@@ -2232,6 +2249,83 @@ nouveau trace collection). The governor takes its levels from the card's perform
 +	int started;	/* какой период уже отправлен прошивке после её загрузки (0 — спит) */
 +} lab_perf;
 +
++/* LAB 22.11 (опыт 114): запрос итога у прошивки PMU — как gt215_pmu_send, но ответ ждём не дольше lab_perf_wait_ms.
++ * Прошивка nouveau молча выбрасывает сообщение, если очередь процесса полна (kernel.fuc send_proc -> send_done; host.fuc
++ * пересылает очередь хоста процессу через тот же send): запрос принят, ответа нет. gt215_pmu_send ждёт ответа без предела —
++ * 21.11 в 15:31 так повис поток регулятора (регистры: обе очереди пусты, микроконтроллер работает). При тайм-ауте снимаем
++ * ожидание (recv.process = 0): если ответ всё же придёт позже, nouveau сам напишет о «неожиданном» сообщении PERF — так
++ * отличается «потерян» от «опоздал». Смену памяти (memx) это не трогает — у неё свой запрос.
++ * lab_perf_drop=N — опыт: следующие N запросов отправить несуществующему процессу (прошивка выбросит их так же молча). */
++static int lab_perf_wait_ms = 1000;
++module_param(lab_perf_wait_ms, int, 0644);
++MODULE_PARM_DESC(lab_perf_wait_ms, "LAB: wait at most N ms for the PMU PERF reply (0 = forever, as nouveau)");
++static int lab_perf_timeouts;
++module_param(lab_perf_timeouts, int, 0444);
++MODULE_PARM_DESC(lab_perf_timeouts, "LAB: PMU PERF replies not received in time (since load)");
++static uint lab_perf_flood;	/* опыт 116: перед следующим запросом итога — N сообщений «начать замеры» подряд (без ответа) */
++module_param(lab_perf_flood, uint, 0644);
++MODULE_PARM_DESC(lab_perf_flood, "LAB experiment 116: before the next load request send N extra START messages to PERF (its queue holds 4: the request gets dropped)");
++static uint lab_perf_drop;
++module_param(lab_perf_drop, uint, 0644);
++MODULE_PARM_DESC(lab_perf_drop, "LAB experiment: send the next N PERF load requests to a non-existent process (they get dropped)");
++
++static int
++lab_pmu_ask(struct nvkm_pmu *pmu, u32 process, u32 message, u32 reply[2])
++{
++	struct nvkm_device *device = pmu->subdev.device;
++	int wait = READ_ONCE(lab_perf_wait_ms);
++	uint drop = READ_ONCE(lab_perf_drop);
++	u32 addr, proc = process;
++	long left;
++
++	if (drop) {
++		WRITE_ONCE(lab_perf_drop, drop - 1);
++		proc = 0x58585858;	/* «XXXX» — такого процесса в прошивке нет */
++	}
++	mutex_lock(&pmu->send.mutex);
++	addr = nvkm_rd32(device, 0x10a4a0);
++	if (nvkm_msec(device, 2000,
++		if (nvkm_rd32(device, 0x10a4b0) != (addr ^ 8))
++			break;
++	) < 0) {
++		mutex_unlock(&pmu->send.mutex);
++		return -EBUSY;
++	}
++	pmu->recv.message = message;
++	pmu->recv.process = process;
++	do {
++		nvkm_wr32(device, 0x10a580, 0x00000001);
++	} while (nvkm_rd32(device, 0x10a580) != 0x00000001);
++	nvkm_wr32(device, 0x10a1c0, 0x01000000 | (((addr & 0x07) << 4) + pmu->send.base));
++	nvkm_wr32(device, 0x10a1c4, proc);
++	nvkm_wr32(device, 0x10a1c4, message);
++	nvkm_wr32(device, 0x10a1c4, 0);
++	nvkm_wr32(device, 0x10a1c4, 0);
++	nvkm_wr32(device, 0x10a4a0, (addr + 1) & 0x0f);
++	nvkm_wr32(device, 0x10a580, 0x00000000);
++
++	if (wait > 0)
++		left = wait_event_timeout(pmu->recv.wait, pmu->recv.process == 0, msecs_to_jiffies(wait));
++	else {
++		wait_event(pmu->recv.wait, pmu->recv.process == 0);
++		left = 1;
++	}
++	if (!left && pmu->recv.process) {
++		pmu->recv.process = 0;
++		lab_perf_timeouts++;
++		mutex_unlock(&pmu->send.mutex);
++		nvkm_warn(&pmu->subdev, "LAB perf: PMU не ответил на запрос итога за %d мс (%d-й раз с загрузки)%s; очереди: в PMU %x/%x, из PMU %x/%x — замер пропускаю\n",
++			  wait, lab_perf_timeouts, proc != process ? " — опыт lab_perf_drop" : "",
++			  nvkm_rd32(device, 0x10a4a0), nvkm_rd32(device, 0x10a4b0),
++			  nvkm_rd32(device, 0x10a4c8), nvkm_rd32(device, 0x10a4cc));
++		return -ETIMEDOUT;
++	}
++	reply[0] = pmu->recv.data[0];
++	reply[1] = pmu->recv.data[1];
++	mutex_unlock(&pmu->send.mutex);
++	return 0;
++}
++
 +static void
 +lab_perf_work(struct work_struct *w)
 +{
@@ -2257,8 +2351,20 @@ nouveau trace collection). The governor takes its levels from the card's perform
 +		nvkm_info(&pmu->subdev, "LAB perf: прошивке дана команда прекратить замеры\n");
 +		lab_perf.started = 0;
 +	}
++	if (ms > 0 && pmu && READ_ONCE(lab_perf_flood) && lab_perf.started) {
++		/* опыт 116: прошивка (host.fuc) забирает очередь драйвера целиком и раскладывает по процессам; у процесса
++		 * очередь на 4 сообщения, лишние выбрасываются молча (kernel.fuc send_proc). START с тем же периодом безвреден:
++		 * замеры уже идут, процесс его проглатывает. Запрос итога придёт следом — и должен пропасть. */
++		uint n = READ_ONCE(lab_perf_flood), k;
++
++		WRITE_ONCE(lab_perf_flood, 0);
++		for (k = 0; k < n; k++)
++			nvkm_pmu_send(pmu, NULL, LAB_PROC_PERF, LAB_PERF_MSG_START, lab_perf.started, 0);
++		nvkm_warn(&pmu->subdev, "LAB perf: опыт 116 — %u сообщений START подряд, следом запрос итога (ожидание %d мс%s)\n",
++			  n, READ_ONCE(lab_perf_wait_ms), READ_ONCE(lab_perf_wait_ms) > 0 ? "" : " — БЕЗ защиты, как nouveau");
++	}
 +	if (ms > 0 && pmu &&
-+	    !nvkm_pmu_send(pmu, reply, LAB_PROC_PERF, LAB_PERF_MSG_LOAD, 0, 0)) {
++	    !lab_pmu_ask(pmu, LAB_PROC_PERF, LAB_PERF_MSG_LOAD, reply)) {
 +		WRITE_ONCE(lab_perf_gr, reply[0]);
 +		WRITE_ONCE(lab_perf_vid, reply[1] & 0xffff);
 +		WRITE_ONCE(lab_perf_samples, reply[1] >> 16);
@@ -2302,7 +2408,7 @@ nouveau trace collection). The governor takes its levels from the card's perform
  
  void
  gf100_pmu_reset(struct nvkm_pmu *pmu)
-@@ -49,8 +339,8 @@
+@@ -49,8 +439,8 @@
  	.data.size = sizeof(gf100_pmu_data),
  	.enabled = gf100_pmu_enabled,
  	.reset = gf100_pmu_reset,
