@@ -13,7 +13,8 @@ set -uo pipefail
 PRM=/sys/module/nouveau/parameters
 [ -e "$PRM/lab_cntr_sys" ] || { echo "The lab build is not loaded (no lab_cntr_sys) — install it first (docs/TESTING-core.md)"; exit 1; }
 MODE="${1:-measure}"
-OUT="$HOME/gf108-check-$(date +%Y%m%d-%H%M%S).txt"
+KIT="$(cd "$(dirname "$0")/.." && pwd)"; BASE="$HOME"; [ -e "$KIT/.lab-machine" ] && BASE="$KIT/results/check" && mkdir -p "$BASE"
+OUT="$BASE/gf108-check-$(date +%Y%m%d-%H%M%S).txt"
 w() { sudo sh -c "echo $2 > $PRM/$1"; }
 sudo -v || exit 1
 PS="$(sudo sh -c 'ls /sys/kernel/debug/dri/*/pstate | head -n 1')"

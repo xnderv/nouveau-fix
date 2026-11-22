@@ -17,7 +17,10 @@
 set -uo pipefail
 PRM=/sys/module/nouveau/parameters
 STAMP="$(date +%Y%m%d-%H%M%S)"
-DIR="$HOME/nouveau-check-$STAMP"; mkdir -p "$DIR"; OUT="$DIR/check.txt"
+KIT="$(cd "$(dirname "$0")/.." && pwd)"
+# результат — в домашнюю папку тестировщика; на нашей тестовой машине (метка .lab-machine) — в results/check
+BASE="$HOME"; [ -e "$KIT/.lab-machine" ] && BASE="$KIT/results/check" && mkdir -p "$BASE"
+DIR="$BASE/nouveau-check-$STAMP"; mkdir -p "$DIR"; OUT="$DIR/check.txt"
 say() { echo "$(date +%T) $*" | tee -a "$OUT"; sync; }
 # kernel log lines of nouveau / the lab build, without the host name and the root UUID (the archive may be posted publicly)
 klog() { sudo journalctl -k "$@" --no-pager 2>/dev/null | grep -E "nouveau|LAB[ :]" \
@@ -27,7 +30,7 @@ errs() { sudo journalctl -k -b 0 --no-pager --since "$1" 2>/dev/null | grep -cE 
 if [ "${1:-}" = after-hang ]; then
     sudo -v || exit 1
     klog -b -1 > "$DIR/previous-boot-nouveau.txt"
-    LAST="$(ls -dt "$HOME"/nouveau-check-*/ 2>/dev/null | sed -n 2p)"
+    LAST="$(ls -dt "$BASE"/nouveau-check-*/ 2>/dev/null | sed -n 2p)"
     [ -n "$LAST" ] && cp "$LAST/check.txt" "$DIR/check-before-hang.txt" 2>/dev/null
     tar -czf "$DIR.tar.gz" -C "$(dirname "$DIR")" "$(basename "$DIR")"
     echo "Collected. Please attach: $DIR.tar.gz"; exit 0

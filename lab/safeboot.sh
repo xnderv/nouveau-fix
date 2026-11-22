@@ -11,13 +11,21 @@
 #                                                   умолчанию — первая строка (самое новое ядро); старое «стабильное» —
 #                                                   убрать (пароль, 2–4 мин: два образа dracut)
 #   bash lab/safeboot.sh lab                    — следующая загрузка ОДИН раз в «LAB nouveau» и перезагрузка
+#   bash lab/safeboot.sh default-lab            — (22.11) LAB — загрузка ПО УМОЛЧАНИЮ, со сторожем: GRUB перед загрузкой LAB
+#                                                   ставит lab_pending=1, служба через 2 мин после удачного старта снимает;
+#                                                   стоит при старте — прошлая LAB не дошла: GRUB грузит первую строку
+#                                                   (обычный nouveau) и выключает LAB по умолчанию до этой команды
+#   bash lab/safeboot.sh default-safe           — по умолчанию снова первая строка (обычный nouveau)
 #   bash lab/safeboot.sh off                    — убрать строку LAB и образ .lab (модуль остаётся в хранилище)
 set -euo pipefail
 NEWEST="$(ls -1 /lib/modules | sort -V | tail -n 1)"
 STORE=/usr/local/lib/nouveau-fix
 GRUBD=/etc/grub.d/42_nouveau_lab
 DEFGRUB=/etc/default/grub
-title() { echo "Ubuntu - LAB nouveau ($1, one boot)"; }
+title() { echo "Ubuntu - LAB nouveau ($1)"; }
+GUARD=/etc/grub.d/01_nouveau_guard
+OKUNIT=/etc/systemd/system/nouveau-lab-ok.service
+genv() { sudo grub-editenv /boot/grub/grubenv "$@"; }
 haslab() { modinfo -p "$1" 2>/dev/null | grep -q '^lab_vbios_src:'; }
 
 # nouveau внутри образа: «lab» / «обычный» / «нет»
@@ -40,7 +48,8 @@ status)
             "$( [ -e /boot/initrd.img-$k ] && img_nouveau /boot/initrd.img-$k || echo '—')" \
             "$( [ -e /boot/initrd.img-$k.lab ] && echo "есть, nouveau $(img_nouveau /boot/initrd.img-$k.lab)" || echo нет)"
     done
-    [ -e "$GRUBD" ] && echo "строка меню LAB: $(sed -n 's/^# ядро: //p' $GRUBD)" || echo "строка меню LAB: нет"
+    [ -e "$GRUBD" ] && echo "строка меню LAB: $(sed -n 's/^# .*ядро: //p' $GRUBD)" || echo "строка меню LAB: нет"
+    echo "LAB по умолчанию: $(genv list | sed -n 's/^lab_default=//p' | sed 's/^1$/да/;s/^0$/нет/;s/^$/нет/'); не подтверждена: $(genv list | sed -n 's/^lab_pending=//p' | sed 's/^$/0/'); был откат: $(genv list | sed -n 's/^lab_fell_back=//p' | sed 's/^$/0/')"
     ls /lib/modules/*/updates/nouveau-fix/nouveau.ko 2>/dev/null | sed 's/^/⚠ наш модуль лежит в обычном месте (попадёт в обычный образ): /' || true
     ;;
 install)
@@ -78,15 +87,57 @@ install)
     echo "=== меню:"; sudo grep -E "^menuentry " /boot/grub/grub.cfg | sed -E "s/^menuentry '([^']*)'.*/  \1/" | head -n 8
     echo "=== готово: по умолчанию — первая строка (самое новое ядро, обычный nouveau); наш — bash lab/safeboot.sh lab"
     ;;
+default-lab)
+    [ -e "$GRUBD" ] || { echo "строки LAB нет — сначала install"; exit 1; }
+    K="$(sed -n 's/^# .*ядро: //p' $GRUBD)"; T="$(title "$K")"
+    sudo -v
+    # имя строки LAB (раньше было «…, one boot»)
+    sudo sed -i -E "s/^menuentry 'Ubuntu - LAB nouveau \([^)]*\)[^']*'/menuentry '$T'/" "$GRUBD"
+    { echo '#!/bin/sh'; echo '# nouveau-fix lab/safeboot.sh: сторож загрузки LAB (счётчик удачной загрузки)'
+      echo "cat <<'GRUBGUARD'"
+      cat <<'GG'
+if [ "${boot_once}" != "true" ]; then
+  if [ "${lab_pending}" = "1" ]; then
+    # прошлая загрузка LAB не подтверждена (повисла) — один раз первая строка (обычный nouveau), LAB по умолчанию — выключить
+    set default="0"
+    set lab_default=0
+    set lab_fell_back=1
+    set lab_pending=0
+    save_env lab_default lab_fell_back lab_pending
+  elif [ "${lab_default}" = "1" ]; then
+    set default="${lab_entry}"
+  else
+    set default="0"
+  fi
+fi
+if [ "${default}" = "${lab_entry}" ]; then
+  set lab_pending=1
+  save_env lab_pending
+fi
+GG
+      echo "GRUBGUARD"; } | sudo tee "$GUARD" >/dev/null
+    sudo chmod 755 "$GUARD"
+    printf '%s
+' '[Unit]' 'Description=nouveau-fix: confirm a successful boot (clears lab_pending in grubenv)' 'After=multi-user.target'       '[Service]' 'Type=oneshot' 'ExecStartPre=/bin/sleep 120' 'ExecStart=/usr/bin/grub-editenv /boot/grub/grubenv set lab_pending=0' 'TimeoutStartSec=300'       '[Install]' 'WantedBy=multi-user.target' | sudo tee "$OKUNIT" >/dev/null
+    sudo systemctl daemon-reload; sudo systemctl enable nouveau-lab-ok.service >/dev/null 2>&1
+    sudo update-grub 2>&1 | tail -n 1
+    genv set "lab_entry=$T" lab_default=1 lab_pending=0 lab_fell_back=0
+    echo "=== по умолчанию: $T (со сторожем); подтверждение — через 2 мин после старта. Перезагрузка — когда скажешь."
+    ;;
+default-safe)
+    genv set lab_default=0 lab_pending=0; echo "по умолчанию — первая строка (обычный nouveau)"
+    ;;
 lab)
     [ -e "$GRUBD" ] || { echo "строки LAB нет — сначала install"; exit 1; }
     K="$(sed -n 's/^# .*ядро: //p' $GRUBD)"
+    genv set "lab_entry=$(title "$K")"
     sudo grep -qF "menuentry '$(title "$K")'" /boot/grub/grub.cfg || { echo "⚠ строки «$(title "$K")» нет в grub.cfg"; exit 1; }
     sudo grub-reboot "$(title "$K")"
     echo "следующая загрузка ОДИН раз: $(title "$K"); перезагружаю"; sudo reboot
     ;;
 off)
-    sudo rm -f "$GRUBD" /boot/initrd.img-*.lab; sudo update-grub 2>&1 | tail -n 1; echo "строка LAB и образы .lab убраны"
+    genv set lab_default=0 lab_pending=0
+    sudo rm -f "$GRUBD" "$GUARD" /boot/initrd.img-*.lab; sudo update-grub 2>&1 | tail -n 1; echo "строка LAB, сторож и образы .lab убраны"
     ;;
 *) sed -n '2,15p' "$0"; exit 1 ;;
 esac
