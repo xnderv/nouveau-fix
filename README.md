@@ -28,6 +28,22 @@ model) are in Russian — they are the lab notebook; everything a tester needs i
 | GF100, GF104, GF106, GF110, GF116, GF117 | — | not yet | testers wanted |
 | GF119 | — | build ready (PMU firmware with load counting, two-level governor), never run on the hardware | first tester wanted |
 
+## Which cards
+
+Fermi is the GPU generation of 2010–2012. If your NVIDIA card is one of these and the legacy NVIDIA 390 driver no longer
+suits you (it ended in 2022 and needs patches for new kernels), this project is for you:
+
+- **Desktop:** GeForce 405, GT 420, GT 430, GT 440, GTS 450, GTX 460, GTX 465, GTX 470, GTX 480, GeForce 510, GT 520, GT 530,
+  GTX 550 Ti, GTX 560, GTX 560 Ti, GTX 570, GTX 580, GTX 590, GT 610, GT 620, GT 630, GT 640, GT 705, GT 730.
+- **Laptop:** GeForce 410M, GT 415M–GT 555M, GTX 460M–GTX 580M, GeForce 610M, GT 620M–GT 640M, GTX 670M, GTX 675M,
+  GT 710M, GT 720M; NVS 4200M, NVS 5200M; Quadro 1000M–5010M.
+- **Workstation:** Quadro 600, 2000, 4000, 5000, 6000; NVS 300, 310, 315.
+
+Many of these names were also used for Kepler or Maxwell chips (GT 630, GT 640, GT 705, GT 730, GT 720M and others), so the
+name alone isn't enough: `bash tools/card-report.sh` tells you which chip you have, and `lspci -nn` shows it as well.
+Status by chip is in the table above; GF117 (some 600M/700M laptop parts) is not supported yet — nouveau doesn't run its
+power-management controller.
+
 **Where we differ from the NVIDIA driver and the VBIOS** — VBIOS errors, NVIDIA misses and nouveau bugs, each with its
 evidence: [docs/deviations.md](docs/deviations.md).
 
