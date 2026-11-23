@@ -1,6 +1,6 @@
 --- a/nvkm/subdev/clk/base.c
 +++ b/nvkm/subdev/clk/base.c
-@@ -33,6 +33,70 @@
+@@ -33,6 +33,82 @@
  #include <subdev/volt.h>
  
  #include <core/option.h>
@@ -35,6 +35,18 @@
 +static uint lab_nv_pcie_late = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_nv_pcie_late, uint, 0644);
 +MODULE_PARM_DESC(lab_nv_pcie_late, "LAB: going down, retrain PCIe after clocks and memory (as NVIDIA); going up it stays first");
++/* LAB 22.11 (сбой памяти DDR3 у sasim44, GF108; разбор всех записей Fermi базы): порядок шины XBAR2CLK и памяти зависит от
++ * семейства чипа. GF100/104/106/110/114/116 и GF119 (45 + 13 подъёмов): подъём — память, потом XBAR на PLL; спуск — XBAR
++ * с PLL, потом память (память «снаружи»). Семейство GF108 (GF108 — 5 плат, DDR3 и GDDR5; GF117 — 28-нм вариант GF108):
++ * подъём — XBAR на PLL, потом память; спуск — память, потом XBAR (шина «снаружи»: быстрая, пока быстрая память). У sasim44
++ * память ушла на 896 МГц при XBAR ещё на делителе 810 — данные в видеопамяти побились. Из VBIOS это не выводится (у GF117
++ * подвыбор хаба 0) — постоянная драйвера NVIDIA по чипу, как коды скобки. lab_nv_xbarmem: -1 по чипу, 0 память снаружи,
++ * 1 шина снаружи. */
++static int lab_nv_xbarmem = 1;	/* 22.11: шина снаружи для ВСЕХ чипов — безопасное направление (пока меняется память, шина
++				 * уже/ещё быстрая); на GF114 и GF106 этот порядок проверен (октябрь, тест 28 «не критичен», тест 69
++				 * шаг 0, прогон 4 rox4d), на GF108/GF117 так делает NVIDIA; порядок NVIDIA остальных чипов — 0 */
++module_param(lab_nv_xbarmem, int, 0644);
++MODULE_PARM_DESC(lab_nv_xbarmem, "LAB: XBAR2CLK vs memory order: 1 XBAR outside memory (default, all chips), 0 memory outside XBAR (NVIDIA on GF100-GF116/GF119), -1 by chip as NVIDIA");
 +static uint lab_nv_hub07mem = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_nv_hub07mem, uint, 0644);
 +MODULE_PARM_DESC(lab_nv_hub07mem, "LAB: switch hubk07 together with memory as NVIDIA (up: core, memory, hubk07; down: hubk07, memory, core)");
@@ -71,7 +83,7 @@
  
  /******************************************************************************
   * misc
-@@ -190,12 +254,38 @@
+@@ -190,12 +266,51 @@
  			nvkm_error(subdev, "failed to raise voltage: %d\n", ret);
  			return ret;
  		}
@@ -82,7 +94,20 @@
 +	lab_mux_stuck = 0;
 +	if (lab_core) {
 +		ret = clk->func->calc(clk, cstate);
-+		if (ret == 0 && lab_h07_pstate) {
++		int xo = READ_ONCE(lab_nv_xbarmem);
++
++		if (xo < 0)
++			xo = (subdev->device->chipset == 0xc1 || subdev->device->chipset == 0xd7);
++		if (ret == 0 && lab_h07_pstate && xo) {
++			/* шина снаружи: подъём — всё ядро вместе с XBAR, потом память; спуск — память, потом всё ядро */
++			nvkm_info(subdev, "LAB nv_xbarmem: %s (шина снаружи памяти)\n", lab_h07_up ? "ядро вместе с XBAR, потом память" : "память, потом ядро вместе с XBAR");
++			if (!lab_h07_up)
++				lab_pstate_mem(clk, lab_h07_pstate, lab_h07_pstatei);
++			ret = clk->func->prog(clk);
++			if (lab_h07_up)
++				lab_pstate_mem(clk, lab_h07_pstate, lab_h07_pstatei);
++			clk->func->tidy(clk);
++		} else if (ret == 0 && lab_h07_pstate) {
 +			u32 h07 = 1u << 2;
 +
 +			nvkm_info(subdev, "LAB nv_hub07mem: %s\n", lab_h07_up ? "ядро без hubk07, память, hubk07" : "hubk07, память, ядро без hubk07");
@@ -114,7 +139,7 @@
  	}
  
  	if (volt) {
-@@ -213,6 +303,8 @@
+@@ -213,6 +328,8 @@
  			nvkm_error(subdev, "failed to lower fan speed: %d\n", err);
  	}
  
@@ -123,7 +148,7 @@
  	return ret;
  }
  
-@@ -266,14 +358,82 @@
+@@ -266,14 +383,82 @@
   * P-States
   *****************************************************************************/
  static int
@@ -208,7 +233,7 @@
  
  	list_for_each_entry(pstate, &clk->states, head) {
  		if (idx++ == pstatei) {
-@@ -286,22 +446,102 @@
+@@ -286,22 +471,102 @@
  		return -EINVAL;
  
  	nvkm_debug(subdev, "setting performance state %d\n", pstatei);
@@ -323,7 +348,7 @@
  }
  
  static void
-@@ -619,6 +859,8 @@
+@@ -619,6 +884,8 @@
  	}
  
  	nvkm_pstate_info(clk, &clk->bstate);
