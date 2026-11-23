@@ -33,6 +33,7 @@ def wrs_trace(ops):
         if op == 0x21: out += [('WR', a[i], a[i + 1]) for i in range(0, len(a), 2)]
     return out
 
+DUMP = []
 per_chip = collections.defaultdict(collections.Counter); diff_tags = collections.defaultdict(collections.Counter)
 diff_regs = collections.defaultdict(collections.Counter); only_his = collections.defaultdict(collections.Counter)
 only_ours = collections.defaultdict(collections.Counter); rows = []
@@ -51,6 +52,11 @@ for lab, d in sorted(S.items()):
     except Exception as e:
         per_chip[d['chip']]['генератор не собрал: ' + type(e).__name__] += 1; continue
     G = {k: [o for o in (g or []) if o[0] == 'WR'] for k, g in gen.items()}
+    RAMCFG = {}
+    for kk, (n_, l0_, l1_) in mg.SCR.items():
+        try: RAMCFG[kk] = list(vb.tables(vb.mem[l1_])[1])
+        except Exception: RAMCFG[kk] = None
+    sc_rs = []
     if not any(G.values()): per_chip[d['chip']]['скрипты не собраны'] += 1; continue
     tagsG = {k: [it.get('tag') for it, o in zip(skel[k], gen[k] or []) if o[0] == 'WR'] for k in gen}
     c = per_chip[d['chip']]; c['трасс'] += 1; seen = set()
@@ -61,6 +67,7 @@ for lab, d in sorted(S.items()):
         best = max(((difflib.SequenceMatcher(None, [x[1] for x in rw], [x[1] for x in g]).ratio(), k) for k, g in G.items() if g), default=None)
         if not best: continue
         ratio, k = best; gw = G[k]; tg = tagsG[k]
+        sc_rs.append(k)
         sm = difflib.SequenceMatcher(None, [x[1] for x in rw], [x[1] for x in gw])
         for tag, i1, i2, j1, j2 in sm.get_opcodes():
             if tag == 'equal':
@@ -68,6 +75,10 @@ for lab, d in sorted(S.items()):
                     c['общих'] += 1
                     if rw[a][2] == gw[b][2]: c['совпали'] += 1
                     else: c['разошлись'] += 1; diff_tags[d['chip']][tg[b] or '?'] += 1; diff_regs[d['chip']][rw[a][1]] += 1
+                    DUMP.append(dict(chip=d['chip'], trace=lab, letter=k, reg=rw[a][1], theirs=rw[a][2], ours=gw[b][2],
+                                     occ=sum(1 for x in rw[:a] if x[1] == rw[a][1]), mpll=any(x[1] == 0x132004 for x in rw),
+                                     rfc=next(((x[2] >> 8) & 0xff for x in rw if x[1] == 0x10f290), None),
+                                     ramcfg=RAMCFG.get(k)))
             if tag in ('delete', 'replace'):
                 c['только у NVIDIA'] += i2 - i1
                 for a in range(i1, i2): only_his[d['chip']][rw[a][1]] += 1
@@ -99,3 +110,5 @@ for ch in per_chip:
     for r, n in only_ours[ch].items(): agg[steps.step(r, 0)][ch][2] += n
 for st in sorted(agg, key=lambda st: -sum(sum(v) for v in agg[st].values())):
     print(f'| {st} | ' + ' | '.join('/'.join(str(x) for x in agg[st][ch]) if ch in agg[st] else '·' for ch in sorted(per_chip)) + ' |')
+
+json.dump(DUMP, open(os.path.join(OUT, 'gen-diffs.json'), 'w'))
