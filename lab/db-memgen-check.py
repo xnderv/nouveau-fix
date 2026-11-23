@@ -45,6 +45,11 @@ for lab, d in sorted(S.items()):
     if len(raw) != 1: per_chip[d['chip']]['трасс с неясным ремешком'] += 1; continue
     try:
         vb0 = mg.Vbios(rs[0], 0); idx = mg.ramcfg_index(vb0.rom, raw.pop()); vb = mg.Vbios(rs[0], idx); vb.active = TOPO.get(lab, {}).get('active')
+        tp = TOPO.get(lab, {}); vb.rules = '--no-rules' not in sys.argv
+        vb.rules_off = tuple(os.environ.get('RULES_OFF', '').split(',')) if os.environ.get('RULES_OFF') else ()
+        if tp.get('fbp') is not None and tp.get('mask') is not None:
+            # контроллеры: у однораздельного с 2 контроллерами (GF108) — 0b11; иначе — активные разделы
+            vb.ctrl_mask = 0b11 if tp['fbp'] == 1 and (tp.get('fbpa') or 1) == 2 else ((1 << tp['fbp']) - 1) & ~tp['mask']
         if BASE and '--no-base' not in sys.argv:
             vb.base_ctrl = {int(a, 16): m for a, m in BASE['ctrl_chip'].get(d['chip'], {}).items()}
             vb.base_now = {int(a, 16): v[lab] for a, v in BASE['first'].items() if lab in v}

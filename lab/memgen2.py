@@ -222,8 +222,36 @@ def generate(vb, skel):
                 # 23.11: адрес = 0x13d834 + 0x40·(активных разделов − 1) (mem-meaning.md §7); нет топологии — как у нас
                 a = 0x13d834 + 0x40 * (vb.active - 1); notes['адрес 0x13d8x4 по топологии'] += 1
             ops.append(('WR', a, v))
+        rules_post(ops, f1, R, vb, notes)
         gen[k] = ops
     return gen, notes
+
+def rules_post(ops, f1, R, vb, notes):
+    """23.11: правила, найденные по всей базе Fermi GDDR5 (docs/2026-11-23/mem-meaning.md §12–13), — к ИТОГОВОЙ (последней)
+    записи регистра в скрипте. Класс 3 — цель на PLL
+    (≥ 1000 МГц) и поля ramcfg. Включено, только если правило задано (vb.rules, по умолчанию да)."""
+    if not getattr(vb, 'rules', True): return
+    last = {}
+    for i, o in enumerate(ops):
+        if o[0] == 'WR': last[o[1]] = i
+    pll = f1 >= 1000
+    def setf(a, sh, w, val, tag):
+        if a not in last: return
+        i = last[a]; v = ops[i][2]; m = ((1 << w) - 1) << sh
+        nv = (v & ~m) | ((val << sh) & m)
+        if any(x in f'{a:06x}:{sh}' for x in getattr(vb, 'rules_off', ())): return
+        if nv != v: ops[i] = ('WR', a, nv); notes['правило: ' + tag] += 1
+    setf(0x10f610, 8, 1, 0 if pll else 1, 'PLL')
+    setf(0x10f808, 19, 1, 1 if pll else 0, 'PLL')
+    setf(0x10f824, 0, 2, 0 if pll else 3, 'PLL')
+    setf(0x10f824, 5, 1, 0 if pll else 1, 'PLL')
+    setf(0x10f824, 7, 1, 1 if pll else 0, 'PLL')
+    setf(0x1373ec, 17, 1, 1 if f1 >= 200 else 0, 'не нижний уровень')
+    # 0x10f808 биты 28–30 по R02 бит 2 — верно для итоговой записи NVIDIA, но в нашем скелете последняя запись стоит на
+    # другом шаге (GF106, GF116 −1 пункт) — не применяем до скелета по направлению (класс 4)
+    setf(0x10f604, 24, 1, 0 if (R[2] >> 2) & 1 else 1, 'R02 бит 2')
+    # 0x1373f8 «по контроллерам» — снято 23.11: NVIDIA пишет 0x55/0x2055 на всех платах; различие было артефактом маски
+
 
 def compare(gen, arrs):
     diffs = {}
