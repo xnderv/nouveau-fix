@@ -213,6 +213,11 @@ def generate(vb, skel):
                 else: v = (base & mask) | (v & ~mask); notes['база из devinit'] += 1
             elif tag in ('Ч', 'Ч1'): notes['константа'] += 1
             else: notes['число (как у нас)'] += 1
+            bm = getattr(vb, 'base_ctrl', {}).get(a)
+            if bm is not None and a in vb.base_now:
+                # 23.11 «база драйвера»: биты вне маски управления — текущее значение регистра платы (железо / трасса),
+                # биты управления — по шагу скелета (db-mem-base.py: маска одна на классических Fermi)
+                v = (vb.base_now[a] & ~bm) | (v & bm); notes['база из железа + биты шага'] += 1
             if 0x13d800 <= a < 0x13da00 and getattr(vb, 'active', None):
                 # 23.11: адрес = 0x13d834 + 0x40·(активных разделов − 1) (mem-meaning.md §7); нет топологии — как у нас
                 a = 0x13d834 + 0x40 * (vb.active - 1); notes['адрес 0x13d8x4 по топологии'] += 1
