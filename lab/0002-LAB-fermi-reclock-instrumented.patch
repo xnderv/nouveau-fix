@@ -1,6 +1,6 @@
 --- a/nvkm/subdev/clk/base.c
 +++ b/nvkm/subdev/clk/base.c
-@@ -33,6 +33,82 @@
+@@ -33,6 +33,108 @@
  #include <subdev/volt.h>
  
  #include <core/option.h>
@@ -40,13 +40,39 @@
 + * с PLL, потом память (память «снаружи»). Семейство GF108 (GF108 — 5 плат, DDR3 и GDDR5; GF117 — 28-нм вариант GF108):
 + * подъём — XBAR на PLL, потом память; спуск — память, потом XBAR (шина «снаружи»: быстрая, пока быстрая память). У sasim44
 + * память ушла на 896 МГц при XBAR ещё на делителе 810 — данные в видеопамяти побились. Из VBIOS это не выводится (у GF117
-+ * подвыбор хаба 0) — постоянная драйвера NVIDIA по чипу, как коды скобки. lab_nv_xbarmem: -1 по чипу, 0 память снаружи,
-+ * 1 шина снаружи. */
++ * подвыбор хаба 0). lab_nv_xbarmem: -1 как NVIDIA (по топологии памяти), 0 память снаружи, 1 шина снаружи.
++ * LAB 23.11: «как NVIDIA» — не список чипов, а правило ТОПОЛОГИИ памяти, прочитанной из железа (как читает nouveau):
++ * разделов FBP 0x022438 минус выключенные (маска 0x022554), подразделов L2 на раздел 0x17e8dc[31:28]. Шина снаружи там,
++ * где активный раздел ОДИН, а подразделов в нём два и больше (весь поток сходится в один раздел, разделённый надвое):
++ * GF108 (1 × 2), GF117 (1 × 2); GF119 — 1 × 1, остальные — 2…6 разделов. Проверено на 44 трассах 9 чипов базы
++ * (docs/2026-11-23/mem-meaning.md §7–9); то же правило даёт адрес 0x13d834 + 0x40·(разделов − 1) в скриптах памяти. */
 +static int lab_nv_xbarmem = 1;	/* 22.11: шина снаружи для ВСЕХ чипов — безопасное направление (пока меняется память, шина
 +				 * уже/ещё быстрая); на GF114 и GF106 этот порядок проверен (октябрь, тест 28 «не критичен», тест 69
 +				 * шаг 0, прогон 4 rox4d), на GF108/GF117 так делает NVIDIA; порядок NVIDIA остальных чипов — 0 */
 +module_param(lab_nv_xbarmem, int, 0644);
 +MODULE_PARM_DESC(lab_nv_xbarmem, "LAB: XBAR2CLK vs memory order: 1 XBAR outside memory (default, all chips), 0 memory outside XBAR (NVIDIA on GF100-GF116/GF119), -1 by chip as NVIDIA");
++/* LAB 23.11: топология памяти из железа; возвращает «шина снаружи памяти по правилу NVIDIA», один раз пишет в журнал */
++static bool
++lab_mem_topo(struct nvkm_subdev *subdev)
++{
++	struct nvkm_device *device = subdev->device;
++	static int cached = -1;
++	u32 fbp, fbpa, mask, slices, act;
++
++	if (cached >= 0)
++		return cached;
++	fbp    = nvkm_rd32(device, 0x022438);
++	fbpa   = nvkm_rd32(device, 0x02243c);
++	mask   = nvkm_rd32(device, 0x022554);
++	slices = nvkm_rd32(device, 0x17e8dc) >> 28;
++	act    = fbp - hweight32(mask & (fbp < 32 ? (1u << fbp) - 1 : ~0u));
++	cached = (act == 1 && slices >= 2);
++	nvkm_info(subdev, "LAB топология памяти: разделов %u (выключены %#x, активных %u), контроллеров %u, "
++		  "подразделов на раздел %u -> по правилу NVIDIA шина XBAR %s памяти; адрес синхронизации 0x%06x\n",
++		  fbp, mask, act, fbpa, slices, cached ? "снаружи" : "внутри", 0x13d834 + 0x40 * (act ? act - 1 : 0));
++	return cached;
++}
++
 +static uint lab_nv_hub07mem = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_nv_hub07mem, uint, 0644);
 +MODULE_PARM_DESC(lab_nv_hub07mem, "LAB: switch hubk07 together with memory as NVIDIA (up: core, memory, hubk07; down: hubk07, memory, core)");
@@ -83,7 +109,7 @@
  
  /******************************************************************************
   * misc
-@@ -190,27 +266,70 @@
+@@ -190,27 +292,71 @@
  			nvkm_error(subdev, "failed to raise voltage: %d\n", ret);
  			return ret;
  		}
@@ -99,9 +125,10 @@
 +	if (lab_core) {
 +		ret = clk->func->calc(clk, cstate);
 +		int xo = READ_ONCE(lab_nv_xbarmem);
++		bool xo_nv = lab_mem_topo(subdev);	/* журнал топологии — один раз, при любом ключе */
 +
 +		if (xo < 0)
-+			xo = (subdev->device->chipset == 0xc1 || subdev->device->chipset == 0xd7);
++			xo = xo_nv;
 +		if (ret == 0 && lab_h07_pstate && xo) {
 +			/* шина снаружи: подъём — всё ядро вместе с XBAR, потом память; спуск — память, потом всё ядро */
 +			nvkm_info(subdev, "LAB nv_xbarmem: %s (шина снаружи памяти)\n", lab_h07_up ? "ядро вместе с XBAR, потом память" : "память, потом ядро вместе с XBAR");
@@ -165,7 +192,7 @@
  	return ret;
  }
  
-@@ -264,36 +383,190 @@
+@@ -264,36 +410,190 @@
   * P-States
   *****************************************************************************/
  static int
@@ -371,7 +398,7 @@
  }
  
  static void
-@@ -473,6 +746,7 @@
+@@ -473,6 +773,7 @@
  nvkm_clk_ustate_update(struct nvkm_clk *clk, int req)
  {
  	struct nvkm_pstate *pstate;
@@ -379,7 +406,7 @@
  	int i = 0;
  
  	if (!clk->allow_reclock)
-@@ -480,12 +754,14 @@
+@@ -480,12 +781,14 @@
  
  	if (req != -1 && req != -2) {
  		list_for_each_entry(pstate, &clk->states, head) {
@@ -396,7 +423,7 @@
  			return -EINVAL;
  		req = i;
  	}
-@@ -608,6 +884,8 @@
+@@ -608,6 +911,8 @@
  	}
  
  	nvkm_pstate_info(clk, &clk->bstate);
@@ -504,21 +531,46 @@
  	default:
  		nvkm_error(subdev, "invalid clock source %d\n", src);
  		return -EINVAL;
-@@ -259,6 +311,13 @@
+@@ -246,6 +298,24 @@
+ 	return sclk;
+ }
+ 
++/* LAB 23.11: имя узла по NVIDIA в журнале (docs/2026-10-31/node-atlas.md); старые имена nouveau (rop, hubk07, hubk06, hubk01) —
++ * только в ключах модуля, чтобы не ломать тестировщикам параметры. copy (09) — имя NVIDIA не установлено. */
++static const char *
++lab_nn(int idx)
++{
++	switch (idx) {
++	case 0x00: return "GPC2CLK(00)";
++	case 0x01: return "LTC2CLK(01)";
++	case 0x02: return "XBAR2CLK(02)";
++	case 0x07: return "SYS2CLK(07)";
++	case 0x08: return "HUB2CLK(08)";
++	case 0x09: return "copy(09)";
++	case 0x0c: return "PWRCLK(0c)";
++	case 0x0e: return "MSDCLK(0e)";
++	default:   return "узел(?)";
++	}
++}
++
+ static u32
+ calc_pll(struct gf100_clk *clk, int idx, u32 freq, u32 *coef)
+ {
+@@ -259,6 +329,13 @@
  		return 0;
  
  	limits.refclk = read_div(clk, idx, 0x137120, 0x137140);
 +	if (idx > 2 && (lab_gpc_seq & 8)) {
 +		u32 r = lab_pll_ref(clk, idx);
-+		nvkm_info(subdev, "LAB calc_pll idx %02x: опора nouveau %u kHz, с делителем опоры %u kHz (lab_gpc_seq&8)\n",
-+			  idx, limits.refclk, r);
++		nvkm_info(subdev, "LAB calc_pll %s: опора nouveau %u kHz, с делителем опоры %u kHz (lab_gpc_seq&8)\n",
++			  lab_nn(idx), limits.refclk, r);
 +		if (r)
 +			limits.refclk = r;
 +	}
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +329,672 @@
+@@ -270,6 +347,672 @@
  	return ret;
  }
  
@@ -772,8 +824,8 @@
 +		return;
 +	b = clamp_t(u32, DIV_ROUND_CLOSEST(vco * 2, low), 2, 65) - 2;	/* поле f даёт VCO * 2 / (f + 2) */
 +	info->ddiv = (info->ddiv & ~0x00003f00) | (b << 8);
-+	nvkm_info(&clk->base.subdev, "LAB nv_divb idx %02x: самая низкая частота узла %u кГц -> поле B %02x, ddiv %08x\n",
-+		  idx, low, b, info->ddiv);
++	nvkm_info(&clk->base.subdev, "LAB nv_divb %s: самая низкая частота узла %u кГц -> поле B %02x, ddiv %08x\n",
++		  lab_nn(idx), low, b, info->ddiv);
 +}
 +
 +static void
@@ -1094,8 +1146,8 @@
 +				div1D++;
 +			clk0 = (pre * 2) / (div1D + 2);
 +			if (flag != 1)	/* при флаге 1 путь делителя — лишь запасной; журнал не засоряем (sasim44, SYS2CLK на 0f) */
-+				nvkm_info(&clk->base.subdev, "LAB calc idx %02x: делитель даёт %u кГц вместо %u (выше VBIOS больше чем на 2 %%) — беру снизу: %u кГц\n",
-+					  idx, was, freq, clk0);
++				nvkm_info(&clk->base.subdev, "LAB calc %s: делитель даёт %u кГц вместо %u (выше VBIOS больше чем на 2 %%) — беру снизу: %u кГц\n",
++					  lab_nn(idx), was, freq, clk0);
 +		}
 +	}
 +
@@ -1139,13 +1191,13 @@
 +
 +		if (!lab_hit(freq, got)) {
 +			if (use_pll && lab_hit(freq, clk0)) {
-+				nvkm_info(&clk->base.subdev, "LAB calc idx %02x: PLL по флагу %d даёт %u кГц мимо VBIOS %u — делитель %u кГц\n",
-+					  idx, flag, got, freq, clk0);
++				nvkm_info(&clk->base.subdev, "LAB calc %s: PLL по флагу %d даёт %u кГц мимо VBIOS %u — делитель %u кГц\n",
++					  lab_nn(idx), flag, got, freq, clk0);
 +				use_pll = false;
 +				got = clk0;
 +			} else if (!use_pll && lab_hit(freq, clk1)) {
-+				nvkm_info(&clk->base.subdev, "LAB calc idx %02x: делитель по флагу %d даёт %u кГц мимо VBIOS %u — PLL %u кГц\n",
-+					  idx, flag, got, freq, clk1);
++				nvkm_info(&clk->base.subdev, "LAB calc %s: делитель по флагу %d даёт %u кГц мимо VBIOS %u — PLL %u кГц\n",
++					  lab_nn(idx), flag, got, freq, clk1);
 +				use_pll = true;
 +				got = clk1;
 +			}
@@ -1162,8 +1214,8 @@
 +			}
 +		}
 +		if (!lab_hit(freq, got))
-+			nvkm_info(&clk->base.subdev, "LAB calc idx %02x: в частоту VBIOS %u кГц не попадает ни один известный путь (флаг %d) — %u кГц\n",
-+				  idx, freq, flag, got);
++			nvkm_info(&clk->base.subdev, "LAB calc %s: в частоту VBIOS %u кГц не попадает ни один известный путь (флаг %d) — %u кГц\n",
++				  lab_nn(idx), freq, flag, got);
 +	}
 +	if (use_pll) {
 +		info->dsrc = info->ddiv = 0;
@@ -1182,8 +1234,8 @@
 +	if (lab_nv_divb && idx <= 0x02 && (info->ddiv & 0x80000000))
 +		lab_divb(clk, idx, dom);
 +	lab_divb_force_apply(clk, idx);
-+	nvkm_info(&clk->base.subdev, "LAB calc idx %02x dom %d: want %u got %u ssel %08x coef %08x dsrc %08x ddiv %08x mdiv %08x (lab_vbios_src: уровень %02x, флаг %d%s%s)\n",
-+		  idx, dom, freq, info->freq, info->ssel, info->coef, info->dsrc, info->ddiv, info->mdiv, level, flag,
++	nvkm_info(&clk->base.subdev, "LAB calc %s dom %d: want %u got %u ssel %08x coef %08x dsrc %08x ddiv %08x mdiv %08x (lab_vbios_src: уровень %02x, флаг %d%s%s)\n",
++		  lab_nn(idx), dom, freq, info->freq, info->ssel, info->coef, info->dsrc, info->ddiv, info->mdiv, level, flag,
 +		  base ? ", основной делитель от уровня на делителях" : "", (flag == 1 && !use_pll) ? ", PLL не рассчитан — делитель" : "");
 +	return 0;
 +}
@@ -1191,7 +1243,7 @@
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +1007,87 @@
+@@ -282,6 +1025,87 @@
  	if (!freq)
  		return 0;
  
@@ -1219,14 +1271,14 @@
 +	}
 +
 +	if (lab_override(idx, freq) != freq) {
-+		nvkm_info(&clk->base.subdev, "LAB calc idx %02x: table %u kHz overridden to %u kHz\n",
-+			  idx, freq, lab_override(idx, freq));
++		nvkm_info(&clk->base.subdev, "LAB calc %s: table %u kHz overridden to %u kHz\n",
++			  lab_nn(idx), freq, lab_override(idx, freq));
 +		freq = lab_override(idx, freq);
 +	}
 +
 +	if (!(lab_eng_mask & (1u << idx))) {
-+		nvkm_info(&clk->base.subdev, "LAB calc idx %02x dom %d: SKIPPED by lab_eng_mask, stays %u kHz (wanted %u)\n",
-+			  idx, dom, read_clk(clk, idx), freq);
++		nvkm_info(&clk->base.subdev, "LAB calc %s dom %d: SKIPPED by lab_eng_mask, stays %u kHz (wanted %u)\n",
++			  lab_nn(idx), dom, read_clk(clk, idx), freq);
 +		return 0;
 +	}
 +
@@ -1236,7 +1288,7 @@
 +
 +		if (flag >= 0)
 +			return lab_calc_vbios(clk, cstate, idx, dom, freq, pstate->pstate, flag);
-+		nvkm_info(&clk->base.subdev, "LAB calc idx %02x: lab_vbios_src — флага в VBIOS нет, обычный путь\n", idx);
++		nvkm_info(&clk->base.subdev, "LAB calc %s: lab_vbios_src — флага в VBIOS нет, обычный путь\n", lab_nn(idx));
 +	}
 +
 +	if (idx == 0x00 && lab_gpc_div) {
@@ -1279,7 +1331,7 @@
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +1097,9 @@
+@@ -291,7 +1115,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -1290,19 +1342,19 @@
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +1126,11 @@
+@@ -318,6 +1144,11 @@
  		info->freq = clk1;
  	}
  
 +	if (lab_nv_divb && idx <= 0x02 && (info->ddiv & 0x80000000))
 +		lab_divb(clk, idx, dom);
 +	lab_divb_force_apply(clk, idx);
-+	nvkm_info(&clk->base.subdev, "LAB calc idx %02x dom %d: want %u got %u ssel %08x coef %08x dsrc %08x ddiv %08x mdiv %08x\n",
-+		  idx, dom, freq, info->freq, info->ssel, info->coef, info->dsrc, info->ddiv, info->mdiv);
++	nvkm_info(&clk->base.subdev, "LAB calc %s dom %d: want %u got %u ssel %08x coef %08x dsrc %08x ddiv %08x mdiv %08x\n",
++		  lab_nn(idx), dom, freq, info->freq, info->ssel, info->coef, info->dsrc, info->ddiv, info->mdiv);
  	return 0;
  }
  
-@@ -327,6 +1140,8 @@
+@@ -327,6 +1158,8 @@
  	struct gf100_clk *clk = gf100_clk(base);
  	int ret;
  
@@ -1311,7 +1363,7 @@
  	if ((ret = calc_clk(clk, cstate, 0x00, nv_clk_src_gpc)) ||
  	    (ret = calc_clk(clk, cstate, 0x01, nv_clk_src_rop)) ||
  	    (ret = calc_clk(clk, cstate, 0x02, nv_clk_src_hubk07)) ||
-@@ -346,20 +1161,811 @@
+@@ -346,20 +1179,811 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -1662,17 +1714,17 @@
 +		nvkm_wr32(device, 0x0201a0 + sv->i * 4, lab_therm >= 2 ? sv->f4 : x4);
 +	}
 +	nvkm_wr32(device, 0x020004, sv->ctrl1);
-+	nvkm_info(&clk->base.subdev, "LAB therm idx %02x (FSRM %d): %s%u мкс; до FSRM2 %08x FSRM3 %08x FSRM4 %08x CTRL1 %08x; после %08x %08x %08x %08x; статус %08x\n",
-+		  idx, sv->i, sv->w ? "по признаку, запас " : "выдержка ", sv->w ? lab_therm_wait_us : sv->us,
++	nvkm_info(&clk->base.subdev, "LAB therm %s (FSRM %d): %s%u мкс; до FSRM2 %08x FSRM3 %08x FSRM4 %08x CTRL1 %08x; после %08x %08x %08x %08x; статус %08x\n",
++		  lab_nn(idx), sv->i, sv->w ? "по признаку, запас " : "выдержка ", sv->w ? lab_therm_wait_us : sv->us,
 +		  sv->f2, sv->f3, sv->f4, sv->ctrl1,
 +		  nvkm_rd32(device, 0x020160 + sv->i * 4), nvkm_rd32(device, 0x020180 + sv->i * 4),
 +		  nvkm_rd32(device, 0x0201a0 + sv->i * 4), nvkm_rd32(device, 0x020004), nvkm_rd32(device, 0x0201e0 + sv->i * 4));
 +	if (sv->w)
-+		nvkm_info(&clk->base.subdev, "LAB therm wait idx %02x: %s через %u нс (чтений %u, статус %08x), запас %u мкс\n",
-+			  idx, sv->wok ? "признак" : "ТАЙМАУТ 100 мкс, признака нет,", sv->wns, sv->wrd, sv->wv, lab_therm_wait_us);
++		nvkm_info(&clk->base.subdev, "LAB therm wait %s: %s через %u нс (чтений %u, статус %08x), запас %u мкс\n",
++			  lab_nn(idx), sv->wok ? "признак" : "ТАЙМАУТ 100 мкс, признака нет,", sv->wns, sv->wrd, sv->wv, lab_therm_wait_us);
 +	if (sv->fx)
-+		nvkm_info(&clk->base.subdev, "LAB therm fixed idx %02x: ждал %u нс от входа (задано %u), признак %s%u нс\n",
-+			  idx, sv->fxns, sv->fxset, sv->fxok ? "через " : "НЕ поднялся до переключения, ждали ", sv->fxok ? sv->fxflag : sv->fxns);
++		nvkm_info(&clk->base.subdev, "LAB therm fixed %s: ждал %u нс от входа (задано %u), признак %s%u нс\n",
++			  lab_nn(idx), sv->fxns, sv->fxset, sv->fxok ? "через " : "НЕ поднялся до переключения, ждали ", sv->fxok ? sv->fxflag : sv->fxns);
 +	if (idx == 0 && lab_cw_n) {
 +		u32 c = nvkm_rd32(device, 0x134128) & 0xfffff, s2 = lab_cw_code + 2;	/* делитель s = s2/2 */
 +		u64 cf = div_u64((u64)lab_cw_half * (lab_cw_n + 4), 27000);		/* отсчёт без замедления */
@@ -1694,8 +1746,8 @@
 +
 +		for (k = 0; k < sv->np && o < (int)sizeof(buf) - 24; k++)
 +			o += scnprintf(buf + o, sizeof(buf) - o, " %u нс:%08x", sv->pt[k], sv->pv[k]);
-+		nvkm_info(&clk->base.subdev, "LAB therm probe idx %02x: статус сразу после записи %08x, чтений %u, изменений %d:%s\n",
-+			  idx, sv->st0, sv->nrd, sv->np, sv->np ? buf : " нет");
++		nvkm_info(&clk->base.subdev, "LAB therm probe %s: статус сразу после записи %08x, чтений %u, изменений %d:%s\n",
++			  lab_nn(idx), sv->st0, sv->nrd, sv->np, sv->np ? buf : " нет");
 +	}
 +	sv->on = false;
 +}
@@ -1843,9 +1895,9 @@
 +	struct nvkm_device *device = clk->base.subdev.device;
 +	u32 pll = idx <= 7 ? 0x137000 + idx * 0x20 : 0x1370e0;	/* у hubk01 (8) — PLL hubk06 */
 +
-+	nvkm_error(&clk->base.subdev, "LAB mux %s idx %02x: 137100 %08x; PLL ctrl %08x coef %08x; опора %08x/%08x; "
++	nvkm_error(&clk->base.subdev, "LAB mux %s %s: 137100 %08x; PLL ctrl %08x coef %08x; опора %08x/%08x; "
 +		   "делитель src %08x div %08x пост %08x; FSRM статус GPC %08x hub06 %08x, FSRM2 %08x/%08x; CTRL1 %08x; "
-+		   "GR 400700 %08x 400500 %08x; 002640 %08x; SPPLL0 %08x/%08x SPPLL1 %08x/%08x\n", what, idx,
++		   "GR 400700 %08x 400500 %08x; 002640 %08x; SPPLL0 %08x/%08x SPPLL1 %08x/%08x\n", what, lab_nn(idx),
 +		   nvkm_rd32(device, 0x137100), nvkm_rd32(device, pll), nvkm_rd32(device, pll + 4),
 +		   nvkm_rd32(device, 0x137120 + (idx & 7) * 4), nvkm_rd32(device, 0x137140 + (idx & 7) * 4),
 +		   nvkm_rd32(device, 0x137160 + idx * 4), idx <= 2 ? nvkm_rd32(device, 0x1371d0 + idx * 4) : 0,
@@ -2023,13 +2075,13 @@
 +	if (!lab_therm_real || chg)
 +		lab_therm_enter(clk, idx, &th);
 +	else if (lab_therm && (idx == 0 || idx == 7))
-+		nvkm_info(&clk->base.subdev, "LAB therm idx %02x: стадия 1, бит не меняется — без скобки\n", idx);
++		nvkm_info(&clk->base.subdev, "LAB therm %s: стадия 1, бит не меняется — без скобки\n", lab_nn(idx));
 +	if (lab_nv_hubpost && (idx == 7 || idx == 8) && chg && !info->ssel) {
 +		u32 was = nvkm_rd32(device, 0x137250 + (idx * 0x04));
 +
 +		nvkm_mask(device, 0x137250 + (idx * 0x04), 0x0000003f, info->mdiv & 0x0000003f);
-+		nvkm_info(&clk->base.subdev, "LAB nv_hubpost idx %02x: пост-делитель %08x -> %08x до мультиплексора\n",
-+			  idx, was, nvkm_rd32(device, 0x137250 + (idx * 0x04)));
++		nvkm_info(&clk->base.subdev, "LAB nv_hubpost %s: пост-делитель %08x -> %08x до мультиплексора\n",
++			  lab_nn(idx), was, nvkm_rd32(device, 0x137250 + (idx * 0x04)));
 +	}
 +	if (idx == 0 && lab_div_late_pending) {
 +		/* без журнала до записи мультиплексора: между делителем и 0x137100 — ничего */
@@ -2065,7 +2117,7 @@
 +					if (!(nvkm_rd32(device, 0x137100) & (1 << idx)))
 +						break;
 +				);
-+				nvkm_error(&clk->base.subdev, "LAB mux_guard idx %02x: попытка %d — %s (137100 %08x)\n", idx, t,
++				nvkm_error(&clk->base.subdev, "LAB mux_guard %s: попытка %d — %s (137100 %08x)\n", lab_nn(idx), t,
 +					   (nvkm_rd32(device, 0x137100) & (1 << idx)) ? "всё ещё на PLL" : "ушёл на делитель",
 +					   nvkm_rd32(device, 0x137100));
 +			}
@@ -2126,13 +2178,13 @@
  }
  
  static void
-@@ -368,20 +1974,58 @@
+@@ -368,20 +1992,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
 +	if (idx <= 7 && lab_mux_guard && (lab_mux_stuck & (1 << idx))) {
-+		nvkm_error(&clk->base.subdev, "LAB mux_guard idx %02x: узел на PLL — PLL не выключаю (ctrl %08x)\n",
-+			   idx, nvkm_rd32(device, addr));
++		nvkm_error(&clk->base.subdev, "LAB mux_guard %s: узел на PLL — PLL не выключаю (ctrl %08x)\n",
++			   lab_nn(idx), nvkm_rd32(device, addr));
 +		return;
 +	}
  	if (idx <= 7) {
@@ -2140,17 +2192,17 @@
 +			u32 ctrl = nvkm_rd32(device, addr + 0x00), coef = nvkm_rd32(device, addr + 0x04);
 +
 +			if (!info->coef) {
-+				nvkm_info(&clk->base.subdev, "LAB pll_keep: idx %02x цель — делитель, PLL не выключаю (ctrl %08x coef %08x)\n",
-+					  idx, ctrl, coef);
++				nvkm_info(&clk->base.subdev, "LAB pll_keep: %s цель — делитель, PLL не выключаю (ctrl %08x coef %08x)\n",
++					  lab_nn(idx), ctrl, coef);
 +				return;
 +			}
 +			if ((ctrl & 0x00000001) && (ctrl & 0x00020000) && coef == info->coef) {
-+				nvkm_info(&clk->base.subdev, "LAB pll_keep: idx %02x PLL уже захвачена с тем же coef %08x (ctrl %08x), не трогаю\n",
-+					  idx, coef, ctrl);
++				nvkm_info(&clk->base.subdev, "LAB pll_keep: %s PLL уже захвачена с тем же coef %08x (ctrl %08x), не трогаю\n",
++					  lab_nn(idx), coef, ctrl);
 +				return;
 +			}
-+			nvkm_info(&clk->base.subdev, "LAB pll_keep: idx %02x PLL надо программировать (ctrl %08x coef %08x -> %08x)\n",
-+				  idx, ctrl, coef, info->coef);
++			nvkm_info(&clk->base.subdev, "LAB pll_keep: %s PLL надо программировать (ctrl %08x coef %08x -> %08x)\n",
++				  lab_nn(idx), ctrl, coef, info->coef);
 +		}
  		nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000000);
  		nvkm_mask(device, addr + 0x00, 0x00000001, 0x00000000);
@@ -2175,20 +2227,20 @@
 -			);
 -			nvkm_mask(device, addr + 0x00, 0x00000010, 0x00000010);
 +			) < 0)
-+				nvkm_error(&clk->base.subdev, "LAB prog_2 idx %02x PLL NOT LOCKED ctrl %08x coef %08x\n",
-+					   idx, nvkm_rd32(device, addr + 0x00), nvkm_rd32(device, addr + 0x04));
++				nvkm_error(&clk->base.subdev, "LAB prog_2 %s PLL NOT LOCKED ctrl %08x coef %08x\n",
++					   lab_nn(idx), nvkm_rd32(device, addr + 0x00), nvkm_rd32(device, addr + 0x04));
 +			else
-+				nvkm_info(&clk->base.subdev, "LAB prog_2 idx %02x PLL locked ctrl %08x coef %08x\n",
-+					  idx, nvkm_rd32(device, addr + 0x00), nvkm_rd32(device, addr + 0x04));
++				nvkm_info(&clk->base.subdev, "LAB prog_2 %s PLL locked ctrl %08x coef %08x\n",
++					  lab_nn(idx), nvkm_rd32(device, addr + 0x00), nvkm_rd32(device, addr + 0x04));
 +			if (!((idx == 0 && (lab_gpc_seq & 1)) || (lab_gpc_seq & 4)))
 +				nvkm_mask(device, addr + 0x00, 0x00000010, 0x00000010);
 +			else
-+				nvkm_info(&clk->base.subdev, "LAB gpc_seq: idx %02x бит 0x10 не ставлю, ctrl %08x\n",
-+					  idx, nvkm_rd32(device, addr + 0x00));
++				nvkm_info(&clk->base.subdev, "LAB gpc_seq: %s бит 0x10 не ставлю, ctrl %08x\n",
++					  lab_nn(idx), nvkm_rd32(device, addr + 0x00));
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +2034,106 @@
+@@ -390,17 +2052,106 @@
  }
  
  static void
@@ -2231,7 +2283,7 @@
 +		struct lab_therm_save th = { .on = false };
 +		bool chg = (nvkm_rd32(device, 0x137100) & (1 << idx)) != info->ssel;
 +
-+		nvkm_info(&clk->base.subdev, "LAB prog_3 idx %02x select PLL, 0x137100=%08x\n", idx, nvkm_rd32(device, 0x137100));
++		nvkm_info(&clk->base.subdev, "LAB prog_3 %s select PLL, 0x137100=%08x\n", lab_nn(idx), nvkm_rd32(device, 0x137100));
 +		if (chg && lab_pmu_br(clk, idx)) {
 +			/* этап Б: подъём делитель -> PLL на карте; делительный путь на VCO/4 (gpc_pre405) — внутри сценария */
 +			u32 r100 = nvkm_rd32(device, 0x137100), a1 = 0, v1 = 0;
@@ -2259,7 +2311,7 @@
 +		if (!lab_therm_real || chg)
 +			lab_therm_enter(clk, idx, &th);
 +		else if (lab_therm && (idx == 0 || idx == 7))
-+			nvkm_info(&clk->base.subdev, "LAB therm idx %02x: стадия 3, бит не меняется — без скобки\n", idx);
++			nvkm_info(&clk->base.subdev, "LAB therm %s: стадия 3, бит не меняется — без скобки\n", lab_nn(idx));
 +		if (idx == 0 && lab_gpc_pre405 && chg && !(nvkm_rd32(device, 0x137100) & 1))
 +			lab_gpc_div405(clk);
  		nvkm_mask(device, 0x137100, (1 << idx), info->ssel);
@@ -2297,7 +2349,7 @@
  	}
  }
  
-@@ -409,7 +2142,17 @@
+@@ -409,7 +2160,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -2306,8 +2358,8 @@
 +	bool chg = (cur & 0x00003f3f) != (info->mdiv & 0x00003f3f);
 +
 +	if (lab_therm_div && (idx == 0 || idx == 7) && (chg || lab_therm_div >= 2)) {
-+		nvkm_info(&clk->base.subdev, "LAB prog_4 idx %02x: пост-делитель %08x -> %04x под скобкой\n",
-+			  idx, cur, info->mdiv & 0x00003f3f);
++		nvkm_info(&clk->base.subdev, "LAB prog_4 %s: пост-делитель %08x -> %04x под скобкой\n",
++			  lab_nn(idx), cur, info->mdiv & 0x00003f3f);
 +		lab_therm_enter(clk, idx, &th);
 +	}
  	nvkm_mask(device, 0x137250 + (idx * 0x04), 0x00003f3f, info->mdiv);
@@ -2315,7 +2367,7 @@
  }
  
  static int
-@@ -426,23 +2169,720 @@
+@@ -426,23 +2187,720 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -2432,7 +2484,7 @@
 +				nvkm_wr32(device, 0x13c844, 3);
 +				nvkm_wr32(device, 0x13ec14, 1);
 +			}
-+		}
+ 		}
 +		if (lab_e9e0 == 1)
 +			nvkm_wr32(device, 0x00e9e0, lvl == 2 ? 0x81200a04 : lvl == 1 ? 0x81200a06 : 0x81200a0a);
 +		if (lab_e9e0 == 2 && lab_e9e0_khz) {
@@ -2443,7 +2495,7 @@
 +			nvkm_mask(device, 0x00e9e0, 0x3f, a);
 +			nvkm_info(&clk->base.subdev, "LAB e9e0 из VBIOS: домен 7 %u кГц, SPPLL0 %u кГц -> поле A %02x (%u кГц); таблица этой карты дала бы %02x\n",
 +				  lab_e9e0_khz, ref, a, ref * 2 / (a + 2), lvl == 2 ? 0x04 : lvl == 1 ? 0x06 : 0x0a);
- 		}
++		}
 +		nvkm_info(&clk->base.subdev, "LAB xbar после (уровень %d): part0 %08x 13c844 %08x 13ec14 %08x e9e0 %08x\n",
 +			  lvl, nvkm_rd32(device, 0x13c054), nvkm_rd32(device, 0x13c844), nvkm_rd32(device, 0x13ec14),
 +			  nvkm_rd32(device, 0x00e9e0));
@@ -3038,7 +3090,7 @@
  }
  
  static const struct nvkm_clk_func
-@@ -461,6 +2901,7 @@
+@@ -461,6 +2919,7 @@
  		{ nv_clk_src_rop    , 0x04 },
  		{ nv_clk_src_mem    , 0x05, 0, "memory", 1000 },
  		{ nv_clk_src_vdec   , 0x06 },
@@ -3046,7 +3098,7 @@
  		{ nv_clk_src_pmu    , 0x0a },
  		{ nv_clk_src_hubk07 , 0x0b },
  		{ nv_clk_src_max }
-@@ -477,5 +2918,5 @@
+@@ -477,5 +2936,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
