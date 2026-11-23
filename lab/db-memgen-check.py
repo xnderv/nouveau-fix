@@ -19,6 +19,7 @@ OUT = args[2] if len(args) > 2 else os.path.expanduser('~/Home/nouveau-archive/m
 DB = args[3] if len(args) > 3 else os.path.expanduser('~/Home/nouveau-archive/nouveau_vbios_trace')
 S = json.load(open(os.path.join(OUT, 'scripts.json'))); key = json.load(open(os.path.join(OUT, 'inventory-key.json')))
 inv = json.load(open(os.path.join(OUT, 'inventory.json')))
+TOPO = json.load(open(os.path.join(OUT, 'topo.json'))) if os.path.exists(os.path.join(OUT, 'topo.json')) else {}
 arrs, nv = mg.load_arrays(lab_c), mg.load_nv(nv_c)
 skel = mg.classify(mg.Vbios(os.path.expanduser('~/Home/nouveau-archive/vbios.rom'), 3), arrs, nv)
 
@@ -41,7 +42,7 @@ for lab, d in sorted(S.items()):
     raw = {(int(s, 16) >> 2) & 0xf for s in inv[lab]['strap']}
     if len(raw) != 1: per_chip[d['chip']]['трасс с неясным ремешком'] += 1; continue
     try:
-        vb0 = mg.Vbios(rs[0], 0); idx = mg.ramcfg_index(vb0.rom, raw.pop()); vb = mg.Vbios(rs[0], idx)
+        vb0 = mg.Vbios(rs[0], 0); idx = mg.ramcfg_index(vb0.rom, raw.pop()); vb = mg.Vbios(rs[0], idx); vb.active = TOPO.get(lab, {}).get('active')
         gen, notes = mg.generate(vb, skel)
     except Exception as e:
         per_chip[d['chip']]['генератор не собрал: ' + type(e).__name__] += 1; continue
