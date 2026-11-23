@@ -8,7 +8,7 @@
 import sys, os, json, collections
 TH = sys.argv[1] if len(sys.argv) > 1 else '0.6'
 OUT = sys.argv[2] if len(sys.argv) > 2 else os.path.expanduser('~/Home/nouveau-archive/mem-survey')
-S = json.load(open(os.path.join(OUT, 'scripts.json')))
+S = json.load(open(os.path.join(OUT, 'scripts.json'))) if __name__ == '__main__' else None
 
 OPS = {0x21: None, 0x2e: 'пауза', 0x13: 'пауза', 0x00: 'ожидание', 0x01: 'ожидание', 0x15: 'ожидание',
        0x14: 'ДИСПЛЕЙ: ждать кадр', 0x20: 'ДОСТУП: стоп/пуск хоста к VRAM', 0x16: 'конец',
@@ -47,14 +47,18 @@ def chain(ops):
             if n in ('пауза', 'ожидание'): n = '·' + n
             if not out or out[-1] != n: out.append(n)
     return out
-CL = json.load(open(os.path.join(OUT, f'clusters-{TH}.json')))
-for ci, members in enumerate(CL):
-    if len(members) < 10: continue
-    scripts = [S[m['trace']]['scripts'][m['n']] for m in members]
-    g = collections.Counter(f"{m['gen']} {m['type']}" for m in members)
-    chains = [tuple(c for c in chain(s['ops']) if not c.startswith('·')) for s in scripts]
-    common = collections.Counter(chains).most_common(1)[0][0]
-    pres = collections.Counter(st for c in chains for st in set(c))
-    print(f"## К{ci + 1} ({', '.join(f'{k} {v}' for k, v in g.most_common(4))}; {len(members)} скриптов)\n")
-    print('Типичная цепочка: ' + ' → '.join(common) + '\n')
-    print('Шаги в доле скриптов кластера: ' + ', '.join(f'{st} {100 * n // len(chains)} %' for st, n in pres.most_common()) + '\n')
+def main():
+    CL = json.load(open(os.path.join(OUT, f'clusters-{TH}.json')))
+    for ci, members in enumerate(CL):
+        if len(members) < 10: continue
+        scripts = [S[m['trace']]['scripts'][m['n']] for m in members]
+        g = collections.Counter(f"{m['gen']} {m['type']}" for m in members)
+        chains = [tuple(c for c in chain(s['ops']) if not c.startswith('·')) for s in scripts]
+        common = collections.Counter(chains).most_common(1)[0][0]
+        pres = collections.Counter(st for c in chains for st in set(c))
+        print(f"## К{ci + 1} ({', '.join(f'{k} {v}' for k, v in g.most_common(4))}; {len(members)} скриптов)\n")
+        print('Типичная цепочка: ' + ' → '.join(common) + '\n')
+        print('Шаги в доле скриптов кластера: ' + ', '.join(f'{st} {100 * n // len(chains)} %' for st, n in pres.most_common()) + '\n')
+
+if __name__ == '__main__':
+    main()

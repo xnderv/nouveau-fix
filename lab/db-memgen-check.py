@@ -10,7 +10,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 def load(name):
     sp = importlib.util.spec_from_file_location(name.replace('-', '_'), os.path.join(HERE, name + '.py')); m = importlib.util.module_from_spec(sp)
     sp.loader.exec_module(m); return m
-mg = load('memgen2')
+mg = load('memgen2'); steps = load('db-mem-steps')
 args = [a for a in sys.argv[1:] if not a.startswith('--')]
 detail = next((sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == '--detail'), None)
 if detail: args.remove(detail)
@@ -84,3 +84,13 @@ print('\nТолько у NVIDIA (нет в нашем скелете), част�
 for ch in sorted(only_his): print(f"- {ch}: {', '.join(f'{r:06x}×{n}' for r, n in only_his[ch].most_common(10))}")
 print('\nТолько у генератора (есть в нашем скелете, NVIDIA на этом чипе не пишет), частые:\n')
 for ch in sorted(only_ours): print(f"- {ch}: {', '.join(f'{r:06x}×{n}' for r, n in only_ours[ch].most_common(10))}")
+
+print('\nПо шагам словаря (docs/2026-11-23/mem-meaning.md): разошлось значений / только у NVIDIA / только у генератора\n')
+print('| шаг | ' + ' | '.join(sorted(per_chip)) + ' |'); print('|---' * (len(per_chip) + 1) + '|')
+agg = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0, 0]))
+for ch in per_chip:
+    for r, n in diff_regs[ch].items(): agg[steps.step(r, 0)][ch][0] += n
+    for r, n in only_his[ch].items(): agg[steps.step(r, 0)][ch][1] += n
+    for r, n in only_ours[ch].items(): agg[steps.step(r, 0)][ch][2] += n
+for st in sorted(agg, key=lambda st: -sum(sum(v) for v in agg[st].values())):
+    print(f'| {st} | ' + ' | '.join('/'.join(str(x) for x in agg[st][ch]) if ch in agg[st] else '·' for ch in sorted(per_chip)) + ' |')
