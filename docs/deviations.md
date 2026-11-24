@@ -41,13 +41,21 @@ memory controllers) and the memory itself. One of them has to go first.
   whole time the memory is fast: **crossbar outside memory**.
 - GF100, GF104, GF106, GF110, GF114, GF116, GF119: the other way round — **memory outside crossbar**.
 
-**Why the two groups differ — memory topology, not a chip list.** The NVIDIA driver reads the layout of the memory at start
+**What separates the two groups inside Fermi — memory topology (a fit, not a proof).** The NVIDIA driver reads the layout of the memory at start
 (the same registers nouveau reads): partitions (0x022438), disabled partitions (0x022554), L2 slices per partition
 (0x17e8dc bits 28–31). GF108 and GF117 have **one active partition split into two slices**: all memory traffic converges in
 one partition. GF119 has one partition with one slice; the others have 2–6 partitions. The rule "crossbar outside memory ⇔ one
 active partition with ≥ 2 slices" matches NVIDIA on all 9 Fermi chips. NVIDIA's own memory scripts confirm that it counts
 GF108 as one partition: a register address in the scripts follows the number of active partitions (0x13d834 + 0x40 · (n − 1)),
 and on GF108 it is n = 1 although the chip has two memory controllers. Details: [2026-11-23/mem-meaning.md](2026-11-23/mem-meaning.md) §7–9.
+
+**Checked against the next generations (24 Nov).** On Kepler and Maxwell (9 chips, 65 recordings) NVIDIA puts the crossbar
+outside the memory on every chip, whatever the memory layout: the crossbar moved to its PLL before the memory script in 89 of
+89 upward changes, and back to the divider after it in 90 of 93 downward ones (the three exceptions are in one recording with
+an unusual slow frequency ramp). The same tool reproduces the Fermi split above with no exceptions (40 recordings). So GF108
+and GF117 already use the order that became universal one generation later, and the topology rule does not carry beyond
+Fermi: inside Fermi it still separates the chips, but it may be a coincidence rather than the reason. Raw output:
+[2026-11-24/xbar-order-raw.md](2026-11-24/xbar-order-raw.md).
 
 **What we first blamed, and what turned out (corrected 24 Nov).** A tester's GF108 (GT 630, DDR3) crashed on the first memory
 switch, and our build did use the order of the large chips there, so we blamed the order
@@ -59,7 +67,8 @@ in [2026-11-24/seq-ops.md](2026-11-24/seq-ops.md).
 **What we do — one order on every chip, deliberately different from NVIDIA on the large chips.** Crossbar outside memory: while
 the memory changes, the crossbar is already (or still) fast. On GF108/GF117 this is NVIDIA's order; on the other chips it is a
 safety margin with a clear reason and no cost, and it works there: tests 28 and 69 (October), a tester's GF106 run, and test 119
-(300 level changes with memory on GF114, 0 errors). We keep it on all chips rather than copy NVIDIA's per-chip choice.
+(300 level changes with memory on GF114, 0 errors). We keep it on all chips rather than copy NVIDIA's per-chip choice. It is
+also the order NVIDIA itself uses on every Kepler and Maxwell chip.
 
 **The module parameter `lab_nv_xbarmem`** (for experiments; users never need to set it):
 
