@@ -49,9 +49,12 @@ active partition with ≥ 2 slices" matches NVIDIA on all 9 Fermi chips. NVIDIA'
 GF108 as one partition: a register address in the scripts follows the number of active partitions (0x13d834 + 0x40 · (n − 1)),
 and on GF108 it is n = 1 although the chip has two memory controllers. Details: [2026-11-23/mem-meaning.md](2026-11-23/mem-meaning.md) §7–9.
 
-**What went wrong.** A tester's GF108 (GT 630, DDR3) crashed on the first memory switch: our build used the order of the large
-chips, so the memory went to 896 MHz while the crossbar was still on its slow divider, and the video memory returned garbage
-([2026-11-22/ddr3-replay-crash.md](2026-11-22/ddr3-replay-crash.md)).
+**What we first blamed, and what turned out (corrected 24 Nov).** A tester's GF108 (GT 630, DDR3) crashed on the first memory
+switch, and our build did use the order of the large chips there, so we blamed the order
+([2026-11-22/ddr3-replay-crash.md](2026-11-22/ddr3-replay-crash.md)). With the order fixed the memory still fails: on two GF108
+DDR3 boards the data read back at 896 MHz is corrupt while 324 MHz is fine, with the crossbar already fast. So the order is
+what NVIDIA does on this chip and a sensible guard, but it was not shown to be the cause of that crash. The search continues
+in [2026-11-24/seq-ops.md](2026-11-24/seq-ops.md).
 
 **What we do — one order on every chip, deliberately different from NVIDIA on the large chips.** Crossbar outside memory: while
 the memory changes, the crossbar is already (or still) fast. On GF108/GF117 this is NVIDIA's order; on the other chips it is a
