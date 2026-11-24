@@ -3,6 +3,7 @@
 # уровень, N раз, под лёгкой нагрузкой (glxgears, если есть). Отделяет смену памяти от смены ядра: если зависает и так —
 # дело в повторе памяти; если нет — во взаимодействии с ядром. Нужен модуль с ключом lab_mem_only (сборка 1123c и новее).
 #   bash lab/memonly-test.sh [N=100] [HOLD=3]      — в терминале рабочего стола, один монитор
+#   LOWER=03 bash lab/memonly-test.sh ...            — гонять нижний уровень <-> верхний вместо среднего
 # Регулятор выключается (lab_gov=0); на плате, где повтор памяти ещё не проверен вживую, включается lab_mem_new=1 (запуск
 # сценария = согласие на опыт с памятью). Стоп — на первой ошибке в журнале ядра или если уровень не встал. В конце ключи
 # возвращаются как были. Если экран замрёт — кнопка Reset; после загрузки:  journalctl -k -b -1 > memonly-crash.txt
@@ -17,7 +18,7 @@ sudo -v || exit 1
 ( while sleep 50; do sudo -n -v 2>/dev/null || exit; done ) & KEEP=$!
 PS="$(sudo sh -c 'ls /sys/kernel/debug/dri/*/pstate 2>/dev/null | head -n 1')"
 [ -n "$PS" ] || { echo "Нет debugfs pstate (sudo mount -t debugfs none /sys/kernel/debug)"; kill $KEEP; exit 1; }
-LEVELS=($(sudo cat "$PS" | grep -oE '^[0-9a-f]{2}:' | tr -d ':')); TOP="${LEVELS[-1]}"; MID="${LEVELS[-2]}"
+LEVELS=($(sudo cat "$PS" | grep -oE '^[0-9a-f]{2}:' | tr -d ':')); TOP="${LEVELS[-1]}"; MID="${LOWER:-${LEVELS[-2]}}"   # LOWER=03 — нижний уровень вместо среднего
 K0="lab_gov=$(cat $PRM/lab_gov) lab_mem_new=$(cat $PRM/lab_mem_new) lab_mem_only=$(cat $PRM/lab_mem_only)"
 GP=""
 restore() {
