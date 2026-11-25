@@ -19,7 +19,7 @@ Other chips have not run it yet — that's what we ask you for. GF119 cards: the
   the result with the card's clock counter, falling back if that path doesn't work. The log shows it as `hub01-alt`.
 - **Already built an earlier version?** `git pull`, then build and install again (below). Builds from before 20.11 lack
   the rule above.
-- **One monitor.** We have never tested with two or more displays. Please unplug the others for these tests.
+- **Use a single monitor: unplug any others.** Two or more monitors is a setup we have not tested, and we are not asking you to test it.
 - If you tested an earlier round: **delete the old options line** in `/etc/modprobe.d/nouveau-lab.conf` (or delete the
   file). Old options override the new defaults.
 - Needs: git, make, gcc, and the headers of your running kernel (Debian/Ubuntu: `sudo apt install linux-headers-$(uname -r)`).

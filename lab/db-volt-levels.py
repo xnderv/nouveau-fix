@@ -7,6 +7,8 @@
 # Только чтение. Пути базы не печатаются — метки «чип#номер».
 #   python3 -I lab/db-volt-levels.py [чипы через запятую | -] [КАТАЛОГ_ОБЗОРА] [КАТАЛОГ_БАЗЫ]
 #   python3 -I lab/db-volt-levels.py --one МЕТКА ОБРАЗ.rom ЗАПИСЬ[.xz]      — запись тестировщика вне базы
+#   python3 -I lab/db-volt-levels.py --timeline МЕТКА ОБРАЗ.rom ЗАПИСЬ[.xz] — ход напряжения и температуры на верхнем уровне
+#   python3 -I lab/db-volt-levels.py --rule МЕТКА ОБРАЗ.rom ЗАПИСЬ[.xz]     — правило драйвера (lab_volt_cold) против записи
 import sys, os, json, glob, struct, subprocess, collections
 NAME = {'nvc0': 'GF100', 'nvc4': 'GF104', 'nvc3': 'GF106', 'nvc1': 'GF108', 'nvc8': 'GF110', 'nvce': 'GF114', 'nvcf': 'GF116', 'nvd7': 'GF117', 'nvd9': 'GF119'}
 GPIO = [0xe104, 0xe108, 0xe280, 0xe284]
@@ -122,6 +124,133 @@ def row(label, ri, ups, temps, speedo):
 
 HEAD = ('| запись | по байту 2, В | по байту 14, В | байт 16 (порог?) | NVIDIA наверху, В × подъёмов | датчик перед подъёмами, °C | NVIDIA берёт |\n'
         '|---|---|---|---|---|---|---|')
+
+def timeline(ri, cmd, bar0):
+    """Ход напряжения и температуры по записи: подъёмы на верхний уровень и смены напряжения внутри него (25.11)."""
+    want = {'0x%x' % (bar0 + r): r for r in GPIO + [0x137100, 0x20400]}
+    prog = 'BEGIN{' + ''.join('A["%s"]=1;' % a for a in want) + '} ($1=="W" || $1=="R") && NF>=6 && ($5 in A) {print $1,$3,$5,$6}'
+    p1 = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    out = subprocess.run(['mawk', prog], stdin=p1.stdout, capture_output=True, text=True).stdout; p1.wait()
+    st = {}; vid = None; mux = 0; temp = None; ev = []; at = collections.defaultdict(collections.Counter)
+    for ln in out.splitlines():
+        try: k, t, a, v = ln.split(); r = want[a]; v = int(v, 16); t = float(t)
+        except (ValueError, KeyError): continue
+        if r == 0x20400:
+            if k == 'R' and v < 150:
+                temp = v
+                if (mux & 1) and vid is not None: at[vid][v] += 1
+        elif r == 0x137100:
+            if k == 'W':
+                if (v & 1) and not (mux & 1): ev.append((t, 'подъём на верхний уровень', temp, vid))
+                mux = v
+        else:
+            if k == 'R' and r in st: continue
+            st[r] = v
+            if k != 'W': continue
+            x = 0; ok = True
+            for bn, (line, log1) in ri['lines'].items():
+                if not (ri['vidmask'] >> bn) & 1: continue
+                reg = GPIO[line >> 3]
+                if reg not in st: ok = False; break
+                if ((st[reg] >> ((line & 7) << 2)) & 1) == (log1 & 1): x |= 1 << bn
+            nv = x if ok else None
+            if nv != vid:
+                if (mux & 1) and vid is not None and nv is not None: ev.append((t, 'смена напряжения внутри верхнего уровня', temp, nv))
+                vid = nv
+    return ev, at
+
+
+def rule_check(ri, cmd, bar0, thr, hyst, back):
+    """Проиграть записанный ход температуры через правило драйвера (lab_volt_cold: холодный -> нагрет на пороге + запас,
+    обратно — ниже back) и сравнить с напряжением NVIDIA на каждом чтении датчика на верхнем уровне и на каждом подъёме."""
+    want = {'0x%x' % (bar0 + r): r for r in GPIO + [0x137100, 0x20400]}
+    prog = 'BEGIN{' + ''.join('A["%s"]=1;' % a for a in want) + '} ($1=="W" || $1=="R") && NF>=6 && ($5 in A) {print $1,$3,$5,$6}'
+    p1 = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    out = subprocess.run(['mawk', prog], stdin=p1.stdout, capture_output=True, text=True).stdout; p1.wait()
+    lvs = list(ri['lv'].values()) if isinstance(ri['lv'], dict) else list(ri['lv'])
+    st = {}; vid = None; mux = 0; temp = None; state = 0; ok = bad = 0; rises = []; pend = None
+    cold_v, hot_v = None, None                       # коды VID NVIDIA для холодного и нагретого: по первому и по второму значению
+    seen = []
+    def upd(t):
+        nonlocal state
+        if state == 0: state = 2 if t >= thr + hyst else 1
+        elif state == 1 and t >= thr + hyst: state = 2
+        elif state == 2 and t < back: state = 1
+    samples = []
+    for ln in out.splitlines():
+        try: k, t, a, v = ln.split(); r = want[a]; v = int(v, 16); t = float(t)
+        except (ValueError, KeyError): continue
+        if r == 0x20400:
+            if k == 'R' and v < 150:
+                temp = v
+                if (mux & 1) and vid is not None:
+                    upd(temp); samples.append((state, vid))
+        elif r == 0x137100:
+            if k == 'W':
+                if (v & 1) and not (mux & 1) and temp is not None:
+                    upd(temp); pend = [state, temp, None]
+                mux = v
+        else:
+            if k == 'R' and r in st: continue
+            st[r] = v
+            if k != 'W': continue
+            x = 0; good = True
+            for bn, (line, log1) in ri['lines'].items():
+                if not (ri['vidmask'] >> bn) & 1: continue
+                reg = GPIO[line >> 3]
+                if reg not in st: good = False; break
+                if ((st[reg] >> ((line & 7) << 2)) & 1) == (log1 & 1): x |= 1 << bn
+            vid = x if good else None
+        if pend is not None and (mux & 1) and vid is not None and pend[2] is None:
+            pend[2] = vid; rises.append(tuple(pend)); pend = None
+    vids = collections.Counter(v for _, v in samples)
+    uv = lambda v: ri['vids'].get(v, 0) if isinstance(ri.get('vids'), dict) else 0
+    top2 = sorted(vids, key=uv)                      # ниже напряжение — «нагрет», выше — «холодный»
+    if len(top2) < 2: return None
+    hot_v, cold_v = top2[0], top2[-1]
+    ok = sum(1 for stt, v in samples if (v == hot_v) == (stt == 2)); n = len(samples)
+    rok = sum(1 for stt, _, v in rises if (v == hot_v) == (stt == 2))
+    return ok, n, rok, len(rises)
+
+
+if len(sys.argv) > 1 and sys.argv[1] == '--rule':   # --rule МЕТКА ОБРАЗ.rom ЗАПИСЬ[.xz]: правило lab_volt_cold против записи NVIDIA
+    label, rom, tr = sys.argv[2:5]
+    ri = rom_info(open(rom, 'rb').read())
+    cmd = ['xz', '-dc', tr] if tr.endswith('.xz') else ['cat', tr]
+    b0 = None
+    for l in subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True, errors='replace').stdout:
+        f = l.split()
+        if l.startswith('PCIDEV') and len(f) > 4 and f[2].startswith('10de') and int(f[1], 16) % 0x100 == 0: b0 = int(f[4], 16) & ~0xf; break
+        if l.startswith(('R ', 'W ')): break
+    lvs = list(ri['lv'].values()) if isinstance(ri['lv'], dict) else list(ri['lv'])
+    thr = max(lvs, key=lambda x: x[0])[3]
+    print(f'== {label}: порог из VBIOS {thr} °C')
+    for hyst in (4, 5, 6):
+        res = rule_check(ri, cmd, b0, thr, hyst, thr)
+        if res is None: print('   в записи напряжение на верхнем уровне одно — сравнивать нечего'); break
+        ok, n, rok, rn = res
+        print(f'   запас {hyst} °C: совпало {ok} чтений датчика из {n} ({100 * ok / n:.1f} %), подъёмов {rok} из {rn}')
+    sys.exit(0)
+
+if len(sys.argv) > 1 and sys.argv[1] == '--timeline':   # --timeline МЕТКА ОБРАЗ.rom ЗАПИСЬ[.xz]: GF100–GF116, GPIO старого образца
+    label, rom, tr = sys.argv[2:5]
+    ri = rom_info(open(rom, 'rb').read())
+    cmd = ['xz', '-dc', tr] if tr.endswith('.xz') else ['cat', tr]
+    b0 = None
+    for l in subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True, errors='replace').stdout:
+        f = l.split()
+        if l.startswith('PCIDEV') and len(f) > 4 and f[2].startswith('10de') and int(f[1], 16) % 0x100 == 0: b0 = int(f[4], 16) & ~0xf; break
+        if l.startswith(('R ', 'W ')): break
+    ev, at = timeline(ri, cmd, b0)
+    def uv(vid):
+        v = ri['vids'].get(vid) if isinstance(ri.get('vids'), dict) else None
+        return f'{v / 1e6:.4f} В' if v else f'VID {vid}'
+    lvs = list(ri['lv'].values()) if isinstance(ri['lv'], dict) else list(ri['lv'])
+    top = max(lvs, key=lambda x: x[0]) if lvs else None
+    print(f'== {label}: верхний уровень — байт 2 = {top[1]}, байт 14 = {top[2]}, байт 16 = {top[3]}' if top else f'== {label}')
+    for t, what, tc, vid in ev: print(f'   {t:8.1f} с  {what:42s} датчик {tc} °C  ->  {uv(vid)}')
+    for vid in sorted(at): print(f'   на верхнем уровне при {uv(vid)}: датчик {min(at[vid])}–{max(at[vid])} °C ({sum(at[vid].values())} чтений)')
+    sys.exit(0)
 
 if len(sys.argv) > 1 and sys.argv[1] == '--one':
     label, rom, trace = sys.argv[2:5]

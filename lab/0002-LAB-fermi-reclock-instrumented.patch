@@ -122,14 +122,147 @@
  
  /******************************************************************************
   * misc
-@@ -190,27 +305,71 @@
+@@ -156,6 +271,121 @@
+ 	return NULL;
+ }
+ 
++/* LAB 25.11 (docs/2026-11-24/volt-levels.md, раздел 1а): напряжение уровня для холодного чипа — из VBIOS, без списка плат.
++ * В записи уровня (таблица 0x40) рядом с основным напряжением (байт 2) у части плат стоит второе (байт 14) и порог
++ * температуры в °C (байт 16). По записям NVIDIA: чип холоднее порога — второе напряжение (оно выше), нагрелся — основное;
++ * переключение идёт и при смене уровня, и на ходу, без смены уровня. Запас при переключении взят из тех же записей:
++ * «холодный -> нагрет» на пороге + 5 °C (пять переходов из пяти на 64–65 °C при пороге 60, плата NVS 5200M), обратно — ниже
++ * порога. До 25.11 драйвер всегда ставил основное значение, то есть значение для нагретого чипа.
++ * Поле считается настоящим, если порог не ноль, а второе напряжение лежит в пределах ступеней платы и не ниже основного
++ * (на нижних уровнях ноутбучных GF108 в байте 14 стоит 0x0f — в ступени платы не попадает; у GF104 и GF110 порог ноль).
++ * Формат записи проверен на платах Fermi (GF104, GF108, GF110, GF119) — правило включается только для этого поколения.
++ * lab_volt_cold: 1 — применять (по умолчанию), 0 — как до 25.11. lab_volt_cold_hyst — запас, °C. Меняются на ходу. */
++static uint lab_volt_cold = 1;
++module_param(lab_volt_cold, uint, 0644);
++MODULE_PARM_DESC(lab_volt_cold, "LAB: use the VBIOS second level voltage (perf entry byte 14) while the chip is colder than the VBIOS threshold (byte 16), as NVIDIA does (1 on, default; 0 as before 25.11)");
++static uint lab_volt_cold_hyst = 5;
++module_param(lab_volt_cold_hyst, uint, 0644);
++MODULE_PARM_DESC(lab_volt_cold_hyst, "LAB: margin in C above the VBIOS threshold at which the level voltage goes from the cold to the warm value (NVIDIA recordings: 5)");
++static int lab_volt_cold_state;	/* 0 — ещё не определялось, 1 — чип холодный, 2 — нагрет */
++module_param(lab_volt_cold_state, int, 0444);
++MODULE_PARM_DESC(lab_volt_cold_state, "LAB: 0 not evaluated yet, 1 chip cold (second voltage used on levels that have one), 2 warm (read-only)");
++static atomic_t lab_vc_dirty;	/* регулятор просит переставить напряжение текущего уровня — делает рабочая очередь уровней */
++
++/* второе поле уровня: id напряжения (байт 14) и порог, °C (байт 16); false — поля нет или оно не годится */
++static bool
++lab_vc_field(struct nvkm_clk *clk, struct nvkm_pstate *pstate, u8 *id, u8 *thr)
++{
++	struct nvkm_subdev *subdev = &clk->subdev;
++	struct nvkm_device *device = subdev->device;
++	struct nvkm_bios *bios = device->bios;
++	struct nvkm_volt *volt = device->volt;
++	struct nvbios_perfE perfE;
++	static u32 said;
++	u8 ver, hdr, cnt, len;
++	u32 data;
++	int i, uv2, uv14;
++
++	if (!volt || device->card_type != NV_C0)
++		return false;
++	for (i = 0; (data = nvbios_perfEp(bios, i, &ver, &hdr, &cnt, &len, &perfE)); i++) {
++		if (perfE.pstate != pstate->pstate)
++			continue;
++		if (ver != 0x40 || hdr <= 0x10)
++			return false;
++		*id = nvbios_rd08(bios, data + 0x0e);
++		*thr = nvbios_rd08(bios, data + 0x10);
++		if (!*thr)
++			return false;
++		uv2 = nvkm_volt_map(volt, pstate->base.voltage, clk->temp);
++		uv14 = nvkm_volt_map(volt, *id, clk->temp);
++		if (uv2 <= 0 || uv14 < uv2 || (u32)uv14 < volt->min_uv || (u32)uv14 > volt->max_uv)
++			return false;
++		if (i < 32 && !(said & (1u << i))) {
++			said |= 1u << i;
++			nvkm_info(subdev, "LAB volt_cold: уровень %02x — VBIOS задаёт %d мкВ, пока чип холоднее %u °C, и %d мкВ для нагретого (байты 14, 16 и 2 записи уровня)\n",
++				  pstate->pstate, uv14, *thr, uv2);
++		}
++		return true;
++	}
++	return false;
++}
++
++/* состояние «холодный / нагрет» по датчику, с запасом; true — чип считается нагретым */
++static bool
++lab_vc_hot(struct nvkm_clk *clk, u8 thr)
++{
++	struct nvkm_therm *therm = clk->subdev.device->therm;
++	int temp = therm ? nvkm_therm_temp_get(therm) : -ENODEV;
++	int st = READ_ONCE(lab_volt_cold_state), hyst = READ_ONCE(lab_volt_cold_hyst);
++
++	if (temp < 0)	/* датчик не читается — как до 25.11: основное напряжение; состояние не трогаем */
++		return true;
++	if (st == 0)
++		st = temp >= thr + hyst ? 2 : 1;
++	else if (st == 1 && temp >= thr + hyst)
++		st = 2;
++	else if (st == 2 && temp < thr)
++		st = 1;
++	WRITE_ONCE(lab_volt_cold_state, st);
++	return st == 2;
++}
++
++/* id напряжения уровня с учётом второго поля; чужие id (не основное напряжение уровня) возвращаются как есть */
++static u8
++lab_vc_id(struct nvkm_clk *clk, struct nvkm_pstate *pstate, u8 id)
++{
++	u8 id14, thr;
++
++	if (!READ_ONCE(lab_volt_cold) || id != pstate->base.voltage || !lab_vc_field(clk, pstate, &id14, &thr))
++		return id;
++	return lab_vc_hot(clk, thr) ? id : id14;
++}
++
++/* переставить напряжение текущего уровня, не трогая такты; вызывается из рабочей очереди уровней */
++static void
++lab_vc_apply(struct nvkm_clk *clk)
++{
++	struct nvkm_subdev *subdev = &clk->subdev;
++	struct nvkm_volt *volt = subdev->device->volt;
++	struct nvkm_pstate *pstate;
++	int idx = 0, was, ret;
++	u8 id;
++
++	if (!volt || clk->pstate < 0)
++		return;
++	list_for_each_entry(pstate, &clk->states, head) {
++		if (idx++ != clk->pstate)
++			continue;
++		id = lab_vc_id(clk, pstate, pstate->base.voltage);
++		was = nvkm_volt_get(volt);
++		ret = nvkm_volt_set_id(volt, id, id, clk->temp, 0);
++		nvkm_info(subdev, "LAB volt_cold: уровень %02x, чип %s — напряжение %d -> %d мкВ (id %u, ret %d)\n", pstate->pstate,
++			  READ_ONCE(lab_volt_cold_state) == 2 ? "нагрет" : "холодный", was, nvkm_volt_get(volt), id, ret);
++		return;
++	}
++}
++
+ static int
+ nvkm_cstate_prog(struct nvkm_clk *clk, struct nvkm_pstate *pstate, int cstatei)
+ {
+@@ -184,33 +414,77 @@
+ 	}
+ 
+ 	if (volt) {
+-		ret = nvkm_volt_set_id(volt, cstate->voltage,
++		ret = nvkm_volt_set_id(volt, lab_vc_id(clk, pstate, cstate->voltage),
+ 				       pstate->base.voltage, clk->temp, +1);
+ 		if (ret && ret != -ENODEV) {
  			nvkm_error(subdev, "failed to raise voltage: %d\n", ret);
  			return ret;
  		}
 +		nvkm_info(subdev, "LAB voltage after raise: %d uV (cstate voltage id %d)\n",
 +			  nvkm_volt_get(volt), cstate->voltage);
-+	}
-+
+ 	}
+ 
+-	ret = clk->func->calc(clk, cstate);
+-	if (ret == 0) {
+-		ret = clk->func->prog(clk);
+-		clk->func->tidy(clk);
 +	lab_mux_stuck = 0;
 +	if (lab_core) {
 +		ret = clk->func->calc(clk, cstate);
@@ -165,12 +298,8 @@
 +	} else {
 +		nvkm_info(subdev, "LAB core clocks SKIPPED (lab_core=0)\n");
 +		ret = 0;
- 	}
- 
--	ret = clk->func->calc(clk, cstate);
--	if (ret == 0) {
--		ret = clk->func->prog(clk);
--		clk->func->tidy(clk);
++	}
++
 +	/* LAB 31.10: блоки снижения напряжения и вентилятора ниже — без правок (в стабильных 6.12/6.18 они другие: ошибка в err) */
 +	if (volt && lab_mux_stuck) {
 +		nvkm_error(subdev, "LAB mux_guard: узлы %08x остались на PLL — напряжение не снижаю (%d мкВ)\n",
@@ -183,7 +312,7 @@
 -				       pstate->base.voltage, clk->temp, -1);
 -		if (ret && ret != -ENODEV)
 -			nvkm_error(subdev, "failed to lower voltage: %d\n", ret);
-+		int err = nvkm_volt_set_id(volt, cstate->voltage,
++		int err = nvkm_volt_set_id(volt, lab_vc_id(clk, pstate, cstate->voltage),
 +					   pstate->base.voltage, clk->temp, -1);
 +
 +		if (err && err != -ENODEV)
@@ -205,7 +334,7 @@
  	return ret;
  }
  
-@@ -264,36 +423,214 @@
+@@ -264,36 +538,215 @@
   * P-States
   *****************************************************************************/
  static int
@@ -305,16 +434,6 @@
  	clk->pstate = pstatei;
  
 -	nvkm_pcie_set_link(pci, pstate->pcie_speed, pstate->pcie_width);
--
--	if (fb && fb->ram && fb->ram->func->calc) {
--		struct nvkm_ram *ram = fb->ram;
--		int khz = pstate->base.domain[nv_clk_src_mem];
--		do {
--			ret = ram->func->calc(ram, khz);
--			if (ret == 0)
--				ret = ram->func->prog(ram);
--		} while (ret > 0);
--		ram->func->tidy(ram);
 +	nvkm_info(subdev, "LAB pstate %d: flags pcie=%d mem=%d core=%d volt_first=%d\n",
 +		  pstatei, lab_pcie, lab_mem, lab_core, lab_volt_first);
 +	if (READ_ONCE(lab_mem_only)) {
@@ -354,7 +473,16 @@
 +	}
 +	if (lab_nv_disphold) {
 +		u32 was = nvkm_rd32(subdev->device, 0x610300);
-+
+ 
+-	if (fb && fb->ram && fb->ram->func->calc) {
+-		struct nvkm_ram *ram = fb->ram;
+-		int khz = pstate->base.domain[nv_clk_src_mem];
+-		do {
+-			ret = ram->func->calc(ram, khz);
+-			if (ret == 0)
+-				ret = ram->func->prog(ram);
+-		} while (ret > 0);
+-		ram->func->tidy(ram);
 +		nvkm_mask(subdev->device, 0x610300, 0x00000001, 0x00000001);
 +		nvkm_info(subdev, "LAB nv_disphold: 0x610300 %08x -> %08x на время перехода\n", was, nvkm_rd32(subdev->device, 0x610300));
 +	}
@@ -377,9 +505,10 @@
 -	return nvkm_cstate_prog(clk, pstate, NVKM_CLK_CSTATE_HIGHEST);
 +	if (lab_volt_first && subdev->device->volt) {
 +		struct nvkm_volt *volt = subdev->device->volt;
-+		int r = nvkm_volt_set_id(volt, pstate->base.voltage, pstate->base.voltage, clk->temp, +1);
++		u8 vid = lab_vc_id(clk, pstate, pstate->base.voltage);	/* 25.11: с учётом напряжения холодного чипа */
++		int r = nvkm_volt_set_id(volt, vid, pstate->base.voltage, clk->temp, +1);
 +		nvkm_info(subdev, "LAB voltage-first ret %d, now %d uV (id %d)\n",
-+			  r, nvkm_volt_get(volt), pstate->base.voltage);
++			  r, nvkm_volt_get(volt), vid);
 +	}
 +
 +	if (lab_nv_hub07mem && lab_core) {
@@ -435,7 +564,50 @@
  }
  
  static void
-@@ -473,6 +810,7 @@
+@@ -328,6 +781,8 @@
+ 				   pstate, ret);
+ 		}
+ 	}
++	if (atomic_xchg(&lab_vc_dirty, 0))	/* 25.11: чип перешёл порог температуры — напряжение текущего уровня */
++		lab_vc_apply(clk);
+ 
+ 	wake_up_all(&clk->wait);
+ }
+@@ -342,6 +797,33 @@
+ 	return 0;
+ }
+ 
++/* LAB 25.11: зовёт регулятор (pmu/gf100.c) раз в замер. Если чип перешёл порог второго поля напряжения текущего уровня,
++ * напряжение переставляется без смены уровня — через ту же рабочую очередь, что и смена уровней, чтобы не пересечься с ней. */
++void lab_volt_cold_poll(struct nvkm_clk *clk);
++void
++lab_volt_cold_poll(struct nvkm_clk *clk)
++{
++	struct nvkm_pstate *pstate;
++	int idx = 0, was;
++	u8 id14, thr;
++
++	if (!READ_ONCE(lab_volt_cold) || clk->pstate < 0)
++		return;
++	list_for_each_entry(pstate, &clk->states, head) {
++		if (idx++ != clk->pstate)
++			continue;
++		if (!lab_vc_field(clk, pstate, &id14, &thr))
++			return;
++		was = READ_ONCE(lab_volt_cold_state);
++		lab_vc_hot(clk, thr);
++		if (was && was == READ_ONCE(lab_volt_cold_state))
++			return;
++		atomic_set(&lab_vc_dirty, 1);
++		nvkm_pstate_calc(clk, true);
++		return;
++	}
++}
++
+ static void
+ nvkm_pstate_info(struct nvkm_clk *clk, struct nvkm_pstate *pstate)
+ {
+@@ -473,6 +955,7 @@
  nvkm_clk_ustate_update(struct nvkm_clk *clk, int req)
  {
  	struct nvkm_pstate *pstate;
@@ -443,7 +615,7 @@
  	int i = 0;
  
  	if (!clk->allow_reclock)
-@@ -480,12 +818,14 @@
+@@ -480,12 +963,14 @@
  
  	if (req != -1 && req != -2) {
  		list_for_each_entry(pstate, &clk->states, head) {
@@ -460,7 +632,7 @@
  			return -EINVAL;
  		req = i;
  	}
-@@ -608,6 +948,8 @@
+@@ -608,6 +1093,8 @@
  	}
  
  	nvkm_pstate_info(clk, &clk->bstate);
@@ -1420,7 +1592,7 @@
  	if ((ret = calc_clk(clk, cstate, 0x00, nv_clk_src_gpc)) ||
  	    (ret = calc_clk(clk, cstate, 0x01, nv_clk_src_rop)) ||
  	    (ret = calc_clk(clk, cstate, 0x02, nv_clk_src_hubk07)) ||
-@@ -346,20 +1192,811 @@
+@@ -346,20 +1192,896 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -1829,14 +2001,98 @@
 +module_param(lab_nv_boot, uint, 0644);
 +MODULE_PARM_DESC(lab_nv_boot, "LAB: at clk init write 0x1371c8/cc = 0x30000 and 0x139060..0x139220 (step 0x40) = 0x74, as the NVIDIA driver does at load (0 off, 1 on)");
 +
++/* LAB 25.11: чтение «на пробу» — есть ли регистр на этом чипе, спрашиваем у самого чипа, без списка чипов.
++ * Списки снимка составлены по нашей карте. На другом чипе части регистров нет, и обычное чтение даёт ошибку шины: прерывание и
++ * строку «MMIO read … FAULT» в журнале (отчёты тестировщиков: счётчик второго GPC на GF108, блок GPIO и регистр PCIe на GF119).
++ * На время чтений снимаем разрешение трёх прерываний ошибок шины (0x001140, биты 1–3 — их ставит gf100_bus_init), после
++ * каждого чтения смотрим признак ошибки (0x001100, те же биты) и снимаем его так же, как обработчик nouveau gf100_bus_intr
++ * (0x009084 = 0, запись этих битов в 0x001100). Регистр, которого нет, печатается как «нет».
++ * Заодно снимается старая отметка адреса ошибки (0x009084): её оставляет ещё инициализация по VBIOS (запись в порты блоков GPC,
++ * которых у чипа нет), и nouveau потом печатал этот чужой адрес при первой же настоящей ошибке шины. */
++static u32
++lab_probe_begin(struct nvkm_subdev *subdev)
++{
++	struct nvkm_device *device = subdev->device;
++	u32 en = nvkm_mask(device, 0x001140, 0x0000000e, 0x00000000);
++	u32 st = nvkm_rd32(device, 0x001100) & 0x0000000e, addr = nvkm_rd32(device, 0x009084);
++
++	if (st || addr) {
++		nvkm_info(subdev, "LAB probe: в чипе уже стояла отметка ошибки шины (%s по адресу %06x, признак %x) — не от этих чтений; снята\n",
++			  (addr & 0x00000002) ? "запись" : "чтение", addr & 0x00fffffc, st);
++		nvkm_wr32(device, 0x009084, 0x00000000);
++		if (st)
++			nvkm_wr32(device, 0x001100, st);
++	}
++	return en;
++}
++
++static void
++lab_probe_end(struct nvkm_device *device, u32 en)
++{
++	nvkm_mask(device, 0x001140, 0x0000000e, en & 0x0000000e);
++}
++
++/* одно чтение между lab_probe_begin и lab_probe_end; false — регистра нет, в *why биты причины (2 !ENGINE, 4 PRIVRING, 8 TIMEOUT) */
++static bool
++lab_probe_rd32(struct nvkm_device *device, u32 addr, u32 *val, u32 *why)
++{
++	u32 st;
++
++	*val = nvkm_rd32(device, addr);
++	st = nvkm_rd32(device, 0x001100) & 0x0000000e;
++	if (why)
++		*why = st;
++	if (!st)
++		return true;
++	nvkm_wr32(device, 0x009084, 0x00000000);
++	nvkm_wr32(device, 0x001100, st);
++	return false;
++}
++
++/* LAB 25.11: lab_probe_addr — прочитать один регистр «на пробу» на ходу: echo 0xАДРЕС > /sys/module/nouveau/parameters/lab_probe_addr,
++ * ответ — в журнале ядра («= значение» или «регистра нет»). Только чтение; у некоторых регистров чтение меняет состояние
++ * (порты с указателем) — такие не трогать. Нужен, чтобы выяснять у тестировщика, есть ли регистр на его чипе, одной командой. */
++static struct nvkm_subdev *lab_probe_subdev;	/* ставится в lab_boot_snapshot */
++static int
++lab_probe_addr_set(const char *val, const struct kernel_param *kp)
++{
++	struct nvkm_subdev *subdev = READ_ONCE(lab_probe_subdev);
++	u32 addr, v, why, en;
++	int ret = kstrtou32(val, 0, &addr);
++
++	if (ret)
++		return ret;
++	if (!subdev)
++		return -ENODEV;
++	if ((addr & 3) || addr >= 0x01000000)
++		return -EINVAL;
++	en = lab_probe_begin(subdev);
++	if (lab_probe_rd32(subdev->device, addr, &v, &why))
++		nvkm_info(subdev, "LAB probe %06x = %08x\n", addr, v);
++	else
++		nvkm_info(subdev, "LAB probe %06x: регистра нет (%s%s%s)\n", addr, (why & 2) ? "!ENGINE " : "",
++			  (why & 4) ? "PRIVRING " : "", (why & 8) ? "TIMEOUT " : "");
++	lab_probe_end(subdev->device, en);
++	return 0;
++}
++static const struct kernel_param_ops lab_probe_addr_ops = { .set = lab_probe_addr_set };
++module_param_cb(lab_probe_addr, &lab_probe_addr_ops, NULL, 0200);
++MODULE_PARM_DESC(lab_probe_addr, "LAB: write a register address to read it once without a bus-fault message; the answer goes to the kernel log (tells whether the register exists on this chip)");
++
 +static void
 +lab_snap_line(struct nvkm_subdev *subdev, int n, const char *name, const u32 *addr, int cnt)
 +{
++	struct nvkm_device *device = subdev->device;
 +	char buf[400];
 +	int i, o = 0;
++	u32 v;
 +
-+	for (i = 0; i < cnt; i++)
-+		o += scnprintf(buf + o, sizeof(buf) - o, " %06x=%08x", addr[i], nvkm_rd32(subdev->device, addr[i]));
++	for (i = 0; i < cnt; i++) {	/* 25.11: чтение «на пробу» — вызывать между lab_probe_begin и lab_probe_end */
++		if (lab_probe_rd32(device, addr[i], &v, NULL))
++			o += scnprintf(buf + o, sizeof(buf) - o, " %06x=%08x", addr[i], v);
++		else
++			o += scnprintf(buf + o, sizeof(buf) - o, " %06x=нет", addr[i]);
++	}
 +	nvkm_info(subdev, "LAB boot snap #%d %s:%s\n", n, name, buf);
 +}
 +
@@ -1868,10 +2124,8 @@
 +	 * 0x139060 + k·0x40. При запуске NVIDIA посреди настройки PCIe пишет 0x1371c8/cc = 0x30000 (источник 100 МГц от платы ->
 +	 * 108 МГц от кварца карты) и 0x139060…0x139220 = 0x74 (было 0x7c); nouveau их не трогает. Все адреса NVIDIA читает. */
 +	static const u32 src2[] = { 0x13718c, 0x137190, 0x137198, 0x1371c8, 0x1371cc, 0x139060, 0x139220 };
-+	/* LAB 16.11: счётчик тактов GPC по коду NVIDIA для Kepler/Maxwell (nvgpu hw_trim_gk20a/gm20b:
-+	 * trim_gpc_clk_cntr_ncgpcclk_cfg 0x134124 + i·0x200, _cnt 0x134128 + i·0x200). Есть ли он на Fermi — неизвестно;
-+	 * только чтение: 0xbadf… = регистра нет, иначе — живой. */
-+	static const u32 cntr[] = { 0x134124, 0x134128, 0x134324, 0x134328 };
++	/* 25.11: проба счётчика тактов GPC (0x134124 + i·0x200, опыт 16.11) убрана: ответ получен — у первого GPC счётчик есть;
++	 * чтение счётчика второго GPC на чипе с одним GPC давало ошибку шины. Нужен адрес — lab_probe_addr. */
 +	static int n;
 +	struct nvkm_subdev *subdev = &base->subdev;
 +
@@ -1898,7 +2152,10 @@
 +			  lab_fs_boot[0][0], lab_fs_boot[0][1], lab_fs_boot[0][2],
 +			  lab_fs_boot[1][0], lab_fs_boot[1][1], lab_fs_boot[1][2]);
 +	}
++	WRITE_ONCE(lab_probe_subdev, subdev);
 +	if (lab_boot_snap) {
++		u32 en = lab_probe_begin(subdev);
++
 +		n++;
 +		lab_snap_line(subdev, n, "PLL", pll, ARRAY_SIZE(pll));
 +		lab_snap_line(subdev, n, "опора", ref, ARRAY_SIZE(ref));
@@ -1908,7 +2165,7 @@
 +		lab_snap_line(subdev, n, "датчик", sens, ARRAY_SIZE(sens));
 +		lab_snap_line(subdev, n, "GPIO/ШИМ", gpio, ARRAY_SIZE(gpio));
 +		lab_snap_line(subdev, n, "ист.26/27, PCIe", src2, ARRAY_SIZE(src2));
-+		lab_snap_line(subdev, n, "счётчик GPC", cntr, ARRAY_SIZE(cntr));
++		lab_probe_end(subdev->device, en);
 +	}
 +	if (lab_nv_boot) {
 +		static const u32 r139[] = { 0x139060, 0x1390a0, 0x1390e0, 0x139120, 0x139160, 0x1391a0, 0x1391e0, 0x139220 };
@@ -2235,7 +2492,7 @@
  }
  
  static void
-@@ -368,20 +2005,58 @@
+@@ -368,20 +2090,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -2297,7 +2554,7 @@
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +2065,106 @@
+@@ -390,17 +2150,106 @@
  }
  
  static void
@@ -2406,7 +2663,7 @@
  	}
  }
  
-@@ -409,7 +2173,17 @@
+@@ -409,7 +2258,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -2424,7 +2681,7 @@
  }
  
  static int
-@@ -426,23 +2200,720 @@
+@@ -426,23 +2285,720 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -2773,7 +3030,7 @@
 +{
 +	struct nvkm_device *device = clk->base.subdev.device;
 +	u32 orig = nvkm_rd32(device, reg), csave = nvkm_rd32(device, cbase), v, k;
-+	char buf[700];
++	static char buf[700];	/* 25.11: не в кадре стека (кадр был 1216 байт при пределе 1024); функция не вызывается параллельно */
 +	int o = 0;
 +	struct { const char *t; u32 val; } var[24];
 +	int nv = 0, i;
@@ -3147,7 +3404,7 @@
  }
  
  static const struct nvkm_clk_func
-@@ -461,6 +2932,7 @@
+@@ -461,6 +3017,7 @@
  		{ nv_clk_src_rop    , 0x04 },
  		{ nv_clk_src_mem    , 0x05, 0, "memory", 1000 },
  		{ nv_clk_src_vdec   , 0x06 },
@@ -3155,7 +3412,7 @@
  		{ nv_clk_src_pmu    , 0x0a },
  		{ nv_clk_src_hubk07 , 0x0b },
  		{ nv_clk_src_max }
-@@ -477,5 +2949,5 @@
+@@ -477,5 +3034,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
@@ -3192,7 +3449,7 @@
  
  struct gf100_ramfuc {
  	struct ramfuc base;
-@@ -123,6 +137,2614 @@
+@@ -123,6 +137,2895 @@
  	}
  }
  
@@ -5092,6 +5349,213 @@
 +	[LAB_G8_D] = LAB_E64_STEP(D, "D 324->135", 8),
 +};
 +
++/* 24.11: GF108M GT 630M (Medion, subsystem 1b0a:20c8, VBIOS 70.08.93.00.A0, DDR3 135/324/896), from a tester's NVIDIA
++ * 390.157 mmiotrace (23.11, no monitor on the NVIDIA GPU). Tables made with lab/mk-replay-tables.py (steps U=0,2 D=1,12
++ * L=4,7,10 H=5,8,11); each repeat is byte-identical, pre and post included. Unlike the ASUS GT 630, NVIDIA runs ALL
++ * three levels on the memory PLL here (0x132004 = 0x00021f07 896, 0x00051806 324, 0x00122406 135, reference 405 MHz);
++ * only the POST state after devinit is on the divider (324). PLL -> PLL steps cross over on the divider inside the
++ * script (0x137360 3 -> reprogram -> 2).
++ *   U 324(POST divider)->896   188 words, no frame wait (NVIDIA at driver start)
++ *   D 896->324                 202 words, no frame wait (NVIDIA at teardown; the runtime 211-word version differs
++ *                              only by the frame waits on heads 0/1 and 0x611200=0x3300 — this GPU drives no display)
++ *   L 324->135                 140 words (with frame waits, as recorded)
++ *   H 135->896                 221 words (with frame waits, as recorded)
++ * No recorded 324(PLL)->896: the plan goes L, then H. lab_mem_line750 clears the line registers before U and H (the
++ * scripts' last 0x132018 writes have bit 28 clear there; D and L have it set). */
++static const u32 lab_medion_scrU[] = { /* 188 слов; t=312.4 */
++	0x00090021, 0x00137320, 0x00000103, 0x00137330, 0x81200606, 0x00132004,
++	0x00021f07, 0x00132000, 0x18000001, 0x00020000, 0x00000002, 0x00020001,
++	0x00137390, 0x00030015, 0x00000002, 0x0000fa00, 0x000d0021, 0x00132018,
++	0x00005000, 0x00137370, 0x00000003, 0x00137380, 0x00000001, 0x0010f808,
++	0x48020004, 0x0010f824, 0x00401867, 0x0013d834, 0x00000000, 0x0002003a,
++	0x00000002, 0x00030021, 0x00100b0c, 0x00080012, 0x00020034, 0x0000000a,
++	0x00030020, 0x00000001, 0x00000000, 0x00070021, 0x0010f200, 0x00028000,
++	0x0010f808, 0x4c020004, 0x0013d834, 0x00000000, 0x0002003a, 0x00000001,
++	0x000b0021, 0x001373ec, 0x00020808, 0x0010f314, 0x00000001, 0x0010f210,
++	0x00000000, 0x0010f310, 0x00000001, 0x0010f310, 0x00000001, 0x0002002e,
++	0x000003e8, 0x00070021, 0x0010f090, 0x00000060, 0x0010f090, 0xc000007e,
++	0x0010f874, 0x00000000, 0x0002002e, 0x00004e20, 0x000b0021, 0x0010f910,
++	0x00002000, 0x0010f914, 0x00002000, 0x0010f658, 0x00000000, 0x0010f830,
++	0x00000011, 0x0013d834, 0x00000000, 0x0002003a, 0x00000003, 0x000b0021,
++	0x00137370, 0x00000003, 0x00137380, 0x00000001, 0x00137360, 0x00000002,
++	0x0010f090, 0x4000007f, 0x0010f210, 0x80000000, 0x0002002e, 0x000003e8,
++	0x00030021, 0x0010f300, 0x00001f20, 0x0002002e, 0x000003e8, 0x00030021,
++	0x0010f300, 0x00001e20, 0x0002002e, 0x000003e8, 0x00030021, 0x0010f320,
++	0x002000a0, 0x0002002e, 0x000003e8, 0x00030021, 0x0010f300, 0x00001e04,
++	0x0002002e, 0x000003e8, 0x00170021, 0x0010f224, 0x0c070a07, 0x0010f290,
++	0x0e44642e, 0x0010f294, 0x4ce3848c, 0x0010f298, 0x440e0711, 0x0010f29c,
++	0x00004cb6, 0x0010f2a0, 0x42e38069, 0x0010f604, 0xf1000000, 0x0010f614,
++	0x40044e77, 0x0010f610, 0x40044e77, 0x0010f808, 0x56820000, 0x0013d834,
++	0x00000000, 0x0002003a, 0x00000004, 0x00070021, 0x001373f8, 0x00002050,
++	0x0010f870, 0xaaaaaaaa, 0x0013d834, 0x00000000, 0x0002003a, 0x00000001,
++	0x00050021, 0x00100c00, 0x04090124, 0x0010f300, 0x00001f04, 0x0002002e,
++	0x000003e8, 0x00030021, 0x0010f300, 0x00001e04, 0x0002002e, 0x000003e8,
++	0x0002002e, 0x000003e8, 0x00050021, 0x0010f830, 0x01000011, 0x0010f830,
++	0x00000011, 0x00030020, 0x00000000, 0x00000000, 0x00020034, 0x0000000b,
++	0x00030021, 0x0013d834, 0x00000000, 0x0002003a, 0x00000002, 0x00070021,
++	0x00100b0c, 0x00080028, 0x00611200, 0x00003330, 0x0010f200, 0x00028800,
++	0x00020016, 0x00000000,
++};
++static const u32 lab_medion_preU[] = { /* 13 пар */
++	0x0010f050, 0xff000450, 0x0000e104, 0x02600000, 0x0010f050, 0xff000450,
++	0x0010f050, 0xff000450, 0x0000e104, 0x03200000, 0x0010f468, 0x00001005,
++	0x0010f420, 0x00000042, 0x0010f430, 0x00000040, 0x0010f400, 0x00001707,
++	0x0010f410, 0x00000307, 0x0010f444, 0x04cc881f, 0x00132000, 0x18000002,
++	0x00132000, 0x18000000,
++};
++static const u32 lab_medion_postU[] = { /* 8 пар */
++	0x0010f824, 0x00401e67, 0x0010f468, 0x00020020, 0x0010f420, 0x00000043,
++	0x0010f430, 0x00000041, 0x0010f400, 0x0000171f, 0x0010f410, 0x00000107,
++	0x0010f444, 0x04cc883f, 0x0010f050, 0xff001050,
++};
++static const u32 lab_medion_scrD[] = { /* 202 слов; t=313.3 */
++	0x000b0021, 0x00137300, 0x00000103, 0x00137370, 0x00000003, 0x00137380,
++	0x00000001, 0x0010f824, 0x00401867, 0x0013d834, 0x00000000, 0x0002003a,
++	0x00000001, 0x00030021, 0x00100b0c, 0x00080012, 0x00020034, 0x0000000a,
++	0x00030020, 0x00000001, 0x00000000, 0x000b0021, 0x0010f200, 0x00028000,
++	0x0010f314, 0x00000001, 0x0010f210, 0x00000000, 0x0010f310, 0x00000001,
++	0x0010f310, 0x00000001, 0x0002002e, 0x000003e8, 0x000b0021, 0x0010f090,
++	0x00000060, 0x0010f090, 0xc000007e, 0x00137360, 0x00000003, 0x0010f830,
++	0x00000017, 0x0013d834, 0x00000000, 0x0002003a, 0x00000001, 0x00110021,
++	0x00137370, 0x00000000, 0x00137380, 0x00000000, 0x00132018, 0x00001000,
++	0x00132000, 0x18030000, 0x00137320, 0x00000103, 0x00137330, 0x81200606,
++	0x00132004, 0x00051806, 0x00132000, 0x18030001, 0x00020000, 0x00000002,
++	0x00020001, 0x00137390, 0x00030015, 0x00000002, 0x0000fa00, 0x00070021,
++	0x0010f874, 0x04000000, 0x0010f658, 0x008c8585, 0x0013d834, 0x00000000,
++	0x0002003a, 0x00000002, 0x000d0021, 0x00132018, 0x10001000, 0x0010f660,
++	0x00001010, 0x0010f910, 0x00000000, 0x0010f914, 0x00000000, 0x0010f824,
++	0x00407867, 0x0013d834, 0x00000000, 0x0002003a, 0x00000002, 0x000b0021,
++	0x00137370, 0x00000003, 0x00137380, 0x00000001, 0x00137360, 0x00000002,
++	0x0010f090, 0x4000007f, 0x0010f210, 0x80000000, 0x0002002e, 0x000007d0,
++	0x00030021, 0x0010f300, 0x00001f04, 0x0002002e, 0x000003e8, 0x00030021,
++	0x0010f300, 0x00001e04, 0x0002002e, 0x000003e8, 0x00030021, 0x0010f320,
++	0x00200080, 0x0002002e, 0x000003e8, 0x00030021, 0x0010f300, 0x00001e20,
++	0x0002002e, 0x000003e8, 0x00170021, 0x0010f224, 0x0c040a07, 0x0010f290,
++	0x0518642e, 0x0010f294, 0x4c514286, 0x0010f298, 0x440e0411, 0x0010f29c,
++	0x00001e6a, 0x0010f2a0, 0x42e20069, 0x0010f604, 0xf0000000, 0x0010f614,
++	0x40044f77, 0x0010f610, 0x40044f77, 0x0010f808, 0x48020004, 0x0013d834,
++	0x00000000, 0x0002003a, 0x00000004, 0x00090021, 0x001373ec, 0x00000808,
++	0x001373f8, 0x00002055, 0x0010f870, 0x00000000, 0x0013d834, 0x00000000,
++	0x0002003a, 0x00000001, 0x00050021, 0x00100c00, 0x0c090124, 0x0010f300,
++	0x00001f20, 0x0002002e, 0x000003e8, 0x00030021, 0x0010f300, 0x00001e20,
++	0x0002002e, 0x000003e8, 0x0002002e, 0x000007d0, 0x00050021, 0x0010f830,
++	0x01000017, 0x0010f830, 0x00000017, 0x00030020, 0x00000000, 0x00000000,
++	0x00020034, 0x0000000b, 0x00030021, 0x0013d834, 0x00000000, 0x0002003a,
++	0x00000002, 0x00070021, 0x00100b0c, 0x00080028, 0x00611200, 0x00003330,
++	0x0010f200, 0x00028800, 0x00020016, 0x00000000,
++};
++static const u32 lab_medion_preD[] = { /* 7 пар */
++	0x0010f050, 0xff000450, 0x0010f468, 0x00001005, 0x0010f420, 0x00000042,
++	0x0010f430, 0x00000040, 0x0010f400, 0x00001707, 0x0010f410, 0x00000307,
++	0x0010f444, 0x04cc881f,
++};
++static const u32 lab_medion_postD[] = { /* 12 пар */
++	0x00132018, 0x10001000, 0x0010f824, 0x00407867, 0x0010f824, 0x004079e7,
++	0x0010f808, 0x08020004, 0x0010f468, 0x00001005, 0x0010f420, 0x00000042,
++	0x0010f430, 0x00000040, 0x0010f400, 0x00001707, 0x0010f410, 0x00000307,
++	0x0010f444, 0x04cc881f, 0x0000e104, 0x06300000, 0x0010f050, 0xff000450,
++};
++static const u32 lab_medion_scrL[] = { /* 140 слов; t=361.6 */
++	0x00090021, 0x00137300, 0x00000103, 0x00137370, 0x00000003, 0x00137380,
++	0x00000001, 0x00100b0c, 0x00080012, 0x00030014, 0x00000000, 0x02b5f070,
++	0x00030014, 0x00010000, 0x02b5f070, 0x00030021, 0x00611200, 0x00003300,
++	0x00020034, 0x0000000a, 0x00030020, 0x00000001, 0x00000000, 0x00070021,
++	0x0010f200, 0x00028000, 0x0010f314, 0x00000001, 0x0010f304, 0x00100003,
++	0x0002002e, 0x000003e8, 0x00090021, 0x0010f314, 0x00000001, 0x0010f210,
++	0x00000000, 0x0010f310, 0x00000001, 0x0010f310, 0x00000001, 0x0002002e,
++	0x000003e8, 0x00150021, 0x0010f090, 0x00000060, 0x0010f090, 0xc000007e,
++	0x00137360, 0x00000003, 0x00137370, 0x00000000, 0x00137380, 0x00000000,
++	0x00132000, 0x18030000, 0x00137320, 0x00000103, 0x00137330, 0x81200606,
++	0x00132004, 0x00122406, 0x00132000, 0x18030001, 0x00020000, 0x00000002,
++	0x00020001, 0x00137390, 0x00030015, 0x00000002, 0x0000fa00, 0x00070021,
++	0x0010f658, 0x009f9f9f, 0x0010f660, 0x00001010, 0x0013d834, 0x00000000,
++	0x0002003a, 0x00000002, 0x000b0021, 0x00137370, 0x00000003, 0x00137380,
++	0x00000001, 0x00137360, 0x00000002, 0x0010f090, 0x4000007f, 0x0010f210,
++	0x80000000, 0x0002002e, 0x00000fa0, 0x00030021, 0x0010f320, 0x00200088,
++	0x0002002e, 0x000003e8, 0x00030021, 0x0010f300, 0x00001220, 0x0002002e,
++	0x000003e8, 0x000b0021, 0x0010f290, 0x030a0f07, 0x0010f294, 0x4c30c305,
++	0x0010f298, 0x44050411, 0x0010f29c, 0x00000e6a, 0x0010f870, 0x00000000,
++	0x0002002e, 0x00001388, 0x00050021, 0x0010f830, 0x01000017, 0x0010f830,
++	0x00000017, 0x00030020, 0x00000000, 0x00000000, 0x00020034, 0x0000000b,
++	0x00030021, 0x0013d834, 0x00000000, 0x0002003a, 0x00000003, 0x00070021,
++	0x00100b0c, 0x00080028, 0x00611200, 0x00003330, 0x0010f200, 0x00028800,
++	0x00020016, 0x00000000,
++};
++static const u32 lab_medion_preL[] = { /* 11 пар */
++	0x0010f2fc, 0x00000000, 0x00100b4c, 0x00000000, 0x0010f254, 0x0200ff4a,
++	0x0010f150, 0x00000010, 0x0010f050, 0xff000450, 0x0010f468, 0x00001005,
++	0x0010f420, 0x00000042, 0x0010f430, 0x00000040, 0x0010f400, 0x00001707,
++	0x0010f410, 0x00000307, 0x0010f444, 0x04cc881f,
++};
++static const u32 lab_medion_postL[] = { /* 17 пар */
++	0x0010f468, 0x00001005, 0x0010f420, 0x00000042, 0x0010f430, 0x00000040,
++	0x0010f400, 0x00001707, 0x0010f410, 0x00000307, 0x0010f444, 0x04cc881f,
++	0x00132018, 0x10001000, 0x0010f824, 0x004079e7, 0x0010f824, 0x004079e7,
++	0x0010f808, 0x08020004, 0x0010f468, 0x00001005, 0x0010f420, 0x00000042,
++	0x0010f430, 0x00000040, 0x0010f400, 0x00001707, 0x0010f410, 0x00000307,
++	0x0010f444, 0x04cc881f, 0x0010f050, 0xff000450,
++};
++static const u32 lab_medion_scrH[] = { /* 221 слов; t=373.0 */
++	0x000d0021, 0x00137300, 0x00000103, 0x00137370, 0x00000003, 0x00137380,
++	0x00000001, 0x0010f808, 0x48020004, 0x0010f824, 0x00407867, 0x0013d834,
++	0x00000000, 0x0002003a, 0x00000002, 0x00030021, 0x00100b0c, 0x00080012,
++	0x00030014, 0x00000000, 0x02b5f070, 0x00030014, 0x00010000, 0x02b5f070,
++	0x00030021, 0x00611200, 0x00003300, 0x00020034, 0x0000000a, 0x00030020,
++	0x00000001, 0x00000000, 0x00070021, 0x0010f200, 0x00028000, 0x0010f808,
++	0x4c020004, 0x0013d834, 0x00000000, 0x0002003a, 0x00000001, 0x000d0021,
++	0x001373ec, 0x00020808, 0x0010f290, 0x030a6407, 0x0010f314, 0x00000001,
++	0x0010f210, 0x00000000, 0x0010f310, 0x00000001, 0x0010f310, 0x00000001,
++	0x0002002e, 0x000003e8, 0x00150021, 0x0010f090, 0x00000060, 0x0010f090,
++	0xc000007e, 0x00137360, 0x00000003, 0x00137370, 0x00000000, 0x00137380,
++	0x00000000, 0x00132000, 0x18030000, 0x00137320, 0x00000103, 0x00137330,
++	0x81200606, 0x00132004, 0x00021f07, 0x00132000, 0x18030001, 0x00020000,
++	0x00000002, 0x00020001, 0x00137390, 0x00030015, 0x00000002, 0x0000fa00,
++	0x00070021, 0x0010f874, 0x00000000, 0x0010f824, 0x00401867, 0x0013d834,
++	0x00000000, 0x0002003a, 0x00000002, 0x00030021, 0x00132018, 0x00005000,
++	0x0002002e, 0x00004e20, 0x000b0021, 0x0010f910, 0x00002000, 0x0010f914,
++	0x00002000, 0x0010f658, 0x00000000, 0x0010f830, 0x00000011, 0x0013d834,
++	0x00000000, 0x0002003a, 0x00000002, 0x000b0021, 0x00137370, 0x00000003,
++	0x00137380, 0x00000001, 0x00137360, 0x00000002, 0x0010f090, 0x4000007f,
++	0x0010f210, 0x80000000, 0x0002002e, 0x000003e8, 0x00030021, 0x0010f304,
++	0x00100002, 0x0002002e, 0x000003e8, 0x00030021, 0x0010f300, 0x00001320,
++	0x0002002e, 0x000003e8, 0x00030021, 0x0010f300, 0x00001220, 0x0002002e,
++	0x000003e8, 0x00030021, 0x0010f320, 0x002000a0, 0x0002002e, 0x000003e8,
++	0x00030021, 0x0010f300, 0x00001e04, 0x0002002e, 0x000003e8, 0x00170021,
++	0x0010f224, 0x0c070a07, 0x0010f290, 0x0e44642e, 0x0010f294, 0x4ce3848c,
++	0x0010f298, 0x440e0711, 0x0010f29c, 0x00004cb6, 0x0010f2a0, 0x42e38069,
++	0x0010f604, 0xf1000000, 0x0010f614, 0x40044e77, 0x0010f610, 0x40044e77,
++	0x0010f808, 0x56820000, 0x0013d834, 0x00000000, 0x0002003a, 0x00000004,
++	0x00070021, 0x001373f8, 0x00002050, 0x0010f870, 0xaaaaaaaa, 0x0013d834,
++	0x00000000, 0x0002003a, 0x00000001, 0x00050021, 0x00100c00, 0x04090124,
++	0x0010f300, 0x00001f04, 0x0002002e, 0x000003e8, 0x00030021, 0x0010f300,
++	0x00001e04, 0x0002002e, 0x000003e8, 0x0002002e, 0x000003e8, 0x00050021,
++	0x0010f830, 0x01000011, 0x0010f830, 0x00000011, 0x00030020, 0x00000000,
++	0x00000000, 0x00020034, 0x0000000b, 0x00030021, 0x0013d834, 0x00000000,
++	0x0002003a, 0x00000002, 0x00070021, 0x00100b0c, 0x00080028, 0x00611200,
++	0x00003330, 0x0010f200, 0x00028800, 0x00020016, 0x00000000,
++};
++static const u32 lab_medion_preH[] = { /* 12 пар */
++	0x0010f2fc, 0x00000000, 0x00100b4c, 0x00000000, 0x0010f254, 0x0200ff4a,
++	0x0010f150, 0x00000010, 0x0010f050, 0xff000450, 0x0000e104, 0x03200000,
++	0x0010f468, 0x00001005, 0x0010f420, 0x00000042, 0x0010f430, 0x00000040,
++	0x0010f400, 0x00001707, 0x0010f410, 0x00000307, 0x0010f444, 0x04cc881f,
++};
++static const u32 lab_medion_postH[] = { /* 8 пар */
++	0x0010f824, 0x00401e67, 0x0010f468, 0x00020020, 0x0010f420, 0x00000043,
++	0x0010f430, 0x00000041, 0x0010f400, 0x0000171f, 0x0010f410, 0x00000107,
++	0x0010f444, 0x04cc883f, 0x0010f050, 0xff001050,
++};
++
++enum { LAB_MD_U, LAB_MD_D, LAB_MD_L, LAB_MD_H };
++#define LAB_MD_STEP(k, nm, bit) { nm, lab_medion_pre##k, ARRAY_SIZE(lab_medion_pre##k), lab_medion_scr##k, \
++				  ARRAY_SIZE(lab_medion_scr##k), lab_medion_post##k, ARRAY_SIZE(lab_medion_post##k), bit }
++static const struct lab_step lab_steps_medion[] = {
++	[LAB_MD_U] = LAB_MD_STEP(U, "U 324(POST)->896", 2),
++	[LAB_MD_D] = LAB_MD_STEP(D, "D 896->324 (PLL, no display)", 4),
++	[LAB_MD_L] = LAB_MD_STEP(L, "L 324->135 (PLL)", 8),
++	[LAB_MD_H] = LAB_MD_STEP(H, "H 135->896 (PLL)", 2),
++};
++
 +/* LAB 28.10: описание платы — записи сняты с конкретной карты (чип + subsystem + ремешок), на другой плате их
 + * повторять нельзя. Нет описания — повтор скриптов памяти отказывает (ядро можно переключать с lab_mem=0). */
 +struct lab_board {
@@ -5111,6 +5575,7 @@
 +static void lab_g6_after(int step);
 +static void lab_g8_after(int step);
 +static void lab_q6_after(int step);
++static int lab_plan_medion(struct nvkm_subdev *, const struct lab_board *, int, int, int *);
 +static const struct lab_board lab_boards[] = {
 +	{ "GF114 GTX 560 Ti (Gigabyte 1458:3515, запись 20.10)", 0xce, 0x1458, 0x3515, 135, 324, 2004, lab_steps_gf114, lab_plan_gf114, NULL, 1 },
 +	{ "GF106 GTS 450 (Gigabyte 1458:3500, запись rox4d 27.10)", 0xc3, 0x1458, 0x3500, 135, 324, 1804, lab_steps_gf106, lab_plan_gf106, lab_g6_after, 1 },	/* 22.11: проверено вживую — прогон 4 rox4d 01.11 (ядро + память 324↔1804 чисто) */
@@ -5121,6 +5586,10 @@
 +	/* 25.11: GDDR5 на GF108; одна плата под двумя subsystem (отдельная карта и Optimus); не проверено вживую */
 +	{ "GF108 NVS 5200M GDDR5 (Dell 1028:0534, запись 25.11)", 0xc1, 0x1028, 0x0534, 135, 324, 1569, lab_steps_e6430, lab_plan_gf108, lab_g8_after, 0 },
 +	{ "GF108 NVS 5200M GDDR5 (Dell 1028:1534 Optimus, запись 25.11)", 0xc1, 0x1028, 0x1534, 135, 324, 1569, lab_steps_e6430, lab_plan_gf108, lab_g8_after, 0 },
++	/* 25.11: DDR3, all three levels on the memory PLL; state read from the hardware; checked live by the tester
++	 * (12 transitions, S3, governor soaks, 30-min VRAM soak at 896 MHz) on the bfd1a6f base with fixed line-register
++	 * writes; tested = 0 until the tester's run with lab_mem_line750 on this tree */
++	{ "GF108M GT 630M DDR3 (Medion 1b0a:20c8, recording 23.11)", 0xc1, 0x1b0a, 0x20c8, 135, 324, 900, lab_steps_medion, lab_plan_medion, NULL, 0 },
 +};
 +static const struct lab_board *lab_board;
 +/* 19.11: есть ли для этой платы записанные сценарии памяти: -1 — не Fermi/не дошли, 0 — нет (clk/base.c тогда меняет
@@ -5380,6 +5849,75 @@
 +		nvkm_error(subdev, "LAB replay: память %d МГц, состояние после шагов неизвестно — память не трогаю\n", cur);
 +		return -EINVAL;
 +	}
++}
++
++/* 24.11: memory state of the GT 630M (Medion) from the hardware. 0x1373f0 does not help here: the DDR3 scripts of
++ * NVIDIA never write it, so it keeps its devinit value (1) on the PLL too. 0x137360 selects the source (3 divider,
++ * 2 PLL); on the PLL only the three recorded coefficients are accepted (lab_cur_mhz would round any coefficient to the
++ * nearest level). -1 — unknown state. */
++static int
++lab_medion_state(struct nvkm_device *device)
++{
++	u32 sel = nvkm_rd32(device, 0x137360) & 3, coef = nvkm_rd32(device, 0x132004);
++
++	if (sel == 3)
++		return (((nvkm_rd32(device, 0x137310) >> 8) & 0x3f) == 8) ? 324 : -1;	/* POST divider */
++	if (sel != 2)
++		return -1;
++	switch (coef) {
++	case 0x00021f07: return 900;	/* NVIDIA 896; the VBIOS level says 900 */
++	case 0x00051806: return 324;
++	case 0x00122406: return 135;
++	default:         return -1;
++	}
++}
++
++/* 24.11: memory-controller state that NVIDIA set once at its init and kept at every level, but that no script writes:
++ * under nouveau (devinit) 0x10f440 = 0x22442410 (NVIDIA 0x22f84f10) and 0x10f160 bit 4 clear (NVIDIA set). NVIDIA wrote
++ * them while the memory ran at 324, and the scripts were recorded in this state. Written before the first step from
++ * POST (U). 0 — do not write. */
++static uint lab_medion_init = 1;
++module_param(lab_medion_init, uint, 0644);
++MODULE_PARM_DESC(lab_medion_init, "LAB: GT 630M (Medion 1b0a:20c8): before step U write NVIDIA's init state 0x10f440=0x22f84f10 and 0x10f160 bit 4 (1 on, 0 off)");
++
++static int
++lab_plan_medion(struct nvkm_subdev *subdev, const struct lab_board *b, int cur, int tgt, int *p)
++{
++	struct nvkm_device *device = subdev->device;
++	bool pll = (nvkm_rd32(device, 0x137360) & 3) == 2;
++	int hw = lab_medion_state(device), n = 0;
++
++	if (hw < 0 || hw != cur) {
++		nvkm_error(subdev, "LAB replay GT 630M: memory state not recorded (0x137360=%08x 0x132004=%08x 0x137310=%08x, %d MHz) — memory untouched\n",
++			   nvkm_rd32(device, 0x137360), nvkm_rd32(device, 0x132004), nvkm_rd32(device, 0x137310), cur);
++		return -EINVAL;
++	}
++	if (cur == tgt)
++		return 0;
++	if (cur == b->mid && !pll) {		/* POST, divider 324 */
++		p[n++] = LAB_MD_U;
++		if (tgt == b->lo) { p[n++] = LAB_MD_D; p[n++] = LAB_MD_L; }
++	} else if (cur == b->hi) {		/* PLL 896 */
++		p[n++] = LAB_MD_D;
++		if (tgt == b->lo) p[n++] = LAB_MD_L;
++	} else if (cur == b->mid) {		/* PLL 324 */
++		p[n++] = LAB_MD_L;
++		if (tgt == b->hi) p[n++] = LAB_MD_H;
++	} else if (cur == b->lo) {		/* PLL 135 */
++		p[n++] = LAB_MD_H;
++		if (tgt == b->mid) p[n++] = LAB_MD_D;
++	} else {
++		return -EINVAL;
++	}
++	if (n && p[0] == LAB_MD_U && READ_ONCE(lab_medion_init)) {
++		u32 a = nvkm_rd32(device, 0x10f440), c = nvkm_rd32(device, 0x10f160);
++
++		nvkm_wr32(device, 0x10f440, 0x22f84f10);
++		nvkm_mask(device, 0x10f160, 0x00000010, 0x00000010);
++		nvkm_info(subdev, "LAB replay GT 630M: NVIDIA init state: 0x10f440 %08x -> %08x, 0x10f160 %08x -> %08x\n",
++			  a, nvkm_rd32(device, 0x10f440), c, nvkm_rd32(device, 0x10f160));
++	}
++	return n;
 +}
 +
 +static const struct lab_board *
@@ -5807,7 +6345,7 @@
  int
  gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  {
-@@ -142,6 +2764,16 @@
+@@ -142,6 +3045,16 @@
  	int from, mode;
  	int N1, M1, P;
  	int ret;
@@ -5824,7 +6362,7 @@
  
  	/* lookup memory config data relevant to the target frequency */
  	rammap.data = nvbios_rammapEm(bios, freq / 1000, &ver, &rammap.size,
-@@ -268,7 +2900,10 @@
+@@ -268,7 +3181,10 @@
  	ram_wr32(fuc, 0x100b0c, 0x00080012);
  // 0x00030014 // 0x00000000 // 0x02b5f070
  // 0x00030014 // 0x00010000 // 0x02b5f070
@@ -5836,7 +6374,7 @@
  // 0x00020034 // 0x0000000a
  // 0x00030020 // 0x00000001 // 0x00000000
  
-@@ -322,7 +2957,7 @@
+@@ -322,7 +3238,7 @@
  		ram_wr32(fuc, 0x10f344, 0x00600009);
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700008);
@@ -5845,7 +6383,7 @@
  		ram_wr32(fuc, 0x10f830, 0x00300017);
  		gf100_ram_train(fuc, 0x80021001);
  		gf100_ram_train(fuc, 0x80081001);
-@@ -333,7 +2968,8 @@
+@@ -333,7 +3249,8 @@
  // 0x00030020 // 0x00000000 // 0x00000000
  // 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -5855,7 +6393,7 @@
  	} else {
  		ram_wr32(fuc, 0x10f800, 0x00001800);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
-@@ -376,7 +3012,7 @@
+@@ -376,7 +3293,7 @@
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700000);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
@@ -5864,7 +6402,7 @@
  
  		gf100_ram_train(fuc, 0x800e1008);
  
-@@ -386,7 +3022,8 @@
+@@ -386,7 +3303,8 @@
  	// 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -5874,7 +6412,7 @@
  		ram_nsec(fuc, 100000);
  		ram_wr32(fuc, 0x10f9b0, 0x05313f41);
  		ram_wr32(fuc, 0x10f9b4, 0x00002f50);
-@@ -408,6 +3045,8 @@
+@@ -408,6 +3326,8 @@
  {
  	struct gf100_ram *ram = gf100_ram(base);
  	struct nvkm_device *device = ram->base.fb->subdev.device;
@@ -5883,7 +6421,7 @@
  	ram_exec(&ram->fuc, nvkm_boolopt(device->cfgopt, "NvMemExec", true));
  	return 0;
  }
-@@ -416,6 +3055,10 @@
+@@ -416,6 +3336,10 @@
  gf100_ram_tidy(struct nvkm_ram *base)
  {
  	struct gf100_ram *ram = gf100_ram(base);
@@ -5894,7 +6432,7 @@
  	ram_exec(&ram->fuc, false);
  }
  
-@@ -580,6 +3223,11 @@
+@@ -580,6 +3504,11 @@
  	if (ret)
  		return ret;
  

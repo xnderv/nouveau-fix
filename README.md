@@ -19,7 +19,7 @@ model) are in Russian — they are the lab notebook; everything a tester needs i
   ([docs/2026-11-21/vbios-hit.md](docs/2026-11-21/vbios-hit.md)).
 - **Memory stays at the VBIOS boot clock** on every card except the reference board. The memory part is the next stage;
   recordings from testers (GF108 DDR3 so far) are its material.
-- **Not tested with more than one monitor.** Please use one.
+- **Use a single monitor: unplug any others.** Two or more monitors is a setup we have not tested, and we are not asking you to test it.
 
 | Card | Chip | What ran | Result |
 |---|---|---|---|
