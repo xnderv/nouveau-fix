@@ -12,6 +12,10 @@ if not res:
                 if open(d + '/vendor').read().strip() == '0x10de' and open(d + '/class').read().startswith('0x03')), None)
     if not dev: sys.exit('видеокарта NVIDIA не найдена')
     res = dev + '/resource0'
+    try: asleep = open(dev + '/power/runtime_status').read().strip() == 'suspended'
+    except OSError: asleep = False
+    if asleep:   # спящая карта (ноутбук с Optimus под nouveau) читается как 0xffffffff — снимок был бы пустым
+        sys.exit(f'карта спит (runtime PM). Разбудить на время снимка: echo on | sudo tee {dev}/power/control')
 fd = os.open(res, os.O_RDONLY | os.O_SYNC)
 bar = mmap.mmap(fd, 16 << 20, mmap.MAP_SHARED, mmap.PROT_READ)
 rd = lambda a: struct.unpack_from('<I', bar, a)[0]
