@@ -14,7 +14,7 @@ driver (ours, testers', the nouveau trace collection; contributors anonymized); 
 | What | Where | Evidence | What we do |
 |---|---|---|---|
 | The hub clock (HUB2CLK) at the top level asks for the crossbar's frequency (1595, 950 MHz) but is marked "from PLL" (flag 1). On Fermi that PLL route leads to the system PLL (SYS2CLK: 1282, 890 MHz) — the number can't be reached that way | 3 ASUS GF108 boards (GT 440 of 06.2011, GT 630, a laptop GF108M). All 14 other GF108 images mark it "divider" (flag 2), and NVIDIA then feeds it from the crossbar PLL. Same chip and same numbers on an MSI GT 440 — flag 2 | image (473), trace (ASUS laptop), counter (GT 630: 1282.5 MHz at the top level) | the route by flag misses → the divider (1620, +1.6 %) or the crossbar PLL (950) — [2026-11-21/vbios-hit.md](2026-11-21/vbios-hit.md) |
-| The hub clock asks for a number no route gives: 1451 MHz with the system PLL at 1401 | 1 GF100 image | image | nearest not above the VBIOS (1401, −3.4 %), logged |
+| The hub clock asks for a number its flagged route can't give: 1451 MHz (the crossbar's number) with the system PLL at 1401 | 1 GF100 board | image; NVIDIA keeps the hub on the system PLL there (trace) | since 24 Nov: one attempt at the crossbar-PLL route with the counter self-check; if the chip has no such wire (GF114 has none, GF100 not measured) — 1401 (−3.4 %), logged |
 | The hub clock asks for 1400 MHz while the crossbar runs at 1460 (+4.3 %) | 1 Gigabyte GT 430 (GF108) image | image | nearest not above the VBIOS + 2 % (1080), logged — not overclocking the hub by 4 % |
 
 Everything else is consistent: over 12,551 clock/level pairs of 470 Fermi images, 99.97 % are reachable within ±1 %, the rest
@@ -88,7 +88,7 @@ This line only reports; the order used is set by `lab_nv_xbarmem`.
 |---|---|---|
 | The VBIOS stores whole megahertz (101 for 101.25 MHz); nouveau took that as an exact target and put the idle shader clock on its PLL — switching away from that PLL could wedge the GPU | trace, test (900 switches clean after the fix) | recognise "a divider value written in whole MHz" and use the divider, as NVIDIA |
 | PMU clock rounded down: 216 instead of 202.5 MHz | trace | both divider fields as the VBIOS / NVIDIA |
-| A clock a divider can't make is rounded to the nearest divider **above**: GT 730 hub 1400 → 1620 (+16 %, an overclock) | image, trace | never above the VBIOS + 2 %; the hub from the crossbar PLL where the VBIOS wired it |
+| A clock a divider can't make is rounded to the nearest divider **above**: GT 730 hub 1400 → 1620 (+16 %, an overclock) | image, trace | never above the VBIOS + 2 %; the hub from the crossbar PLL whenever no other route hits and the crossbar runs on its PLL at that number, checked with the clock counter (until 24 Nov only where the VBIOS selected that source at boot — too narrow: 7 of 39 GF108 images don't, and NVIDIA uses the route on such boards too; [survey](2026-11-24/hub-alt.md)) |
 | Source "code 2" read as always 100 MHz; its sub-select (bits 24–26) is ignored. On GF108 sub-select 7 is the crossbar PLL | counter (GF114, GF108 probe) | read and use the sub-select |
 | Fan PWM read back with the update bit set → the fan could drop to 3 % | test | patch 0006, sent upstream |
 | A GPU hang when an app deletes an engine object while its channel is busy | test | patch 0001, sent upstream |

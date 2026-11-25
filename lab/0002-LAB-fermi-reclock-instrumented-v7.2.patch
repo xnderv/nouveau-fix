@@ -507,7 +507,24 @@
  	return sclk * N / M / P;
  }
  
-@@ -200,6 +244,14 @@
+@@ -180,6 +224,16 @@
+ 	case nv_clk_src_mdiv:
+ 		return read_div(clk, 0, 0x137300, 0x137310);
+ 	case nv_clk_src_mem:
++		/* LAB 24.11: у DDR3 (GF108) память на PLL — это 0x137360 = 2 (3 — делитель); бит 1 регистра 0x1373f0 скрипты DDR3
++		 * не ставят, и строка AC показывала 324 МГц при памяти на 896 (нашёл тестировщик GT 630M). Опора PLL — делитель
++		 * 0x137330 (405 МГц), коэффициенты — 0x132004. У GDDR5 в 0x137360 стоит 1 или 3 — там по-прежнему. */
++		if ((nvkm_rd32(device, 0x137360) & 0x00000003) == 0x00000002) {
++			u32 coef = nvkm_rd32(device, 0x132004);
++			u32 P = (coef >> 16) & 0x3f, N = (coef >> 8) & 0xff, M = coef & 0xff;
++			u32 ref = nvkm_clk_read(&clk->base, nv_clk_src_mpllsrcref);
++
++			return (M && P) ? ref * N / M / P : 0;
++		}
+ 		if (nvkm_rd32(device, 0x1373f0) & 0x00000002)
+ 			return nvkm_clk_read(&clk->base, nv_clk_src_mpll);
+ 		return nvkm_clk_read(&clk->base, nv_clk_src_mdiv);
+@@ -200,6 +254,14 @@
  		return read_clk(clk, 0x0c);
  	case nv_clk_src_vdec:
  		return read_clk(clk, 0x0e);
@@ -522,7 +539,7 @@
  	default:
  		nvkm_error(subdev, "invalid clock source %d\n", src);
  		return -EINVAL;
-@@ -246,6 +298,24 @@
+@@ -246,6 +308,24 @@
  	return sclk;
  }
  
@@ -547,7 +564,7 @@
  static u32
  calc_pll(struct gf100_clk *clk, int idx, u32 freq, u32 *coef)
  {
-@@ -259,6 +329,13 @@
+@@ -259,6 +339,13 @@
  		return 0;
  
  	limits.refclk = read_div(clk, idx, 0x137120, 0x137140);
@@ -561,7 +578,7 @@
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +347,672 @@
+@@ -270,6 +357,675 @@
  	return ret;
  }
  
@@ -1007,9 +1024,10 @@
 +	return got && got + want / 50 >= want && got <= want + want / 50;
 +}
 +
-+/* исходный источник HUB2CLK (0x137180) после init-скрипта VBIOS: подвыбор 7 в битах 24–26 VBIOS ставит только там, где есть
-+ * провод к PLL XBAR2CLK (GF108: все образы и замер sasim44; у GF100/GF114 — 0). По нему, а не по списку чипов, решается,
-+ * пробовать ли обходной путь. */
++/* исходный источник HUB2CLK (0x137180) после init-скрипта VBIOS. 24.11: подвыбор 7 в битах 24–26 при загрузке — НЕ признак
++ * провода к PLL XBAR2CLK: из 39 образов GF108 его ставят 32, а у семи остальных (в том числе GT 630M тестировщика) число хаба
++ * тоже равно числу XBAR2CLK и делителем не достижимо, и NVIDIA на GT 630M сама включает этот путь (lab/vbios-hub-alt.py,
++ * docs/2026-11-24/hub-alt.md). Значение остаётся в журнале и для режима lab_hub01_alt=2. */
 +static u32 lab_hub_src_boot;
 +
 +/* LAB 20.11 (docs/2026-11-20/hub2clk-gf108.md): HUB2CLK (idx 8) от PLL XBAR2CLK — «код 2, подвыбор 7» в 0x137180, как NVIDIA
@@ -1017,11 +1035,13 @@
 + * XBAR2CLK на этом уровне просит ту же частоту и идёт на своей PLL) и по САМОПРОВЕРКЕ: после переключения HUB2CLK меряется
 + * счётчиком 0x1373b0 (источник 1); не совпало в пределах 2 % — откат на делитель (правило «не выше VBIOS») и отказ от
 + * обходного пути до перезагрузки. Без счётчика обходной путь не включается.
-+ * lab_hub01_alt: 1 — разрешено (по умолчанию); 0 — выключено. lab_hub01_alt_force=1 — ОПЫТ: на ближайшем уровне без PLL у
-+ * HUB2CLK попробовать обходной путь принудительно (цель — текущая частота HUB2CLK, пост-делитель — чтобы не выше неё). */
++ * lab_hub01_alt: 1 — пробовать всякий раз, когда правило не попадает в число VBIOS, а число XBAR2CLK попадает (по умолчанию,
++ * с 24.11); 2 — только если VBIOS при загрузке поставил подвыбор 7 (как было до 24.11); 0 — выключено.
++ * lab_hub01_alt_force=1 — ОПЫТ: на ближайшем уровне без PLL у HUB2CLK попробовать обходной путь принудительно (цель —
++ * текущая частота HUB2CLK, пост-делитель — чтобы не выше неё). */
 +static uint lab_hub01_alt = 1;
 +module_param(lab_hub01_alt, uint, 0644);
-+MODULE_PARM_DESC(lab_hub01_alt, "LAB: allow HUB2CLK from the XBAR2CLK PLL (source code 2, sub-select 7) when the VBIOS asks for it, with a counter self-check (1 on, 0 off)");
++MODULE_PARM_DESC(lab_hub01_alt, "LAB: HUB2CLK from the XBAR2CLK PLL (source code 2, sub-select 7) when no other route hits the VBIOS number, with a counter self-check: 1 try (default), 2 only if the VBIOS selected sub-select 7 at boot (as before 24.11), 0 off");
 +static uint lab_hub01_alt_force;
 +module_param(lab_hub01_alt_force, uint, 0644);
 +MODULE_PARM_DESC(lab_hub01_alt_force, "LAB experiment: force one HUB2CLK alternative-source attempt (with self-check and fallback) at the next level where HUB2CLK is not on a PLL; resets to 0");
@@ -1173,9 +1193,9 @@
 +	 * 1) путь по флагу (1 — PLL, 2 — делитель, 0 — делитель, если VBIOS записал его частоту целыми МГц); попал в ±2 % (lab_hit)
 +	 *    — берём, даже если другой путь точнее (NVIDIA у5: хаб 1595, делитель 1620 — берёт делитель);
 +	 * 2) не попал — делитель от SPPLL, если он попадает (работает всегда, без чужой PLL и проверки);
-+	 * 3) не попал и он — PLL: своя / PLL SYS2CLK; у HUB2CLK затем PLL XBAR2CLK («код 2, подвыбор 7») — только если VBIOS при
-+	 *    загрузке сам поставил подвыбор 7, с самопроверкой счётчиком (не прошла — до перезагрузки без неё; GT 730: 1400;
-+	 *    ноутбук ASUS GF108 с флагом 1: 950 вместо 891);
++	 * 3) не попал и он — PLL: своя / PLL SYS2CLK; у HUB2CLK затем PLL XBAR2CLK («код 2, подвыбор 7»), если XBAR2CLK на этом
++	 *    уровне на своей PLL и его число попадает, — с самопроверкой счётчиком (не прошла — до перезагрузки без неё; GT 730:
++	 *    1400; GT 630M: 1344; ноутбук ASUS GF108 с флагом 1: 950 вместо 891);
 +	 * 4) не попало ничто — что получилось (не выше VBIOS +2 %, правило А), в журнал. */
 +	{
 +		u32 got = use_pll ? clk1 : clk0;
@@ -1194,7 +1214,7 @@
 +			}
 +		}
 +		if (!lab_hit(freq, got) && idx == 0x08 && READ_ONCE(lab_hub01_alt) && !lab_hub01_alt_bad &&
-+		    ((lab_hub_src_boot >> 24) & 7) == 7 && clk->eng[2].ssel) {
++		    (READ_ONCE(lab_hub01_alt) != 2 || ((lab_hub_src_boot >> 24) & 7) == 7) && clk->eng[2].ssel) {
 +			u32 x = cstate->domain[nv_clk_src_hubk07];
 +
 +			if (lab_hit(freq, x)) {
@@ -1234,7 +1254,7 @@
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +1025,87 @@
+@@ -282,6 +1038,87 @@
  	if (!freq)
  		return 0;
  
@@ -1322,7 +1342,7 @@
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +1115,9 @@
+@@ -291,7 +1128,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -1333,7 +1353,7 @@
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +1144,11 @@
+@@ -318,6 +1157,11 @@
  		info->freq = clk1;
  	}
  
@@ -1345,7 +1365,7 @@
  	return 0;
  }
  
-@@ -327,6 +1158,8 @@
+@@ -327,6 +1171,8 @@
  	struct gf100_clk *clk = gf100_clk(base);
  	int ret;
  
@@ -1354,7 +1374,7 @@
  	if ((ret = calc_clk(clk, cstate, 0x00, nv_clk_src_gpc)) ||
  	    (ret = calc_clk(clk, cstate, 0x01, nv_clk_src_rop)) ||
  	    (ret = calc_clk(clk, cstate, 0x02, nv_clk_src_hubk07)) ||
-@@ -346,20 +1179,811 @@
+@@ -346,20 +1192,811 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -1827,7 +1847,7 @@
 +		lab_fs_boot_ok = true;
 +		lab_hub_src_boot = nvkm_rd32(device, 0x137180);
 +		nvkm_info(subdev, "LAB источник HUB2CLK после VBIOS: %08x (подвыбор %u%s)\n", lab_hub_src_boot,
-+			  (lab_hub_src_boot >> 24) & 7, ((lab_hub_src_boot >> 24) & 7) == 7 ? " — провод к PLL XBAR2CLK" : "");
++			  (lab_hub_src_boot >> 24) & 7, ((lab_hub_src_boot >> 24) & 7) == 7 ? " — VBIOS сам выбрал PLL XBAR2CLK" : "");
 +		nvkm_info(subdev, "LAB выход скобки по состоянию VBIOS: GPC %08x %08x %08x, hub %08x %08x %08x\n",
 +			  lab_fs_boot[0][0], lab_fs_boot[0][1], lab_fs_boot[0][2],
 +			  lab_fs_boot[1][0], lab_fs_boot[1][1], lab_fs_boot[1][2]);
@@ -2169,7 +2189,7 @@
  }
  
  static void
-@@ -368,20 +1992,58 @@
+@@ -368,20 +2005,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -2231,7 +2251,7 @@
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +2052,106 @@
+@@ -390,17 +2065,106 @@
  }
  
  static void
@@ -2340,7 +2360,7 @@
  	}
  }
  
-@@ -409,7 +2160,17 @@
+@@ -409,7 +2173,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -2358,7 +2378,7 @@
  }
  
  static int
-@@ -426,23 +2187,720 @@
+@@ -426,23 +2200,720 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -2475,7 +2495,7 @@
 +				nvkm_wr32(device, 0x13c844, 3);
 +				nvkm_wr32(device, 0x13ec14, 1);
 +			}
- 		}
++		}
 +		if (lab_e9e0 == 1)
 +			nvkm_wr32(device, 0x00e9e0, lvl == 2 ? 0x81200a04 : lvl == 1 ? 0x81200a06 : 0x81200a0a);
 +		if (lab_e9e0 == 2 && lab_e9e0_khz) {
@@ -2486,7 +2506,7 @@
 +			nvkm_mask(device, 0x00e9e0, 0x3f, a);
 +			nvkm_info(&clk->base.subdev, "LAB e9e0 из VBIOS: домен 7 %u кГц, SPPLL0 %u кГц -> поле A %02x (%u кГц); таблица этой карты дала бы %02x\n",
 +				  lab_e9e0_khz, ref, a, ref * 2 / (a + 2), lvl == 2 ? 0x04 : lvl == 1 ? 0x06 : 0x0a);
-+		}
+ 		}
 +		nvkm_info(&clk->base.subdev, "LAB xbar после (уровень %d): part0 %08x 13c844 %08x 13ec14 %08x e9e0 %08x\n",
 +			  lvl, nvkm_rd32(device, 0x13c054), nvkm_rd32(device, 0x13c844), nvkm_rd32(device, 0x13ec14),
 +			  nvkm_rd32(device, 0x00e9e0));
@@ -3081,7 +3101,7 @@
  }
  
  static const struct nvkm_clk_func
-@@ -461,6 +2919,7 @@
+@@ -461,6 +2932,7 @@
  		{ nv_clk_src_rop    , 0x04 },
  		{ nv_clk_src_mem    , 0x05, 0, "memory", 1000 },
  		{ nv_clk_src_vdec   , 0x06 },
@@ -3089,7 +3109,7 @@
  		{ nv_clk_src_pmu    , 0x0a },
  		{ nv_clk_src_hubk07 , 0x0b },
  		{ nv_clk_src_max }
-@@ -477,5 +2936,5 @@
+@@ -477,5 +2949,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
@@ -3098,7 +3118,7 @@
  }
 --- a/nvkm/subdev/fb/ramgf100.c
 +++ b/nvkm/subdev/fb/ramgf100.c
-@@ -25,9 +25,21 @@
+@@ -25,13 +25,27 @@
  #include "ram.h"
  #include "ramfuc.h"
  
@@ -3120,7 +3140,13 @@
  #include <subdev/bios/rammap.h>
  #include <subdev/bios/timing.h>
  #include <subdev/clk.h>
-@@ -123,6 +135,1899 @@
+ #include <subdev/clk/pll.h>
++#include <subdev/gpio.h>
++#include <subdev/bios/gpio.h>
+ 
+ struct gf100_ramfuc {
+ 	struct ramfuc base;
+@@ -123,6 +137,2004 @@
  	}
  }
  
@@ -3132,8 +3158,9 @@
 + *   0x00 значение / 0x01 адрес / 0x15 маска+таймаут          -> WAIT
 + *   0x14 ожидание кадра (головы 0 и 1) -> VBLANK (nouveau сам выбирает активную голову, один раз)
 + *   0x20 1 / 0x20 0 (останов доступа к видеопамяти) -> ENTER / LEAVE (block/unblock)
-+ *   0x34, 0x3a, 0x39 — смысл неизвестен, пропускаем (nouveau их тоже пропускал); 0x16 — конец;
-+ *   0x13 (только в E, арг. 1000) — считаем паузой в мкс (дольше — безопаснее).
++ *   0x39 (нс) — единица ожидания; 0x3a (N) — ждать N единиц после записи 0x13d8x4 = 0 -> DELAY (24.11, lab_mem_syncwait;
++ *   docs/2026-11-24/seq-ops.md); 0x34 — отметка времени для драйвера, действия нет; 0x16 — конец;
++ *   0x13 (нс) — пауза -> DELAY (множитель lab_mem_op13).
 + * 0x611200 (пауза вывода изображения): по умолчанию относительно текущего значения
 + * (снять/вернуть биты 0x30), бит 5 параметра — числа NVIDIA как есть. */
 +/* LAB: данные из записи mmiotrace NVIDIA 390 на этой карте (20.10.2026, попытка 1).
@@ -4560,15 +4587,59 @@
 +static uint lab_mem_op34 = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
 +module_param(lab_mem_op34, uint, 0644);
 +MODULE_PARM_DESC(lab_mem_op34, "LAB: NVIDIA op 0x34 0x0a: 0 skip, 1 wait 0x611200&3==0 after display pause (gt215-style)");
-+/* LAB 26.10: операция NVIDIA 0x3a N пропускается, смысл неизвестен. Ключ lab_mem_op3a с толкованием из чужих заметок,
-+ * основанных на декомпиляции драйвера NVIDIA, убран (тест 1 от 23.10 показал, что операция не нужна; docs/provenance.md). */
++/* LAB 24.11 (docs/2026-11-24/seq-ops.md): операции NVIDIA 0x39 / 0x3a — ожидание после записи 0x13d8x4 = 0 (рабочее название:
++ * команда синхронизации контроллеров памяти; пара есть только у чипов с двумя и более контроллерами). 0x39 (нс) задаёт
++ * единицу, 0x3a (N) ждёт N единиц. Вывод наш, из записей базы: в драйверах 260–270 на том же месте стоит оп 0x13 с аргументом
++ * N × единица (530 случаев из 531; всего 1087 записей 0x13d8x4 = 0, исключений нет); единица у GDDR5 ≈ 25 периодов такта
++ * памяти, у DDR3 — всегда 250 нс. В скриптах DDR3 новых драйверов оп 0x39 нет — берётся lab_mem_unit_ns.
++ * (26.10 ключ lab_mem_op3a с толкованием из чужих заметок был убран, docs/provenance.md; это толкование с ним не связано.)
++ * lab_mem_syncwait: 1 — ждать, как NVIDIA (по умолчанию); 0 — пропускать, как было до 24.11. Меняется на ходу. */
++static uint lab_mem_syncwait = 1;
++module_param(lab_mem_syncwait, uint, 0644);
++MODULE_PARM_DESC(lab_mem_syncwait, "LAB: NVIDIA ops 0x39/0x3a: 1 wait N units after each 0x13d8x4 write, as NVIDIA does (default); 0 skip them (as before 24.11)");
++static uint lab_mem_unit_ns = 250;
++module_param(lab_mem_unit_ns, uint, 0644);
++MODULE_PARM_DESC(lab_mem_unit_ns, "LAB: wait unit in ns for op 0x3a in scripts that never set one with op 0x39 (DDR3); 250 is what the 260-270 drivers used on DDR3");
++/* LAB 24.11: линии GPIO, которыми плата задаёт напряжение ядра (VID0..VID7 из таблицы GPIO VBIOS), в списках прямых записей
++ * не трогаем: напряжением управляет драйвер (volt) по уровню ядра. В записи NVIDIA эти линии попадают в списки вместе с
++ * остальными линиями того же регистра (линия напряжения памяти и др.). Раньше пропускался регистр 0x00e104 целиком — частное
++ * правило нашей платы; у Quadro 600 VID1/VID2 — линии 16/17 в 0x00e280, и запись «как есть» на спуске роняла бы напряжение
++ * ядра раньше его тактов. lab_mem_vidmask: 1 — в записях регистров GPIO поля линий VID берутся из текущего значения регистра
++ * (по умолчанию); 0 — как до 24.11 (0x00e104 пропускать целиком, остальное как записано). Бит 4 lab_mem_replay — всё как записано. */
++static uint lab_mem_vidmask = 1;
++module_param(lab_mem_vidmask, uint, 0644);
++MODULE_PARM_DESC(lab_mem_vidmask, "LAB: in recorded host writes keep the core-voltage GPIO lines (VID0..7 of the VBIOS GPIO table) as they are now (1, default); 0 = as before 24.11 (skip 0xe104 only)");
 +static int lab_plan[6], lab_plan_n, lab_plan_i;
 +static bool lab_armed;
 +static u32 lab_rp611;
 +
++/* LAB 24.11 (нашёл тестировщик GT 630M; сверено по записям трёх плат GF108): у DDR3 источник такта памяти переключает
++ * регистр 0x137360 (2 — PLL, 3 — делитель), а бит 1 регистра 0x1373f0 скрипты DDR3 не ставят вовсе. По одному 0x1373f0 память
++ * на PLL читалась как «на делителе»: после подъёма следующий спуск был бы отклонён. Частота на PLL — из коэффициентов
++ * 0x132004 и делителя опоры 0x137330 (405 МГц × N / M / P), с привязкой к ближайшему уровню платы в пределах 2 % (в VBIOS 900,
++ * NVIDIA ставит 896). У GDDR5 в 0x137360 стоит 1 (или 3 после POST) — там всё по-прежнему. */
 +static int
 +lab_cur_mhz(struct nvkm_device *device)
 +{
++	if ((nvkm_rd32(device, 0x137360) & 0x00000003) == 0x00000002) {
++		u32 c = nvkm_rd32(device, 0x132004), r = nvkm_rd32(device, 0x137330);
++		u32 P = (c >> 16) & 0x3f, N = (c >> 8) & 0xff, M = c & 0xff, ref = 1620000;	/* кГц */
++		int mhz, lv[3], i;
++
++		if (r & 0x80000000) {
++			if (nvkm_rd32(device, 0x137320) & 0x00000100)
++				r >>= 8;
++			ref = 3240000 / ((r & 0x3f) + 2);
++		}
++		mhz = (M && P) ? ref * N / M / P / 1000 : 0;
++		if (lab_board) {
++			lv[0] = lab_board->lo; lv[1] = lab_board->mid; lv[2] = lab_board->hi;
++			for (i = 0; i < 3; i++)
++				if (abs(mhz - lv[i]) * 50 <= lv[i])
++					return lv[i];
++		}
++		return mhz;
++	}
 +	if (nvkm_rd32(device, 0x1373f0) & 0x00000002)
 +		return lab_board ? lab_board->hi : 2004;
 +	return 3240 / (((nvkm_rd32(device, 0x137310) >> 8) & 0x3f) + 2);
@@ -4786,7 +4857,8 @@
 +{
 +	struct lab_est e = {};
 +	u32 waddr = 0, wval = 0, i = 0, nwr = 0, nwait = 0, ndel = 0, nskip = 0;
-+	bool blocked = false;
++	u32 unit = lab_mem_unit_ns, nsync = 0, sync_ns = 0;
++	bool blocked = false, syncwait = READ_ONCE(lab_mem_syncwait);
 +
 +	while (i < st->nscr) {
 +		u32 h = st->scr[i], n = h >> 16, op = h & 0xffff, k;
@@ -4815,7 +4887,7 @@
 +			lab_est_cmd(&e, 5, 1);
 +			ndel++;
 +			break;
-+		case 0x13:	/* только в шаге E, аргумент 1000; смысл не известен — берём ДЛИННУЮ паузу (мкс) */
++		case 0x13:	/* пауза, нс (сверено с ramgt215.c: те же места и числа); множитель lab_mem_op13 = 1 */
 +			if (build)
 +				nvkm_memx_nsec(memx, a[0] * lab_mem_op13);
 +			lab_est_cmd(&e, 5, 1);
@@ -4869,10 +4941,22 @@
 +			}
 +			nskip++;
 +			break;
-+		case 0x3a:
++		case 0x3a:	/* ждать N единиц после записи 0x13d8x4 = 0 */
++			if (syncwait && a[0] && unit) {
++				if (build)
++					nvkm_memx_nsec(memx, a[0] * unit);
++				lab_est_cmd(&e, 5, 1);
++				nsync++;
++				sync_ns += a[0] * unit;
++				break;
++			}
 +			nskip++;
 +			break;
-+		case 0x39:
++		case 0x39:	/* единица ожидания, нс */
++			if (syncwait) {
++				unit = a[0];
++				break;
++			}
 +			nskip++;
 +			break;
 +		default:
@@ -4889,8 +4973,8 @@
 +		e.total += 1 + e.sz;
 +	*words = e.total;
 +	if (build)
-+		nvkm_info(subdev, "LAB replay %s: в memx %u записей, %u ожиданий, %u пауз, пропущено %u операций, ~%u слов\n",
-+			  st->name, nwr, nwait, ndel, nskip, e.total);
++		nvkm_info(subdev, "LAB replay %s: в memx %u записей, %u ожиданий, %u пауз, ожиданий после 0x13d8x4: %u (всего %u нс), пропущено %u операций, ~%u слов\n",
++			  st->name, nwr, nwait, ndel, nsync, sync_ns, nskip, e.total);
 +	return 0;
 +}
 +
@@ -4963,20 +5047,67 @@
 +	return 0;
 +}
 +
++/* какие биты записи в регистр GPIO принадлежат линиям напряжения ядра (их берём из текущего значения регистра).
++ * Раскладка — из открытого кода nouveau: gpio/nv50.c (GF100…GF116: 8 линий на регистр, 4 бита на линию),
++ * gpio/gf119.c (GF117, GF119: регистр на линию, 0x00d610 + 4 · линия). */
++static u32
++lab_vid_keep(struct nvkm_device *device, u32 addr)
++{
++	static const u8 tags[] = { DCB_GPIO_VID0, DCB_GPIO_VID1, DCB_GPIO_VID2, DCB_GPIO_VID3,
++				   DCB_GPIO_VID4, DCB_GPIO_VID5, DCB_GPIO_VID6, DCB_GPIO_VID7 };
++	static const u32 regs[4] = { 0x00e104, 0x00e108, 0x00e280, 0x00e284 };
++	struct nvkm_gpio *gpio = device->gpio;
++	struct dcb_gpio_func func;
++	u32 keep = 0;
++	int i;
++
++	if (!gpio)
++		return 0;
++	for (i = 0; i < ARRAY_SIZE(tags); i++) {
++		if (nvkm_gpio_find(gpio, 0, tags[i], DCB_GPIO_UNUSED, &func))
++			continue;
++		if (device->chipset >= 0xd0) {
++			if (addr == 0x00d610 + func.line * 4)
++				keep = 0xffffffff;
++		} else if (func.line < 32 && addr == regs[func.line >> 3]) {
++			keep |= 0x0000000f << ((func.line & 7) << 2);
++		}
++	}
++	return keep;
++}
++
 +static void
 +lab_host_writes(struct nvkm_subdev *subdev, const char *what, const u32 *l, int n)
 +{
 +	struct nvkm_device *device = subdev->device;
-+	int i, cnt = 0;
++	int i, cnt = 0, kept = 0;
 +
 +	for (i = 0; i + 1 < n; i += 2) {
-+		if (l[i] == 0x00e104 && !(lab_mem_replay & 16))
-+			continue;
-+		nvkm_wr32(device, l[i], l[i + 1]);
++		u32 addr = l[i], data = l[i + 1];
++
++		if (lab_mem_replay & 16) {
++			/* всё как записано, вместе с линиями напряжения (опыт) */
++		} else if (!READ_ONCE(lab_mem_vidmask)) {
++			if (addr == 0x00e104)	/* как до 24.11 */
++				continue;
++		} else {
++			u32 keep = lab_vid_keep(device, addr);
++
++			if (keep) {
++				u32 cur = nvkm_rd32(device, addr);
++
++				data = (data & ~keep) | (cur & keep);
++				kept++;
++				if (data == cur)	/* кроме линий напряжения, запись ничего не меняет */
++					continue;
++			}
++		}
++		nvkm_wr32(device, addr, data);
 +		cnt++;
 +	}
 +	if (n)
-+		nvkm_info(subdev, "LAB replay: прямых записей %s: %d\n", what, cnt);
++		nvkm_info(subdev, "LAB replay: прямых записей %s: %d (записей GPIO с линиями напряжения ядра: %d — линии не тронуты)\n",
++			  what, cnt, kept);
 +}
 +
 +static int
@@ -4997,10 +5128,10 @@
 +	ret = ram_exec(&ram->fuc, true);
 +	us = ktime_us_delta(ktime_get(), t0);
 +	lab_armed = false;
-+	nvkm_info(subdev, "LAB replay %s: выполнен за %lld мкс (op13×%u op34=%u), ret %d; 0x137310=%08x 0x1373f0=%08x 0x132000=%08x 0x10f290=%08x 0x10f300=%08x 0x611200=%08x\n",
-+		  st->name, us, lab_mem_op13, lab_mem_op34, ret, nvkm_rd32(device, 0x137310), nvkm_rd32(device, 0x1373f0),
-+		  nvkm_rd32(device, 0x132000), nvkm_rd32(device, 0x10f290),
-+		  nvkm_rd32(device, 0x10f300), nvkm_rd32(device, 0x611200));
++	nvkm_info(subdev, "LAB replay %s: выполнен за %lld мкс (op13×%u op34=%u syncwait=%u), ret %d; 0x137310=%08x 0x1373f0=%08x 0x137360=%08x 0x132000=%08x 0x132004=%08x 0x10f290=%08x 0x10f300=%08x 0x611200=%08x; память теперь %d МГц\n",
++		  st->name, us, lab_mem_op13, lab_mem_op34, lab_mem_syncwait, ret, nvkm_rd32(device, 0x137310), nvkm_rd32(device, 0x1373f0),
++		  nvkm_rd32(device, 0x137360), nvkm_rd32(device, 0x132000), nvkm_rd32(device, 0x132004), nvkm_rd32(device, 0x10f290),
++		  nvkm_rd32(device, 0x10f300), nvkm_rd32(device, 0x611200), lab_cur_mhz(device));
 +	lab_host_writes(subdev, "после скрипта", st->post, st->npost);
 +	if (ret < 0) {
 +		if (lab_board && lab_board->after)
@@ -5020,7 +5151,7 @@
  int
  gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  {
-@@ -142,6 +2047,16 @@
+@@ -142,6 +2154,16 @@
  	int from, mode;
  	int N1, M1, P;
  	int ret;
@@ -5037,7 +5168,7 @@
  
  	/* lookup memory config data relevant to the target frequency */
  	rammap.data = nvbios_rammapEm(bios, freq / 1000, &ver, &rammap.size,
-@@ -268,7 +2183,10 @@
+@@ -268,7 +2290,10 @@
  	ram_wr32(fuc, 0x100b0c, 0x00080012);
  // 0x00030014 // 0x00000000 // 0x02b5f070
  // 0x00030014 // 0x00010000 // 0x02b5f070
@@ -5049,7 +5180,7 @@
  // 0x00020034 // 0x0000000a
  // 0x00030020 // 0x00000001 // 0x00000000
  
-@@ -322,7 +2240,7 @@
+@@ -322,7 +2347,7 @@
  		ram_wr32(fuc, 0x10f344, 0x00600009);
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700008);
@@ -5058,7 +5189,7 @@
  		ram_wr32(fuc, 0x10f830, 0x00300017);
  		gf100_ram_train(fuc, 0x80021001);
  		gf100_ram_train(fuc, 0x80081001);
-@@ -333,7 +2251,8 @@
+@@ -333,7 +2358,8 @@
  // 0x00030020 // 0x00000000 // 0x00000000
  // 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -5068,7 +5199,7 @@
  	} else {
  		ram_wr32(fuc, 0x10f800, 0x00001800);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
-@@ -376,7 +2295,7 @@
+@@ -376,7 +2402,7 @@
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700000);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
@@ -5077,7 +5208,7 @@
  
  		gf100_ram_train(fuc, 0x800e1008);
  
-@@ -386,7 +2305,8 @@
+@@ -386,7 +2412,8 @@
  	// 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -5087,7 +5218,7 @@
  		ram_nsec(fuc, 100000);
  		ram_wr32(fuc, 0x10f9b0, 0x05313f41);
  		ram_wr32(fuc, 0x10f9b4, 0x00002f50);
-@@ -408,6 +2328,8 @@
+@@ -408,6 +2435,8 @@
  {
  	struct gf100_ram *ram = gf100_ram(base);
  	struct nvkm_device *device = ram->base.fb->subdev.device;
@@ -5096,7 +5227,7 @@
  	ram_exec(&ram->fuc, nvkm_boolopt(device->cfgopt, "NvMemExec", true));
  	return 0;
  }
-@@ -416,6 +2338,10 @@
+@@ -416,6 +2445,10 @@
  gf100_ram_tidy(struct nvkm_ram *base)
  {
  	struct gf100_ram *ram = gf100_ram(base);
@@ -5107,7 +5238,7 @@
  	ram_exec(&ram->fuc, false);
  }
  
-@@ -580,6 +2506,11 @@
+@@ -580,6 +2613,11 @@
  	if (ret)
  		return ret;
  
