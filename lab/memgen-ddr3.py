@@ -124,6 +124,20 @@ def want_pll(flags, mhz):
     return (3240 % mhz) != 0 or not 0 <= 3240 // mhz - 2 <= 63          # флага нет: делитель, если он даёт частоту точно
 
 
+def uses_618(vb):
+    """использует ли плата регистр 0x10f618: в VBIOS хотя бы у одного уровня памяти его значение (младшая тетрада байта 3
+    ramcfg) не ноль. 26.11, по сверке на железе (GT 630M) и по трём записям NVIDIA: на платах, где оно ноль на всех
+    уровнях (GT 630M, Quadro 600), драйвер NVIDIA этот регистр не читает и не пишет вовсе; на ASUS GT 630 (324 МГц — 1,
+    остальные — 0) читает перед каждым скриптом и пишет при смене. Регистра нет и в init-скриптах VBIOS этих плат."""
+    cached = getattr(vb, '_uses_618', None)
+    if cached is None:
+        cached = False
+        for m in mem_flags(vb):
+            if m and level(vb, m)['R'][3] & 0xf: cached = True
+        vb._uses_618 = cached
+    return cached
+
+
 def generate(vb, lim, st, cur_mhz, on_pll, tgt_mhz, tgt_pll=True, display=True):
     """скрипт перехода памяти cur -> tgt; st — текущее состояние регистров; on_pll / tgt_pll — от чего идёт такт сейчас
     и от чего должен идти после (флаг уровня в VBIOS). Возвращает (токены, регистры без известного состояния, кГц)."""
@@ -242,7 +256,8 @@ def generate(vb, lim, st, cur_mhz, on_pll, tgt_mhz, tgt_pll=True, display=True):
         w(0x1373ec, cur(0x1373ec) & ~0x20000)
     w(0x1373f8, (cur(0x1373f8) & ~5) | (5 if L['r2'] & 1 else 0))
     w(0x10f870, (R[0xd] & 0xf) * 0x11111111, True)
-    w(0x10f618, (R[3] & 0xf) * 0x11111111)
+    if uses_618(vb):
+        w(0x10f618, (R[3] & 0xf) * 0x11111111)
     m1 = cur(0x10f304)
     if (m1 & 0x244) != odt:
         w(0x10f304, (m1 & ~0x244) | odt, True); g.wait(1000)
@@ -535,7 +550,7 @@ def cmd_cases(label, rom, raw, scripts, states, memhost, out):
             keep |= {p + o for p in (0x110000, 0x111000) for o in (0x620, 0x628, 0x630)} | {0x132000, 0x132004, 0x137310, 0x137360}
             cut = lambda d: {a: v for a, v in d.items() if a in keep}
             f.write(f'case {label.replace(" ", "_")}#{i}\n')
-            f.write(f'p {tgt:x} {int(on_pll)} {int(tgt_pll)} {int(display)} {int(first)} {int(i in H)} {cur:x}\n')
+            f.write(f'p {tgt:x} {int(on_pll)} {int(tgt_pll)} {int(display)} {int(first)} {int(i in H)} {cur:x} {int(uses_618(vb))}\n')
             f.write('pll ' + ' '.join(f'{lim[k]:x}' for k in ('refclk', 'min_freq', 'max_freq', 'min_in', 'max_in', 'min_m', 'max_m', 'min_n', 'max_n', 'min_p', 'max_p')) + '\n')
             for nm, lv in (('c', C), ('t', L), ('l', low)):
                 for k in 'TRM': f.write(f'{k}{nm} {len(lv[k]):x} {hx(lv[k])}\n')

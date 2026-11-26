@@ -24,7 +24,7 @@ struct regs { int n; u32 *reg, *val; };
 struct tcase {
 	char name[128];
 	u32 tgt, cur;
-	int on_pll, tgt_pll, display, first, hosted;
+	int on_pll, tgt_pll, display, first, hosted, f618;
 	struct lab_g3_pll pll;
 	struct lab_g3_level c, t, l;
 	struct regs st, sp, dv, sa, as;
@@ -125,6 +125,7 @@ setup(struct lab_g3 *g, const struct tcase *c, struct view *v)
 	g->on_pll = c->on_pll;
 	g->tgt_pll = c->tgt_pll;
 	g->display = c->display;
+	g->f618 = c->f618;
 	g->rd = rd;
 	g->priv = v;
 	g->run = -1;
@@ -175,6 +176,7 @@ main(int argc, char **argv)
 			c.first = strtoul(p, &p, 16);
 			c.hosted = strtoul(p, &p, 16);
 			c.cur = strtoul(p, &p, 16);
+			c.f618 = strtoul(p, &p, 16);
 		} else if (!strncmp(p, "pll ", 4)) {
 			u32 *a;
 

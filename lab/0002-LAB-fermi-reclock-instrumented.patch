@@ -3501,7 +3501,7 @@
  
  struct gf100_ramfuc {
  	struct ramfuc base;
-@@ -123,6 +138,3894 @@
+@@ -123,6 +138,3908 @@
  	}
  }
  
@@ -6271,6 +6271,7 @@
 +	u32 tgt_mhz;				/* target frequency from the VBIOS level table */
 +	bool on_pll, tgt_pll;			/* memory clock source now and after: PLL or divider */
 +	bool display;				/* wait for the frame gap and pause scanout */
++	bool f618;				/* the VBIOS uses register 0x10f618: its value is non-zero at some memory level */
 +	u32 (*rd)(void *priv, u32 reg);		/* register read */
 +	void *priv;
 +	/* out */
@@ -6770,7 +6771,13 @@
 +		lab_g3_w(g, 0x1373ec, lab_g3_cur(g, 0x1373ec) & ~0x00020000, false);
 +	lab_g3_w(g, 0x1373f8, (lab_g3_cur(g, 0x1373f8) & ~0x00000005) | ((r2 & 1) ? 0x00000005 : 0), false);
 +	lab_g3_w(g, 0x10f870, (R[0x0d] & 0x0f) * 0x11111111, true);
-+	lab_g3_w(g, 0x10f618, (R[3] & 0x0f) * 0x11111111, false);
++	/* 26.11: 0x10f618 only where the VBIOS uses it. On boards whose value for it (low nibble of ramcfg byte 3) is zero
++	 * at every memory level NVIDIA never reads or writes the register (GT 630M, Quadro 600 recordings); it reads it
++	 * before every script and writes it on change only on the board where the value differs between levels (ASUS
++	 * GT 630). Under nouveau the register is not zero on a GT 630M, so the unconditional "write if changed" added a
++	 * write NVIDIA does not make (found by that board's tester in the first build-and-print run). */
++	if (g->f618)
++		lab_g3_w(g, 0x10f618, (R[3] & 0x0f) * 0x11111111, false);
 +	m1 = lab_g3_cur(g, 0x10f304);
 +	if ((m1 & 0x244) != odt) {
 +		lab_g3_w(g, 0x10f304, (m1 & ~0x00000244) | odt, true);
@@ -6809,6 +6816,7 @@
 +static bool lab_gen_cur;	/* the armed step is a built one */
 +static bool lab_gen_used;	/* a built script has run since load: the software state of the recorded plans is stale */
 +static bool lab_gen_more;	/* the armed step is the first of two (divider -> PLL level -> divider) */
++static bool lab_gen_f618;	/* the VBIOS has a non-zero value for 0x10f618 at some memory level (lab_gen_probe) */
 +
 +static u32
 +lab_gen_rd(void *priv, u32 reg)
@@ -7004,9 +7012,14 @@
 +		why = "the VBIOS memory PLL is not 0x132000 with a 405 MHz reference";
 +	else if (lab_gen_level(subdev, 0, true, &lv))
 +		why = "the VBIOS memory tables (rammap, ramcfg, timing) are not version 1.0 of the known size";
++	lab_gen_f618 = false;
 +	for (i = 0; !why && i < n; i++) {
-+		if (mhz[i] && lab_gen_level(subdev, mhz[i], false, &lv))
++		if (!mhz[i])
++			continue;
++		if (lab_gen_level(subdev, mhz[i], false, &lv))
 +			why = "a memory level has no VBIOS memory tables";
++		else if (lv.R[3] & 0x0f)
++			lab_gen_f618 = true;
 +	}
 +	if (why) {
 +		nvkm_info(subdev, "LAB gen: the DDR3 script generator does not apply to this card: %s\n", why);
@@ -7016,8 +7029,8 @@
 +	for (i = 0; i < n; i++)
 +		p += scnprintf(list + p, sizeof(list) - p, "%s%u (%s)", i ? ", " : "", mhz[i],
 +			       lab_gen_want_pll(flag[i], mhz[i]) ? "PLL" : "divider");
-+	nvkm_info(subdev, "LAB gen: DDR3 memory scripts can be built from the VBIOS and the register state here; memory levels, MHz: %s. lab_mem_gen=%u (2 build and print, switch by the recorded scripts as before; 1 build and run; 0 recorded scripts only)\n",
-+		  list, lab_mem_gen);
++	nvkm_info(subdev, "LAB gen: DDR3 memory scripts can be built from the VBIOS and the register state here; memory levels, MHz: %s; register 0x10f618 is %s by this VBIOS. lab_mem_gen=%u (2 build and print, switch by the recorded scripts as before; 1 build and run; 0 recorded scripts only)\n",
++		  list, lab_gen_f618 ? "used" : "not used", lab_mem_gen);
 +	return true;
 +}
 +
@@ -7044,6 +7057,7 @@
 +	g->priv = device;
 +	g->run = -1;
 +	g->display = true;	/* as NVIDIA at run time; with no active head the frame wait is skipped by the PMU code */
++	g->f618 = lab_gen_f618;
 +	g->tgt_mhz = freq / 1000;
 +	for (i = 0; i < n; i++)
 +		if (mhz[i] == g->tgt_mhz)
@@ -7396,7 +7410,7 @@
  int
  gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  {
-@@ -142,6 +4045,16 @@
+@@ -142,6 +4059,16 @@
  	int from, mode;
  	int N1, M1, P;
  	int ret;
@@ -7413,7 +7427,7 @@
  
  	/* lookup memory config data relevant to the target frequency */
  	rammap.data = nvbios_rammapEm(bios, freq / 1000, &ver, &rammap.size,
-@@ -268,7 +4181,10 @@
+@@ -268,7 +4195,10 @@
  	ram_wr32(fuc, 0x100b0c, 0x00080012);
  // 0x00030014 // 0x00000000 // 0x02b5f070
  // 0x00030014 // 0x00010000 // 0x02b5f070
@@ -7425,7 +7439,7 @@
  // 0x00020034 // 0x0000000a
  // 0x00030020 // 0x00000001 // 0x00000000
  
-@@ -322,7 +4238,7 @@
+@@ -322,7 +4252,7 @@
  		ram_wr32(fuc, 0x10f344, 0x00600009);
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700008);
@@ -7434,7 +7448,7 @@
  		ram_wr32(fuc, 0x10f830, 0x00300017);
  		gf100_ram_train(fuc, 0x80021001);
  		gf100_ram_train(fuc, 0x80081001);
-@@ -333,7 +4249,8 @@
+@@ -333,7 +4263,8 @@
  // 0x00030020 // 0x00000000 // 0x00000000
  // 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -7444,7 +7458,7 @@
  	} else {
  		ram_wr32(fuc, 0x10f800, 0x00001800);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
-@@ -376,7 +4293,7 @@
+@@ -376,7 +4307,7 @@
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700000);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
@@ -7453,7 +7467,7 @@
  
  		gf100_ram_train(fuc, 0x800e1008);
  
-@@ -386,7 +4303,8 @@
+@@ -386,7 +4317,8 @@
  	// 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -7463,7 +7477,7 @@
  		ram_nsec(fuc, 100000);
  		ram_wr32(fuc, 0x10f9b0, 0x05313f41);
  		ram_wr32(fuc, 0x10f9b4, 0x00002f50);
-@@ -408,6 +4326,8 @@
+@@ -408,6 +4340,8 @@
  {
  	struct gf100_ram *ram = gf100_ram(base);
  	struct nvkm_device *device = ram->base.fb->subdev.device;
@@ -7472,7 +7486,7 @@
  	ram_exec(&ram->fuc, nvkm_boolopt(device->cfgopt, "NvMemExec", true));
  	return 0;
  }
-@@ -416,6 +4336,12 @@
+@@ -416,6 +4350,12 @@
  gf100_ram_tidy(struct nvkm_ram *base)
  {
  	struct gf100_ram *ram = gf100_ram(base);
@@ -7485,7 +7499,7 @@
  	ram_exec(&ram->fuc, false);
  }
  
-@@ -580,6 +4506,11 @@
+@@ -580,6 +4520,11 @@
  	if (ret)
  		return ret;
  
@@ -7497,7 +7511,7 @@
  	ret = nvbios_pll_parse(bios, 0x0c, &ram->refpll);
  	if (ret) {
  		nvkm_error(subdev, "mclk refpll data not found\n");
-@@ -592,6 +4523,10 @@
+@@ -592,6 +4537,10 @@
  		return ret;
  	}
  
