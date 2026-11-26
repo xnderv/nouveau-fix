@@ -4,13 +4,14 @@ This build changes the **core clocks automatically by load**, the way the NVIDIA
 GPU is busy, down step by step when it is idle. All core clocks, sources and voltages are computed from **your card's own
 VBIOS**; nothing in it is tuned for one particular board. No service and no module options are needed.
 
-**Memory clock:** stays where your VBIOS puts it at power-on (on most boards 135 or 324 MHz), except on the two boards whose
-NVIDIA memory scripts we have recorded (GTX 560 Ti Gigabyte 1458:3515, GTS 450 Gigabyte 1458:3500). So you get the full
-core clock with the memory at its boot clock: a clear gain in compute-heavy work, less in memory-heavy 3D.
+**Memory clock:** stays where your VBIOS puts it at power-on (on most boards 135 or 324 MHz), except on the boards whose
+NVIDIA memory scripts have been recorded (the table in the [README](../README.md) lists them). So on most cards you get
+the full core clock with the memory at its boot clock: a clear gain in compute-heavy work, less in memory-heavy 3D. GF108
+cards with DDR3 can go further: [TESTING-memory-ddr3.md](TESTING-memory-ddr3.md).
 
 Tested on our GTX 560 Ti (GF114): 10,000 + 17,600 core switches under load without a hang, and 900 automatic switches
-overnight without an error; and by a tester on an ASUS GT 630 (GF108): an evening of normal use and games without an error.
-Other chips have not run it yet — that's what we ask you for. GF119 cards: the build supports them since 21.11, but it has never run on GF119 hardware — expect several test rounds.
+overnight without an error; and by testers on six more boards (GF106, GF108, GF119) without a hang. GF100, GF104, GF110,
+GF116 and GF117 have not run it yet — that's what we ask you for.
 
 ## Before you start
 - **Post your card report** (`bash tools/card-report.sh`, attach the output to your issue) — it helps us check your VBIOS.

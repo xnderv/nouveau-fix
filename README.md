@@ -8,7 +8,7 @@ per-board tables. Small, self-contained fixes go upstream; there are no support 
 Issues may be written in Russian too. / Issues можно писать по-русски. Research notes under `docs/` (dated folders, the
 model) are in Russian — they are the lab notebook; everything a tester needs is in English.
 
-## Status (21 Nov 2026)
+## Status (26 Nov 2026)
 
 - **Core clocks change automatically by load**, the way the NVIDIA driver does it: up to the top level when the GPU is
   busy, down step by step when it's idle. The governor runs inside the driver (load is counted in the PMU firmware); no
@@ -17,19 +17,33 @@ model) are in Russian — they are the lab notebook; everything a tester needs i
   the waits around each switch. The one rule for choosing a clock route — the VBIOS flag first, then a divider, then a PLL,
   always within ±2 % of the VBIOS number — is checked against 473 Fermi VBIOS images
   ([docs/2026-11-21/vbios-hit.md](docs/2026-11-21/vbios-hit.md)).
-- **Memory clock:** can be changed on the six boards whose NVIDIA memory scripts have been recorded, by replaying the
-  recording (on by default where a tester has confirmed it); everywhere else it stays at the VBIOS boot clock. Since 26 Nov the driver can also **build the
-  DDR3 script of GF108 cards from the VBIOS**, with no recording: checked word for word against NVIDIA's recordings of
-  five boards, first runs on hardware are under way ([docs/TESTING-memory-ddr3.md](docs/TESTING-memory-ddr3.md)).
+- **Core reclocking has run on 7 boards of 4 chips** (GF114, GF106, GF108, GF119): ours and six testers', without a hang.
+  GF100, GF104, GF110, GF116 and GF117 have not run it yet.
+- **Memory clock, by replaying NVIDIA's recorded script of the board:** works on five boards (GDDR5 on GF114 and GF106,
+  DDR3 on three GF108 boards); a sixth is recorded and not yet run. On the DDR3 boards memory is where the speed is: on a
+  tester's Quadro 600 glmark2 goes from 749 to 1498 with the memory clock, and gains nothing from the core clocks alone.
+- **Memory clock without a recording (new, 26 Nov):** for GF108 cards with DDR3 the driver can build the script from the
+  VBIOS and the register state. The C code of the driver reproduces 35 of 37 distinct NVIDIA scripts recorded on five
+  boards word for word. No built script has run on hardware yet: in this round the driver builds and prints it while the
+  recorded script does the switch, and the first runs are with the testers
+  ([docs/TESTING-memory-ddr3.md](docs/TESTING-memory-ddr3.md)). On every other card the memory stays at the VBIOS boot clock.
+- **Open:** one GPU fault during a memory switch on our GF114 after 6,726 clean level cycles (a day-long run in NVIDIA's
+  own order of steps is under way); a band at the bottom of the screen during level changes with two monitors on a
+  tester's GT 630.
 - **Use a single monitor: unplug any others.** Two or more monitors is a setup we have not tested, and we are not asking you to test it.
 
-| Card | Chip | What ran | Result |
+| Card | Chip, memory | Core clocks | Memory clock |
 |---|---|---|---|
-| Gigabyte GTX 560 Ti (reference board, ours) | GF114 | 10,000 + 17,600 core switches under load; a night of 900 automatic switches | no hang, no error |
-| ASUS GT 630 (tester) | GF108 | an evening of normal use and games; 38 automatic switches; clock counters | no hang, no error |
-| GF100, GF104, GF106, GF110, GF116 | — | not yet | testers wanted |
+| Gigabyte GTX 560 Ti (reference board, ours) | GF114, GDDR5 | 10,000 + 17,600 switches under load; a night of 900 automatic switches: no hang | recorded scripts: 3,000 full level cycles clean; in a later run one GPU fault after 6,726 clean cycles (open) |
+| Gigabyte GTS 450 (tester) | GF106, GDDR5 | clean | recorded scripts, 324 ↔ 1804 MHz: clean |
+| ASUS GT 630 (tester) | GF108, DDR3 | an evening of normal use and games: clean | recorded scripts: 3 hours of use and games, 71 switches, no error |
+| GT 630M, Medion laptop (tester) | GF108, DDR3 | clean | recorded scripts: all level transitions, suspend/resume, 134 GiB of video memory read back correct; on by default |
+| HP Quadro 600 (tester) | GF108, DDR3 | clean; piglit `quick` with no regression | recorded scripts: about 1,100 switches in 5 hours, no error |
+| GT 730 4 GB (tester) | GF108, DDR3 | first run clean | not yet: no recording, the first candidate for built scripts |
+| NVS 315 (tester) | GF119 | the first run on a GF119: works | not yet |
+| Dell NVS 5200M (tester) | GF108, GDDR5 | not yet run | recorded, not yet run |
+| GF100, GF104, GF110, GF116 | — | not yet | testers wanted |
 | GF117 | — | not yet: no display, and nouveau doesn't run its power-management controller (PMU), so no automatic governor | planned |
-| GF119 | — | build ready (PMU firmware with load counting, two-level governor), never run on the hardware | first tester wanted |
 
 ## Which cards
 
@@ -51,7 +65,8 @@ evidence: [docs/deviations.md](docs/deviations.md).
 
 ## Try it
 
-Step by step: **[docs/TESTING-core.md](docs/TESTING-core.md)**. In short: `bash tools/card-report.sh` (read-only report of
+Step by step: **[docs/TESTING-core.md](docs/TESTING-core.md)**; memory on GF108 cards with DDR3:
+**[docs/TESTING-memory-ddr3.md](docs/TESTING-memory-ddr3.md)**. In short: `bash tools/card-report.sh` (read-only report of
 your card), `bash lab/tester-build.sh` (fetches nouveau for your running kernel, applies the patches, builds; checked on
 Linux 6.12, 7.0, 7.2, 7.3), `bash lab/tester-build.sh install`, reboot. Undo: `bash lab/tester-build.sh remove`. Your
 distribution's nouveau stays untouched. Results and questions: the issues of this repository.
@@ -99,6 +114,7 @@ Tester build (`lab/tester-build.sh`): `0001` + `lab/0002` (one of three variants
 | Path | Contents |
 |---|---|
 | `docs/TESTING-core.md` | how to test the build on your card |
+| `docs/TESTING-memory-ddr3.md` | memory reclocking on GF108 cards with DDR3: scripts built from the VBIOS |
 | `docs/deviations.md` | VBIOS errors, NVIDIA misses, nouveau bugs — and what we do |
 | `docs/model/` | the model of NVIDIA's behaviour (Russian), register coverage |
 | `docs/2026-MM-DD/` | research notes by date (Russian); the newest are the most current |
