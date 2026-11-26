@@ -17,8 +17,10 @@ model) are in Russian — they are the lab notebook; everything a tester needs i
   the waits around each switch. The one rule for choosing a clock route — the VBIOS flag first, then a divider, then a PLL,
   always within ±2 % of the VBIOS number — is checked against 473 Fermi VBIOS images
   ([docs/2026-11-21/vbios-hit.md](docs/2026-11-21/vbios-hit.md)).
-- **Memory stays at the VBIOS boot clock** on every card except the reference board. The memory part is the next stage;
-  recordings from testers (GF108 DDR3 so far) are its material.
+- **Memory clock:** can be changed on the six boards whose NVIDIA memory scripts have been recorded, by replaying the
+  recording (on by default where a tester has confirmed it); everywhere else it stays at the VBIOS boot clock. Since 26 Nov the driver can also **build the
+  DDR3 script of GF108 cards from the VBIOS**, with no recording: checked word for word against NVIDIA's recordings of
+  five boards, first runs on hardware are under way ([docs/TESTING-memory-ddr3.md](docs/TESTING-memory-ddr3.md)).
 - **Use a single monitor: unplug any others.** Two or more monitors is a setup we have not tested, and we are not asking you to test it.
 
 | Card | Chip | What ran | Result |

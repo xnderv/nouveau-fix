@@ -343,7 +343,7 @@
 +		static bool said;
 +
 +		if (!said)
-+			nvkm_info(subdev, "LAB: запись памяти этой платы вживую не проверена — память стоит; включить: lab_mem_new=1 (можно на ходу)\n");
++			nvkm_info(subdev, "LAB: memory reclocking is not tested live on this board - memory stays; to enable: lab_mem_new=1 (can be set at run time)\n");
 +		said = true;
 +	} else if (!lab_mem) {
 +		nvkm_info(subdev, "LAB pstate %d: memory SKIPPED (lab_mem=0)\n", pstatei);
@@ -759,7 +759,7 @@
  	if (!limits.refclk)
  		return 0;
  
-@@ -270,6 +357,675 @@
+@@ -270,6 +357,690 @@
  	return ret;
  }
  
@@ -1232,6 +1232,21 @@
 +static bool lab_hub01_alt_on;		/* сейчас HUB2CLK на обходном пути */
 +static u32 lab_hub01_alt_src0, lab_hub01_alt_post0;	/* что было до переключения */
 +
++/* LAB 25.11: HUB2CLK — ведомый узел: своей PLL у него нет, он берёт PLL узла SYS2CLK (бит 8 переключателя) или PLL узла
++ * XBAR2CLK (обходной путь выше). Во всех записях NVIDIA всех чипов Fermi (42 записи базы и пять плат тестировщиков,
++ * docs/2026-11-25/core-gf108-nvidia.md, раздел 2) HUB2CLK переводится после своего ведущего и раньше GPC2CLK. Когда ведущий —
++ * SYS2CLK, обычный порядок (7 8 0 1 2) это уже выполняет. Когда ведущий — XBAR2CLK, до 25.11 HUB2CLK переводился последним,
++ * после GPC2CLK. lab_hub_follow=1: в этом случае подъём идёт SYS2CLK, XBAR2CLK, HUB2CLK, GPC2CLK, спуск — GPC2CLK, HUB2CLK,
++ * XBAR2CLK, SYS2CLK (так у NVIDIA на 7 платах GF108 из 7 с этим путём). Действует, только когда ядро и XBAR2CLK
++ * программируются одним вызовом (lab_nv_xbarmem = 1 или правило топологии «шина снаружи памяти»); иначе — как раньше.
++ * 0 — как до 25.11. На плате без обходного пути ключ ничего не меняет.
++ * 26.11: по умолчанию пока 0 — правило ещё ни разу не исполнялось на железе (на нашей GF114 обходного пути нет), а сборка
++ * 26.11 выходит к тестировщикам с одним изменением — генератором скриптов памяти DDR3. Включается ключом; по умолчанию
++ * станет 1 после первого прогона на плате GF108. */
++static uint lab_hub_follow;
++module_param(lab_hub_follow, uint, 0644);
++MODULE_PARM_DESC(lab_hub_follow, "LAB: HUB2CLK is switched right after the node whose PLL feeds it and before GPC2CLK (1; default 0 until it has run on hardware). Only matters where HUB2CLK runs from the XBAR2CLK PLL: order SYS2CLK, XBAR2CLK, HUB2CLK, GPC2CLK on the way up and the reverse on the way down; 0 = as before 25.11 (HUB2CLK last)");
++
 +static u32 lab_meas_khz(struct nvkm_device *device, u32 base, u32 src);
 +
 +static void
@@ -1435,7 +1450,7 @@
  static int
  calc_clk(struct gf100_clk *clk, struct nvkm_cstate *cstate, int idx, int dom)
  {
-@@ -282,6 +1038,87 @@
+@@ -282,6 +1053,87 @@
  	if (!freq)
  		return 0;
  
@@ -1523,7 +1538,7 @@
  	/* first possible path, using only dividers */
  	clk0 = calc_src(clk, idx, freq, &src0, &div0);
  	clk0 = calc_div(clk, idx, clk0, freq, &div1D);
-@@ -291,7 +1128,9 @@
+@@ -291,7 +1143,9 @@
  		if (idx <= 7)
  			clk1 = calc_pll(clk, idx, freq, &info->coef);
  		else
@@ -1534,7 +1549,7 @@
  		clk1 = calc_div(clk, idx, clk1, freq, &div1P);
  	}
  
-@@ -318,6 +1157,11 @@
+@@ -318,6 +1172,11 @@
  		info->freq = clk1;
  	}
  
@@ -1546,7 +1561,7 @@
  	return 0;
  }
  
-@@ -327,6 +1171,8 @@
+@@ -327,6 +1186,8 @@
  	struct gf100_clk *clk = gf100_clk(base);
  	int ret;
  
@@ -1555,7 +1570,7 @@
  	if ((ret = calc_clk(clk, cstate, 0x00, nv_clk_src_gpc)) ||
  	    (ret = calc_clk(clk, cstate, 0x01, nv_clk_src_rop)) ||
  	    (ret = calc_clk(clk, cstate, 0x02, nv_clk_src_hubk07)) ||
-@@ -346,20 +1192,896 @@
+@@ -346,20 +1207,907 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	if (idx < 7 && !info->ssel) {
@@ -1672,9 +1687,18 @@
 +/* LAB 02.11: коды замедления в скобке, как их ставит NVIDIA 390, — по чипу, из записей базы (docs/2026-10-29/db-fermi-waits.md,
 + * lab/db-bracket-codes.py). От VBIOS (0x020130, 0x020144) не зависят — проверено подменой 02.11. GF110: 1080/1081 — /2,
 + * остальные — /6. GF108: в записях 2016–2017 GPC /8 (в 2010–2011 было /2). lab_therm_code_nv=0 — прежнее (GF106 /2, иначе /6). */
-+static uint lab_therm_code_nv = 1;	/* 19.11: по умолчанию как служба (набор 18.11) */
++/* 25.11: глубина скобки GPC2CLK у NVIDIA задаётся не чипом, а моделью платы (docs/2026-11-25/core-gf108-nvidia.md, раздел 4:
++ * у GF108, GF110 и GF114 по две глубины; в том, что VBIOS пишет в регистры, её нет — перебор по 34 платам), поэтому
++ * таблицу «по чипу» повторить нельзя. lab_therm_code_nv=2 (по умолчанию): одна глубина для всех — GPC2CLK /8 (самая
++ * глубокая из тех, что ставит NVIDIA: ни одна плата не получит замедление слабее, чем у неё), SYS2CLK /2 (как у NVIDIA
++ * на всех платах в драйверах 304+). На нашей GF114 глубины /2, /6 и /8 в опытах 61 и 70 неразличимы.
++ * 1 — прежняя таблица по чипу, 0 — ещё более ранний вариант.
++ * 26.11: по умолчанию пока 1 (как в опубликованной сборке a5577fc): сборка 26.11 выходит к тестировщикам с одним
++ * изменением — генератором скриптов памяти DDR3. Единая глубина включается ключом lab_therm_code_nv=2; по умолчанию станет
++ * 2 после прогона на нашей карте (опыт 126). */
++static uint lab_therm_code_nv = 1;
 +module_param(lab_therm_code_nv, uint, 0644);
-+MODULE_PARM_DESC(lab_therm_code_nv, "LAB: bracket slowdown codes per chip as NVIDIA 390 (0 = old: GF106 /2, else /6; 1 = table from NVIDIA traces)");
++MODULE_PARM_DESC(lab_therm_code_nv, "LAB: slowdown depth in the clock-switch bracket: 2 = one depth for every chip, GPC2CLK /8 and SYS2CLK /2; 1 = per-chip table from NVIDIA traces (default, as before 25.11); 0 = old (GF106 /2, else /6)");
 +static u32
 +lab_therm_code_tab(struct nvkm_device *device, int gpc)
 +{
@@ -1695,6 +1719,8 @@
 +{
 +	if (lab_therm_gpc_factor)
 +		return lab_therm_gpc_factor & 0x3f;
++	if (READ_ONCE(lab_therm_code_nv) == 2)
++		return 0xe;
 +	if (READ_ONCE(lab_therm_code_nv))
 +		return lab_therm_code_tab(device, 1);
 +	return (device->chipset == 0xc3) ? 0x2 : 0xa;
@@ -1705,7 +1731,7 @@
 +static u32
 +lab_therm_hub_code(struct nvkm_device *device)
 +{
-+	if (READ_ONCE(lab_therm_code_nv) && lab_therm_hub_factor == 0x2)
++	if (READ_ONCE(lab_therm_code_nv) == 1 && lab_therm_hub_factor == 0x2)
 +		return lab_therm_code_tab(device, 0);
 +	return lab_therm_hub_factor & 0x3f;
 +}
@@ -2455,7 +2481,7 @@
  }
  
  static void
-@@ -368,20 +2090,58 @@
+@@ -368,20 +2116,58 @@
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
  	const u32 addr = 0x137000 + (idx * 0x20);
@@ -2517,7 +2543,7 @@
  
  			/* Enable sync mode */
  			nvkm_mask(device, addr + 0x00, 0x00000004, 0x00000004);
-@@ -390,17 +2150,106 @@
+@@ -390,17 +2176,106 @@
  }
  
  static void
@@ -2626,7 +2652,7 @@
  	}
  }
  
-@@ -409,7 +2258,17 @@
+@@ -409,7 +2284,17 @@
  {
  	struct gf100_clk_info *info = &clk->eng[idx];
  	struct nvkm_device *device = clk->base.subdev.device;
@@ -2644,7 +2670,7 @@
  }
  
  static int
-@@ -426,23 +2285,720 @@
+@@ -426,23 +2311,745 @@
  		{ gf100_clk_prog_4 }, /* final divider */
  	};
  	int i, j;
@@ -2658,8 +2684,18 @@
 +	struct nvkm_mmu *mmu = device->mmu;
 +	bool mmu_locked = false;
 +	u64 lk0 = 0;
++	/* HUB2CLK следом за ведущим (lab_hub_follow): только если этим вызовом идут и GPC2CLK, и XBAR2CLK, и HUB2CLK */
++	bool hf = READ_ONCE(lab_hub_follow) && lab_order && (lab_clk_prog_mask & 0x105) == 0x105 &&
++		  clk->eng[0].freq && clk->eng[2].freq && clk->eng[8].freq;
++	/* спуск с обходного пути: GPC2CLK и XBAR2CLK уходят на делители — HUB2CLK снимается после GPC2CLK, до XBAR2CLK */
++	bool hf_dn = hf && lab_hub01_alt_on && !clk->eng[0].ssel && !clk->eng[2].ssel;
++	bool hf_up;
 +
-+	lab_hub01_alt_leave(clk);
++	if (!hf_dn)
++		lab_hub01_alt_leave(clk);
++	/* подъём на обходной путь: XBAR2CLK раньше GPC2CLK, HUB2CLK сразу за XBAR2CLK */
++	hf_up = hf && !lab_hub01_alt_on && lab_hub01_alt_want && clk->eng[0].ssel && clk->eng[2].ssel &&
++		READ_ONCE(lab_hub01_alt) && !lab_hub01_alt_bad;
 +	if (lab_clk_mmu_lock && mmu) {
 +		lk0 = ktime_get_ns();
 +		mutex_lock(&mmu->mutex);
@@ -2729,19 +2765,34 @@
  	for (i = 0; i < ARRAY_SIZE(stage); i++) {
 +		static const int up_order[16]   = { 7, 8, 0, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15 };
 +		static const int down_order[16] = { 2, 1, 0, 8, 7, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15 };
++		static const int up_follow[16]   = { 7, 2, 8, 0, 1, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15 };
++		static const int down_follow[16] = { 0, 1, 8, 2, 7, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15 };
 +		bool up = clk->eng[0].ssel != 0;	/* цель GPC — PLL: подъём */
 +		bool mux_stage = (i == 1 || i == 3);
++		const int *ord = up ? (hf_up ? up_follow : up_order) : (hf_dn ? down_follow : down_order);
 +
 +		nvkm_info(&clk->base.subdev, "LAB prog stage %d%s\n", i,
-+			  (lab_order && mux_stage) ? (up ? " (порядок NVIDIA, подъём: 7 8 0 1 2)" : " (порядок NVIDIA, спуск: 2 1 0 8 7)") : "");
++			  !(lab_order && mux_stage) ? "" :
++			  hf_up ? " (подъём: 7 2 8 0 1 — HUB2CLK следом за XBAR2CLK, от PLL которого он идёт)" :
++			  hf_dn ? " (спуск: 0 1 8 2 7 — HUB2CLK снимается с PLL XBAR2CLK после GPC2CLK)" :
++			  up ? " (порядок NVIDIA, подъём: 7 8 0 1 2)" : " (порядок NVIDIA, спуск: 2 1 0 8 7)");
  		for (j = 0; j < ARRAY_SIZE(clk->eng); j++) {
 -			if (!clk->eng[j].freq)
-+			int e = (lab_order && mux_stage) ? (up ? up_order[j] : down_order[j]) : j;
++			int e = (lab_order && mux_stage) ? ord[j] : j;
 +
++			/* спуск: GPC2CLK уже на делителе — снять HUB2CLK с PLL XBAR2CLK, пока сам XBAR2CLK ещё на ней */
++			if (hf_dn && i == 1 && e == 8)
++				lab_hub01_alt_leave(clk);
 +			if (!clk->eng[e].freq || !(lab_clk_prog_mask & (1u << e)))
++				continue;
++			/* HUB2CLK уже на PLL XBAR2CLK со своим пост-делителем — делитель обычного пути не писать */
++			if (i == 4 && e == 8 && lab_hub01_alt_on)
  				continue;
 -			stage[i].exec(clk, j);
 +			stage[i].exec(clk, e);
++			/* подъём: XBAR2CLK на PLL — сразу за ним HUB2CLK, до GPC2CLK (проверка счётчиком — внутри) */
++			if (hf_up && i == 3 && e == 2)
++				lab_hub01_alt_apply(clk);
 +			if (lab_order_us && mux_stage)
 +				udelay(lab_order_us);
 +		}
@@ -3367,7 +3418,7 @@
  }
  
  static const struct nvkm_clk_func
-@@ -461,6 +3017,7 @@
+@@ -461,6 +3068,7 @@
  		{ nv_clk_src_rop    , 0x04 },
  		{ nv_clk_src_mem    , 0x05, 0, "memory", 1000 },
  		{ nv_clk_src_vdec   , 0x06 },
@@ -3375,7 +3426,7 @@
  		{ nv_clk_src_pmu    , 0x0a },
  		{ nv_clk_src_hubk07 , 0x0b },
  		{ nv_clk_src_max }
-@@ -477,5 +3034,5 @@
+@@ -477,5 +3085,5 @@
  		return -ENOMEM;
  	*pclk = &clk->base;
  
@@ -3384,7 +3435,7 @@
  }
 --- a/nvkm/subdev/fb/ramgf100.c
 +++ b/nvkm/subdev/fb/ramgf100.c
-@@ -25,13 +25,27 @@
+@@ -25,13 +25,28 @@
  #include "ram.h"
  #include "ramfuc.h"
  
@@ -3405,6 +3456,7 @@
 +#include <linux/pci.h>
  #include <subdev/bios/rammap.h>
  #include <subdev/bios/timing.h>
++#include <subdev/bios/perf.h>
  #include <subdev/clk.h>
  #include <subdev/clk/pll.h>
 +#include <subdev/gpio.h>
@@ -3412,7 +3464,7 @@
  
  struct gf100_ramfuc {
  	struct ramfuc base;
-@@ -123,6 +137,2895 @@
+@@ -123,6 +138,3894 @@
  	}
  }
  
@@ -5258,6 +5310,7 @@
 +	const u32 *scr; int nscr;	/* слова скрипта PMU NVIDIA */
 +	const u32 *post; int npost;	/* пары, прямые записи после скрипта */
 +	u32 need;			/* бит lab_mem_replay, разрешающий шаг */
++	bool gen;			/* 26.11: step built by the DDR3 generator, not a recorded one */
 +};
 +enum { LAB_S_A, LAB_S_B, LAB_S_C, LAB_S_DC, LAB_S_D, LAB_S_E };
 +static const struct lab_step lab_steps_gf114[] = {
@@ -5537,7 +5590,6 @@
 +static int lab_plan_q600(struct nvkm_subdev *, const struct lab_board *, int, int, int *);
 +static void lab_g6_after(int step);
 +static void lab_g8_after(int step);
-+static void lab_q6_after(int step);
 +static int lab_plan_medion(struct nvkm_subdev *, const struct lab_board *, int, int, int *);
 +static const struct lab_board lab_boards[] = {
 +	{ "GF114 GTX 560 Ti (Gigabyte 1458:3515, запись 20.10)", 0xce, 0x1458, 0x3515, 135, 324, 2004, lab_steps_gf114, lab_plan_gf114, NULL, 1 },
@@ -5545,14 +5597,15 @@
 +	/* 21.11: DDR3; верх в таблице VBIOS 900 МГц (NVIDIA ставит 896) */
 +	{ "GF108 GT 630 DDR3 (ASUS 1043:8400, запись sasim44 20.11)", 0xc1, 0x1043, 0x8400, 135, 324, 900, lab_steps_gf108, lab_plan_gf108, lab_g8_after, 0 },
 +	/* 23.11: DDR3; верх в таблице VBIOS 800 МГц (NVIDIA ставит 793); не проверено вживую */
-+	{ "GF108 Quadro 600 DDR3 (HP 103c:0835, запись 23.11)", 0xc1, 0x103c, 0x0835, 135, 324, 800, lab_steps_q600, lab_plan_q600, lab_q6_after, 0 },
++	{ "GF108 Quadro 600 DDR3 (HP 103c:0835, запись 23.11)", 0xc1, 0x103c, 0x0835, 135, 324, 800, lab_steps_q600, lab_plan_q600, NULL, 0 },
 +	/* 25.11: GDDR5 на GF108; одна плата под двумя subsystem (отдельная карта и Optimus); не проверено вживую */
 +	{ "GF108 NVS 5200M GDDR5 (Dell 1028:0534, запись 25.11)", 0xc1, 0x1028, 0x0534, 135, 324, 1569, lab_steps_e6430, lab_plan_gf108, lab_g8_after, 0 },
 +	{ "GF108 NVS 5200M GDDR5 (Dell 1028:1534 Optimus, запись 25.11)", 0xc1, 0x1028, 0x1534, 135, 324, 1569, lab_steps_e6430, lab_plan_gf108, lab_g8_after, 0 },
 +	/* 25.11: DDR3, all three levels on the memory PLL; state read from the hardware; checked live by the tester
 +	 * (12 transitions, S3, governor soaks, 30-min VRAM soak at 896 MHz) on the bfd1a6f base with fixed line-register
-+	 * writes; tested = 0 until the tester's run with lab_mem_line750 on this tree */
-+	{ "GF108M GT 630M DDR3 (Medion 1b0a:20c8, recording 23.11)", 0xc1, 0x1b0a, 0x20c8, 135, 324, 900, lab_steps_medion, lab_plan_medion, NULL, 0 },
++	 * writes. 26.11: tested = 1 — the tester's series on a5577fc as published (lab_mem_line750 = 1 and 2, S3 at 0f
++	 * and 03, soaks, 134 GiB read back correct, 0 nouveau errors). That is the recorded scripts (lab_mem_gen=0). */
++	{ "GF108M GT 630M DDR3 (Medion 1b0a:20c8, recording 23.11)", 0xc1, 0x1b0a, 0x20c8, 135, 324, 900, lab_steps_medion, lab_plan_medion, NULL, 1 },
 +};
 +static const struct lab_board *lab_board;
 +/* 19.11: есть ли для этой платы записанные сценарии памяти: -1 — не Fermi/не дошли, 0 — нет (clk/base.c тогда меняет
@@ -5789,17 +5842,18 @@
 +}
 +
 +/* LAB 23.11: состояние памяти Quadro 600 — после загрузки 324 на делителе (POST); после A/C — верх (PLL); после B — 324 на PLL.
-+ * Уровень 135 не записан: цель 135 считается 324 (память остаётся). Неизвестное состояние — память не трогаем. */
++ * Уровень 135 не записан: цель 135 считается 324 (память остаётся). Неизвестное состояние — память не трогаем.
++ * 26.11: the state is read from the registers at every plan (0x137360: 2 PLL, 3 divider; frequency from lab_cur_mhz).
++ * Until then it was a software copy that started at "POST" on module load: after a module reload at the top level or a
++ * suspend/resume it no longer matched the card, the wrong script ran and the GPU hung (found by the board's tester). */
 +enum { Q6_UNKNOWN, Q6_POST, Q6_HI, Q6_MID };
-+static int lab_q6_state = Q6_POST;
-+static void
-+lab_q6_after(int step)
-+{
-+	lab_q6_state = (step == LAB_Q6_A || step == LAB_Q6_C) ? Q6_HI : step == LAB_Q6_B ? Q6_MID : Q6_UNKNOWN;
-+}
 +static int
 +lab_plan_q600(struct nvkm_subdev *subdev, const struct lab_board *b, int cur, int tgt, int *p)
 +{
++	bool pll = (nvkm_rd32(subdev->device, 0x137360) & 0x00000003) == 0x00000002;
++	int lab_q6_state = (!pll && cur == b->mid) ? Q6_POST : (pll && cur == b->mid) ? Q6_MID :
++			   (pll && cur == b->hi) ? Q6_HI : Q6_UNKNOWN;
++
 +	if (tgt == b->lo) {
 +		nvkm_info(subdev, "LAB replay: уровня памяти %d МГц в записи этой платы нет — цель %d МГц\n", b->lo, b->mid);
 +		tgt = b->mid;
@@ -5809,7 +5863,8 @@
 +	case Q6_MID:  if (tgt == b->hi) { p[0] = LAB_Q6_C; return 1; } return 0;
 +	case Q6_HI:   if (tgt != b->hi) { p[0] = LAB_Q6_B; return 1; } return 0;
 +	default:
-+		nvkm_error(subdev, "LAB replay: память %d МГц, состояние после шагов неизвестно — память не трогаю\n", cur);
++		nvkm_error(subdev, "LAB replay: память %d МГц (%s; 0x137360=%08x 0x132004=%08x) — такого состояния в записи нет, память не трогаю\n",
++			   cur, pll ? "PLL" : "делитель", nvkm_rd32(subdev->device, 0x137360), nvkm_rd32(subdev->device, 0x132004));
 +		return -EINVAL;
 +	}
 +}
@@ -5987,7 +6042,7 @@
 +	u32 unit = lab_mem_unit_ns, nsync = 0, sync_ns = 0, nline = 0;
 +	bool blocked = false, syncwait = READ_ONCE(lab_mem_syncwait);
 +	/* 25.11: lab_mem_line750 = 2 — записи линий DDR3 внутри скрипта, перед первой записью 0x10f830 (место из записей базы) */
-+	bool line_in = READ_ONCE(lab_mem_line750) == 2 && lab_line750_wanted(subdev->device, st);
++	bool line_in = READ_ONCE(lab_mem_line750) == 2 && !st->gen && lab_line750_wanted(subdev->device, st);
 +
 +	while (i < st->nscr) {
 +		u32 h = st->scr[i], n = h >> 16, op = h & 0xffff, k;
@@ -6122,6 +6177,977 @@
 +	return 0;
 +}
 +
++/* =================== LAB 26.11: DDR3 memory scripts built from the VBIOS and the register state ===================
++ * (docs/2026-11-25/ddr3-generator.md) Instead of replaying a script recorded on one board, the driver builds the script
++ * NVIDIA's driver would build: field values from the VBIOS tables of the target level, order and conditions from the
++ * recordings, and every "write only if it changes" decision from the registers as they are at that moment. No software
++ * copy of the memory state is kept, so a module reload, a suspend/resume or a state left by another driver cannot put
++ * it out of step with the card (the recorded plans below could: a tester's Quadro 600 hung that way).
++ * Checked offline: this C text reproduces 35 of the 37 distinct recorded scripts of five GF108 DDR3 boards word for
++ * word, and the host writes around them (lab/memgen-ddr3-ctest.sh). First run on hardware: after 26.11.
++ * Where it applies is decided from the hardware and the VBIOS, never from a chip list: DDR3; one memory partition with
++ * two controllers (0x022438 = 1, 0x02243c = 2); VBIOS tables rammap/ramcfg/timing 1.0 and level table 4.0; memory PLL
++ * at 0x132000 with a 405 MHz reference. Anything else keeps the recorded scripts of its board, or no memory reclocking.
++ * lab_mem_gen: 2 (default in this first round, until a built script has run on somebody's card): at every memory
++ * transition build the script and print it, but leave the switch itself to the recorded scripts of the board, exactly
++ * as before 26.11 (no recorded scripts: memory untouched); 1: build and run it; 0: recorded scripts only (not after a
++ * built script has run: reload the module for that). The printed script can be compared with NVIDIA's recording of the
++ * same board: lab/memgen-ddr3-logcheck.py.
++ * lab_mem_gen_dump: how many distinct built scripts are still to be printed in full (counts down).
++ * lab_mem_gen_updiv: the recordings hold every kind of transition except one: divider -> divider upwards (it needs two
++ * memory levels on the divider: of the boards seen, only the ASUS GT 630 has that, 135 -> 324 MHz). 0 (default): such a
++ * transition goes through the highest PLL level in two steps, each of a recorded kind (the route the recorded plan of
++ * that board took, tested live there); 1: one direct step, built by the same rules but with no recording behind it. */
++static uint lab_mem_gen = 2;
++module_param(lab_mem_gen, uint, 0644);
++MODULE_PARM_DESC(lab_mem_gen, "LAB: DDR3 memory scripts built from the VBIOS and the register state, where that applies (DDR3, one partition with two controllers): 2 build and print them, the switch itself stays with the recorded scripts of the board as before (default in this first round), 1 build and run them, 0 recorded scripts only");
++static int lab_mem_gen_dump = 8;
++module_param(lab_mem_gen_dump, int, 0644);
++MODULE_PARM_DESC(lab_mem_gen_dump, "LAB: print this many more distinct built memory scripts in full (counts down, default 8)");
++static uint lab_mem_gen_updiv;
++module_param(lab_mem_gen_updiv, uint, 0644);
++MODULE_PARM_DESC(lab_mem_gen_updiv, "LAB: built DDR3 scripts, divider -> divider upwards (no NVIDIA recording of this kind): 0 go through the highest PLL level in two steps (default), 1 one direct step");
++
++/* LAB_G3_CORE_BEGIN — generator core: plain C with no kernel calls. lab/memgen-ddr3-ctest.sh cuts this very text out,
++ * builds it in userspace and compares its output word for word with the recorded NVIDIA scripts. */
++#define LAB_G3_SCR_MAX		640	/* script words, NVIDIA format */
++#define LAB_G3_HOST_MAX		16	/* host writes before or after the script */
++#define LAB_G3_SHADOW_MAX	96
++#define LAB_G3_FBPA		2	/* memory controllers: strobe 0x13d834 and line registers 0x110xxx / 0x111xxx */
++#define LAB_G3_FRAME_TO		0x02b5f070	/* argument of NVIDIA's frame wait (a timeout in ns by its size; unverified) */
++
++struct lab_g3_level {			/* VBIOS bytes of one memory level */
++	u8 T[0x20];			/* timing table entry */
++	u8 R[0x10];			/* ramcfg entry of the board's strap */
++	u8 M[0x10];			/* rammap entry (frequency range) */
++};
++
++struct lab_g3_pll {			/* memory PLL limits from the VBIOS PLL table; frequencies in kHz */
++	u32 refclk, min_freq, max_freq, min_in, max_in;
++	u32 min_m, max_m, min_n, max_n, min_p, max_p;
++};
++
++struct lab_g3 {
++	/* in */
++	struct lab_g3_level cur, tgt, low;	/* level now, target level, first rammap entry (lowest frequencies) */
++	struct lab_g3_pll pll;
++	u32 tgt_mhz;				/* target frequency from the VBIOS level table */
++	bool on_pll, tgt_pll;			/* memory clock source now and after: PLL or divider */
++	bool display;				/* wait for the frame gap and pause scanout */
++	u32 (*rd)(void *priv, u32 reg);		/* register read */
++	void *priv;
++	/* out */
++	u32 scr[LAB_G3_SCR_MAX];
++	u32 pre[2 * LAB_G3_HOST_MAX], post[2 * LAB_G3_HOST_MAX];	/* address/value pairs */
++	int nscr, npre, npost;
++	u32 got_khz, coef, div;			/* result: frequency; 0x132004 word (PLL target) or divider code */
++	const char *err;
++	/* work */
++	u32 sreg[LAB_G3_SHADOW_MAX], sval[LAB_G3_SHADOW_MAX];	/* register state: values read plus the writes queued so far */
++	int ns, pending, run;
++};
++
++static const u8 lab_g3_cl[]  = { 5, 2, 6, 4, 7, 6, 8, 8, 9, 10, 10, 12, 11, 14, 12, 1, 13, 3, 14, 5 };
++static const u8 lab_g3_wr[]  = { 5, 1, 6, 2, 7, 3, 8, 4, 10, 5, 12, 6, 14, 7, 15, 7, 16, 0 };
++static const u8 lab_g3_cwl[] = { 5, 0, 6, 1, 7, 2, 8, 3, 9, 4, 10, 5 };
++
++static void
++lab_g3_fail(struct lab_g3 *g, const char *why)
++{
++	if (!g->err)
++		g->err = why;
++}
++
++/* clock count from the VBIOS -> DDR3 mode register code (JESD79-3; the same tables as nouveau's fb/sddr3.c) */
++static u32
++lab_g3_xlat(struct lab_g3 *g, const u8 *tab, int n, u8 key, const char *what)
++{
++	int i;
++
++	for (i = 0; i + 1 < n; i += 2)
++		if (tab[i] == key)
++			return tab[i + 1];
++	lab_g3_fail(g, what);
++	return 0;
++}
++
++static u32
++lab_g3_cur(struct lab_g3 *g, u32 reg)
++{
++	int i;
++
++	for (i = 0; i < g->ns; i++)
++		if (g->sreg[i] == reg)
++			return g->sval[i];
++	if (g->ns >= LAB_G3_SHADOW_MAX) {
++		lab_g3_fail(g, "state table full");
++		return 0;
++	}
++	g->sreg[g->ns] = reg;
++	g->sval[g->ns] = g->rd(g->priv, reg);
++	return g->sval[g->ns++];
++}
++
++static void
++lab_g3_set(struct lab_g3 *g, u32 reg, u32 val)
++{
++	int i;
++
++	for (i = 0; i < g->ns; i++) {
++		if (g->sreg[i] == reg) {
++			g->sval[i] = val;
++			return;
++		}
++	}
++	if (g->ns >= LAB_G3_SHADOW_MAX) {
++		lab_g3_fail(g, "state table full");
++		return;
++	}
++	g->sreg[g->ns] = reg;
++	g->sval[g->ns++] = val;
++}
++
++static void
++lab_g3_word(struct lab_g3 *g, u32 w)
++{
++	if (g->nscr >= LAB_G3_SCR_MAX) {
++		lab_g3_fail(g, "script longer than the buffer");
++		return;
++	}
++	g->scr[g->nscr++] = w;
++}
++
++/* a register write; NVIDIA packs consecutive writes into one op 0x21 */
++static void
++lab_g3_emit(struct lab_g3 *g, u32 reg, u32 val)
++{
++	if (g->run < 0) {
++		g->run = g->nscr;
++		lab_g3_word(g, 0x00010021);
++	}
++	lab_g3_word(g, reg);
++	lab_g3_word(g, val);
++	if (!g->err)
++		g->scr[g->run] += 0x00020000;
++}
++
++static void
++lab_g3_op(struct lab_g3 *g, u32 code, int n, u32 a0, u32 a1)
++{
++	g->run = -1;
++	lab_g3_word(g, ((u32)(1 + n) << 16) | code);
++	if (n > 0)
++		lab_g3_word(g, a0);
++	if (n > 1)
++		lab_g3_word(g, a1);
++}
++
++static void
++lab_g3_wait(struct lab_g3 *g, u32 ns)
++{
++	lab_g3_op(g, 0x2e, 1, ns, 0);
++}
++
++/* Strobe: writes to 0x10f600..0x10f8ff are counted; before a write to the clock registers, the memory PLL, 0x100xxx or
++ * the controllers' line registers NVIDIA writes 0x13d834 = 0 and waits one unit per counted write (op 0x3a N). */
++static void
++lab_g3_flush(struct lab_g3 *g)
++{
++	if (g->pending) {
++		lab_g3_emit(g, 0x13d834, 0x00000000);
++		lab_g3_op(g, 0x3a, 1, g->pending, 0);
++		g->pending = 0;
++	}
++}
++
++/* always = false: the write goes into the script only if it changes the register */
++static bool
++lab_g3_w(struct lab_g3 *g, u32 reg, u32 val, bool always)
++{
++	if (!always && lab_g3_cur(g, reg) == val)
++		return false;
++	if ((reg >= 0x137300 && reg < 0x137400) || (reg >= 0x132000 && reg < 0x133000) ||
++	    (reg >= 0x100000 && reg < 0x101000) || (reg >= 0x110000 && reg < 0x118000))
++		lab_g3_flush(g);
++	lab_g3_emit(g, reg, val);
++	lab_g3_set(g, reg, val);
++	if (reg >= 0x10f600 && reg < 0x10f900)
++		g->pending++;
++	return true;
++}
++
++/* wait for the memory PLL lock (0x137390 bit 1, up to 64 us); the lock flags in 0x132000 read as ones from then on */
++static void
++lab_g3_lockwait(struct lab_g3 *g)
++{
++	lab_g3_op(g, 0x00, 1, 0x00000002, 0);
++	lab_g3_op(g, 0x01, 1, 0x00137390, 0);
++	lab_g3_op(g, 0x15, 2, 0x00000002, 0x0000fa00);
++	lab_g3_set(g, 0x132000, lab_g3_cur(g, 0x132000) | 0x00030000);
++}
++
++/* Memory PLL coefficients: P from the largest down (VCO within the VBIOS limits), M while the divided reference stays
++ * within the input limits, N by rounding; a later candidate wins only with a strictly smaller error. */
++static bool
++lab_g3_mem_pll(const struct lab_g3_pll *l, u32 khz, u32 *got, u32 *coef)
++{
++	u32 ref = l->refclk, mlo, mhi, P, M, best = 0;
++	bool have = false;
++
++	if (!ref || !l->max_in || !l->min_in || !khz)
++		return false;
++	mlo = (ref + l->max_in - 1) / l->max_in;
++	if (mlo < l->min_m)
++		mlo = l->min_m;
++	mhi = ref / l->min_in;
++	if (mhi > l->max_m)
++		mhi = l->max_m;
++	for (P = l->max_p; P >= l->min_p && P > 0; P--) {
++		u32 vco;
++
++		if (khz > l->max_freq / P)
++			continue;
++		vco = khz * P;
++		if (vco < l->min_freq)
++			continue;
++		for (M = mlo; M <= mhi; M++) {
++			u32 N, f, err;
++
++			if (!M || vco > (0xffffffffu - ref / 2) / M)
++				continue;
++			N = (vco * M + ref / 2) / ref;
++			if (N < l->min_n || N > l->max_n || N > 0xffffffffu / ref)
++				continue;
++			f = ref * N / M / P;
++			err = khz > f ? khz - f : f - khz;
++			if (!have || err < best) {
++				have = true;
++				best = err;
++				*got = f;
++				*coef = P << 16 | N << 8 | M;
++			}
++		}
++	}
++	return have;
++}
++
++static u32
++lab_g3_f808(const struct lab_g3_level *l)
++{
++	u8 r2 = l->R[2];
++
++	return 0x00020000 | ((r2 & 0x04) ? 0x00000004 : 0x12800000) | ((r2 & 0x10) ? 0x08000000 : 0x04000000) |
++	       ((r2 & 0x08) ? 0 : 0x00100000);
++}
++
++static u32
++lab_g3_f018(const struct lab_g3 *g)
++{
++	u32 lo = g->tgt.M[0] | g->tgt.M[1] << 8;
++
++	return 0x00001000 | (lo > 450 ? 0x00004000 : 0) | (g->tgt_mhz <= 750 ? 0x10000000 : 0) | (g->tgt_pll ? 0 : 0x00008000);
++}
++
++/* what the target needs: PLL coefficients or the divider code (3240 MHz / (code + 2)) */
++static bool
++lab_g3_target(struct lab_g3 *g)
++{
++	if (!g->tgt_mhz) {
++		lab_g3_fail(g, "target frequency is zero");
++		return false;
++	}
++	if (g->tgt_pll) {
++		if (!lab_g3_mem_pll(&g->pll, g->tgt_mhz * 1000, &g->got_khz, &g->coef)) {
++			lab_g3_fail(g, "no memory PLL coefficients within the VBIOS limits");
++			return false;
++		}
++		g->div = 0;
++	} else {
++		u32 q = (6480 + g->tgt_mhz) / (2 * g->tgt_mhz);	/* 3240 / target, rounded */
++
++		if (q < 2 || q > 65) {
++			lab_g3_fail(g, "memory clock divider out of range");
++			return false;
++		}
++		if (3240 % g->tgt_mhz) {	/* every divider target in the recordings is exact; NVIDIA's rounding is unknown */
++			lab_g3_fail(g, "the divider cannot give the target frequency exactly");
++			return false;
++		}
++		g->div = q - 2;
++		g->got_khz = 3240000 / q;
++		g->coef = 0;
++	}
++	return true;
++}
++
++static void
++lab_g3_host(struct lab_g3 *g, u32 *l, int *n, u32 reg, u32 val)
++{
++	if (*n >= LAB_G3_HOST_MAX) {
++		lab_g3_fail(g, "host write list full");
++		return;
++	}
++	l[2 * *n] = reg;
++	l[2 * *n + 1] = val;
++	(*n)++;
++}
++
++/* The six range registers 0x10f4xx from the packed word of the rammap entry (bytes 5-8); the layout is the one nouveau
++ * uses on Kepler (fb/ramgk104.c), checked against the recordings. 0x1700 in 0x10f400 and 0x8800 in 0x10f444: meaning
++ * unknown; absent after POST, always present under NVIDIA. */
++static void
++lab_g3_range(struct lab_g3 *g, u32 *l, int *n, const u8 *M)
++{
++	u32 w = M[5] | M[6] << 8 | M[7] << 16 | (u32)M[8] << 24;
++
++	lab_g3_host(g, l, n, 0x10f468, (lab_g3_cur(g, 0x10f468) & ~0x001ff1ff) | (w & 0x1ff) | ((w >> 9) & 0x1ff) << 12);
++	lab_g3_host(g, l, n, 0x10f420, (lab_g3_cur(g, 0x10f420) & ~0x00000001) | ((w >> 18) & 1));
++	lab_g3_host(g, l, n, 0x10f430, (lab_g3_cur(g, 0x10f430) & ~0x00000001) | ((w >> 19) & 1));
++	lab_g3_host(g, l, n, 0x10f400, (lab_g3_cur(g, 0x10f400) & ~0x0000001f) | 0x00001700 | ((w >> 20) & 0x1f));
++	lab_g3_host(g, l, n, 0x10f410, (lab_g3_cur(g, 0x10f410) & ~0x00000200) | ((w >> 25) & 1) << 9);
++	lab_g3_host(g, l, n, 0x10f444, (lab_g3_cur(g, 0x10f444) & ~0x000000a0) | 0x00008800 | ((w >> 26) & 1) << 5 | ((w >> 27) & 1) << 7);
++}
++
++/* Host writes before the script: 0x10f050 and the six range registers go to the set of the lowest VBIOS range, whatever
++ * the transition; PLL preparation if the PLL starts from scratch (bit 1 of 0x132000 is set only after POST).
++ * The writes also enter the state: the script is built as if they were done (NVIDIA's host does them before building). */
++static bool
++lab_g3_pre(struct lab_g3 *g)
++{
++	int i;
++
++	g->npre = 0;
++	lab_g3_host(g, g->pre, &g->npre, 0x10f050, (lab_g3_cur(g, 0x10f050) & ~0x00001400) | 0x00000400);
++	lab_g3_range(g, g->pre, &g->npre, g->low.M);
++	if (g->tgt_pll && !g->on_pll && (lab_g3_cur(g, 0x132000) & 0x00000002)) {
++		u32 v = lab_g3_cur(g, 0x132000);
++
++		lab_g3_host(g, g->pre, &g->npre, 0x132000, v);
++		lab_g3_host(g, g->pre, &g->npre, 0x132000, v & ~0x00000002);
++	}
++	for (i = 0; i < g->npre; i++)
++		lab_g3_set(g, g->pre[2 * i], g->pre[2 * i + 1]);
++	return !g->err;
++}
++
++/* Host writes after the script (the state is read again, after it ran): the six range registers and 0x10f050 go to the
++ * target's set; a bit pair of 0x10f824 and bit 30 of 0x10f808 by bit 4 of ramcfg byte 2 (nouveau's GT21x code calls
++ * these "post fiddlings"); a divider target clears the PLL enable bit. */
++static bool
++lab_g3_post(struct lab_g3 *g)
++{
++	u32 lo = g->tgt.M[0] | g->tgt.M[1] << 8;
++
++	g->ns = 0;
++	g->npost = 0;
++	if (g->tgt.R[2] & 0x10) {
++		lab_g3_host(g, g->post, &g->npost, 0x132018, lab_g3_f018(g));
++		lab_g3_host(g, g->post, &g->npost, 0x10f824, lab_g3_cur(g, 0x10f824) | 0x00000180);
++		lab_g3_host(g, g->post, &g->npost, 0x10f808, lab_g3_cur(g, 0x10f808) & ~0x40000000);
++	} else {
++		lab_g3_host(g, g->post, &g->npost, 0x10f824, lab_g3_cur(g, 0x10f824) | 0x00000600);
++	}
++	if (!g->tgt_pll)
++		lab_g3_host(g, g->post, &g->npost, 0x132000, lab_g3_cur(g, 0x132000) & ~0x00000001);
++	lab_g3_range(g, g->post, &g->npost, g->tgt.M);
++	lab_g3_host(g, g->post, &g->npost, 0x10f050, (lab_g3_cur(g, 0x10f050) & ~0x00001400) | (lo > 450 ? 0x00001000 : 0x00000400));
++	return !g->err;
++}
++
++/* The memory transition script in NVIDIA's format (words for lab_interp). Order and conditions come from NVIDIA
++ * recordings of five GF108 DDR3 boards (docs/2026-11-25/ddr3-generator.md), field values from the VBIOS bytes of the
++ * target level. Call lab_g3_target() first. */
++static bool
++lab_g3_script(struct lab_g3 *g)
++{
++	const struct lab_g3_level *C = &g->cur, *L = &g->tgt;
++	const u8 *T = L->T, *R = L->R;
++	const u8 r2 = R[2];
++	const bool b4 = r2 & 0x10, dlloff = r2 & 0x40, cdlloff = C->R[2] & 0x40, numeric = L->M[4] & 0x08;
++	const bool on_pll = g->on_pll, tgt_pll = g->tgt_pll;
++	const u32 mhz = g->tgt_mhz, hi = L->M[2] | L->M[3] << 8;
++	const u32 f018 = lab_g3_f018(g), rng824 = hi <= 450 ? 0x00006000 : 0;
++	const u32 odt = (T[0x0e] & 1) << 2 | (T[0x0e] & 2) << 5 | (T[0x0e] & 4) << 7;
++	const u32 t290 = (u32)T[9] << 24 | T[7] << 17 | T[5] << 8 | T[3];
++	const u32 line = mhz <= 750 ? 0x22222222 : 0x00000000;
++	u32 cl, mr0, cwl, v, m1, rfc, built0, old0, div = 0, dllwait;
++	int i, k;
++
++	g->nscr = 0;
++	g->pending = 0;
++	g->run = -1;
++	cl = lab_g3_xlat(g, lab_g3_cl, sizeof(lab_g3_cl), T[2], "CL of the VBIOS is not a DDR3 value");
++	mr0 = 0x00001000 | lab_g3_xlat(g, lab_g3_wr, sizeof(lab_g3_wr), T[0], "WR of the VBIOS is not a DDR3 value") << 9 |
++	      (cl & 0x0e) << 3 | (cl & 0x01) << 2;
++	cwl = lab_g3_xlat(g, lab_g3_cwl, sizeof(lab_g3_cwl), T[0x13], "CWL of the VBIOS is not a DDR3 value");
++	if (!mhz)
++		lab_g3_fail(g, "target frequency is zero");
++	if (g->err)
++		return false;
++	dllwait = (512000 + mhz * 1000 - 1) / (mhz * 1000) * 1000;	/* 512 memory clocks, rounded up to 1 us */
++	if (!tgt_pll)
++		div = (lab_g3_cur(g, 0x137310) & ~0x00003f00) | g->div << 8;
++
++	/* before the memory stops */
++	if (tgt_pll && !on_pll) {		/* memory runs from the divider: set up and lock the PLL in advance */
++		lab_g3_w(g, 0x137320, 0x00000103, true);
++		lab_g3_w(g, 0x137330, 0x81200606, true);
++		lab_g3_w(g, 0x132004, g->coef, true);
++		lab_g3_w(g, 0x132000, lab_g3_cur(g, 0x132000) | 0x00000001, true);
++		lab_g3_lockwait(g);
++		lab_g3_w(g, 0x132018, f018, false);
++	}
++	if (on_pll && !tgt_pll)			/* memory runs from the PLL: set up the divider in advance */
++		lab_g3_w(g, 0x137310, div, false);
++	if (on_pll)
++		lab_g3_w(g, 0x137300, 0x00000103, true);
++	if (on_pll || tgt_pll) {
++		lab_g3_w(g, 0x137370, 0x00000003, true);
++		lab_g3_w(g, 0x137380, 0x00000001, true);
++	}
++	if (!b4)
++		lab_g3_w(g, 0x10f808, lab_g3_f808(C) | 0x40000000, true);
++	v = lab_g3_cur(g, 0x10f824) & ~(b4 ? 0x00000600 : 0x00000180);
++	if (tgt_pll && !on_pll && !rng824)	/* PLL already locked at the target: bits 13-14 are cleared at once (set: later) */
++		v &= ~0x00006000;
++	lab_g3_w(g, 0x10f824, v, false);
++	lab_g3_w(g, 0x100b0c, 0x00080012, true);
++	if (g->display) {
++		lab_g3_op(g, 0x14, 2, 0x00000000, LAB_G3_FRAME_TO);
++		lab_g3_op(g, 0x14, 2, 0x00010000, LAB_G3_FRAME_TO);
++		lab_g3_w(g, 0x611200, 0x00003300, true);
++	}
++	lab_g3_op(g, 0x34, 1, 0x0000000a, 0);
++	lab_g3_op(g, 0x20, 2, 0x00000001, 0x00000000);
++
++	/* memory stopped */
++	lab_g3_w(g, 0x10f200, lab_g3_cur(g, 0x10f200) & ~0x00000800, true);
++	m1 = lab_g3_cur(g, 0x10f304);
++	if ((m1 & 0x244) & ~odt)		/* termination: clear early, set after the clock change */
++		lab_g3_w(g, 0x10f304, (m1 & ~0x00000244) | (m1 & 0x244 & odt), false);
++	if (!b4)
++		lab_g3_w(g, 0x10f808, lab_g3_cur(g, 0x10f808) | 0x04020000, false);
++	if (dlloff && !cdlloff) {
++		lab_g3_w(g, 0x10f314, 0x00000001, true);
++		lab_g3_w(g, 0x10f304, lab_g3_cur(g, 0x10f304) | 0x00000001, true);
++		lab_g3_wait(g, 1000);
++	}
++	if (!b4)
++		lab_g3_w(g, 0x1373ec, lab_g3_cur(g, 0x1373ec) | 0x00020000, false);
++	rfc = t290 & 0x0001ff00;
++	if (rfc > (lab_g3_cur(g, 0x10f290) & 0x0001ff00))	/* refresh takes more clocks: raise it early */
++		lab_g3_w(g, 0x10f290, (lab_g3_cur(g, 0x10f290) & ~0x0001ff00) | rfc, false);
++	lab_g3_w(g, 0x10f314, 0x00000001, true);
++	lab_g3_w(g, 0x10f210, 0x00000000, true);
++	lab_g3_w(g, 0x10f310, 0x00000001, true);
++	lab_g3_w(g, 0x10f310, 0x00000001, true);
++	lab_g3_wait(g, 1000);
++	lab_g3_w(g, 0x10f090, 0x00000060, true);
++	lab_g3_w(g, 0x10f090, 0xc000007e, true);
++	if (on_pll) {				/* leave the PLL for the divider: for good, or while the PLL is retuned */
++		lab_g3_w(g, 0x137360, 0x00000003, true);
++		lab_g3_w(g, 0x10f830, lab_g3_cur(g, 0x10f830) | 0x00000006, false);
++		lab_g3_w(g, 0x137370, 0x00000000, true);
++		lab_g3_w(g, 0x137380, 0x00000000, true);
++		lab_g3_w(g, 0x132018, lab_g3_cur(g, 0x132018) & ~0x00004000, false);
++		lab_g3_w(g, 0x132000, lab_g3_cur(g, 0x132000) & ~0x00000001, true);
++		if (tgt_pll) {
++			lab_g3_w(g, 0x137320, 0x00000103, true);
++			lab_g3_w(g, 0x137330, 0x81200606, true);
++			lab_g3_w(g, 0x132004, g->coef, true);
++			lab_g3_w(g, 0x132000, lab_g3_cur(g, 0x132000) | 0x00000001, true);
++			lab_g3_lockwait(g);
++		}
++	} else if (!tgt_pll) {			/* divider -> divider: the code changes in place */
++		lab_g3_w(g, 0x137310, div, false);
++	}
++	lab_g3_w(g, 0x10f874, (lab_g3_cur(g, 0x10f874) & ~0x04000000) | (mhz <= 750 ? 0x04000000 : 0), false);
++	if (numeric) {
++		lab_g3_w(g, 0x10f658, R[6] << 16 | R[5] << 8 | R[5], false);
++		lab_g3_w(g, 0x132018, f018, false);
++		lab_g3_w(g, 0x10f660, R[8] << 8 | R[7], true);
++		lab_g3_w(g, 0x10f668, 0x80000000 | (R[9] >> 4) << 20 | (R[3] & 0x0f) << 16 | (R[9] & 0x0f), false);
++		lab_g3_w(g, 0x10f910, lab_g3_cur(g, 0x10f910) & ~0x00002000, false);
++		lab_g3_w(g, 0x10f914, lab_g3_cur(g, 0x10f914) & ~0x00002000, false);
++		lab_g3_w(g, 0x10f824, (lab_g3_cur(g, 0x10f824) & ~0x00006000) | rng824, false);
++	} else {
++		lab_g3_w(g, 0x10f824, (lab_g3_cur(g, 0x10f824) & ~0x00006000) | rng824, false);
++		lab_g3_w(g, 0x132018, f018, false);
++		lab_g3_wait(g, 20000);
++		lab_g3_w(g, 0x10f910, lab_g3_cur(g, 0x10f910) | 0x00002000, false);
++		lab_g3_w(g, 0x10f914, lab_g3_cur(g, 0x10f914) | 0x00002000, false);
++		lab_g3_w(g, 0x10f658, 0x00000000, false);
++		for (i = 0; i < LAB_G3_FBPA; i++) {	/* line registers: bit 1 of every nibble = frequency not above 750 MHz */
++			static const u16 off[] = { 0x620, 0x628, 0x630 };
++
++			for (k = 0; k < 3; k++) {
++				u32 reg = 0x110000 + i * 0x1000 + off[k];
++
++				lab_g3_w(g, reg, (lab_g3_cur(g, reg) & ~0x22222222) | line, false);
++			}
++		}
++		if (mhz > 500)
++			lab_g3_w(g, 0x10f830, lab_g3_cur(g, 0x10f830) & ~0x00000006, false);
++	}
++	if (tgt_pll) {
++		lab_g3_w(g, 0x137370, 0x00000003, true);
++		lab_g3_w(g, 0x137380, 0x00000001, true);
++		lab_g3_w(g, 0x137360, 0x00000002, true);
++	}
++	lab_g3_w(g, 0x10f090, 0x4000007f, true);
++	lab_g3_w(g, 0x10f210, 0x80000000, true);
++	lab_g3_wait(g, dllwait);
++
++	/* memory is clocked again: mode registers and timings */
++	built0 = lab_g3_cur(g, 0x10f300);
++	old0 = built0 & ~0x00000100;
++	if (!dlloff) {
++		if (cdlloff) {
++			lab_g3_w(g, 0x10f304, lab_g3_cur(g, 0x10f304) & ~0x00000001, true);
++			lab_g3_wait(g, 1000);
++		}
++		lab_g3_w(g, 0x10f300, old0 | 0x00000100, true);
++		lab_g3_wait(g, 1000);
++		lab_g3_w(g, 0x10f300, old0, true);
++		lab_g3_wait(g, 1000);
++	}
++	if (lab_g3_w(g, 0x10f320, (lab_g3_cur(g, 0x10f320) & ~0x00000038) | cwl << 3, false))
++		lab_g3_wait(g, 1000);
++	lab_g3_w(g, 0x10f300, mr0 | (built0 & 0x00000100), true);
++	lab_g3_wait(g, 1000);
++
++	lab_g3_w(g, 0x10f224, (lab_g3_cur(g, 0x10f224) & ~0x00ff0000) | T[0x12] << 16, false);
++	lab_g3_w(g, 0x10f290, t290, false);
++	lab_g3_w(g, 0x10f294, (lab_g3_cur(g, 0x10f294) & 0xfc000000) | T[0x0b] << 20 | T[0x0a] << 14 | T[0x13] << 7 |
++			      (u32)(T[2] - (dlloff ? 1 : 0)), false);
++	lab_g3_w(g, 0x10f298, (lab_g3_cur(g, 0x10f298) & 0xff000000) | T[0] << 16 | T[1] << 8 | 0x11, false);
++	lab_g3_w(g, 0x10f29c, (lab_g3_cur(g, 0x10f29c) & ~0x0000ffff) | T[0x14] << 9 | T[0x15] << 5 | T[0x0d], false);
++	lab_g3_w(g, 0x10f2a0, (lab_g3_cur(g, 0x10f2a0) & ~0x001f8000) | T[0x0c] << 15, false);
++	lab_g3_w(g, 0x10f200, (lab_g3_cur(g, 0x10f200) & ~0x00001000) | ((r2 & 0x08) ? 0 : 0x00001000), false);
++	lab_g3_w(g, 0x10f604, (lab_g3_cur(g, 0x10f604) & ~0xf1000000) | ((r2 & 0x20) ? 0xf0000000 : 0) |
++			      ((r2 & 0x04) ? 0 : 0x01000000), false);
++	lab_g3_w(g, 0x10f614, (lab_g3_cur(g, 0x10f614) & ~0xf0000100) | (u32)(T[0x18] & 0x0f) << 28 | (r2 & 1) << 8, false);
++	lab_g3_w(g, 0x10f610, (lab_g3_cur(g, 0x10f610) & ~0xf0000100) | (u32)(T[0x18] & 0x0f) << 28 | ((r2 >> 1) & 1) << 8, false);
++	lab_g3_w(g, 0x10f808, lab_g3_f808(L) | (lab_g3_cur(g, 0x10f808) & 0x40000000), false);
++	if (b4)
++		lab_g3_w(g, 0x1373ec, lab_g3_cur(g, 0x1373ec) & ~0x00020000, false);
++	lab_g3_w(g, 0x1373f8, (lab_g3_cur(g, 0x1373f8) & ~0x00000005) | ((r2 & 1) ? 0x00000005 : 0), false);
++	lab_g3_w(g, 0x10f870, (R[0x0d] & 0x0f) * 0x11111111, true);
++	lab_g3_w(g, 0x10f618, (R[3] & 0x0f) * 0x11111111, false);
++	m1 = lab_g3_cur(g, 0x10f304);
++	if ((m1 & 0x244) != odt) {
++		lab_g3_w(g, 0x10f304, (m1 & ~0x00000244) | odt, true);
++		lab_g3_wait(g, 1000);
++	}
++	if (!dlloff) {
++		/* bits 16 and 19 of 0x100c00 (0x00090000): meaning unknown, NVIDIA always sets them */
++		lab_g3_w(g, 0x100c00, (lab_g3_cur(g, 0x100c00) & ~0x08000000) | 0x00090000 | (hi <= 450 ? 0x08000000 : 0), false);
++		lab_g3_w(g, 0x10f300, mr0 | 0x00000100, true);
++		lab_g3_wait(g, 1000);
++		lab_g3_w(g, 0x10f300, mr0, true);
++		lab_g3_wait(g, 1000);
++		lab_g3_wait(g, dllwait);
++	} else {
++		lab_g3_wait(g, 5000);		/* DLL off: 5 us instead of the lock wait; origin of the number unknown */
++	}
++	v = lab_g3_cur(g, 0x10f830);
++	lab_g3_w(g, 0x10f830, v | 0x01000000, true);
++	lab_g3_w(g, 0x10f830, v, true);
++	lab_g3_op(g, 0x20, 2, 0x00000000, 0x00000000);
++	lab_g3_op(g, 0x34, 1, 0x0000000b, 0);
++
++	lab_g3_w(g, 0x100b0c, 0x00080028, true);
++	lab_g3_w(g, 0x611200, 0x00003330, true);
++	lab_g3_w(g, 0x10f200, lab_g3_cur(g, 0x10f200) | 0x00000800, true);
++	lab_g3_op(g, 0x16, 1, 0x00000000, 0);
++	return !g->err;
++}
++/* LAB_G3_CORE_END */
++
++#define LAB_GEN_LEVELS 8
++static struct lab_g3 lab_gen;
++static struct lab_step lab_gen_step;
++static char lab_gen_name[48];
++static bool lab_gen_ok;		/* the generator applies to this card (decided at load, lab_gen_probe) */
++static bool lab_gen_cur;	/* the armed step is a built one */
++static bool lab_gen_used;	/* a built script has run since load: the software state of the recorded plans is stale */
++static bool lab_gen_more;	/* the armed step is the first of two (divider -> PLL level -> divider) */
++
++static u32
++lab_gen_rd(void *priv, u32 reg)
++{
++	struct nvkm_device *device = priv;
++
++	return nvkm_rd32(device, reg);
++}
++
++/* memory levels of the VBIOS level table (sub-entry 5, as the clk domain table says): MHz and the clock source flag
++ * (bits 14-15, the same flag the core nodes have: 1 PLL, 2 divider, 0 not given) */
++static int
++lab_gen_levels(struct nvkm_subdev *subdev, u16 *mhz, u8 *flag, int max)
++{
++	struct nvkm_bios *bios = subdev->device->bios;
++	struct nvbios_perfE perfE;
++	u8 ver, hdr, cnt, len, sver, shdr;
++	u32 data, sdata;
++	int i = 0, n = 0;
++
++	while ((data = nvbios_perfEp(bios, i++, &ver, &hdr, &cnt, &len, &perfE))) {
++		u16 v;
++
++		if (ver != 0x40)
++			return -EINVAL;
++		if (perfE.pstate == 0xff)
++			continue;
++		sver = ver;
++		shdr = hdr;
++		sdata = nvbios_perfSe(bios, data, 5, &sver, &shdr, cnt, len);
++		if (!sdata || n >= max)
++			return -EINVAL;
++		v = nvbios_rd16(bios, sdata);
++		mhz[n] = v & 0x3fff;
++		flag[n++] = v >> 14;
++	}
++	return n;
++}
++
++/* no flag in the VBIOS: the divider, if it gives the frequency exactly */
++static bool
++lab_gen_want_pll(u8 flag, u32 mhz)
++{
++	if (flag == 1)
++		return true;
++	if (flag == 2)
++		return false;
++	return !mhz || (3240 % mhz) != 0 || 3240 / mhz < 2 || 3240 / mhz > 65;
++}
++
++/* VBIOS bytes of the level whose rammap range holds mhz (first: the first rammap entry, the lowest frequencies):
++ * rammap entry, ramcfg entry of the board's strap, timing entry. The same lookups as the stock gf100_ram_calc. */
++static int
++lab_gen_level(struct nvkm_subdev *subdev, u32 mhz, bool first, struct lab_g3_level *lv)
++{
++	struct nvkm_bios *bios = subdev->device->bios;
++	struct nvbios_ramcfg cfg;
++	u8 ver, hdr, cnt, len, strap, tver, thdr, tcnt, tlen, tidx;
++	u32 rammap, ramcfg, timing;
++	int i;
++
++	memset(lv, 0, sizeof(*lv));
++	if (first)
++		rammap = nvbios_rammapEp(bios, 0, &ver, &hdr, &cnt, &len, &cfg);
++	else
++		rammap = nvbios_rammapEm(bios, mhz, &ver, &hdr, &cnt, &len, &cfg);
++	if (!rammap || ver != 0x10 || hdr < 0x09 || hdr > sizeof(lv->M))
++		return -EINVAL;
++	strap = nvbios_ramcfg_index(subdev);
++	if (strap >= cnt || len < 0x0e || len > sizeof(lv->R))
++		return -EINVAL;
++	ramcfg = rammap + hdr + strap * len;
++	tidx = nvbios_rd08(bios, ramcfg + 0x01);
++	if (tidx == 0xff)
++		return -EINVAL;
++	timing = nvbios_timingEe(bios, tidx, &tver, &thdr, &tcnt, &tlen);
++	if (!timing || tver != 0x10 || thdr < 0x19 || thdr > sizeof(lv->T))
++		return -EINVAL;
++	for (i = 0; i < hdr; i++)
++		lv->M[i] = nvbios_rd08(bios, rammap + i);
++	for (i = 0; i < len; i++)
++		lv->R[i] = nvbios_rd08(bios, ramcfg + i);
++	for (i = 0; i < thdr; i++)
++		lv->T[i] = nvbios_rd08(bios, timing + i);
++	return 0;
++}
++
++/* memory frequency now, from the registers, kHz; *pll: the clock comes from the PLL (0x137360: 2 PLL, 3 divider).
++ * PLL: reference (3240 MHz over the divider in 0x137330) x N / M / P of 0x132004; divider: 3240 MHz / (code + 2). */
++static u32
++lab_gen_cur_khz(struct nvkm_device *device, bool *pll)
++{
++	if ((nvkm_rd32(device, 0x137360) & 0x00000003) == 0x00000002) {
++		u32 c = nvkm_rd32(device, 0x132004), r = nvkm_rd32(device, 0x137330);
++		u32 P = (c >> 16) & 0x3f, N = (c >> 8) & 0xff, M = c & 0xff, ref = 1620000;
++
++		*pll = true;
++		if (r & 0x80000000) {
++			if (nvkm_rd32(device, 0x137320) & 0x00000100)
++				r >>= 8;
++			ref = 3240000 / ((r & 0x3f) + 2);
++		}
++		return (M && P) ? ref * N / M / P : 0;
++	}
++	*pll = false;
++	return 3240000 / (((nvkm_rd32(device, 0x137310) >> 8) & 0x3f) + 2);
++}
++
++/* the VBIOS level nearest to the measured frequency, if within 1.5 % (the PLL gives 896.8 MHz for the 900 MHz level);
++ * otherwise the frequency itself */
++static u32
++lab_gen_snap(const u16 *mhz, int n, u32 khz)
++{
++	u32 best = 0, bd = ~0u;
++	int i;
++
++	for (i = 0; i < n; i++) {
++		u32 lv = mhz[i] * 1000, d = lv > khz ? lv - khz : khz - lv;
++
++		if (mhz[i] && d < bd) {
++			bd = d;
++			best = mhz[i];
++		}
++	}
++	if (best && bd <= 15 * best)
++		return best;
++	return (khz + 500) / 1000;
++}
++
++/* is the memory clock at the target the generator computed: same source, same coefficients or divider code */
++static bool
++lab_gen_there(struct nvkm_device *device, const struct lab_g3 *g)
++{
++	bool pll = (nvkm_rd32(device, 0x137360) & 0x00000003) == 0x00000002;
++
++	if (g->tgt_pll)
++		return pll && nvkm_rd32(device, 0x132004) == g->coef;
++	return !pll && ((nvkm_rd32(device, 0x137310) >> 8) & 0x3f) == g->div;
++}
++
++/* true the first time a script is seen (a ring of the last eight): each distinct script is printed once */
++static bool
++lab_gen_fresh(const u32 *w, int n)
++{
++	static u32 seen[8];
++	static int nseen;
++	u32 h = 2166136261u;
++	int i;
++
++	for (i = 0; i < n; i++)
++		h = (h ^ w[i]) * 16777619u;
++	for (i = 0; i < ARRAY_SIZE(seen) && i < nseen; i++)
++		if (seen[i] == h)
++			return false;
++	seen[nseen++ % ARRAY_SIZE(seen)] = h;
++	return true;
++}
++
++static void
++lab_gen_dump(struct nvkm_subdev *subdev, const char *what, const u32 *w, int n)
++{
++	char line[8 * 9 + 1];
++	int i, k, p;
++
++	for (i = 0; i < n; i += 8) {
++		for (k = 0, p = 0; k < 8 && i + k < n; k++)
++			p += scnprintf(line + p, sizeof(line) - p, " %08x", w[i + k]);
++		nvkm_info(subdev, "LAB gen %s %03d:%s\n", what, i, line);
++	}
++}
++
++/* Does the generator apply to this card? Decided from the hardware and the VBIOS (see the header above). */
++static bool
++lab_gen_probe(struct gf100_ram *ram)
++{
++	struct nvkm_subdev *subdev = &ram->base.fb->subdev;
++	struct nvkm_device *device = subdev->device;
++	struct lab_g3_level lv;
++	u16 mhz[LAB_GEN_LEVELS];
++	u8 flag[LAB_GEN_LEVELS];
++	const char *why = NULL;
++	char list[128];
++	int n, i, p = 0;
++
++	if (ram->base.type != NVKM_RAM_TYPE_DDR3)
++		return false;
++	n = lab_gen_levels(subdev, mhz, flag, LAB_GEN_LEVELS);
++	if (nvkm_rd32(device, 0x022438) != 1 || nvkm_rd32(device, 0x02243c) != LAB_G3_FBPA)
++		why = "the memory is not one partition with two controllers";
++	else if (n <= 0)
++		why = "no VBIOS level table 4.0 with a memory entry";
++	else if (ram->mempll.reg != 0x132000 || ram->mempll.refclk != 405000)
++		why = "the VBIOS memory PLL is not 0x132000 with a 405 MHz reference";
++	else if (lab_gen_level(subdev, 0, true, &lv))
++		why = "the VBIOS memory tables (rammap, ramcfg, timing) are not version 1.0 of the known size";
++	for (i = 0; !why && i < n; i++) {
++		if (mhz[i] && lab_gen_level(subdev, mhz[i], false, &lv))
++			why = "a memory level has no VBIOS memory tables";
++	}
++	if (why) {
++		nvkm_info(subdev, "LAB gen: the DDR3 script generator does not apply to this card: %s\n", why);
++		return false;
++	}
++	list[0] = 0;
++	for (i = 0; i < n; i++)
++		p += scnprintf(list + p, sizeof(list) - p, "%s%u (%s)", i ? ", " : "", mhz[i],
++			       lab_gen_want_pll(flag[i], mhz[i]) ? "PLL" : "divider");
++	nvkm_info(subdev, "LAB gen: DDR3 memory scripts can be built from the VBIOS and the register state here; memory levels, MHz: %s. lab_mem_gen=%u (2 build and print, switch by the recorded scripts as before; 1 build and run; 0 recorded scripts only)\n",
++		  list, lab_mem_gen);
++	return true;
++}
++
++/* Build the script for the transition "memory as the registers show it now" -> freq, and queue it for the PMU.
++ * One direct step; returns 0 with nothing armed if the memory is already there. dry: build and print only — nothing is
++ * queued and no register is written. */
++static int
++lab_gen_calc(struct gf100_ram *ram, u32 freq, bool dry)
++{
++	struct nvkm_subdev *subdev = &ram->base.fb->subdev;
++	struct nvkm_device *device = subdev->device;
++	struct lab_g3 *g = &lab_gen;
++	u16 mhz[LAB_GEN_LEVELS];
++	u8 flag[LAB_GEN_LEVELS], f = 0;
++	u32 cur_khz, cur_mhz, words, via = 0;
++	bool on_pll, there, fresh;
++	int n, i, ret;
++
++	n = lab_gen_levels(subdev, mhz, flag, LAB_GEN_LEVELS);
++	if (n <= 0)
++		return -EINVAL;
++	memset(g, 0, sizeof(*g));
++	g->rd = lab_gen_rd;
++	g->priv = device;
++	g->run = -1;
++	g->display = true;	/* as NVIDIA at run time; with no active head the frame wait is skipped by the PMU code */
++	g->tgt_mhz = freq / 1000;
++	for (i = 0; i < n; i++)
++		if (mhz[i] == g->tgt_mhz)
++			f = flag[i];
++	g->tgt_pll = lab_gen_want_pll(f, g->tgt_mhz);
++	cur_khz = lab_gen_cur_khz(device, &on_pll);
++	cur_mhz = lab_gen_snap(mhz, n, cur_khz);
++	g->on_pll = on_pll;
++	lab_gen_more = false;
++	if (!on_pll && !g->tgt_pll && g->tgt_mhz > cur_mhz && !READ_ONCE(lab_mem_gen_updiv)) {
++		/* divider -> divider upwards: no recording of this kind; go through the highest PLL level */
++		for (i = 0; i < n; i++)
++			if (mhz[i] > via && lab_gen_want_pll(flag[i], mhz[i]))
++				via = mhz[i];
++		if (!via) {
++			nvkm_error(subdev, "LAB gen: %u -> %u MHz is divider -> divider upwards, not in any recording, and the VBIOS has no PLL level to go through - memory untouched (lab_mem_gen_updiv=1 allows the direct step)\n",
++				   cur_mhz, g->tgt_mhz);
++			return -EINVAL;
++		}
++		nvkm_info(subdev, "LAB gen: %u -> %u MHz is divider -> divider upwards, not in any recording: going through the PLL level %u MHz in two steps (lab_mem_gen_updiv=1 allows the direct step)\n",
++			  cur_mhz, g->tgt_mhz, via);
++		g->tgt_mhz = via;
++		g->tgt_pll = true;
++		lab_gen_more = !dry;
++	}
++	g->pll.refclk = ram->mempll.refclk;
++	g->pll.min_freq = ram->mempll.vco1.min_freq;
++	g->pll.max_freq = ram->mempll.vco1.max_freq;
++	g->pll.min_in = ram->mempll.vco1.min_inputfreq;
++	g->pll.max_in = ram->mempll.vco1.max_inputfreq;
++	g->pll.min_m = ram->mempll.vco1.min_m;
++	g->pll.max_m = ram->mempll.vco1.max_m;
++	g->pll.min_n = ram->mempll.vco1.min_n;
++	g->pll.max_n = ram->mempll.vco1.max_n;
++	g->pll.min_p = ram->mempll.min_p;
++	g->pll.max_p = ram->mempll.max_p;
++	if (lab_gen_level(subdev, cur_mhz, false, &g->cur) || lab_gen_level(subdev, g->tgt_mhz, false, &g->tgt) ||
++	    lab_gen_level(subdev, 0, true, &g->low)) {
++		nvkm_error(subdev, "LAB gen: no VBIOS memory tables for %u MHz (now, %u kHz) or %u MHz (target) - memory untouched\n",
++			   cur_mhz, cur_khz, g->tgt_mhz);
++		return -EINVAL;
++	}
++	if (!lab_g3_target(g)) {
++		nvkm_error(subdev, "LAB gen: target %u MHz: %s - memory untouched\n", g->tgt_mhz, g->err ? g->err : "?");
++		return -EINVAL;
++	}
++	there = lab_gen_there(device, g);
++	nvkm_info(subdev, "LAB gen: memory now %u kHz on the %s (level %u MHz; 0x137360=%08x 0x132000=%08x 0x132004=%08x 0x137310=%08x), target %u MHz on the %s (gives %u kHz)%s\n",
++		  cur_khz, on_pll ? "PLL" : "divider", cur_mhz, nvkm_rd32(device, 0x137360), nvkm_rd32(device, 0x132000),
++		  nvkm_rd32(device, 0x132004), nvkm_rd32(device, 0x137310), g->tgt_mhz, g->tgt_pll ? "PLL" : "divider",
++		  g->got_khz, there ? " - already there, no script" : "");
++	if (there)
++		return 0;
++	if (!lab_g3_pre(g) || !lab_g3_script(g)) {
++		nvkm_error(subdev, "LAB gen: script not built: %s - memory untouched\n", g->err ? g->err : "?");
++		return -EINVAL;
++	}
++	snprintf(lab_gen_name, sizeof(lab_gen_name), "built %u(%s)->%u(%s)", cur_mhz, on_pll ? "PLL" : "div",
++		 g->tgt_mhz, g->tgt_pll ? "PLL" : "div");
++	lab_gen_step = (struct lab_step){ lab_gen_name, g->pre, 2 * g->npre, g->scr, g->nscr, NULL, 0, 0, true };
++	ret = lab_interp(subdev, NULL, &lab_gen_step, false, &words);
++	if (ret || words > 480) {
++		nvkm_error(subdev, "LAB gen %s: script does not fit the PMU (ret %d, %u memx words) - memory untouched\n",
++			   lab_gen_name, ret, words);
++		return ret ? ret : -E2BIG;
++	}
++	fresh = lab_gen_fresh(g->scr, g->nscr);
++	if (fresh && lab_mem_gen_dump > 0) {
++		lab_mem_gen_dump--;
++		nvkm_info(subdev, "LAB gen %s: %d host writes before the script, %d script words (NVIDIA format), about %u memx words\n",
++			  lab_gen_name, g->npre, g->nscr, words);
++		lab_gen_dump(subdev, "pre", g->pre, 2 * g->npre);
++		lab_gen_dump(subdev, "scr", g->scr, g->nscr);
++	}
++	if (dry) {
++		if (fresh)
++			nvkm_info(subdev, "LAB gen %s: built and printed only (lab_mem_gen=2); lab_mem_gen=1 runs built scripts\n",
++				  lab_gen_name);
++		return 0;
++	}
++	/* GT 630M (Medion): two registers NVIDIA sets once at its init and no script writes (see lab_plan_medion). The
++	 * board's tester ran 12 transitions with data checks without them (lab_medion_init=0, 26.11) and all passed; that
++	 * was one run, not a soak, so the write stays under its key (default 1): the first built scripts then run in the
++	 * state his whole series was done in */
++	if (lab_board && lab_board->plan == lab_plan_medion && !on_pll && READ_ONCE(lab_medion_init)) {
++		u32 a = nvkm_rd32(device, 0x10f440), c = nvkm_rd32(device, 0x10f160);
++
++		nvkm_wr32(device, 0x10f440, 0x22f84f10);
++		nvkm_mask(device, 0x10f160, 0x00000010, 0x00000010);
++		nvkm_info(subdev, "LAB gen GT 630M: NVIDIA init state: 0x10f440 %08x -> %08x, 0x10f160 %08x -> %08x\n",
++			  a, nvkm_rd32(device, 0x10f440), c, nvkm_rd32(device, 0x10f160));
++	}
++	lab_rp611 = nvkm_rd32(device, 0x611200);
++	ret = ram_init(&ram->fuc, ram->base.fb);
++	if (ret)
++		return ret;
++	ret = lab_interp(subdev, ram->fuc.base.memx, &lab_gen_step, true, &words);
++	if (ret) {
++		ram_exec(&ram->fuc, false);
++		return ret;
++	}
++	lab_gen_cur = true;
++	lab_armed = true;
++	return 0;
++}
++
++/* After a built script ran: check on the registers that the memory clock is where the script should have left it, and
++ * only then make the host writes that follow the script (they assume it ran: a divider target, for one, gets the PLL
++ * enable bit cleared). */
++static void lab_host_writes(struct nvkm_subdev *subdev, const char *what, const u32 *l, int n);
++static int
++lab_gen_done(struct nvkm_subdev *subdev)
++{
++	struct nvkm_device *device = subdev->device;
++	struct lab_g3 *g = &lab_gen;
++	bool pll;
++	u32 khz;
++
++	bool more = lab_gen_more;
++
++	lab_gen_cur = false;
++	lab_gen_more = false;
++	lab_gen_used = true;
++	khz = lab_gen_cur_khz(device, &pll);
++	if (!lab_gen_there(device, g)) {
++		nvkm_error(subdev, "LAB gen %s: after the script the memory clock is not at the target: %u kHz on the %s (0x137360=%08x 0x132000=%08x 0x132004=%08x 0x137310=%08x; wanted %u kHz on the %s) - host writes after the script skipped\n",
++			   lab_gen_name, khz, pll ? "PLL" : "divider", nvkm_rd32(device, 0x137360), nvkm_rd32(device, 0x132000),
++			   nvkm_rd32(device, 0x132004), nvkm_rd32(device, 0x137310), g->got_khz, g->tgt_pll ? "PLL" : "divider");
++		return -EIO;
++	}
++	if (!lab_g3_post(g)) {
++		nvkm_error(subdev, "LAB gen %s: host writes after the script not built: %s\n", lab_gen_name, g->err ? g->err : "?");
++		return -EINVAL;
++	}
++	lab_host_writes(subdev, "после скрипта", g->post, 2 * g->npost);
++	nvkm_info(subdev, "LAB gen %s: memory at the target, %u kHz on the %s%s\n", lab_gen_name, khz, pll ? "PLL" : "divider",
++		  more ? "; second step follows" : "");
++	return more ? 1 : 0;	/* 1: the caller runs calc and prog again for the level it asked for */
++}
++/* =================== end of LAB: DDR3 memory scripts built from the VBIOS =================== */
++
 +static int
 +lab_replay_calc(struct gf100_ram *ram, u32 freq)
 +{
@@ -6135,6 +7161,25 @@
 +		int cur = lab_cur_mhz(device), t = freq / 1000, tgt;
 +
 +		lab_plan_n = lab_plan_i = 0;
++		lab_gen_cur = false;
++		if (lab_gen_ok) {		/* 26.11: DDR3 — the script can be built instead of replayed */
++			u32 mode = READ_ONCE(lab_mem_gen);
++
++			if (mode == 1)
++				return lab_gen_calc(ram, freq, false);
++			if (mode) {		/* 2: build and print; the switch stays with the recorded scripts, if any */
++				static int failed;
++
++				if (failed < 3 && lab_gen_calc(ram, freq, true) < 0 && ++failed == 3)
++					nvkm_warn(subdev, "LAB gen: three builds failed - no more build attempts until the module is reloaded (lab_mem_gen=2)\n");
++				if (!lab_board)
++					return 0;
++			}
++		}
++		if (lab_gen_used) {
++			nvkm_error(subdev, "LAB replay: recorded scripts are refused after a built script has run (their plans keep their own copy of the memory state) - reload the module with lab_mem_gen=0\n");
++			return -EBUSY;
++		}
 +		if (!lab_board) {
 +			nvkm_error(subdev, "LAB replay: плата не описана — память не трогаю (lab_mem=0 для ядра без памяти)\n");
 +			return -ENODEV;
@@ -6266,9 +7311,9 @@
 +
 +	if (!lab_armed)
 +		return 0;
-+	st = &lab_board->steps[lab_plan[lab_plan_i]];
++	st = lab_gen_cur ? &lab_gen_step : &lab_board->steps[lab_plan[lab_plan_i]];
 +	lab_host_writes(subdev, "до скрипта", st->pre, st->npre);
-+	if (READ_ONCE(lab_mem_line750) == 1 && lab_line750_wanted(device, st)) {
++	if (!st->gen && READ_ONCE(lab_mem_line750) == 1 && lab_line750_wanted(device, st)) {
 +		/* 25.11: линии DDR3 перед подъёмом выше 750 МГц — прямой записью, как в проверенной правке тестировщика */
 +		u32 la[LAB_LINE750_MAX], lv[LAB_LINE750_MAX];
 +		int ln = lab_line750_list(device, la, lv), i;
@@ -6289,6 +7334,12 @@
 +		  st->name, us, lab_mem_op13, lab_mem_op34, lab_mem_syncwait, ret, nvkm_rd32(device, 0x137310), nvkm_rd32(device, 0x1373f0),
 +		  nvkm_rd32(device, 0x137360), nvkm_rd32(device, 0x132000), nvkm_rd32(device, 0x132004), nvkm_rd32(device, 0x10f290),
 +		  nvkm_rd32(device, 0x10f300), nvkm_rd32(device, 0x611200), lab_cur_mhz(device));
++	if (st->gen) {		/* 26.11: built script — one step; check the result, then the host writes after it */
++		int r = lab_gen_done(subdev);
++
++		lab_plan_n = lab_plan_i = 0;
++		return ret < 0 ? ret : r;
++	}
 +	lab_host_writes(subdev, "после скрипта", st->post, st->npost);
 +	if (ret < 0) {
 +		if (lab_board && lab_board->after)
@@ -6308,7 +7359,7 @@
  int
  gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  {
-@@ -142,6 +3045,16 @@
+@@ -142,6 +4045,16 @@
  	int from, mode;
  	int N1, M1, P;
  	int ret;
@@ -6325,7 +7376,7 @@
  
  	/* lookup memory config data relevant to the target frequency */
  	rammap.data = nvbios_rammapEm(bios, freq / 1000, &ver, &rammap.size,
-@@ -268,7 +3181,10 @@
+@@ -268,7 +4181,10 @@
  	ram_wr32(fuc, 0x100b0c, 0x00080012);
  // 0x00030014 // 0x00000000 // 0x02b5f070
  // 0x00030014 // 0x00010000 // 0x02b5f070
@@ -6337,7 +7388,7 @@
  // 0x00020034 // 0x0000000a
  // 0x00030020 // 0x00000001 // 0x00000000
  
-@@ -322,7 +3238,7 @@
+@@ -322,7 +4238,7 @@
  		ram_wr32(fuc, 0x10f344, 0x00600009);
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700008);
@@ -6346,7 +7397,7 @@
  		ram_wr32(fuc, 0x10f830, 0x00300017);
  		gf100_ram_train(fuc, 0x80021001);
  		gf100_ram_train(fuc, 0x80081001);
-@@ -333,7 +3249,8 @@
+@@ -333,7 +4249,8 @@
  // 0x00030020 // 0x00000000 // 0x00000000
  // 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -6356,7 +7407,7 @@
  	} else {
  		ram_wr32(fuc, 0x10f800, 0x00001800);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
-@@ -376,7 +3293,7 @@
+@@ -376,7 +4293,7 @@
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700000);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
@@ -6365,7 +7416,7 @@
  
  		gf100_ram_train(fuc, 0x800e1008);
  
-@@ -386,7 +3303,8 @@
+@@ -386,7 +4303,8 @@
  	// 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -6375,7 +7426,7 @@
  		ram_nsec(fuc, 100000);
  		ram_wr32(fuc, 0x10f9b0, 0x05313f41);
  		ram_wr32(fuc, 0x10f9b4, 0x00002f50);
-@@ -408,6 +3326,8 @@
+@@ -408,6 +4326,8 @@
  {
  	struct gf100_ram *ram = gf100_ram(base);
  	struct nvkm_device *device = ram->base.fb->subdev.device;
@@ -6384,18 +7435,20 @@
  	ram_exec(&ram->fuc, nvkm_boolopt(device->cfgopt, "NvMemExec", true));
  	return 0;
  }
-@@ -416,6 +3336,10 @@
+@@ -416,6 +4336,12 @@
  gf100_ram_tidy(struct nvkm_ram *base)
  {
  	struct gf100_ram *ram = gf100_ram(base);
 +	if (lab_armed) {	/* LAB: calc был, prog не было — сбросить план */
 +		lab_armed = false;
++		lab_gen_cur = false;
++		lab_gen_more = false;
 +		lab_plan_n = lab_plan_i = 0;
 +	}
  	ram_exec(&ram->fuc, false);
  }
  
-@@ -580,6 +3504,11 @@
+@@ -580,6 +4506,11 @@
  	if (ret)
  		return ret;
  
@@ -6407,6 +7460,17 @@
  	ret = nvbios_pll_parse(bios, 0x0c, &ram->refpll);
  	if (ret) {
  		nvkm_error(subdev, "mclk refpll data not found\n");
+@@ -592,6 +4523,10 @@
+ 		return ret;
+ 	}
+ 
++	lab_gen_ok = lab_gen_probe(ram);	/* LAB 26.11: DDR3 scripts built from the VBIOS, where that applies */
++	if (lab_gen_ok && lab_mem_board != 1)
++		lab_mem_board = 2;		/* no recorded scripts tested live on this board: memory only with lab_mem_new=1 */
++
+ 	ram->fuc.r_0x10fe20 = ramfuc_reg(0x10fe20);
+ 	ram->fuc.r_0x10fe24 = ramfuc_reg(0x10fe24);
+ 	ram->fuc.r_0x137320 = ramfuc_reg(0x137320);
 --- a/nvkm/subdev/volt/base.c
 +++ b/nvkm/subdev/volt/base.c
 @@ -28,6 +28,8 @@

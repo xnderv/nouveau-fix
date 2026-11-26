@@ -63,7 +63,7 @@ class Vbios:
         self.rh, self.rl, self.rs, self.rn, self.rc = (r8(self.rammap + k) for k in (1, 2, 3, 4, 5))
         self.th, self.tc, self.tl = r8(self.timing + 1), r8(self.timing + 2), r8(self.timing + 3)
         # уровни: частота памяти по id уровня (таблица 0x40)
-        perf = self.rom.A(r32(self.po)); hdr, ln, cnt, snr, ssz = (r8(perf + k) for k in (1, 2, 3, 4, 5))
+        perf = self.rom.A(r32(self.po)); hdr, ln, ssz, snr, cnt = (r8(perf + k) for k in (1, 2, 3, 4, 5))   # 25.11: порядок полей исправлен (ошибка не проявлялась, пока уровней 4 и подзапись 4 байта)
         self.mem = {}
         for i in range(cnt):
             e = perf + hdr + i * (ln + snr * ssz); lid = r8(e)
