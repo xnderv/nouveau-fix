@@ -48,7 +48,9 @@ journalctl -k -b | python3 lab/memgen-ddr3-logcheck.py -
 For every built script this says whether it **matches a recorded NVIDIA script word for word**, or which recorded script
 is nearest and which register writes differ. A transition that is not in any recording of your board (for example a
 direct 324 -> 896 MHz on the GT 630M, where NVIDIA went through 135) cannot match exactly; the differences are still
-worth seeing. Please send the output and the kernel log (`journalctl -k -b > nouveau-$(date +%Y%m%d-%H%M).txt`).
+worth seeing. A script may also be reported as matching "except the frame wait and the display pause": NVIDIA leaves
+these out when no display is active (at its driver start, or on a GPU that drives no screen), the lab driver always has
+them at run time. Please send the output and the kernel log (`journalctl -k -b > nouveau-$(date +%Y%m%d-%H%M).txt`).
 
 This step tells us whether the driver reads your VBIOS tables and the register state the way the offline check assumes.
 On a board with no recording it is the only step we ask for now: send the log first.
