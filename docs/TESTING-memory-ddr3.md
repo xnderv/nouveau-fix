@@ -20,7 +20,9 @@ journalctl -k -b | grep "LAB gen:"
 distinct NVIDIA scripts recorded on five GF108 DDR3 boards word for word, and the host writes around them
 (`bash lab/memgen-ddr3-ctest.sh` repeats that check on your machine in a few seconds; it touches no hardware). The two
 that differ come from one board of the public trace collection and differ by six writes to one register we cannot
-explain. **No built script has run on hardware yet.** Our own card has GDDR5 and cannot run it.
+explain. **On hardware the built scripts have run on one board so far:** a tester's Quadro 600, 507 switches over every
+transition between its three levels, after a module reload at any level and across suspend/resume, with no error and no
+corrupted video memory. Other boards have not run them yet; our own card has GDDR5 and cannot.
 
 ## Three modes: `lab_mem_gen`
 
@@ -32,7 +34,8 @@ explain. **No built script has run on hardware yet.** Our own card has GDDR5 and
 
 It can be changed at run time: `echo 1 | sudo tee /sys/module/nouveau/parameters/lab_mem_gen`. One exception: after a
 built script has run, going back to the recorded scripts (0 or 2) needs a module reload or a reboot. `lab_mem_new=1` is
-still what turns memory reclocking on for a board whose recording has not been tested live.
+still what turns memory reclocking on for a board whose recording has not been tested live. Either switch takes effect
+at the next level change: the memory of the current level does not move by itself.
 
 ## Step 1: build and print (no new risk)
 

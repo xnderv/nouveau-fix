@@ -51,3 +51,16 @@ journalctl -k -b > nouveau-$(date +%Y%m%d-%H%M).txt
 ```
 and attach the file to your issue, with a word about anything odd: freezes, artifacts, black screen, fan or temperature
 behaviour. If the screen freezes, reboot and send `journalctl -k -b -1` (the previous boot) instead.
+
+## Memory on a board that is recorded but not yet run
+If the [README](../README.md) table says "recorded, not yet run" for your card, the build knows the memory scripts NVIDIA's
+driver uses on your board, and keeps them off until you ask. Run the core test above first and send its log. Then, by hand
+after boot:
+```
+echo 1 | sudo tee /sys/module/nouveau/parameters/lab_mem_new
+```
+From the next level change the memory clock follows the level (the kernel log shows `LAB replay ...: выполнен`, and
+`память теперь N МГц` is the memory clock after the step). A level the recording does not contain keeps the memory at the
+nearest recorded one. **This is a first run on your board:** a wrong step can corrupt the picture or freeze the machine.
+Save your work, keep a second way in (SSH) or be ready to press Reset, and see [boot-recovery.md](boot-recovery.md). Do
+not put the switch into `/etc/modprobe.d` until a session has gone well. Send the kernel log as above.

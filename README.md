@@ -8,7 +8,7 @@ per-board tables. Small, self-contained fixes go upstream; there are no support 
 Issues may be written in Russian too. / Issues можно писать по-русски. Research notes under `docs/` (dated folders, the
 model) are in Russian — they are the lab notebook; everything a tester needs is in English.
 
-## Status (26 Nov 2026)
+## Status (27 Nov 2026)
 
 - **Core clocks change automatically by load**, the way the NVIDIA driver does it: up to the top level when the GPU is
   busy, down step by step when it's idle. The governor runs inside the driver (load is counted in the PMU firmware); no
@@ -20,29 +20,33 @@ model) are in Russian — they are the lab notebook; everything a tester needs i
 - **Core reclocking has run on 7 boards of 4 chips** (GF114, GF106, GF108, GF119): ours and six testers', without a hang.
   GF100, GF104, GF110, GF116 and GF117 have not run it yet.
 - **Memory clock, by replaying NVIDIA's recorded script of the board:** works on five boards (GDDR5 on GF114 and GF106,
-  DDR3 on three GF108 boards); a sixth is recorded and not yet run. On the DDR3 boards memory is where the speed is: on a
+  DDR3 on three GF108 boards); two more are recorded and not yet run (GDDR5 on GF108 and on GF116). On the DDR3 boards
+  memory is where the speed is: on a
   tester's Quadro 600 glmark2 goes from 749 to 1498 with the memory clock, and gains nothing from the core clocks alone.
 - **Memory clock without a recording (new, 26 Nov):** for GF108 cards with DDR3 the driver can build the script from the
   VBIOS and the register state. The C code of the driver reproduces 35 of 37 distinct NVIDIA scripts recorded on five
-  boards word for word. No built script has run on hardware yet: in this round the driver builds and prints it while the
-  recorded script does the switch, and the first runs are with the testers
+  boards word for word. First hardware run (a tester's Quadro 600): 507 built scripts, every transition between the three
+  levels, also after a module reload and across suspend/resume, with no error and no corrupted video memory. By default
+  the driver still builds and prints the script while the recorded one does the switch, until more boards have run it
   ([docs/TESTING-memory-ddr3.md](docs/TESTING-memory-ddr3.md)). On every other card the memory stays at the VBIOS boot clock.
-- **Open:** one GPU fault during a memory switch on our GF114 after 6,726 clean level cycles (a day-long run in NVIDIA's
-  own order of steps is under way); a band at the bottom of the screen during level changes with two monitors on a
-  tester's GT 630.
+- **Open:** one GPU fault during a memory switch on our GF114 after 6,726 clean level cycles, in our own order of steps
+  (bus clock outside the memory step); a day-long run in NVIDIA's order then went 34,800 cycles without an error, and the
+  hang that followed the fault matches a nouveau recovery bug for which a tester has sent a fix to the nouveau list.
+  A glitch on both screens during level changes with two monitors on a tester's GT 630.
 - **Use a single monitor: unplug any others.** Two or more monitors is a setup we have not tested, and we are not asking you to test it.
 
 | Card | Chip, memory | Core clocks | Memory clock |
 |---|---|---|---|
-| Gigabyte GTX 560 Ti (reference board, ours) | GF114, GDDR5 | 10,000 + 17,600 switches under load; a night of 900 automatic switches: no hang | recorded scripts: 3,000 full level cycles clean; in a later run one GPU fault after 6,726 clean cycles (open) |
+| Gigabyte GTX 560 Ti (reference board, ours) | GF114, GDDR5 | 10,000 + 17,600 switches under load; a night of 900 automatic switches: no hang | recorded scripts: 37,800 full level cycles clean in NVIDIA's order of steps (one run of 34,800 over 23 hours); in our own order one GPU fault after 6,726 clean cycles (open) |
 | Gigabyte GTS 450 (tester) | GF106, GDDR5 | clean | recorded scripts, 324 ↔ 1804 MHz: clean |
 | ASUS GT 630 (tester) | GF108, DDR3 | an evening of normal use and games: clean | recorded scripts: 3 hours of use and games, 71 switches, no error |
 | GT 630M, Medion laptop (tester) | GF108, DDR3 | clean | recorded scripts: all level transitions, suspend/resume, 134 GiB of video memory read back correct; on by default |
-| HP Quadro 600 (tester) | GF108, DDR3 | clean; piglit `quick` with no regression | recorded scripts: about 1,100 switches in 5 hours, no error |
+| HP Quadro 600 (tester) | GF108, DDR3 | clean; piglit `quick` with no regression | recorded scripts: about 1,100 switches in 5 hours, no error; built scripts: 507 switches, module reload and suspend/resume included, no error |
 | GT 730 4 GB (tester) | GF108, DDR3 | first run clean | not yet: no recording, the first candidate for built scripts |
 | NVS 315 (tester) | GF119 | the first run on a GF119: works | not yet |
 | Dell NVS 5200M (tester) | GF108, GDDR5 | not yet run | recorded, not yet run |
-| GF100, GF104, GF110, GF116 | — | not yet | testers wanted |
+| Palit GTX 550 Ti (tester) | GF116, GDDR5 | not yet run; computed from its VBIOS, every clock of the two recorded levels equals what NVIDIA set | recorded 26 Nov (324 ↔ 2052 MHz), not yet run |
+| GF100, GF104, GF110 | — | not yet | testers wanted |
 | GF117 | — | not yet: no display, and nouveau doesn't run its power-management controller (PMU), so no automatic governor | planned |
 
 ## Which cards
