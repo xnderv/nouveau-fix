@@ -15,7 +15,9 @@ P3="$KIT/patches/0003-nouveau-disp-hdmi-without-scdc-below-340mhz.patch"
 P4="$KIT/patches/0004-LAB-pmu-perf-load.patch"
 P5="$KIT/patches/0005-LAB-hdmi-avi-itc.patch"
 P6="$KIT/patches/0006-nouveau-therm-mask-pwm-update-bit-on-read.patch"
-F2="nvkm/subdev/clk/base.c nvkm/subdev/clk/gf100.c nvkm/subdev/fb/ramgf100.c nvkm/subdev/volt/base.c"
+# 27.11: в 0002 добавлены pmu/memx.c (числа PMU о скрипте для журнала) и nouveau_display.c (пробный переключатель
+# lab_disp_resync, дописан в конец файла). Оба файла одинаковы в 7.0.14, 7.2.11 и 7.3; в 6.12 отличаются далеко от правок.
+F2="nvkm/subdev/clk/base.c nvkm/subdev/clk/gf100.c nvkm/subdev/fb/ramgf100.c nvkm/subdev/volt/base.c nvkm/subdev/pmu/memx.c nouveau_display.c"
 F4="nvkm/subdev/pmu/fuc/gf100.fuc3.h nvkm/subdev/pmu/fuc/gf119.fuc4.h nvkm/subdev/pmu/fuc/perf.fuc nvkm/subdev/pmu/gf100.c nvkm/subdev/pmu/gf119.c nvkm/subdev/pmu/priv.h"
 mkdir -p "$W"; cd "$W"
 fetch() {   # $1 тег → каталог up-$1 с drivers/gpu/drm/nouveau

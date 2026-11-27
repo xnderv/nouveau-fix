@@ -32,7 +32,11 @@ model) are in Russian — they are the lab notebook; everything a tester needs i
 - **Open:** one GPU fault during a memory switch on our GF114 after 6,726 clean level cycles, in our own order of steps
   (bus clock outside the memory step); a day-long run in NVIDIA's order then went 34,800 cycles without an error, and the
   hang that followed the fault matches a nouveau recovery bug for which a tester has sent a fix to the nouveau list.
-  A glitch on both screens during level changes with two monitors on a tester's GT 630.
+  A glitch on both screens during level changes with two monitors on a tester's GT 630: it appears only when the frames
+  of the two screens are shifted against each other (second monitor plugged in after boot). The build of 27 Nov prints
+  what the PMU measured at every memory step and has a trial switch, `lab_disp_resync`, that restarts all active outputs
+  in one operation to bring their frames back into step; neither has run on hardware yet
+  ([docs/2026-11-26/two-monitors.md](docs/2026-11-26/two-monitors.md)).
 - **Use a single monitor: unplug any others.** Two or more monitors is a setup we have not tested, and we are not asking you to test it.
 
 | Card | Chip, memory | Core clocks | Memory clock |

@@ -3458,7 +3458,7 @@
  
  struct gf100_ramfuc {
  	struct ramfuc base;
-@@ -123,6 +138,4349 @@
+@@ -123,6 +138,4358 @@
  	}
  }
  
@@ -5979,6 +5979,8 @@
 +	  lab_steps_gf116, lab_plan_gf116, NULL, 0, 0x70262800, 0x00, 3 },
 +};
 +static const struct lab_board *lab_board;
++extern u32 lab_memx_ns, lab_memx_in;	/* pmu/memx.c, 27.11 */
++extern int lab_memx_head;
 +/* 19.11: есть ли для этой платы записанные сценарии памяти: -1 — не Fermi/не дошли, 0 — нет (clk/base.c тогда меняет
 + * только ядро, память остаётся на частоте VBIOS), 1 — есть */
 +int lab_mem_board = -1;		/* 21.11: 2 — плата описана, но повтор памяти на ней вживую не проверен (нужен lab_mem_new) */
@@ -7549,6 +7551,7 @@
 +			  a, nvkm_rd32(device, 0x10f440), c, nvkm_rd32(device, 0x10f160));
 +	}
 +	lab_rp611 = nvkm_rd32(device, 0x611200);
++	lab_memx_head = -1;		/* 27.11: set by the frame wait while the script is put together */
 +	ret = ram_init(&ram->fuc, ram->base.fb);
 +	if (ret)
 +		return ret;
@@ -7670,6 +7673,7 @@
 +
 +	st = &lab_board->steps[lab_plan[lab_plan_i]];
 +	lab_rp611 = nvkm_rd32(device, 0x611200);
++	lab_memx_head = -1;		/* 27.11: set by the frame wait while the script is put together */
 +	ret = ram_init(&ram->fuc, ram->base.fb);
 +	if (ret) {
 +		lab_plan_n = lab_plan_i = 0;
@@ -7783,6 +7787,11 @@
 +		  st->name, us, lab_mem_op13, lab_mem_op34, lab_mem_syncwait, ret, nvkm_rd32(device, 0x137310), nvkm_rd32(device, 0x1373f0),
 +		  nvkm_rd32(device, 0x137360), nvkm_rd32(device, 0x132000), nvkm_rd32(device, 0x132004), nvkm_rd32(device, 0x10f290),
 +		  nvkm_rd32(device, 0x10f300), nvkm_rd32(device, 0x611200), lab_cur_mhz(device));
++	/* 27.11: what the PMU measured itself (pmu/memx.c): which head the frame wait was put on, how long the video memory
++	 * was stopped, and whether each head was in vertical blanking when the script ended */
++	nvkm_info(subdev, "LAB replay %s: frame wait on head %d; video memory stopped for %u ns; PMU inputs at the end %08x (in blanking: head 0 %s, head 1 %s)\n",
++		  st->name, lab_memx_head, lab_memx_ns, lab_memx_in, (lab_memx_in & 0x00000008) ? "yes" : "no",
++		  (lab_memx_in & 0x00000020) ? "yes" : "no");
 +	if (st->gen) {		/* 26.11: built script — one step; check the result, then the host writes after it */
 +		int r = lab_gen_done(subdev);
 +
@@ -7808,7 +7817,7 @@
  int
  gf100_ram_calc(struct nvkm_ram *base, u32 freq)
  {
-@@ -142,6 +4500,16 @@
+@@ -142,6 +4509,16 @@
  	int from, mode;
  	int N1, M1, P;
  	int ret;
@@ -7825,7 +7834,7 @@
  
  	/* lookup memory config data relevant to the target frequency */
  	rammap.data = nvbios_rammapEm(bios, freq / 1000, &ver, &rammap.size,
-@@ -268,7 +4636,10 @@
+@@ -268,7 +4645,10 @@
  	ram_wr32(fuc, 0x100b0c, 0x00080012);
  // 0x00030014 // 0x00000000 // 0x02b5f070
  // 0x00030014 // 0x00010000 // 0x02b5f070
@@ -7837,7 +7846,7 @@
  // 0x00020034 // 0x0000000a
  // 0x00030020 // 0x00000001 // 0x00000000
  
-@@ -322,7 +4693,7 @@
+@@ -322,7 +4702,7 @@
  		ram_wr32(fuc, 0x10f344, 0x00600009);
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700008);
@@ -7846,7 +7855,7 @@
  		ram_wr32(fuc, 0x10f830, 0x00300017);
  		gf100_ram_train(fuc, 0x80021001);
  		gf100_ram_train(fuc, 0x80081001);
-@@ -333,7 +4704,8 @@
+@@ -333,7 +4713,8 @@
  // 0x00030020 // 0x00000000 // 0x00000000
  // 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -7856,7 +7865,7 @@
  	} else {
  		ram_wr32(fuc, 0x10f800, 0x00001800);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
-@@ -376,7 +4748,7 @@
+@@ -376,7 +4757,7 @@
  		ram_nsec(fuc, 1000);
  		ram_wr32(fuc, 0x10f348, 0x00700000);
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
@@ -7865,7 +7874,7 @@
  
  		gf100_ram_train(fuc, 0x800e1008);
  
-@@ -386,7 +4758,8 @@
+@@ -386,7 +4767,8 @@
  	// 0x00020034 // 0x0000000b
  		ram_wr32(fuc, 0x13d8f4, 0x00000000);
  		ram_wr32(fuc, 0x100b0c, 0x00080028);
@@ -7875,7 +7884,7 @@
  		ram_nsec(fuc, 100000);
  		ram_wr32(fuc, 0x10f9b0, 0x05313f41);
  		ram_wr32(fuc, 0x10f9b4, 0x00002f50);
-@@ -408,6 +4781,8 @@
+@@ -408,6 +4790,8 @@
  {
  	struct gf100_ram *ram = gf100_ram(base);
  	struct nvkm_device *device = ram->base.fb->subdev.device;
@@ -7884,7 +7893,7 @@
  	ram_exec(&ram->fuc, nvkm_boolopt(device->cfgopt, "NvMemExec", true));
  	return 0;
  }
-@@ -416,6 +4791,12 @@
+@@ -416,6 +4800,12 @@
  gf100_ram_tidy(struct nvkm_ram *base)
  {
  	struct gf100_ram *ram = gf100_ram(base);
@@ -7897,7 +7906,7 @@
  	ram_exec(&ram->fuc, false);
  }
  
-@@ -580,6 +4961,11 @@
+@@ -580,6 +4970,11 @@
  	if (ret)
  		return ret;
  
@@ -7909,7 +7918,7 @@
  	ret = nvbios_pll_parse(bios, 0x0c, &ram->refpll);
  	if (ret) {
  		nvkm_error(subdev, "mclk refpll data not found\n");
-@@ -592,6 +4978,10 @@
+@@ -592,6 +4987,10 @@
  		return ret;
  	}
  
@@ -7999,3 +8008,122 @@
  	if (ret >= 0) {
  		int prev = nvkm_volt_get(volt);
  		if (!condition || prev < 0 ||
+--- a/nvkm/subdev/pmu/memx.c
++++ b/nvkm/subdev/pmu/memx.c
+@@ -68,6 +68,13 @@
+ 	return 0;
+ }
+ 
++/* LAB 27.11: what the PMU code already measures for every script, kept for the lab log (fb/ramgf100.c): the time the
++ * video memory was stopped (from the stop to its release, ns), the PMU inputs when the script ended (bit 3: head 0 in
++ * vertical blanking, bit 5: head 1), and the head the frame wait was put on (-1: the script has no frame wait,
++ * -2: no active head). Print only; nothing here changes what the script does. */
++u32 lab_memx_ns, lab_memx_in;
++int lab_memx_head = -1;
++
+ int
+ nvkm_memx_fini(struct nvkm_memx **pmemx, bool exec)
+ {
+@@ -90,6 +97,8 @@
+ 			      memx->base, finish);
+ 		nvkm_debug(subdev, "Exec took %uns, PMU_IN %08x\n",
+ 			   reply[0], reply[1]);
++		lab_memx_ns = reply[0];		/* LAB: for the lab log (fb/ramgf100.c) */
++		lab_memx_in = reply[1];
+ 	}
+ 
+ 	kfree(memx);
+@@ -147,10 +156,12 @@
+ 
+ 	if (px == 0) {
+ 		nvkm_debug(subdev, "WAIT VBLANK !NO ACTIVE HEAD\n");
++		lab_memx_head = -2;	/* LAB */
+ 		return;
+ 	}
+ 
+ 	nvkm_debug(subdev, "WAIT VBLANK HEAD%d\n", head_sync);
++	lab_memx_head = head_sync;	/* LAB */
+ 	memx_cmd(memx, MEMX_VBLANK, 1, (u32[]){ head_sync });
+ 	memx_out(memx); /* fuc can't handle multiple */
+ }
+--- a/nouveau_display.c
++++ b/nouveau_display.c
+@@ -826,3 +826,78 @@
+ 	drm_gem_object_put(&bo->bo.base);
+ 	return ret;
+ }
++
++
++/* LAB 27.11: restart every active output in ONE atomic commit (experimental, on request only).
++ * Two heads that were started at different times - a monitor plugged in later - run with their frames shifted against
++ * each other, and a memory clock change can wait for the vertical blanking of one head only (two-monitor glitch found
++ * by a tester). Heads started by the same commit, as at boot, start together. This forces a full modeset of every
++ * active CRTC in a single commit, with the modes, framebuffers and outputs they have now: the screens go dark for a
++ * moment and come back. It is what a mode change of all screens at once does; nothing else is touched.
++ *   echo 1 | sudo tee /sys/module/nouveau/parameters/lab_disp_resync */
++#include <linux/moduleparam.h>
++#include <linux/pci.h>
++#include <drm/drm_modeset_lock.h>
++
++static int
++lab_disp_resync_dev(struct drm_device *dev)
++{
++	struct drm_modeset_acquire_ctx ctx;
++	struct drm_atomic_state *state;
++	struct drm_crtc *crtc;
++	int ret, n = 0;
++
++	if (!drm_drv_uses_atomic_modeset(dev))
++		return -EOPNOTSUPP;
++
++	DRM_MODESET_LOCK_ALL_BEGIN(dev, ctx, 0, ret);
++	n = 0;
++	state = drm_atomic_state_alloc(dev);
++	if (state) {
++		state->acquire_ctx = &ctx;
++		drm_for_each_crtc(crtc, dev) {
++			struct drm_crtc_state *cs = drm_atomic_get_crtc_state(state, crtc);
++
++			if (IS_ERR(cs)) {
++				ret = PTR_ERR(cs);
++				break;
++			}
++			if (cs->active) {
++				cs->mode_changed = true;	/* full modeset of this CRTC within the commit */
++				n++;
++			}
++		}
++		if (!ret && n)
++			ret = drm_atomic_commit(state);
++		drm_atomic_state_put(state);
++	} else {
++		ret = -ENOMEM;
++	}
++	DRM_MODESET_LOCK_ALL_END(dev, ctx, ret);
++
++	dev_info(dev->dev, "LAB disp resync: %d active output(s) restarted in one commit, ret %d\n", n, ret);
++	return ret;
++}
++
++static int
++lab_disp_resync_set(const char *val, const struct kernel_param *kp)
++{
++	struct pci_dev *pdev = NULL;
++	int ret = -ENODEV;
++
++	while ((pdev = pci_get_device(PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID, pdev))) {
++		device_lock(&pdev->dev);
++		if (pdev->driver && !strcmp(pdev->driver->name, "nouveau")) {
++			struct nouveau_drm *drm = pci_get_drvdata(pdev);
++
++			if (drm && drm->dev && drm->dev->mode_config.num_crtc)
++				ret = lab_disp_resync_dev(drm->dev);
++		}
++		device_unlock(&pdev->dev);
++	}
++	return ret;
++}
++
++static const struct kernel_param_ops lab_disp_resync_ops = { .set = lab_disp_resync_set };
++module_param_cb(lab_disp_resync, &lab_disp_resync_ops, NULL, 0200);
++MODULE_PARM_DESC(lab_disp_resync, "LAB: write anything to restart every active output in one atomic commit, so that the frames of all heads start together (experimental; the screens go dark for a moment)");
