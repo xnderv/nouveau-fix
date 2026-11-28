@@ -10,6 +10,9 @@
 # two frame timings are shifted against each other. This tool measures that shift.
 #
 #   sudo python3 lab/heads-phase.py            (about 3 seconds; add a PCI address such as 0000:01:00.0 to pick a card)
+#   sudo python3 lab/heads-phase.py --pmu      (also, about 8 seconds more: the PMU input register 0x10a7c4 read together
+#                                               with the line counters, to see which input bit follows which head's
+#                                               blanking; the driver's frame wait watches bit 3 for head 0, bit 5 for head 1)
 #
 # Output: for each head its mode, blanking length and frame rate measured from the line counter; for the pair the shift
 # between the frames, whether it is constant, how long both heads are in blanking at the same time, and where the other
@@ -140,6 +143,54 @@ def analyse(heads, samples, sync):
     return out
 
 
+def pmu_inputs(rd, heads, live, n=4000):
+    """Read the PMU input register next to the line counters and say, for every bit of its low byte, how often it is set
+    while each active head is in vertical blanking and while it is not. Read only."""
+    rows = []
+    for k in range(n):
+        a = time.perf_counter_ns()
+        x = rd(0x10a7c4)
+        v0 = rd(0x616340) & 0xffff; c0 = rd(0x616344) & 0xffff
+        v1 = rd(0x616b40) & 0xffff; c1 = rd(0x616b44) & 0xffff
+        if time.perf_counter_ns() - a < 40000:
+            rows.append((x, v0, v1, c0, c1))
+        time.sleep(0.0013 + (k % 7) * 0.0001)      # uneven steps, so that the readings do not lock to the frame rate
+    out = [f'PMU input register 0x10a7c4: {len(rows)} readings together with the line counters']
+    vals = {}
+    for x, *_ in rows:
+        vals[x] = vals.get(x, 0) + 1
+    out.append('  values seen: ' + ', '.join(f'{x:08x} x{c}' for x, c in sorted(vals.items(), key=lambda t: -t[1])[:12]))
+    inblank = lambda h, v: v > h.vblanks or v <= h.vblanke
+    for h in live:
+        col = 1 if h.id == 0 else 2
+        nb = sum(1 for r in rows if inblank(h, r[col]))
+        out.append(f'  head {h.id}: {nb} readings in its blanking, {len(rows) - nb} in the picture')
+    changing = [b for b in range(32) if 0 < sum(1 for r in rows if r[0] >> b & 1) < len(rows)]
+    out.append('  bits that change: ' + (', '.join(str(b) for b in changing) or 'none'))
+    for b in sorted(set(changing) | {3, 4, 5}):
+        line = f'  bit {b}: set in {sum(1 for r in rows if r[0] >> b & 1)} of {len(rows)}'
+        for h in live:
+            col = 1 if h.id == 0 else 2
+            bl = [r for r in rows if inblank(h, r[col])]; pic = [r for r in rows if not inblank(h, r[col])]
+            sb = sum(1 for r in bl if r[0] >> b & 1); sp = sum(1 for r in pic if r[0] >> b & 1)
+            ln = sorted(r[col] for r in rows if r[0] >> b & 1)
+            span = f', lines {ln[0]}..{ln[-1]}' if ln else ''
+            line += f'; head {h.id}: {sb}/{len(bl)} in blanking, {sp}/{len(pic)} in the picture{span}'
+        out.append(line)
+        if b in changing:
+            for h in live:      # where in the frame and in the line of this head the bit is set
+                col = 1 if h.id == 0 else 2
+                eight = [[0, 0] for _ in range(8)]
+                for r in rows:
+                    k = min(7, r[col] * 8 // h.vtotal); eight[k][1] += 1; eight[k][0] += r[0] >> b & 1
+                hb = [r for r in rows if not inblank(h, r[col]) and (r[col + 2] > h.hblanks or r[col + 2] <= h.hblanke)]
+                hp = [r for r in rows if not inblank(h, r[col]) and not (r[col + 2] > h.hblanks or r[col + 2] <= h.hblanke)]
+                out.append(f'      head {h.id}, set by eighths of the frame from line 0: ' + ' '.join(f'{a}/{n}' for a, n in eight)
+                           + f'; within picture lines: {sum(1 for r in hb if r[0] >> b & 1)}/{len(hb)} between lines (horizontal blanking), '
+                           + f'{sum(1 for r in hp if r[0] >> b & 1)}/{len(hp)} inside a line')
+    return out
+
+
 def find_card(want):
     for d in sorted(glob.glob('/sys/bus/pci/devices/*')):
         try:
@@ -168,7 +219,8 @@ def connectors():
 
 
 def main():
-    dev = find_card(sys.argv[1] if len(sys.argv) > 1 else None)
+    args = [a for a in sys.argv[1:] if not a.startswith('--')]
+    dev = find_card(args[0] if args else None)
     if not dev:
         sys.exit('No NVIDIA display card found.')
     try:
@@ -208,6 +260,9 @@ def main():
         print(f'Only {len(live)} active head: nothing to compare. (The frame wait of the driver goes to head {sync}.)')
         if not live:
             return
+    if '--pmu' in sys.argv:
+        for line in pmu_inputs(rd, heads, live):
+            print(line)
     now = time.perf_counter_ns
     samples = []
     for _ in range(SAMPLES):
